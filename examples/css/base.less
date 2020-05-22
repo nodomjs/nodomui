@@ -1,0 +1,67 @@
+@backcolor1: rgb(29,97,195);
+@backcolor2:#fff;
+@backcolor3:#acacac;
+@forecolor1:#fff;
+@forecolor2:#000;
+@bordercolor:#cfcfcf;
+@headfont:14px;
+@bodyfont:12px;
+@padding:5px;
+/* panel */
+.nd-panel{
+    /* 头部 */
+    .nd-panel-header{
+        padding:@padding;        
+        background-color:@backcolor1;
+        color:@forecolor1;
+            
+        /* 标题 */
+        .nd-panel-title{
+            font-size:@headfont;
+        }
+
+        /*头部工具栏*/
+        .nd-panel-header-bar{
+            float:right;
+            padding:0 0px 0 10px;
+            /*小方块*/
+            span{
+                margin-right:10px;
+                width:16px;
+                height:16px;
+                background-size:16px 16px;
+                display:inline-block;
+                width:16px;
+                height:16px;
+                cursor:hand;
+            }
+            /*最小化按钮*/
+            .nd-panel-header-bar-min{
+                background-image:url(imgs/minus.png);
+            }
+
+            /*最大化按钮*/
+            .nd-panel-header-bar-max{
+                background-image:url(imgs/maximize.png);
+            }
+
+            /*关闭按钮*/
+            .nd-panel-header-bar-close{
+                background-image:url(imgs/close.png);
+            }
+        }
+    }
+
+    /* 工具栏 */
+    .nd-panel-toolbar{
+        background-color:@backcolor3;
+        padding:@padding;        
+    }
+    
+    .nd-panel-body{
+        padding:@padding;
+        font-size:@bodyfont;
+        
+        border:1px solid @bordercolor
+    }
+}
