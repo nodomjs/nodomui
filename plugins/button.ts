@@ -11,12 +11,9 @@ export default class UIPanel implements nodom.IDefineElement{
     init(el:HTMLElement){
         let data = {
             $uidata:{
+                icon:el.getAttribute('icon'),
                 title:el.getAttribute('title'),
-                showHead:el.getAttribute('showHead'),
-                showHeaderbar:el.getAttribute('showHeaderbar'),
-                showMin:el.getAttribute('showMin'),
-                showMax:el.getAttribute('showMax'),
-                showClose:el.getAttribute('showClose')
+                padding:el.getAttribute('padding')
             }
         }
         el.removeAttribute('title');
@@ -30,9 +27,9 @@ export default class UIPanel implements nodom.IDefineElement{
             <div class='nd-panel-header'>
             <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
             <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-                <button x-if='$uidata.showMin' class='nd-btn nd-icon-nofont-small nd-ico-min nd-btn-nobg'></button>
-                <button x-if='$uidata.showMax' class='nd-btn nd-icon-nofont-small nd-ico-max nd-btn-nobg'></button>
-                <button x-if='$uidata.showClose' class='nd-btn nd-icon-nofont-small nd-ico-close nd-btn-nobg'></button>
+                <span x-if='$uidata.showMin' class='nd-panel-header-bar-min'></span>
+                <span x-if='$uidata.showMax' class='nd-panel-header-bar-max'></span>
+                <span x-if='$uidata.showClose' class='nd-panel-header-bar-close'></span>
             </div>
             </div>
             <div class='nd-panel-body'> ` 

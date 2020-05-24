@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <!-- <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" /> -->
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/panel.js'></script>
+    
+</head>
+<body>
+    <button class='nd-btn nd-icon-nofont-small nd-ico-close'></button>
+    <button class='nd-btn nd-icon-nofont-normal nd-ico-close nd-btn-nobg'></button>
+    <button class='nd-btn nd-icon-nofont-big nd-ico-close'></button>
+
+    <button class='nd-btn nd-icon-left-small nd-ico-close'>小左图标</button>
+    <button class='nd-btn nd-icon-left-normal nd-ico-close'>中左图标</button>
+    <button class='nd-btn nd-icon-left-big nd-ico-close'>大左图标</button>
+
+    <button class='nd-btn nd-icon-top-small nd-ico-close'>小上图标</button>
+    <button class='nd-btn nd-icon-top-normal nd-ico-close'>中上图标</button>
+    <button class='nd-btn nd-icon-top-big nd-ico-close'>大上图标</button>
+
+    <button class='nd-btn nd-icon-right-small nd-ico-close'>小右图标</button>
+    <button class='nd-btn nd-icon-right-normal nd-ico-close'>中右图标</button>
+    <button class='nd-btn nd-icon-right-big nd-ico-close'>大右图标</button>
+
+    <button class='nd-btn nd-icon-bottom-small nd-ico-close'>小右图标</button>
+    <button class='nd-btn nd-icon-bottom-normal nd-ico-close'>中右图标</button>
+    <button class='nd-btn nd-icon-bottom-big nd-ico-close'>大右图标</button>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div'
+        }
+    })
+</script>
+</html>

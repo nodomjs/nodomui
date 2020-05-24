@@ -3,8 +3,8 @@
 /**
  * panel 插件
  */
-export default class UIPanel implements nodom.IDefineElement{
-    tagName:string = 'NUI:PANEL';
+export default class UIToolbar implements nodom.IDefineElement{
+    tagName:string = 'NUI:TOOLBAR';
     /**
      * 编译后执行代码
      */
@@ -26,16 +26,8 @@ export default class UIPanel implements nodom.IDefineElement{
         el.removeAttribute('showMax');
         el.removeAttribute('showClose');
         const str:string = `
-        <div class='nd-panel'>
-            <div class='nd-panel-header'>
-            <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
-            <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-                <button x-if='$uidata.showMin' class='nd-btn nd-icon-nofont-small nd-ico-min nd-btn-nobg'></button>
-                <button x-if='$uidata.showMax' class='nd-btn nd-icon-nofont-small nd-ico-max nd-btn-nobg'></button>
-                <button x-if='$uidata.showClose' class='nd-btn nd-icon-nofont-small nd-ico-close nd-btn-nobg'></button>
-            </div>
-            </div>
-            <div class='nd-panel-body'> ` 
+        <div class='nd-toolbar'>
+            ` 
             + el.innerHTML +
             `</div>
         </div>`

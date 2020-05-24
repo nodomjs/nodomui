@@ -1,17 +1,70 @@
 @backcolor1: rgb(29,97,195);
 @backcolor2:#fff;
-@backcolor3:#acacac;
+@lightgrey:#ececec;
+@grey:#bcbcbc;
+@deepgrey:#9c9c9c;
+
 @forecolor1:#fff;
 @forecolor2:#000;
 @bordercolor:#cfcfcf;
 @headfont:14px;
 @bodyfont:12px;
 @padding:5px;
+
+/* 图标 */
+
+/*icon size*/
+@icon-size-small:16px;
+@icon-size-normal:32px;
+@icon-size-big:64px;
+
+
+
+.nd-ico-size-small{
+    background-size: @icon-size-small @icon-size-small;
+}
+
+.nd-ico-size-normal{
+    background-size: @icon-size-normal @icon-size-normal;
+}
+
+.nd-ico-size-big{
+    background-size: @icon-size-big @icon-size-big;
+}
+
+
+/*img url*/
+@icon-img-close:'imgs/close.png';
+@icon-img-max:'imgs/maximize.png';
+@icon-img-min:'imgs/minus.png';
+
+
+.nd-ico-close{
+    background-image:url(@icon-img-close);
+    background-repeat: no-repeat;
+}
+
+
+.nd-ico-max{
+    background-image:url(@icon-img-max);
+    background-repeat: no-repeat;
+}
+
+.nd-ico-min{
+    background-image:url(@icon-img-min);
+    background-repeat: no-repeat;
+}
+
+
+
 /* panel */
+
+@panel-padding-left:15px;
+@panel-padding-top:8px;
 .nd-panel{
     /* 头部 */
     .nd-panel-header{
-        padding:@padding;        
+        padding:@panel-padding-top @panel-padding-left;        
         background-color:@backcolor1;
         color:@forecolor1;
             
@@ -23,38 +76,14 @@
         /*头部工具栏*/
         .nd-panel-header-bar{
             float:right;
-            padding:0 0px 0 10px;
-            /*小方块*/
-            span{
-                margin-right:10px;
-                width:16px;
-                height:16px;
-                background-size:16px 16px;
-                display:inline-block;
-                width:16px;
-                height:16px;
-                cursor:hand;
-            }
-            /*最小化按钮*/
-            .nd-panel-header-bar-min{
-                background-image:url(imgs/minus.png);
-            }
-
-            /*最大化按钮*/
-            .nd-panel-header-bar-max{
-                background-image:url(imgs/maximize.png);
-            }
-
-            /*关闭按钮*/
-            .nd-panel-header-bar-close{
-                background-image:url(imgs/close.png);
-            }
+            margin:-@btn-padding-top-normal+3 -@panel-padding-left + 3 0 0;
+            
         }
     }
 
     /* 工具栏 */
     .nd-panel-toolbar{
-        background-color:@backcolor3;
+        background-color:@lightgrey;
         padding:@padding;        
     }
     
@@ -64,4 +93,192 @@
         
         border:1px solid @bordercolor
     }
+}
+
+/** toolbar */
+
+.nd-toolbar{
+    background-color:@lightgrey;
+    border-color:@deepgrey;
+    border-radius:5px;
+    padding:@padding;
+    .btn{
+        border-right:1px solid @deepgrey;
+    }
+
+    .btn:last-child{
+        border-right:0px;
+    }
+    
+}
+
+
+/**按钮**/
+
+/*padding*/
+@btn-padding-left-small:15px;
+@btn-padding-top-small:8px;
+@btn-padding-left-normal:15px;
+@btn-padding-top-normal:8px;
+@btn-padding-left-big:15px;
+@btn-padding-top-big:8px;
+@btn-corner:6px; /*圆角半径*/
+/*font-size*/
+@btn-font-small:12px;
+@btn-font-normal:14px;
+@btn-font-big:20px;
+
+.nd-btn{
+    display:inline-block;
+    background-color:@lightgrey;
+    border-radius: @btn-corner;
+    border:0px;
+}
+
+.nd-btn-nobg{
+    background-color:transparent;
+}
+.nd-btn:hover{
+    background-color:@grey;
+}
+/*无文字*/
+.nd-icon-nofont-small{
+    background-position: @btn-padding-top-small;
+    background-size:@icon-size-small;
+    min-height:@icon-size-small + @btn-padding-top-small * 2;
+    min-width:@icon-size-small  + @btn-padding-top-small * 2;
+}
+
+.nd-icon-nofont-normal{
+    background-position: @btn-padding-top-small;
+    background-size:@icon-size-normal;
+    min-height:@icon-size-normal + @btn-padding-top-small * 2;
+    min-width:@icon-size-normal + @btn-padding-top-small * 2;
+}
+
+.nd-icon-nofont-big{
+    background-position: @btn-padding-top-small;
+    background-size:@icon-size-big;
+    min-height:@icon-size-big + @btn-padding-top-small * 2;
+    min-width:@icon-size-big + @btn-padding-top-small * 2;
+}
+
+.nd-icon-left-small{
+    font-size:@btn-font-small;
+    background-position: @btn-padding-left-small 50%;
+    background-size:@icon-size-small;
+    padding:@btn-padding-top-small @btn-padding-left-small @btn-padding-top-small @icon-size-small + @btn-padding-left-small;
+    min-height:@icon-size-small;
+    min-width:@icon-size-small;
+    line-height:@icon-size-small + (@icon-size-small - @btn-font-small)/2;
+}
+
+.nd-icon-left-normal{
+    font-size:@btn-font-normal;
+    background-position: @btn-padding-left-normal 50%;
+    background-size:@icon-size-normal;
+    padding:@btn-padding-top-normal @btn-padding-left-normal @btn-padding-top-normal @icon-size-normal + @btn-padding-left-normal;
+    min-height:@icon-size-normal;
+    min-width:@icon-size-normal;
+    line-height:@icon-size-normal + (@icon-size-normal - @btn-font-normal)/2;
+}
+
+.nd-icon-left-big{
+    font-size:@btn-font-big;
+    background-position: @btn-padding-left-big 50%;
+    background-size:@icon-size-big;
+    padding:@btn-padding-top-big @btn-padding-left-big @btn-padding-top-big @icon-size-big + @btn-padding-left-big;
+    min-height:@icon-size-big;
+    min-width:@icon-size-big;
+    line-height:@icon-size-big + (@icon-size-big - @btn-font-big)/2;
+}
+
+.nd-icon-top-small{
+    font-size:@btn-font-small;
+    background-position: 50% @btn-padding-left-small;
+    background-size:@icon-size-small;
+    padding:@icon-size-small + @btn-padding-top-small  @btn-padding-left-small @btn-padding-top-small @btn-padding-left-small;
+    min-height:@icon-size-small;
+    min-width:@icon-size-small;
+    text-align:center;
+}
+
+.nd-icon-top-normal{
+    font-size:@btn-font-normal;
+    background-position: 50% @btn-padding-left-normal;
+    background-size:@icon-size-normal;
+    padding:@icon-size-normal + @btn-padding-top-normal  @btn-padding-left-normal @btn-padding-top-normal @btn-padding-left-normal;
+    min-height:@icon-size-normal;
+    min-width:@icon-size-normal;
+    text-align:center;
+}
+
+.nd-icon-top-big{
+    font-size:@btn-font-big;
+    background-position: 50% @btn-padding-left-big;
+    background-size:@icon-size-big;
+    padding:@icon-size-big + @btn-padding-top-big  @btn-padding-left-big @btn-padding-top-big @btn-padding-left-big;
+    min-height:@icon-size-big;
+    min-width:@icon-size-big;
+    text-align:center;
+}
+
+.nd-icon-right-small{
+    font-size:@btn-font-small;
+    background-position: 100% - @btn-padding-left-small 50%;
+    background-size:@icon-size-small;
+    padding:@btn-padding-top-small @icon-size-small + @btn-padding-left-small @btn-padding-top-small @btn-padding-left-small;
+    min-height:@icon-size-small;
+    min-width:@icon-size-small;
+    line-height:@icon-size-small + (@icon-size-small - @btn-font-small)/2;
+}
+
+.nd-icon-right-normal{
+    font-size:@btn-font-normal;
+    background-position: 100% - @btn-padding-left-normal 50%;
+    background-size:@icon-size-normal;
+    padding:@btn-padding-top-normal @icon-size-normal + @btn-padding-left-normal @btn-padding-top-normal @btn-padding-left-normal;
+    min-height:@icon-size-normal;
+    min-width:@icon-size-normal;
+    line-height:@icon-size-normal + (@icon-size-normal - @btn-font-normal)/2;
+}
+
+.nd-icon-right-big{
+    font-size:@btn-font-big;
+    background-position: 100% - @btn-padding-left-big 50%;
+    background-size:@icon-size-big;
+    padding:@btn-padding-top-big @icon-size-big + @btn-padding-left-big @btn-padding-top-big @btn-padding-left-big;
+    min-height:@icon-size-big;
+    min-width:@icon-size-big;
+    line-height:@icon-size-big + (@icon-size-big - @btn-font-big)/2;
+}
+
+.nd-icon-bottom-small{
+    font-size:@btn-font-small;
+    background-position: 50% 100% - @btn-padding-left-small;
+    background-size:@icon-size-small;
+    padding:@btn-padding-top-small @btn-padding-left-small @icon-size-small + @btn-padding-top-small  @btn-padding-left-small;
+    min-height:@icon-size-small;
+    min-width:@icon-size-small;
+    text-align:center;
+}
+
+.nd-icon-bottom-normal{
+    font-size:@btn-font-normal;
+    background-position: 50% 100% - @btn-padding-left-normal;
+    background-size:@icon-size-normal;
+    padding:@btn-padding-top-normal @btn-padding-left-normal @icon-size-normal + @btn-padding-top-normal  @btn-padding-left-normal;
+    min-height:@icon-size-normal;
+    min-width:@icon-size-normal;
+    text-align:center;
+}
+
+.nd-icon-bottom-big{
+    font-size:@btn-font-big;
+    background-position: 50% 100% - @btn-padding-left-big;
+    background-size:@icon-size-big;
+    padding:@btn-padding-top-big @btn-padding-left-big @icon-size-big + @btn-padding-top-big  @btn-padding-left-big; 
+    min-height:@icon-size-big;
+    min-width:@icon-size-big;
+    text-align:center;
 }
