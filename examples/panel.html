@@ -9,16 +9,21 @@
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
     <script src='../dist/panel.js'></script>
+    <script src='../dist/button.js'></script>
+    <script src='../dist/toolbar.js'></script>
     
 </head>
 <body>
     <div>
-        <nui:panel title='测试panel' showHead='true' showHeaderbar='true' showMin='true' showMax='true'>
-            <nui:toolbar>
-                <span></span>
-            </nui:toolbar>
+        <ui-panel title='测试panel' head min max close>
+            <ui-toolbar>
+                <ui-button>添加</ui-button>
+                <ui-button>删除</ui-button>
+                <ui-button>编辑</ui-button>
+                <ui-button>查询</ui-button>
+            </ui-toolbar>
             <div>hello world!</div>
-        </nui:panel>
+        </ui-panel>
     </div>
 </body>
 <script>

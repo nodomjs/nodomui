@@ -3,45 +3,81 @@
 /**
  * panel 插件
  */
-export default class UIPanel implements nodom.IDefineElement{
-    tagName:string = 'NUI:PANEL';
+export default class UIButton implements nodom.IDefineElement{
+    tagName:string = 'UI-BUTTON';
     /**
      * 编译后执行代码
      */
     init(el:HTMLElement){
-        let data = {
-            $uidata:{
-                icon:el.getAttribute('icon'),
-                title:el.getAttribute('title'),
-                padding:el.getAttribute('padding')
-            }
+        //图标
+        let icon:string;
+        if(el.hasAttribute('icon')){
+            icon = 'nd-ico-' + el.getAttribute('icon');
+            el.removeAttribute('icon');
+        } 
+        //图标位置
+        let arr:string[] = ['left','top','right','bottom'];
+        let loc:string;
+        for(let l of arr){
+            if(el.hasAttribute(l)){
+                loc = l;
+                el.removeAttribute(l);
+                break;
+            }    
         }
-        el.removeAttribute('title');
-        el.removeAttribute('showHead');
-        el.removeAttribute('showHeaderbar');
-        el.removeAttribute('showMin');
-        el.removeAttribute('showMax');
-        el.removeAttribute('showClose');
-        const str:string = `
-        <div class='nd-panel'>
-            <div class='nd-panel-header'>
-            <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
-            <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-                <span x-if='$uidata.showMin' class='nd-panel-header-bar-min'></span>
-                <span x-if='$uidata.showMax' class='nd-panel-header-bar-max'></span>
-                <span x-if='$uidata.showClose' class='nd-panel-header-bar-close'></span>
-            </div>
-            </div>
-            <div class='nd-panel-body'> ` 
-            + el.innerHTML +
-            `</div>
-        </div>`
-    
-        let oe:nodom.Element = nodom.Compiler.compile(str);
-        oe.tagName = 'DIV';
-        oe.extraData = data;
+        //默认左
+        if(icon && !loc){
+            loc = 'left';
+        }
+        
+        //图标大小
+        arr = ['small','normal','big'];
+        let size:string;
+        for(let l of arr){
+            if(el.hasAttribute(l)){
+                size = l;
+                el.removeAttribute(l);
+                break;
+            }    
+        }
+        //默认normal
+        if(!size){
+            size = 'normal';
+        }
+
+        //无背景色
+        let nobg:String;
+        if(el.hasAttribute('nobg')){
+            nobg = 'nd-btn-nobg';
+            el.removeAttribute('nobg');
+        }else{
+            nobg = '';
+        }
+        //是否无文本
+        let notext:boolean = el.innerHTML.trim() === '';
+
+        let cls = '';
+        
+        if(icon){
+            if(notext){
+                cls = 'nd-icon-notext-' + size;
+            }else{
+                cls = 'nd-icon-' + loc + '-' + size;
+            }
+        }else{
+            cls = 'nd-btn-' + size;
+            icon = '';
+        }
+
+        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg;
+        let oe:nodom.Element = new nodom.Element();
+        oe.tagName = 'BUTTON';
+        nodom.Compiler.handleAttributes(oe,el);
+        nodom.Compiler.handleChildren(oe,el);
+        //把btn类加入到class
+        oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
         return oe;
     }
 }
 
-nodom.DefineElementManager.add(new UIPanel());
+nodom.DefineElementManager.add(new UIButton());

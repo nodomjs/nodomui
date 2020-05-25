@@ -41,5 +41,5 @@ class UIToolbar {
     }
 }
 exports.default = UIToolbar;
-nodom.DefineElementManager.add(new UIPanel());
+nodom.DefineElementManager.add(new UIToolbar());
 //# sourceMappingURL=boolbar.js.map
