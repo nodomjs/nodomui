@@ -3,8 +3,8 @@
 /**
  * panel 插件
  */
-class UIToolbar implements nodom.IDefineElement{
-    tagName:string = 'UI-TOOLBAR';
+class UIButtonGroup implements nodom.IDefineElement{
+    tagName:string = 'UI-BUTTONGROUP';
     /**
      * 编译后执行代码
      */
@@ -13,11 +13,11 @@ class UIToolbar implements nodom.IDefineElement{
         oe.tagName = 'DIV';
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
-        const cls:string = 'nd-toolbar';
+        const cls:string = 'nd-buttongroup';
         oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
-        oe.defineType='toolbar'
+        oe.defineType='buttongroup';
         return oe;
     }
 }
 
-nodom.DefineElementManager.add(new UIToolbar());
+nodom.DefineElementManager.add(new UIButtonGroup());

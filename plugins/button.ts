@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-export default class UIButton implements nodom.IDefineElement{
+class UIButton implements nodom.IDefineElement{
     tagName:string = 'UI-BUTTON';
     /**
      * 编译后执行代码
@@ -45,12 +45,31 @@ export default class UIButton implements nodom.IDefineElement{
             size = 'normal';
         }
 
+        
+        
         //无背景色
         let nobg:String;
+        //背景色
+        let bg:string;
+            
         if(el.hasAttribute('nobg')){
             nobg = 'nd-btn-nobg';
             el.removeAttribute('nobg');
+            bg = '';
         }else{
+            //背景色
+            arr = ['warn','active','emphasis'];
+            for(let l of arr){
+                if(el.hasAttribute(l)){
+                    bg = 'nd-bg-' + l ;
+                    el.removeAttribute(l);
+                    break;
+                }    
+            }
+            //默认灰色
+            if(!bg){
+                bg = 'nd-bg-grey';    
+            }
             nobg = '';
         }
         //是否无文本
@@ -69,13 +88,14 @@ export default class UIButton implements nodom.IDefineElement{
             icon = '';
         }
 
-        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg;
+        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg + ' ' + bg;
         let oe:nodom.Element = new nodom.Element();
         oe.tagName = 'BUTTON';
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
         //把btn类加入到class
         oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
+        oe.defineType='button';
         return oe;
     }
 }

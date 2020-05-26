@@ -2,9 +2,9 @@
 /**
  * panel 插件
  */
-class UIToolbar {
+class UIButtonGroup {
     constructor() {
-        this.tagName = 'UI-TOOLBAR';
+        this.tagName = 'UI-BUTTONGROUP';
     }
     /**
      * 编译后执行代码
@@ -14,11 +14,11 @@ class UIToolbar {
         oe.tagName = 'DIV';
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
-        const cls = 'nd-toolbar';
+        const cls = 'nd-buttongroup';
         oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
-        oe.defineType = 'toolbar';
+        oe.defineType = 'buttongroup';
         return oe;
     }
 }
-nodom.DefineElementManager.add(new UIToolbar());
-//# sourceMappingURL=toolbar.js.map
+nodom.DefineElementManager.add(new UIButtonGroup());
+//# sourceMappingURL=buttongroup.js.map

@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-export default class UIPanel implements nodom.IDefineElement{
+class UIPanel implements nodom.IDefineElement{
     tagName:string = 'UI-PANEL';
     /**
      * 编译后执行代码
@@ -55,33 +55,56 @@ export default class UIPanel implements nodom.IDefineElement{
             <div class='nd-panel-header'>
             <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
             <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-                <ui-button x-if='$uidata.showMin' small nobg icon='min'></ui-button>
-                <ui-button x-if='$uidata.showMax' small nobg icon='max'></ui-button>
-                <ui-button x-if='$uidata.showClose' small nobg icon='close'></ui-button>
+                <ui-button x-if='$uidata.showMin' small nobg icon='minus-white'></ui-button>
+                <ui-button x-if='$uidata.showMax' small nobg icon='plus-white'></ui-button>
+                <ui-button x-if='$uidata.showClose' small nobg icon='close-white'></ui-button>
             </div>
             </div>
         </div>`;
         
-        let oe:nodom.Element = nodom.Compiler.compile(str);
-        let panel:nodom.Element = oe.children[1];
-        for(let i=0;i<el.children.length;i++){
-            if(el.children[i].tagName === 'UI-TOOLBAR'){
-                let tbar = nodom.Compiler.compile(el.children[i].outerHTML);
-                console.log(tbar);
-                panel.children.push(tbar.children[0]);
-                nodom.Util.remove(el.children[i]);
-            }else if(el.children[i].tagName === 'UI-BUTTONGROUP'){
-
+        let parentDom:nodom.Element = nodom.Compiler.compile(str);
+        let panel:nodom.Element = parentDom.children[1];
+        let oe:nodom.Element = new nodom.Element();
+        nodom.Compiler.handleAttributes(oe,el);
+        nodom.Compiler.handleChildren(oe,el);
+        //合并属性
+        Object.getOwnPropertyNames(oe.props).forEach((p)=>{
+            panel.props[p] = oe.props[p];
+        });
+        panel.props['class'] = panel.props['class']?'nd-panel ' + panel.props['class']:'nd-panel';
+        Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
+            panel.exprProps[p] = oe.exprProps[p];
+        });
+        let tbar:nodom.Element;
+        //button group，，放在panel body后
+        let btnGrp:nodom.Element;
+        //toolbar，放在panel body前
+        for(let i=0;i<oe.children.length && (!tbar||!btnGrp);i++){
+            let item = oe.children[i];
+            if(item.defineType === 'toolbar'){
+                tbar = item;
+                oe.children.splice(i--,1);
+            }else if(item.defineType === 'buttongroup'){
+                btnGrp = item;
+                oe.children.splice(i--,1);
             }
         }
-        let body:nodom.Element = nodom.Compiler.compile("<div class='nd-panel-body'>" + el.innerHTML + '</div>');
-        for(let b of body.children){
-            panel.children.push(b);
-        }
         
-        oe.tagName = 'DIV';
-        oe.extraData = data;
-        return oe;
+        panel.children.push(tbar);
+        for(let b of oe.children){
+            if(b.tagName){
+                panel.children.push(b);
+                b.props['class'] = b.props['class']?'nd-panel-body ' + b.props['class']:'nd-panel-body';
+                break;
+            }
+            
+        }
+        panel.children.push(btnGrp);
+
+        panel.tagName = 'DIV';
+        panel.extraData = data;
+        panel.defineType='panel';        
+        return panel;
     }
 }
 

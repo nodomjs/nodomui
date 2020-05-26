@@ -1,6 +1,4 @@
-"use strict";
 ///<reference types='nodom'/>
-// Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * panel 插件
  */
@@ -48,11 +46,27 @@ class UIButton {
         }
         //无背景色
         let nobg;
+        //背景色
+        let bg;
         if (el.hasAttribute('nobg')) {
             nobg = 'nd-btn-nobg';
             el.removeAttribute('nobg');
+            bg = '';
         }
         else {
+            //背景色
+            arr = ['warn', 'active', 'emphasis'];
+            for (let l of arr) {
+                if (el.hasAttribute(l)) {
+                    bg = 'nd-bg-' + l;
+                    el.removeAttribute(l);
+                    break;
+                }
+            }
+            //默认灰色
+            if (!bg) {
+                bg = 'nd-bg-grey';
+            }
             nobg = '';
         }
         //是否无文本
@@ -70,16 +84,16 @@ class UIButton {
             cls = 'nd-btn-' + size;
             icon = '';
         }
-        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg;
+        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg + ' ' + bg;
         let oe = new nodom.Element();
         oe.tagName = 'BUTTON';
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
         //把btn类加入到class
         oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
+        oe.defineType = 'button';
         return oe;
     }
 }
-// exports.default = UIButton;
 nodom.DefineElementManager.add(new UIButton());
 //# sourceMappingURL=button.js.map

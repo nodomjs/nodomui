@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/panel.js'></script>
+    <script src='../dist/button.js'></script>
+    <script src='../dist/toolbar.js'></script>
+    <script src='../dist/buttongroup.js'></script>
+    <script src='../dist/layout.js'></script>
+    <style>
+        .north{
+            height:100px;
+            font-size:18px;
+            background-color:#9cf;
+        }
+
+        .south{
+            height:100px;
+            background-color:#333;
+            color:#fff;
+            font-size:14px;
+        }
+
+        .west{
+            background-color:#acacac;
+            width:200px;
+        }
+        .east{
+            background-color:#ccc;
+            width:200px;
+        }
+        .panel{
+            height:100%;
+        }
+        
+    </style>
+</head>
+<body>
+    <div>
+        <ui-layout>
+            <div class='north' north>这是一个管理系统</div>
+            <div west class='west'>西边</div>
+            <div center>
+                <ui-panel class='panel' title='测试panel' head min max close>
+                    <ui-toolbar>
+                        <ui-button nobg small top icon='setting-black'></ui-button>
+                        <ui-button nobg small right icon='dropdown-black' >颜色</ui-button>
+                        <ui-button nobg small icon='edit-black'></ui-button>
+                        <ui-button nobg small icon='publish-black'></ui-button>
+                    </ui-toolbar>
+                    <div>hello world!</div>
+                    <ui-buttongroup>
+                        <ui-button active small left icon='plus-black'>添加</ui-button>
+                        <ui-button emphasis small left icon='close-black'>删除</ui-button>
+                        <ui-button warn small left icon='edit-black'>编辑</ui-button>
+                        <ui-button left small icon='search-black'>查询</ui-button>
+                    </ui-buttongroup>
+                </ui-panel>
+            </div>
+            <div east class='east'>东边</div>
+            <div south class='south'>nodom团队@版权所有</div>
+        </ui-layout>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div'
+        }
+    })
+</script>
+</html>

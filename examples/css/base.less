@@ -1,3 +1,5 @@
+
+
 @backcolor1: rgb(29,97,195);
 @backcolor2:#fff;
 @lightgrey:#ececec;
@@ -6,11 +8,27 @@
 
 @forecolor1:#fff;
 @forecolor2:#000;
+@activecolor:rgb(52,205,187);
+@activecolordeep:rgb(32,185,167);
+@emphasiscolor:rgb(241,113,91);
+@emphasiscolordeep:rgb(221,93,71);
+@warncolor:rgb(225,168,9);
+@warncolordeep:rgb(205,148,0);
+
 @bordercolor:#cfcfcf;
 @headfont:14px;
 @bodyfont:12px;
 @padding:5px;
 @radius:5px;
+
+
+/*global*/
+body{
+    padding:0;
+    margin:0;
+}
+
+
 
 /* 图标 */
 
@@ -18,8 +36,6 @@
 @icon-size-small:16px;
 @icon-size-normal:32px;
 @icon-size-big:64px;
-
-
 
 .nd-ico-size-small{
     background-size: @icon-size-small @icon-size-small;
@@ -34,30 +50,6 @@
 }
 
 
-/*img url*/
-@icon-img-close:'imgs/close.png';
-@icon-img-max:'imgs/maximize.png';
-@icon-img-min:'imgs/minus.png';
-
-
-.nd-ico-close{
-    background-image:url(@icon-img-close);
-    background-repeat: no-repeat;
-}
-
-
-.nd-ico-max{
-    background-image:url(@icon-img-max);
-    background-repeat: no-repeat;
-}
-
-.nd-ico-min{
-    background-image:url(@icon-img-min);
-    background-repeat: no-repeat;
-}
-
-
-
 /* panel */
 
 @panel-padding-left:15px;
@@ -65,39 +57,60 @@
 .nd-panel{
     border-radius:@radius;
     border:1px solid @lightgrey;
+    box-sizing: border-box;
+    width:100%;
+    display: flex;
+    flex-direction:column;
+
+    > div{
+        width:inherit;
+        box-sizing: border-box;
+    }
     /* 头部 */
     .nd-panel-header{
         padding:@panel-padding-top @panel-padding-left;        
         background-color:@backcolor1;
         color:@forecolor1;
-        border-radius:@radius @radius 0 0;    
+        border-radius:@radius @radius 0 0;
+        display:inline-flex;
+        justify-content: space-between;
         /* 标题 */
         .nd-panel-title{
             font-size:@headfont;
-            
+            flex:1;
         }
 
         /*头部工具栏*/
         .nd-panel-header-bar{
-            float:right;
             margin:-@btn-padding-top-normal+3 -@panel-padding-left + 3 0 0;
-            
+            display:inline-flex;
         }
     }
 
     .nd-panel-body{
         padding:@padding;
         font-size:@bodyfont;
+        flex:1;
     }
 
     /* toolbar */
 
     .nd-toolbar{
-        width:100%;
         background-color:@lightgrey;
-        /*border-top:1px solid @grey;*/
         border-bottom:1px solid @grey;
         text-align:left;
+        display:inline-flex;
+    }
+
+    /* button group*/
+    .nd-buttongroup{
+        padding:@padding;
+        background-color:@lightgrey;
+        display:inline-flex;
+        justify-content: flex-end;
+        .nd-btn{
+            margin-right:10px;
+        }
     }
 }
 
@@ -129,6 +142,7 @@
 }
 .nd-btn:hover{
     background-color:@grey;
+    
 }
 
 /*无图标*/
@@ -247,7 +261,8 @@
     padding:@btn-padding-top-normal @icon-size-normal + @btn-padding-left-normal @btn-padding-top-normal @btn-padding-left-normal;
     min-height:@icon-size-normal;
     min-width:@icon-size-normal;
-    line-height:@icon-size-normal + (@icon-size-normal - @btn-font-normal)/2;
+    line-height:@icon-size-normal;
+    /*line-height:@icon-size-normal + (@icon-size-normal - @btn-font-normal)/2;*/
 }
 
 .nd-icon-right-big{
@@ -290,5 +305,71 @@
     text-align:center;
 }
 
+/******* layout *******/
+.nd-layout{
+    display:flex;
+    flex-direction: column;
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+
+    .nd-layout-middle{
+        display:flex;
+        flex:1;
+
+        .nd-layout-center{
+            flex:1;
+        }
+    }
+}
 
 
+
+/*颜色*/
+/*背景色*/
+/*激活背景色*/
+.nd-bg-active{
+    background-color:@activecolor;
+}
+.nd-bg-active:hover{
+    background-color:@activecolordeep;
+}
+/*强调背景色*/
+.nd-bg-emphasis{
+    background-color:@emphasiscolor;
+}
+.nd-bg-emphasis:hover{
+    background-color:@emphasiscolordeep;
+}
+
+/*警告背景色*/
+.nd-bg-warn{
+    background-color:@warncolor;
+}
+
+.nd-bg-warn:hover{
+    background-color:@warncolordeep;
+}
+/*灰色背景色*/
+.nd-bg-grey{
+    background-color:@grey;
+}
+
+.nd-bg-grey:hover{
+    background-color:@deepgrey;
+}
+
+/*激活前景色*/
+.nd-fr-active{
+    color:@activecolor;
+}
+/*强调前景色*/
+.nd-fr-emphasis{
+    color:@emphasiscolor;
+}
+/*警告前景色*/
+.nd-fr-warn{
+    color:@warncolor;
+}

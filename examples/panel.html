@@ -6,23 +6,35 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
     <script src='../dist/panel.js'></script>
     <script src='../dist/button.js'></script>
     <script src='../dist/toolbar.js'></script>
-    
+    <script src='../dist/buttongroup.js'></script>
+    <style>
+        .panel{
+            height:600px;
+        }
+    </style>
 </head>
 <body>
     <div>
-        <ui-panel title='测试panel' head min max close>
+        <ui-panel class='panel' title='测试panel' head min max close>
             <ui-toolbar>
-                <ui-button>添加</ui-button>
-                <ui-button>删除</ui-button>
-                <ui-button>编辑</ui-button>
-                <ui-button>查询</ui-button>
+                <ui-button nobg small top icon='setting-black'></ui-button>
+                <ui-button nobg small right icon='dropdown-black' >颜色</ui-button>
+                <ui-button  nobg small icon='edit-black'></ui-button>
+                <ui-button  nobg small icon='publish-black'></ui-button>
             </ui-toolbar>
             <div>hello world!</div>
+            <ui-buttongroup>
+                <ui-button active small left icon='plus-black'>添加</ui-button>
+                <ui-button emphasis small left icon='close-black'>删除</ui-button>
+                <ui-button warn small left icon='edit-black'>编辑</ui-button>
+                <ui-button left small icon='search-black'>查询</ui-button>
+            </ui-buttongroup>
         </ui-panel>
     </div>
 </body>
