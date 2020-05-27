@@ -5,76 +5,113 @@
 class UIAccordion {
     constructor() {
         this.tagName = 'UI-ACCORDION';
+        /**
+         * accordion 实例map
+         */
+        this.instanceMap = new Map();
     }
     /**
      * 编译后执行代码
      */
     init(el) {
-        //收回后按钮图
-        let iconDown = '';
-        //展开后按钮图
-        let iconUp = '';
-        if (el.hasAttribute('iconDown')) {
-            iconDown = "<span class='nd-accordion-icon nd-ico-" + el.getAttribute('iconDown') + "'></span>";
-            el.removeAttribute('iconDown');
+        let ct = new nodom.Element();
+        ct.tagName = 'DIV';
+        nodom.Compiler.handleAttributes(ct, el);
+        nodom.Compiler.handleChildren(ct, el);
+        ct.props['class'] = ct.props['class'] ? 'nd-accordion ' + ct.props['class'] : 'nd-accordion';
+        let firstDom = new nodom.Element();
+        let secondDom = new nodom.Element();
+        firstDom.tagName = 'DIV';
+        secondDom.tagName = 'DIV';
+        for (let i = 0; i < ct.children.length; i++) {
+            let item = ct.children[i];
+            if (!item.tagName) {
+                continue;
+            }
+            if (item.props.hasOwnProperty('first')) {
+                //添加repeat指令
+                firstDom.directives.push(new nodom.Directive('repeat', item.props['data'], firstDom));
+                item.props['class'] = item.props['class'] ? 'nd-accordion-first ' + item.props['class'] : 'nd-accordion-first';
+                //增加事件
+                let methodId = '$nodomGenMethod' + nodom.Util.genId();
+                this.instanceMap.set(item.key, {
+                    methodId: methodId,
+                    dataKey: item.props['data'],
+                    activeName: item.props['activename']
+                });
+                item.events['click'] = new nodom.NodomEvent('click', methodId);
+                firstDom.children.push(item);
+                //图标
+                if (item.props['icon']) {
+                    let cls = item.props['icon'].trim();
+                    //去掉多余空格
+                    cls = cls.replace(/\s+/, ' ');
+                    let arr = cls.split(' ');
+                    let iconDown = 'nd-ico-' + arr[0];
+                    let iconUp = 'nd-ico-' + arr[1];
+                    item.directives.push(new nodom.Directive('class', "{'" + iconUp + "':'$pullDown','"
+                        + iconDown + "':'!$pullDown'}", item));
+                }
+                delete item.props['data'];
+                delete item.props['activename'];
+                delete item.props['icon'];
+                delete item.props['first'];
+            }
+            else if (item.props.hasOwnProperty('second')) {
+                item.directives.push(new nodom.Directive('repeat', item.props['data'], item));
+                item.props['class'] = item.props['class'] ? 'nd-accordion-second ' + item.props['class'] : 'nd-accordion-second';
+                secondDom.props['class'] = 'nd-accordion-secondct';
+                secondDom.directives.push(new nodom.Directive('class', "{'nd-accordion-hide':'!$pullDown'}", secondDom));
+                secondDom.children.push(item);
+                delete item.props['data'];
+                delete item.props['second'];
+            }
         }
-        if (el.hasAttribute('iconUp')) {
-            iconUp = 'nd-ico-' + el.getAttribute('iconUp');
-            el.removeAttribute('iconUp');
-        }
-        console.log(iconDown);
-        // let data = {
-        //     $uidata:{
-        //         title:title,
-        //         showHead:showHead,
-        //         showMin:showMin,
-        //         showMax:showMax,
-        //         showClose:showClose,
-        //         showHeaderbar:showHeaderbar
-        //     }
-        // }
-        const str = `
-        <div class='nd-accordion'>
-            <div x-repeat='rows'>
-                <div class='nd-accordion-first' e-click='' >
-                    <span>{{title}}</span>`
-            + iconDown +
-            `</div>
-                <div>
-                    <div x-repeat='rows'  class='nd-accordion-second'>{{name}}</div>
-                </div>
-            </div>
-        </div>`;
-        console.log(str);
-        // //添加click事件
-        // let method = '$nodomGenMethod' + Util.genId();
-        // module.methodFactory.add(method,
-        //    async (e, module, view,dom) => {
-        //         let path:string = dom.props['path'];
-        //         if (Util.isEmpty(path)) {
-        //             return;
-        //         }
-        //         Router.addPath(path);
-        //     }
-        // );
-        // dom.events['click'] = new NodomEvent('click', method);
-        let parentDom = nodom.Compiler.compile(str);
-        let panel = parentDom.children[1];
-        console.log(panel);
-        let oe = new nodom.Element();
-        nodom.Compiler.handleAttributes(oe, el);
-        //合并属性
-        Object.getOwnPropertyNames(oe.props).forEach((p) => {
-            panel.props[p] = oe.props[p];
+        //指令按优先级排序
+        firstDom.directives.sort((a, b) => {
+            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
         });
-        panel.props['class'] = panel.props['class'] ? 'nd-panel ' + panel.props['class'] : 'nd-panel';
-        Object.getOwnPropertyNames(oe.exprProps).forEach((p) => {
-            panel.exprProps[p] = oe.exprProps[p];
+        secondDom.directives.sort((a, b) => {
+            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
         });
-        panel.tagName = 'DIV';
+        firstDom.children.push(secondDom);
+        ct.children = [firstDom];
         // panel.extraData = data;
-        panel.defineType = 'accordion';
-        return panel;
+        ct.defineType = 'UI-ACCORDION';
+        return ct;
+    }
+    /**
+     * 渲染前执行
+     * @param module
+     */
+    beforeRender(module, dom) {
+        let firstDom = dom.children[0].children[0];
+        const instance = this.instanceMap.get(firstDom.key);
+        //添加click事件
+        module.methodFactory.add(instance['methodId'], (e, module, view, dom) => {
+            let model = module.modelFactory.get(dom.modelId);
+            model.data.$pullDown = !model.data.$pullDown;
+        });
+    }
+    afterRender(module, dom) {
+        let firstDom = dom.children[0].children[0];
+        let key = firstDom.key;
+        key = key.substr(0, key.indexOf('_'));
+        const instance = this.instanceMap.get(key);
+        //设置激活
+        if (instance['activeName']) {
+            let an = instance['activeName'];
+            for (let d of dom.children) {
+                let model = module.modelFactory.get(d.modelId);
+                let data = model.data;
+                if (data[an]) {
+                    model.set('$pullDown', true);
+                }
+                else {
+                    model.set('$pullDown', false);
+                }
+            }
+        }
     }
 }
 nodom.DefineElementManager.add(new UIAccordion());

@@ -95,7 +95,7 @@ class UIButton implements nodom.IDefineElement{
         nodom.Compiler.handleChildren(oe,el);
         //把btn类加入到class
         oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
-        oe.defineType='button';
+        oe.defineType='UI_BUTTON';
         return oe;
     }
 }

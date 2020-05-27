@@ -61,7 +61,7 @@ class UILayout {
             }
         }
         oe.children.splice(insertIndex - 1, 0, middleCt);
-        oe.defineType = 'layout';
+        oe.defineType = 'UI-LAYOUT';
         return oe;
     }
 }

@@ -1,7 +1,5 @@
 ///<reference types='nodom'/>
 
-import { domainToASCII } from "url";
-
 /**
  * panel 插件
  */
@@ -65,7 +63,7 @@ class UILayout implements nodom.IDefineElement{
         }
         
         oe.children.splice(insertIndex-1,0,middleCt);
-        oe.defineType='layout';
+        oe.defineType='UI-LAYOUT';
         return oe;
     }
 }

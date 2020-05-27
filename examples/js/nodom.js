@@ -117,7 +117,7 @@ var nodom;
                     return dst;
                 }
             }
-            static merge() {
+            static merge(o1, o2, o3, o4, o5, o6) {
                 for (let i = 0; i < arguments.length; i++) {
                     if (!this.isObject(arguments[i])) {
                         throw new nodom.NodomError('invoke', 'this.merge', i + '', 'object');
@@ -686,7 +686,7 @@ var nodom;
                 this.value = value.trim();
             }
             if (type !== undefined) {
-                nodom.Util.apply(nodom.DirectiveManager.init, nodom.DirectiveManager, [this, vdom, el]);
+                nodom.DirectiveManager.init(this, vdom, el);
             }
         }
         exec(value) {
@@ -734,10 +734,10 @@ var nodom;
             static hasType(name) {
                 return this.directiveTypes.has(name);
             }
-            static init(directive, dom, module, el) {
+            static init(directive, dom, el) {
                 let dt = this.directiveTypes.get(directive.type);
                 if (dt) {
-                    return dt.init(directive, dom, module, el);
+                    return dt.init(directive, dom, el);
                 }
             }
             static exec(directive, dom, module, parent) {
@@ -780,6 +780,9 @@ var nodom;
             if (this.dontRender) {
                 return;
             }
+            if (this.defineType) {
+                nodom.DefineElementManager.beforeRender(module, this);
+            }
             if (parent) {
                 this.parentKey = parent.key;
                 if (!this.modelId) {
@@ -813,6 +816,11 @@ var nodom;
                     i--;
                 }
             }
+            if (this.defineType) {
+                console.log(this.modelId);
+                nodom.DefineElementManager.afterRender(module, this);
+            }
+            
         }
         renderToHtml(module, params) {
             let el;
@@ -1386,10 +1394,16 @@ var nodom;
                 let fieldObj = model.data;
                 let valueArr = [];
                 this.fields.forEach((field) => {
-                    valueArr.push(fieldObj[field]);
+                    valueArr.push(getFieldValue(module, fieldObj, field));
                 });
                 valueArr.unshift(module);
                 return this.execFunc.apply(null, valueArr);
+                function getFieldValue(module, dataObj, field) {
+                    if (dataObj.hasOwnProperty(field)) {
+                        return dataObj[field];
+                    }
+                    return module.model.query(field);
+                }
             }
             addField(field) {
                 if (field === '' || field.startsWith(Expression.REP_STR) || nodom.Util.isNumberString(field)) {
@@ -3341,7 +3355,7 @@ var nodom;
                 modelName = value;
             }
             if (!dom.hasDirective('model')) {
-                dom.directives.push(new nodom.Directive('model', modelName, dom));
+                dom.directives.push(new nodom.Directive('model', modelName, dom, el));
             }
             directive.value = modelName;
         },
@@ -3999,6 +4013,18 @@ var nodom;
             }
             static get(tagName) {
                 return this.elementMap.get(tagName);
+            }
+            static beforeRender(module, dom) {
+                let de = this.get(dom.defineType);
+                if (de && de.beforeRender) {
+                    de.beforeRender(module, dom);
+                }
+            }
+            static afterRender(module, dom) {
+                let de = this.get(dom.defineType);
+                if (de && de.afterRender) {
+                    de.afterRender(module, dom);
+                }
             }
         }
         DefineElementManager.elementMap = new Map();

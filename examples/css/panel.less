@@ -1,0 +1,62 @@
+@import "base.less";
+/* panel */
+
+.nd-panel{
+    border-radius:@radius;
+    border:1px solid @lightgrey;
+    box-sizing: border-box;
+    width:100%;
+    display: flex;
+    flex-direction:column;
+
+    > div{
+        width:inherit;
+        box-sizing: border-box;
+    }
+    /* 头部 */
+    .nd-panel-header{
+        padding:@panel-padding-top @panel-padding-left;        
+        background-color:@backcolor1;
+        color:@forecolor1;
+        border-radius:@radius @radius 0 0;
+        display:inline-flex;
+        justify-content: space-between;
+        /* 标题 */
+        .nd-panel-title{
+            font-size:@fontsizenormal;
+            flex:1;
+        }
+
+        /*头部工具栏*/
+        .nd-panel-header-bar{
+            margin:-@btn-padding-top-normal+3 -@panel-padding-left + 3 0 0;
+            display:inline-flex;
+        }
+    }
+
+    .nd-panel-body{
+        padding:@padding;
+        font-size:@fontsizesmall;
+        flex:1;
+    }
+
+    /* toolbar */
+
+    .nd-toolbar{
+        background-color:@lightgrey;
+        border-bottom:1px solid @grey;
+        text-align:left;
+        display:inline-flex;
+    }
+
+    /* button group*/
+    .nd-buttongroup{
+        padding:@padding;
+        background-color:@lightgrey;
+        display:inline-flex;
+        justify-content: flex-end;
+        .nd-btn{
+            margin-right:10px;
+        }
+    }
+}

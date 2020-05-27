@@ -1,0 +1,40 @@
+@import "base.less";
+/********** accordion ***********/
+.nd-accordion{
+    .nd-accordion-first{
+        height:35px;
+        line-height:35px;
+        text-indent: 1em;
+        background-color:@grey;
+        font-size:@fontsizenormal;
+        width:inherit;
+        justify-content: space-between;
+        // .nd-accordion-icon{
+            background-size:@icon-size-small;
+            min-height:@icon-size-small;
+            min-width:@icon-size-small;
+            background-position: 100% 50%;
+            // margin-right:5px;
+        // }
+    }
+
+    .nd-accordion-secondct{
+        .nd-accordion-second{
+            height:30px;
+            line-height:30px;
+            text-indent: 2em;
+            background-color:@lightgrey;
+            font-size:@fontsizesmall;
+            display:block;
+        }
+    
+        .nd-accordion-second:hover{
+            background-color:@grey;
+        }
+    }
+
+    .nd-accordion-hide{
+        display:none;
+    }
+    
+}

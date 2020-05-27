@@ -16,7 +16,7 @@ class UIButtonGroup {
         nodom.Compiler.handleChildren(oe, el);
         const cls = 'nd-buttongroup';
         oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
-        oe.defineType = 'buttongroup';
+        oe.defineType = 'UI-BUTTONGROUP';
         return oe;
     }
 }

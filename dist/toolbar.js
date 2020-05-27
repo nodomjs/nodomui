@@ -16,7 +16,7 @@ class UIToolbar {
         nodom.Compiler.handleChildren(oe, el);
         const cls = 'nd-toolbar';
         oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
-        oe.defineType = 'toolbar';
+        oe.defineType = 'UI-TOOLBAR';
         return oe;
     }
 }

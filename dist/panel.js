@@ -74,11 +74,11 @@ class UIPanel {
         //toolbar，放在panel body前
         for (let i = 0; i < oe.children.length && (!tbar || !btnGrp); i++) {
             let item = oe.children[i];
-            if (item.defineType === 'toolbar') {
+            if (item.defineType === 'UI-TOOLBAR') {
                 tbar = item;
                 oe.children.splice(i--, 1);
             }
-            else if (item.defineType === 'buttongroup') {
+            else if (item.defineType === 'UI-BUTTONGROUP') {
                 btnGrp = item;
                 oe.children.splice(i--, 1);
             }
@@ -94,7 +94,7 @@ class UIPanel {
         panel.children.push(btnGrp);
         panel.tagName = 'DIV';
         panel.extraData = data;
-        panel.defineType = 'panel';
+        panel.defineType = 'UI-PANEL';
         return panel;
     }
 }
