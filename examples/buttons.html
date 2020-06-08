@@ -6,8 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet/less" type="text/css" href="css/base.less" />
-    <!-- <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/button.less" /> -->
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
     <script src='../dist/button.js'></script>
@@ -18,6 +19,7 @@
 </head>
 <body>
     <div class='btnct'>
+        
         <ui-button small>无图小</ui-button>
         <ui-button normal>无图中</ui-button>
         <ui-button big>无图大</ui-button>
@@ -26,21 +28,22 @@
         <ui-button normal icon='close'></ui-button>
         <ui-button big icon='close'></ui-button>
 
-        <ui-button left small icon='close'>小左图标</ui-button>
-        <ui-button left normal icon='close'>中左图标</ui-button>
-        <ui-button left big icon='close'>大左图标</ui-button>
+        <ui-button small icon='close'>小图标</ui-button>
+        <ui-button normal icon='close'>中图标</ui-button>
+        <ui-button big icon='close' active>大图标</ui-button>
 
-        <ui-button top small icon='close'>小上图标</ui-button>
-        <ui-button top normal icon='close'>中上图标</ui-button>
-        <ui-button top big icon='close'>大上图标</ui-button>
+        <ui-button small top icon='close'>小图标</ui-button>
+        <ui-button normal top icon='close'>中图标</ui-button>
+        <ui-button big top icon='close' active>大图标</ui-button>
 
-        <ui-button right small icon='close'>小右图标</ui-button>
-        <ui-button right normal icon='close'>中右图标</ui-button>
-        <ui-button right big icon='close'>大右图标</ui-button>
+        <ui-button small right icon='publish'>小图标</ui-button>
+        <ui-button normal right icon='publish'>中图标</ui-button>
+        <ui-button big right icon='publish' active>大图标</ui-button>
 
-        <ui-button bottom small icon='close'>小下图标</ui-button>
-        <ui-button bottom normal icon='close'>中下图标</ui-button>
-        <ui-button bottom big icon='close'>大下图标</ui-button>
+        <ui-button small bottom icon='publish'>小图标</ui-button>
+        <ui-button normal bottom icon='publish'>中图标</ui-button>
+        <ui-button big bottom warn icon='publish' >大图标</ui-button>
+        
     </div>
 </body>
 <script>

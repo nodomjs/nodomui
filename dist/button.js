@@ -13,25 +13,11 @@ class UIButton {
         //图标
         let icon;
         if (el.hasAttribute('icon')) {
-            icon = 'nd-ico-' + el.getAttribute('icon');
+            icon = el.getAttribute('icon');
             el.removeAttribute('icon');
         }
-        //图标位置
-        let arr = ['left', 'top', 'right', 'bottom'];
-        let loc;
-        for (let l of arr) {
-            if (el.hasAttribute(l)) {
-                loc = l;
-                el.removeAttribute(l);
-                break;
-            }
-        }
-        //默认左
-        if (icon && !loc) {
-            loc = 'left';
-        }
         //图标大小
-        arr = ['small', 'normal', 'big'];
+        let arr = ['small', 'normal', 'big'];
         let size;
         for (let l of arr) {
             if (el.hasAttribute(l)) {
@@ -44,14 +30,24 @@ class UIButton {
         if (!size) {
             size = 'normal';
         }
-        //无背景色
-        let nobg;
-        //背景色
+        //图位置
+        let loc;
+        arr = ['left', 'top', 'right', 'bottom'];
+        for (let l of arr) {
+            if (el.hasAttribute(l)) {
+                loc = l;
+                el.removeAttribute(l);
+                break;
+            }
+        }
+        //默认normal
+        if (!loc) {
+            loc = 'left';
+        }
         let bg;
         if (el.hasAttribute('nobg')) {
-            nobg = 'nd-btn-nobg';
+            bg = 'nd-btn-nobg';
             el.removeAttribute('nobg');
-            bg = '';
         }
         else {
             //背景色
@@ -67,30 +63,37 @@ class UIButton {
             if (!bg) {
                 bg = 'nd-bg-grey';
             }
-            nobg = '';
         }
         //是否无文本
-        let notext = el.innerHTML.trim() === '';
-        let cls = '';
-        if (icon) {
-            if (notext) {
-                cls = 'nd-icon-notext-' + size;
-            }
-            else {
-                cls = 'nd-icon-' + loc + '-' + size;
-            }
-        }
-        else {
-            cls = 'nd-btn-' + size;
-            icon = '';
-        }
-        cls = 'nd-btn ' + cls + ' ' + icon + ' ' + nobg + ' ' + bg;
+        let notext = icon && el.innerHTML.trim() === '' ? 'nd-btn-notext' : '';
+        let cls = 'nd-btn ' + notext + ' nd-btn-' + size + ' ' + bg;
         let oe = new nodom.Element();
         oe.tagName = 'BUTTON';
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
         //把btn类加入到class
         oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
+        //图标element
+        let img = new nodom.Element();
+        img.tagName = 'b';
+        switch (loc) {
+            case 'left':
+                oe.children.unshift(img);
+                img.props['class'] = 'nd-icon-' + icon + ' nd-icon-' + size;
+                break;
+            case 'top':
+                oe.children.unshift(img);
+                img.props['class'] = 'nd-btn-vert nd-icon-' + icon + ' nd-icon-' + size;
+                break;
+            case 'right':
+                oe.children.push(img);
+                img.props['class'] = 'nd-icon-' + icon + ' nd-icon-' + size;
+                break;
+            case 'bottom':
+                oe.children.push(img);
+                img.props['class'] = 'nd-btn-vert nd-icon-' + icon + ' nd-icon-' + size;
+                break;
+        }
         oe.defineType = 'UI_BUTTON';
         return oe;
     }

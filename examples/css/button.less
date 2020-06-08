@@ -6,6 +6,7 @@
     background-color:@lightgrey;
     border-radius: @btn-corner;
     border:0px;
+    padding:@btn-padding-top-small @btn-padding-left-small;
 }
 
 .nd-btn-nobg{
@@ -20,157 +21,21 @@
 /*有图标*/
 .nd-btn-small{
     font-size:@fontsizesmall;
-    line-height:@icon-size-small;
 }
 
 .nd-btn-normal{
     font-size:@fontsizenormal;
-    line-height:@icon-size-normal;
 }
 
 .nd-btn-big{
     font-size:@fontsizebiggest;
-    line-height:@icon-size-big;
 }
 /*无文字*/
-.nd-icon-notext-small{
-    background-position: @btn-padding-top-small;
-    background-size:@icon-size-small;
-    min-height:@icon-size-small + @btn-padding-top-small * 2;
-    min-width:@icon-size-small  + @btn-padding-top-small * 2;
+.nd-btn-notext{
+    padding:@btn-padding-top-small - 3;
 }
 
-.nd-icon-notext-normal{
-    background-position: @btn-padding-top-small;
-    background-size:@icon-size-normal;
-    min-height:@icon-size-normal + @btn-padding-top-small * 2;
-    min-width:@icon-size-normal + @btn-padding-top-small * 2;
-}
-
-.nd-icon-notext-big{
-    background-position: @btn-padding-top-small;
-    background-size:@icon-size-big;
-    min-height:@icon-size-big + @btn-padding-top-small * 2;
-    min-width:@icon-size-big + @btn-padding-top-small * 2;
-}
-
-.nd-icon-left-small{
-    font-size:@fontsizesmall;
-    background-position: @btn-padding-left-small 50%;
-    background-size:@icon-size-small;
-    padding:@btn-padding-top-small @btn-padding-left-small @btn-padding-top-small @icon-size-small + @btn-padding-left-small;
-    min-height:@icon-size-small;
-    min-width:@icon-size-small;
-    line-height:@icon-size-small + (@icon-size-small - @fontsizesmall)/2;
-}
-
-.nd-icon-left-normal{
-    font-size:@fontsizenormal;
-    background-position: @btn-padding-left-normal 50%;
-    background-size:@icon-size-normal;
-    padding:@btn-padding-top-normal @btn-padding-left-normal @btn-padding-top-normal @icon-size-normal + @btn-padding-left-normal;
-    min-height:@icon-size-normal;
-    min-width:@icon-size-normal;
-    line-height:@icon-size-normal + (@icon-size-normal - @fontsizenormal)/2;
-}
-
-.nd-icon-left-big{
-    font-size:@fontsizebiggest;
-    background-position: @btn-padding-left-big 50%;
-    background-size:@icon-size-big;
-    padding:@btn-padding-top-big @btn-padding-left-big @btn-padding-top-big @icon-size-big + @btn-padding-left-big;
-    min-height:@icon-size-big;
-    min-width:@icon-size-big;
-    line-height:@icon-size-big + (@icon-size-big - @fontsizebiggest)/2;
-}
-
-.nd-icon-top-small{
-    font-size:@fontsizesmall;
-    background-position: 50% @btn-padding-top-small;
-    background-size:@icon-size-small;
-    padding:@icon-size-small + @btn-padding-top-small @btn-padding-left-small @btn-padding-top-small @btn-padding-left-small;
-    min-height:@icon-size-small;
-    min-width:@icon-size-small;
-    text-align:center;
-}
-
-.nd-icon-top-normal{
-    font-size:@fontsizenormal;
-    background-position: 50% @btn-padding-top-normal;
-    background-size:@icon-size-normal;
-    padding:@icon-size-normal + @btn-padding-top-normal  @btn-padding-left-normal @btn-padding-top-normal @btn-padding-left-normal;
-    min-height:@icon-size-normal;
-    min-width:@icon-size-normal;
-    text-align:center;
-}
-
-.nd-icon-top-big{
-    font-size:@fontsizebiggest;
-    background-position: 50% @btn-padding-top-big;
-    background-size:@icon-size-big;
-    padding:@icon-size-big + @btn-padding-top-big  @btn-padding-left-big @btn-padding-top-big @btn-padding-left-big;
-    min-height:@icon-size-big;
-    min-width:@icon-size-big;
-    text-align:center;
-}
-
-.nd-icon-right-small{
-    font-size:@fontsizesmall;
-    background-position: 100% - @btn-padding-left-small 50%;
-    background-size:@icon-size-small;
-    padding:@btn-padding-top-small @icon-size-small + @btn-padding-left-small @btn-padding-top-small @btn-padding-left-small;
-    min-height:@icon-size-small;
-    min-width:@icon-size-small;
-    line-height:@icon-size-small + (@icon-size-small - @fontsizesmall)/2;
-}
-
-.nd-icon-right-normal{
-    font-size:@fontsizenormal;
-    background-position: 100% - @btn-padding-left-normal 50%;
-    background-size:@icon-size-normal;
-    padding:@btn-padding-top-normal @icon-size-normal + @btn-padding-left-normal @btn-padding-top-normal @btn-padding-left-normal;
-    min-height:@icon-size-normal;
-    min-width:@icon-size-normal;
-    line-height:@icon-size-normal;
-    /*line-height:@icon-size-normal + (@icon-size-normal - @fontsizenormal)/2;*/
-}
-
-.nd-icon-right-big{
-    font-size:@fontsizebiggest;
-    background-position: 100% - @btn-padding-left-big 50%;
-    background-size:@icon-size-big;
-    padding:@btn-padding-top-big @icon-size-big + @btn-padding-left-big @btn-padding-top-big @btn-padding-left-big;
-    min-height:@icon-size-big;
-    min-width:@icon-size-big;
-    line-height:@icon-size-big + (@icon-size-big - @fontsizebiggest)/2;
-}
-
-.nd-icon-bottom-small{
-    font-size:@fontsizesmall;
-    background-position: 50% 100% - @btn-padding-top-small;
-    background-size:@icon-size-small;
-    padding:@btn-padding-top-small @btn-padding-left-small @icon-size-small + @btn-padding-top-small  @btn-padding-left-small;
-    min-height:@icon-size-small;
-    min-width:@icon-size-small;
-    text-align:center;
-}
-
-.nd-icon-bottom-normal{
-    font-size:@fontsizenormal;
-    background-position: 50% 100% - @btn-padding-top-normal;
-    background-size:@icon-size-normal;
-    padding:@btn-padding-top-normal @btn-padding-left-normal @icon-size-normal + @btn-padding-top-normal  @btn-padding-left-normal;
-    min-height:@icon-size-normal;
-    min-width:@icon-size-normal;
-    text-align:center;
-}
-
-.nd-icon-bottom-big{
-    font-size:@fontsizebiggest;
-    background-position: 50% 100% - @btn-padding-top-big;
-    background-size:@icon-size-big;
-    padding:@btn-padding-top-big @btn-padding-left-big @icon-size-big + @btn-padding-top-big  @btn-padding-left-big; 
-    min-height:@icon-size-big;
-    min-width:@icon-size-big;
-    text-align:center;
+/*图标纵向*/
+.nd-btn-vert{
+    display:block;
 }

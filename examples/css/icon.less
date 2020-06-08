@@ -1,124 +1,133 @@
 @import "base.less";
-/* 图标 */
-.nd-ico-size-small{
-    background-size: @icon-size-small @icon-size-small;
+
+@font-face {font-family: "nd-iconfont";
+    src:url('font/iconfont.ttf'),
+    url('font/iconfont.woff')
 }
 
-.nd-ico-size-normal{
-    background-size: @icon-size-normal @icon-size-normal;
+.nd-icon-small{
+    font-size:@fontsizesmall + 3;
 }
 
-.nd-ico-size-big{
-    background-size: @icon-size-big @icon-size-big;
+.nd-icon-normal{
+    font-size:@fontsizenormal + 3;
 }
 
-/*图标图片*/
-.nd-ico-check-black{
-    background-image:url(imgs/check-black.png);
-    background-repeat: no-repeat;
+.nd-icon-big{
+    font-size:@fontsizebiggest + 3;
 }
 
-.nd-ico-check-white{
-    background-image:url(imgs/close-white.png);
-    background-repeat: no-repeat;
+.nd-icon-minus::before{
+    font-family: nd-iconfont;
+    content:'\e6a0';
 }
 
-.nd-ico-close-black{
-    background-image:url(imgs/close-black.png);
-    background-repeat: no-repeat;
+.nd-icon-close::before{
+    font-family: nd-iconfont;
+    content:'\e6a1';
 }
 
-.nd-ico-close-white{
-    background-image:url(imgs/close-white.png);
-    background-repeat: no-repeat;
-}
-.nd-ico-dropdown-black{
-    background-image:url(imgs/dropdown-black.png);
-    background-repeat: no-repeat;
-}
-.nd-ico-edit-black{
-    background-image:url(imgs/edit-black.png);
-    background-repeat: no-repeat;
+.nd-icon-finish::before{
+    font-family: nd-iconfont;
+    content:'\e6a2';
 }
 
-.nd-ico-edit-white{
-    background-image:url(imgs/edit-white.png);
-    background-repeat: no-repeat;
+.nd-icon-search::before{
+    font-family: nd-iconfont;
+    content:'\e6a3';
 }
 
-.nd-ico-heart-black{
-    background-image:url(imgs/heart-black.png);
-    background-repeat: no-repeat;
+.nd-icon-message::before{
+    font-family: nd-iconfont;
+    content:'\e6a4';
 }
 
-
-.nd-ico-heart-red{
-    background-image:url(imgs/heart-red.png);
-    background-repeat: no-repeat;
+.nd-icon-user::before{
+    font-family: nd-iconfont;
+    content:'\e6a5';
 }
 
-.nd-ico-info-blue{
-    background-image:url(imgs/info-blue.png);
-    background-repeat: no-repeat;
+.nd-icon-data::before{
+    font-family: nd-iconfont;
+    content:'\e6a6';
 }
 
-.nd-ico-menu-black{
-    background-image:url(imgs/menu-black.png);
-    background-repeat: no-repeat;
+.nd-icon-question::before{
+    font-family: nd-iconfont;
+    content:'\e6a7';
 }
-.nd-ico-menu-white{
-    background-image:url(imgs/menu-white.png);
-    background-repeat: no-repeat;
+
+.nd-icon-pulldown::before{
+    font-family: nd-iconfont;
+    content:'\e6a8';
 }
-.nd-ico-minus-black{
-    background-image:url(imgs/minus-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-info::before{
+    font-family: nd-iconfont;
+    content:'\e6a9';
 }
-.nd-ico-minus-white{
-    background-image:url(imgs/minus-white.png);
-    background-repeat: no-repeat;
+
+.nd-icon-reject::before{
+    font-family: nd-iconfont;
+    content:'\e6aa';
 }
-.nd-ico-packup-black{
-    background-image:url(imgs/packup-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-pullup::before{
+    font-family: nd-iconfont;
+    content:'\e6ab';
 }
-.nd-ico-plus-black{
-    background-image:url(imgs/plus-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-setting::before{
+    font-family: nd-iconfont;
+    content:'\e6ac';
 }
-.nd-ico-plus-white{
-    background-image:url(imgs/plus-white.png);
-    background-repeat: no-repeat;
+
+.nd-icon-heart::before{
+    font-family: nd-iconfont;
+    content:'\e6ad';
 }
-.nd-ico-publish-black{
-    background-image:url(imgs/publish-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-plus::before{
+    font-family: nd-iconfont;
+    content:'\e6ae';
 }
-.nd-ico-search-black{
-    background-image:url(imgs/search-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-refresh::before{
+    font-family: nd-iconfont;
+    content:'\e6af';
 }
-.nd-ico-setting-black{
-    background-image:url(imgs/setting-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-money::before{
+    font-family: nd-iconfont;
+    content:'\e6b0';
 }
-.nd-ico-star-yellow{
-    background-image:url(imgs/star-yellow.png);
-    background-repeat: no-repeat;
+
+.nd-icon-publish::before{
+    font-family: nd-iconfont;
+    content:'\e6b1';
 }
-.nd-ico-star-black{
-    background-image:url(imgs/start-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-dialog::before{
+    font-family: nd-iconfont;
+    content:'\e6b2';
 }
-.nd-ico-star-white{
-    background-image:url(imgs/start-white.png);
-    background-repeat: no-repeat;
+
+.nd-icon-list::before{
+    font-family: nd-iconfont;
+    content:'\e6b3';
 }
-.nd-ico-view-black{
-    background-image:url(imgs/view-black.png);
-    background-repeat: no-repeat;
+
+.nd-icon-menu::before{
+    font-family: nd-iconfont;
+    content:'\e6b4';
 }
-.nd-ico-view-white{
-    background-image:url(imgs/view-white.png);
-    background-repeat: no-repeat;
+
+.nd-icon-chart::before{
+    font-family: nd-iconfont;
+    content:'\e6b5';
+}
+
+.nd-icon-location::before{
+    font-family: nd-iconfont;
+    content:'\e6b6';
 }

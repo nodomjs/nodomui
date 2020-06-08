@@ -55,9 +55,9 @@ class UIPanel implements nodom.IDefineElement{
             <div class='nd-panel-header'>
             <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
             <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-                <ui-button x-if='$uidata.showMin' small nobg icon='minus-white'></ui-button>
-                <ui-button x-if='$uidata.showMax' small nobg icon='plus-white'></ui-button>
-                <ui-button x-if='$uidata.showClose' small nobg icon='close-white'></ui-button>
+                <ui-button x-if='$uidata.showMin' small nobg icon='minus'></ui-button>
+                <ui-button x-if='$uidata.showMax' small nobg icon='plus'></ui-button>
+                <ui-button x-if='$uidata.showClose' small nobg icon='close'></ui-button>
             </div>
             </div>
         </div>`;

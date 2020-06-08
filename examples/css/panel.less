@@ -31,7 +31,12 @@
         .nd-panel-header-bar{
             margin:-@btn-padding-top-normal+3 -@panel-padding-left + 3 0 0;
             display:inline-flex;
+
+            *{
+                color:@forecolor1;
+            }
         }
+        
     }
 
     .nd-panel-body{
@@ -45,8 +50,11 @@
     .nd-toolbar{
         background-color:@lightgrey;
         border-bottom:1px solid @grey;
-        text-align:left;
         display:inline-flex;
+        .nd-btn{
+            padding:@btn-padding-top-small
+        }
+        
     }
 
     /* button group*/

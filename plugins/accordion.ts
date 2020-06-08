@@ -23,7 +23,7 @@ class UIAccordion implements nodom.IDefineElement{
         let secondDom:nodom.Element = new nodom.Element();   
         firstDom.tagName = 'DIV';
         secondDom.tagName = 'DIV';
-        
+        let activeName:string;
         for(let i=0;i<ct.children.length;i++){
             let item = ct.children[i];
             if(!item.tagName){
@@ -41,6 +41,7 @@ class UIAccordion implements nodom.IDefineElement{
                     dataKey:item.props['data'],
                     activeName:item.props['activename']
                 });
+                activeName = item.props['activename'] || 'active';
                 item.events['click'] = new nodom.NodomEvent('click', methodId);
                 firstDom.children.push(item);
 
@@ -52,8 +53,8 @@ class UIAccordion implements nodom.IDefineElement{
                     let arr:string = cls.split(' ');
                     let iconDown = 'nd-ico-' + arr[0];
                     let iconUp = 'nd-ico-' + arr[1];
-                    item.directives.push(new nodom.Directive('class',"{'" + iconUp + "':'$pullDown','"
-                        + iconDown + "':'!$pullDown'}",item));
+                    item.directives.push(new nodom.Directive('class',"{'" + iconUp + "':'"+ activeName +"','"
+                        + iconDown + "':'!"+ activeName +"'}",item));
                 }
                 delete item.props['data']; 
                 delete item.props['activename']; 
@@ -63,7 +64,7 @@ class UIAccordion implements nodom.IDefineElement{
                 item.directives.push(new nodom.Directive('repeat',item.props['data'],item));
                 item.props['class'] = item.props['class']?'nd-accordion-second ' + item.props['class']:'nd-accordion-second';
                 secondDom.props['class'] = 'nd-accordion-secondct';
-                secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!$pullDown'}",secondDom));
+                secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName +"'}",secondDom));
                 secondDom.children.push(item);
                 delete item.props['data'];
                 delete item.props['second'];
@@ -79,9 +80,6 @@ class UIAccordion implements nodom.IDefineElement{
 
         firstDom.children.push(secondDom);
         ct.children = [firstDom];
-        
-        
-        // panel.extraData = data;
         ct.defineType='UI-ACCORDION';      
         return ct;
     }
@@ -96,33 +94,12 @@ class UIAccordion implements nodom.IDefineElement{
         module.methodFactory.add(instance['methodId'],
             (e, module, view,dom) => {
                 let model = module.modelFactory.get(dom.modelId);
-                model.data.$pullDown = !model.data.$pullDown;
+                model.set(instance['activeName'],!model.data[instance['activeName']]);
             }
         );
     }
 
-    afterRender(module:nodom.Module,dom:nodom.Element){
-        let firstDom:nodom.Element = dom.children[0].children[0];
-        let key = firstDom.key;
-        key = key.substr(0,key.indexOf('_'));
-        const instance = this.instanceMap.get(key);
-        //设置激活
-        if(instance['activeName']){
-            let an:string = instance['activeName'];
-            for(let d of dom.children[0].children){
-                let model:nodom.Model = module.modelFactory.get(d.modelId);
-                let data = model.data;
-                console.log(data);
-                if(data[an]){
-                    model.set('$pullDown',true);
-                }else{
-                    model.set('$pullDown',false);
-                }
-            }
-        }
-        
-    }
-
+    
 
 }
 

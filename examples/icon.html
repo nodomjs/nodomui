@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    
+    <style>
+        .panel{
+            height:600px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <b class='nd-icon-minus'></b>
+        <b class='nd-icon-plus'></b>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div'
+        }
+    })
+</script>
+</html>
