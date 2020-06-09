@@ -14,8 +14,7 @@ class UIToolbar {
         oe.tagName = 'DIV';
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
-        const cls = 'nd-toolbar';
-        oe.props['class'] = oe.props['class'] ? oe.props['class'] + ' ' + cls : cls;
+        oe.addClass('nd-toolbar');
         oe.defineType = 'UI-TOOLBAR';
         return oe;
     }

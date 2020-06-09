@@ -10,6 +10,7 @@
     <link rel="stylesheet/less" type="text/css" href="css/button.less" />
     <link rel="stylesheet/less" type="text/css" href="css/layout.less" />
     <link rel="stylesheet/less" type="text/css" href="css/accordion.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
     <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
     <link rel="stylesheet/less" type="text/css" href="css/color.less" />
     <script src='js/nodom.js'></script>
@@ -19,26 +20,32 @@
     <script src='../dist/toolbar.js'></script>
     <script src='../dist/buttongroup.js'></script>
     <script src='../dist/layout.js'></script>
+    <script src='../dist/accordion.js'></script>
     <style>
         .north{
-            height:100px;
+            height:50px;
+            line-height:50px;
             font-size:18px;
-            background-color:#9cf;
+            background-color:#333;
+            color:#fff;
+            text-align:center;
         }
 
         .south{
             height:100px;
+            line-height:25px;
+            box-sizing:border-box;
             background-color:#333;
             color:#fff;
             font-size:14px;
+            padding:20px;
+            text-align:center;
         }
 
         .west{
-            background-color:#acacac;
             width:200px;
         }
         .east{
-            background-color:#ccc;
             width:200px;
         }
         .panel{
@@ -51,33 +58,71 @@
     <div>
         <ui-layout>
             <div class='north' north>这是一个管理系统</div>
-            <div west class='west'>西边</div>
+            <div west class='west'>
+                <ui-panel title='功能选择'>
+                    <ui-accordion>
+                        <div first data='levels' icon='pulldown pullup' activeName='active'>{{title}}</div>
+                        <a second data='rows'>{{name}}</a>
+                    </ui-accordion>
+                </ui-panel>
+            </div>
             <div center>
-                <ui-panel class='panel' title='测试panel' head min max close>
+                <ui-panel title='测试panel' buttons='min,max,close'>
                     <ui-toolbar>
-                        <ui-button nobg small top icon='setting-black'></ui-button>
-                        <ui-button nobg small right icon='dropdown-black' >颜色</ui-button>
-                        <ui-button nobg small icon='edit-black'></ui-button>
-                        <ui-button nobg small icon='publish-black'></ui-button>
+                        <ui-button nobg left icon='menu'></ui-button>
+                        <ui-button nobg right icon='pulldown' >颜色</ui-button>
+                        <ui-button  nobg icon='setting'></ui-button>
+                        <ui-button  nobg icon='publish'></ui-button>
                     </ui-toolbar>
                     <div>hello world!</div>
                     <ui-buttongroup>
-                        <ui-button active small left icon='plus-black'>添加</ui-button>
-                        <ui-button emphasis small left icon='close-black'>删除</ui-button>
-                        <ui-button warn small left icon='edit-black'>编辑</ui-button>
-                        <ui-button left small icon='search-black'>查询</ui-button>
+                        <ui-button active small icon='plus'>添加</ui-button>
+                        <ui-button emphasis small icon='close'>删除</ui-button>
+                        <ui-button warn small icon='info'>编辑</ui-button>
+                        <ui-button small icon='search'>查询</ui-button>
                     </ui-buttongroup>
                 </ui-panel>
             </div>
             <div east class='east'>东边</div>
-            <div south class='south'>nodom团队@版权所有</div>
+            <div south class='south'>
+                nodom团队@版权所有<br>
+                邮箱：nodomjs@aliyun.com
+            </div>
+            
         </ui-layout>
     </div>
 </body>
 <script>
     nodom.newApp({
         module:{
-            el:'div'
+            el:'div',
+            data:{
+                levels:[
+                    {title:'商品管理',active:true,rows:[
+                        {name:'商品上架'},
+                        {name:'商品下架'},
+                        {name:'商品编辑'},
+                        {name:'商品统计'}
+                    ]},
+                    {title:'商家管理',rows:[
+                        {name:'商家审核'},
+                        {name:'商家关店'},
+                        {name:'临时关闭'},
+                        {name:'商家统计'}
+                    ]},
+                    {title:'订单管理',rows:[
+                        {name:'发货'},
+                        {name:'取消申请'},
+                        {name:'删除订单'}
+                    ]},
+                    {title:'安全管理',rows:[
+                        {name:'角色管理'},
+                        {name:'用户管理'},
+                        {name:'资源管理'},
+                        {name:'权限管理'}
+                    ]}
+                ]
+            }
         }
     })
 </script>

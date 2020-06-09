@@ -13,8 +13,7 @@ class UIToolbar implements nodom.IDefineElement{
         oe.tagName = 'DIV';
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
-        const cls:string = 'nd-toolbar';
-        oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
+        oe.addClass('nd-toolbar');
         oe.defineType='UI-TOOLBAR';
         return oe;
     }

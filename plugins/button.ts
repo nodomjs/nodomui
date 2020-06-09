@@ -77,28 +77,26 @@ class UIButton implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
         //把btn类加入到class
-        oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
+        oe.addClass(cls);
 
         //图标element
         let img:nodom.Element = new nodom.Element();
         img.tagName = 'B';
-        
+        img.addClass('nd-icon-' + icon + ' nd-icon-' + size);
         switch(loc){
             case 'left':
                 oe.children.unshift(img);
-                img.props['class'] = 'nd-icon-' + icon + ' nd-icon-' + size;
                 break;
             case 'top':
                 oe.children.unshift(img);
-                img.props['class'] = 'nd-btn-vert nd-icon-' + icon + ' nd-icon-' + size;
+                img.addClass('nd-btn-vert');
                 break;
             case 'right':
                 oe.children.push(img);
-                img.props['class'] = 'nd-icon-' + icon + ' nd-icon-' + size;
                 break;
             case 'bottom':
                 oe.children.push(img);
-                img.props['class'] = 'nd-btn-vert nd-icon-' + icon + ' nd-icon-' + size;
+                img.addClass('nd-btn-vert');
                 break;    
         }
         

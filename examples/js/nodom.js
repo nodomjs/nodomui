@@ -817,10 +817,8 @@ var nodom;
                 }
             }
             if (this.defineType) {
-                console.log(this.modelId);
                 nodom.DefineElementManager.afterRender(module, this);
             }
-            
         }
         renderToHtml(module, params) {
             let el;
@@ -943,12 +941,13 @@ var nodom;
         }
         clone() {
             let dst = new Element();
+            let notCopyProps = ['directives', 'props', 'exprProps', 'events', 'children'];
             nodom.Util.getOwnProps(this).forEach((p) => {
-                if (typeof this[p] !== 'object') {
-                    dst[p] = this[p];
+                if (notCopyProps.includes(p)) {
+                    return;
                 }
+                dst[p] = this[p];
             });
-            dst['extraData'] = this['extraData'];
             for (let d of this.directives) {
                 dst.directives.push(d);
             }
@@ -961,10 +960,14 @@ var nodom;
             nodom.Util.getOwnProps(this.events).forEach((k) => {
                 dst.events[k] = this.events[k].clone();
             });
-            dst.expressions = this.expressions;
-            this.children.forEach((d) => {
-                dst.children.push(d.clone());
-            });
+            for (let i = 0; i < this.children.length; i++) {
+                if (!this.children[i]) {
+                    this.children.splice(i--, 1);
+                }
+                else {
+                    dst.children.push(this.children[i].clone());
+                }
+            }
             return dst;
         }
         handleDirectives(module, parent) {
@@ -1102,6 +1105,54 @@ var nodom;
             for (; dom !== undefined && dom !== this; dom = dom.parent)
                 ;
             return dom !== undefined;
+        }
+        addClass(cls) {
+            let clazz = this.props['class'];
+            let finded = false;
+            if (!clazz) {
+                clazz = cls;
+            }
+            else {
+                let sa = clazz.split(' ');
+                let s;
+                for (let i = 0; i < sa.length; i++) {
+                    if (s === '') {
+                        sa.splice(i--, 1);
+                        continue;
+                    }
+                    if (sa[i] === cls) {
+                        finded = true;
+                        break;
+                    }
+                }
+                if (!finded) {
+                    sa.push(cls);
+                }
+                clazz = sa.join(' ');
+            }
+            this.props['class'] = clazz;
+        }
+        removeClass(cls) {
+            let clazz = this.props['class'];
+            if (!clazz) {
+                return;
+            }
+            else {
+                let sa = clazz.split(' ');
+                let s;
+                for (let i = 0; i < sa.length; i++) {
+                    if (s === '') {
+                        sa.splice(i--, 1);
+                        continue;
+                    }
+                    if (sa[i] === cls) {
+                        sa.splice(i, 1);
+                        break;
+                    }
+                }
+                clazz = sa.join(' ');
+            }
+            this.props['class'] = clazz;
         }
         query(key) {
             if (this.key === key) {
@@ -1406,7 +1457,10 @@ var nodom;
                 }
             }
             addField(field) {
-                if (field === '' || field.startsWith(Expression.REP_STR) || nodom.Util.isNumberString(field)) {
+                const jsKeyWords = ['true', 'false', 'undefined', 'null', 'typeof',
+                    'Object', 'Function', 'Array', 'Number', 'Date',
+                    'instanceof', 'NaN'];
+                if (field === '' || jsKeyWords.includes(field) || field.startsWith(Expression.REP_STR) || nodom.Util.isNumberString(field)) {
                     return false;
                 }
                 let ind;
@@ -3431,8 +3485,11 @@ var nodom;
                     parent.children[indelse].dontRender = true;
                 }
             }
-            else if (indelse > 0) {
+            else {
                 dom.dontRender = true;
+                if (indelse > 0) {
+                    parent.children[indelse].dontRender = false;
+                }
             }
             return true;
         }

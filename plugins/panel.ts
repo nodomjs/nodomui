@@ -9,33 +9,32 @@ class UIPanel implements nodom.IDefineElement{
      * 编译后执行代码
      */
     init(el:HTMLElement){
-        let title:string; 
-        let showMin:boolean;
-        let showMax:boolean;
-        let showClose:boolean;
-        let showHead:boolean;
-        let showHeaderbar:boolean;
+        let title:string;
+        let showMin:boolean = false;
+        let showMax:boolean = false;
+        let showClose:boolean = false;
+        let showHead:boolean = false;
+        let showHeaderbar:boolean = false;
         
         if(el.hasAttribute('title')){
             title = el.getAttribute('title');
             el.removeAttribute('title');
         }
 
-        if(el.hasAttribute('min')){
-            showMin = true;
-            el.removeAttribute('min');
+        if(el.hasAttribute('buttons')){
+            let buttons = el.getAttribute('buttons').split(',');
+            if(buttons.includes('min')){
+                showMin = true;    
+            }
+            if(buttons.includes('max')){
+                showMax = true;    
+            }
+            if(buttons.includes('close')){
+                showClose = true;    
+            }
+            el.removeAttribute('buttons');
         }
         
-        if(el.hasAttribute('max')){
-            showMax = true;
-            el.removeAttribute('max');
-        }
-
-        if(el.hasAttribute('close')){
-            showClose = true;
-            el.removeAttribute('close');
-        }
-
         showHeaderbar = showMax || showMin || showClose;
         showHead = title!==undefined && title !== '' || showHeaderbar;
 
@@ -71,7 +70,7 @@ class UIPanel implements nodom.IDefineElement{
         Object.getOwnPropertyNames(oe.props).forEach((p)=>{
             panel.props[p] = oe.props[p];
         });
-        panel.props['class'] = panel.props['class']?'nd-panel ' + panel.props['class']:'nd-panel';
+        panel.addClass('nd-panel');
         Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
             panel.exprProps[p] = oe.exprProps[p];
         });
@@ -94,7 +93,7 @@ class UIPanel implements nodom.IDefineElement{
         for(let b of oe.children){
             if(b.tagName){
                 panel.children.push(b);
-                b.props['class'] = b.props['class']?'nd-panel-body ' + b.props['class']:'nd-panel-body';
+                b.addClass('nd-panel-body');
                 break;
             }
             

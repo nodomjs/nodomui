@@ -15,25 +15,24 @@
     }
     /* 头部 */
     .nd-panel-header{
-        padding:@panel-padding-top @panel-padding-left;        
-        background-color:@backcolor1;
-        color:@forecolor1;
+        height: 40px;
+        line-height:40px;
+        padding:0 @title-padding;
+        background-color:@title-color;
+        color:@white;
         border-radius:@radius @radius 0 0;
         display:inline-flex;
         justify-content: space-between;
         /* 标题 */
         .nd-panel-title{
-            font-size:@fontsizenormal;
-            flex:1;
+            font-size:@fontnormal;
+            
         }
 
         /*头部工具栏*/
         .nd-panel-header-bar{
-            margin:-@btn-padding-top-normal+3 -@panel-padding-left + 3 0 0;
-            display:inline-flex;
-
-            *{
-                color:@forecolor1;
+            .nd-btn{
+                color:@white;
             }
         }
         
@@ -41,7 +40,7 @@
 
     .nd-panel-body{
         padding:@padding;
-        font-size:@fontsizesmall;
+        font-size:@fontsmall;
         flex:1;
     }
 
@@ -52,9 +51,8 @@
         border-bottom:1px solid @grey;
         display:inline-flex;
         .nd-btn{
-            padding:@btn-padding-top-small
+            padding:@btn-padding-top;
         }
-        
     }
 
     /* button group*/

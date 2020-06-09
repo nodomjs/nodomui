@@ -13,8 +13,7 @@ class UIButtonGroup implements nodom.IDefineElement{
         oe.tagName = 'DIV';
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
-        const cls:string = 'nd-buttongroup';
-        oe.props['class'] = oe.props['class']?oe.props['class'] + ' ' + cls:cls;
+        oe.addClass('nd-buttongroup');
         oe.defineType='UI-BUTTONGROUP';
         return oe;
     }
