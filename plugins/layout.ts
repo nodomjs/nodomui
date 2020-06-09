@@ -56,7 +56,7 @@ class UILayout implements nodom.IDefineElement{
             oe.children.push(items['south']);
         }
         
-        oe.defineType='UI-LAYOUT';
+        oe.defineType=this.tagName;
         return oe;
     }
 }

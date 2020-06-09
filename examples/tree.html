@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/accordion.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/tree.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/tree.js'></script>
+    <style>
+        .ct{
+            width:300px !important;
+            display:inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ui-tree class='ct' x-model='data1'>
+            <div icon='max minus data' data='rows' activeName='active'>{{title}}</div>
+        </ui-tree>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                rows:[
+                    {title:'商品管理',active:true,rows:[
+                        {name:'商品上架'},
+                        {name:'商品下架'},
+                        {name:'商品编辑'},
+                        {name:'商品统计'}
+                    ]},
+                    {title:'商家管理',rows:[
+                        {name:'商家审核'},
+                        {name:'商家关店'},
+                        {name:'临时关闭'},
+                        {name:'商家统计'}
+                    ]},
+                    {title:'订单管理',rows:[
+                        {name:'发货'},
+                        {name:'取消申请'},
+                        {name:'删除订单'}
+                    ]},
+                    {title:'安全管理',rows:[
+                        {name:'角色管理'},
+                        {name:'用户管理'},
+                        {name:'资源管理'},
+                        {name:'权限管理'}
+                    ]}
+                ]    
+                
+            }
+        }
+    })
+</script>
+</html>

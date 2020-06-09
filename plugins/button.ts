@@ -100,7 +100,7 @@ class UIButton implements nodom.IDefineElement{
                 break;    
         }
         
-        oe.defineType='UI_BUTTON';
+        oe.defineType=this.tagName;
         return oe;
     }
 }

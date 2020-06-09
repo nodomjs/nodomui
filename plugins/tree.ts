@@ -3,8 +3,8 @@
 /**
  * panel 插件
  */
-class UIAccordion implements nodom.IDefineElement{
-    tagName:string = 'UI-ACCORDION';
+class UITree implements nodom.IDefineElement{
+    tagName:string = 'UI-TREE';
     /**
      * 编译后执行代码
      */
@@ -15,7 +15,7 @@ class UIAccordion implements nodom.IDefineElement{
         ct.tagName = 'DIV';
         nodom.Compiler.handleAttributes(ct,el);
         nodom.Compiler.handleChildren(ct,el);
-        ct.addClass('nd-accordion');
+        ct.addClass('nd-tree');
 
         let firstDom:nodom.Element = new nodom.Element();
         let secondDom:nodom.Element = new nodom.Element();   
@@ -142,6 +142,28 @@ class UIAccordion implements nodom.IDefineElement{
 
                 model = module.modelFactory.get(dom.modelId);
                 model.set(f,true);
+                
+                /*const an = '$active';
+                let p:nodom.Element = dom.getParent(module);
+                let model:nodom.Model;
+                //清除之前的active
+                if(p.tmpData['current']){
+                    if(p.tmpData['current'] === dom.key){
+                        return;
+                    }
+                    let old:nodom.Element = p.query(p.tmpData['current']);
+                    console.log(old,dom);
+                    if(old){
+                        model = module.modelFactory.get(old.modelId);
+                        if(model){
+                            model.set(an,false);
+                        }    
+                    }
+                    //设置active dom key
+                    p.tmpData['current'] = dom.key;
+                }
+                model = module.modelFactory.get(dom.modelId);
+                model.set(an,true); */
             }
         );
     }

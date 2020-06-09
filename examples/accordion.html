@@ -15,16 +15,22 @@
     <script src='js/less.min.js'></script>
     <script src='../dist/accordion.js'></script>
     <style>
-        .panel{
-            height:600px;
+        .ct{
+            width:300px !important;
+            display:inline-block;
         }
     </style>
 </head>
 <body>
     <div>
-        <ui-accordion>
+        <ui-accordion class='ct' x-model='data1'>
         <div first data='levels' icon='pulldown pullup' activeName='active'>{{title}}</div>
-        <a second data='rows'>{{name}}</a>
+        <a second data='rows' activeName='a1'>{{name}}</a>
+        </ui-accordion>
+    
+        <ui-accordion  class='ct' x-model='data2'>
+        <div first data='levels' icon='pulldown pullup' activeName='active'>{{title}}</div>
+        <a second data='rows' activeName='a1'>{{name}}</a>
         </ui-accordion>
     </div>
 </body>
@@ -33,31 +39,60 @@
         module:{
             el:'div',
             data:{
-                levels:[
-                    {title:'商品管理',active:true,rows:[
-                        {name:'商品上架'},
-                        {name:'商品下架'},
-                        {name:'商品编辑'},
-                        {name:'商品统计'}
-                    ]},
-                    {title:'商家管理',rows:[
-                        {name:'商家审核'},
-                        {name:'商家关店'},
-                        {name:'临时关闭'},
-                        {name:'商家统计'}
-                    ]},
-                    {title:'订单管理',rows:[
-                        {name:'发货'},
-                        {name:'取消申请'},
-                        {name:'删除订单'}
-                    ]},
-                    {title:'安全管理',rows:[
-                        {name:'角色管理'},
-                        {name:'用户管理'},
-                        {name:'资源管理'},
-                        {name:'权限管理'}
-                    ]}
-                ]
+                data1:{
+                    levels:[
+                        {title:'商品管理',active:true,rows:[
+                            {name:'商品上架'},
+                            {name:'商品下架'},
+                            {name:'商品编辑'},
+                            {name:'商品统计'}
+                        ]},
+                        {title:'商家管理',rows:[
+                            {name:'商家审核'},
+                            {name:'商家关店'},
+                            {name:'临时关闭'},
+                            {name:'商家统计'}
+                        ]},
+                        {title:'订单管理',rows:[
+                            {name:'发货'},
+                            {name:'取消申请'},
+                            {name:'删除订单'}
+                        ]},
+                        {title:'安全管理',rows:[
+                            {name:'角色管理'},
+                            {name:'用户管理'},
+                            {name:'资源管理'},
+                            {name:'权限管理'}
+                        ]}
+                    ]    
+                },
+                data2:{
+                    levels:[
+                        {title:'商品管理',active:true,rows:[
+                            {name:'商品上架'},
+                            {name:'商品下架'},
+                            {name:'商品编辑'},
+                            {name:'商品统计'}
+                        ]},
+                        {title:'商家管理',rows:[
+                            {name:'商家审核'},
+                            {name:'商家关店'},
+                            {name:'临时关闭'},
+                            {name:'商家统计'}
+                        ]},
+                        {title:'订单管理',rows:[
+                            {name:'发货'},
+                            {name:'取消申请'},
+                            {name:'删除订单'}
+                        ]},
+                        {title:'安全管理',rows:[
+                            {name:'角色管理'},
+                            {name:'用户管理'},
+                            {name:'资源管理'},
+                            {name:'权限管理'}
+                        ]}
+                    ]    
+                }
             }
         }
     })
