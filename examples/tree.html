@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet/less" type="text/css" href="css/base.less" />
@@ -24,8 +24,11 @@
 </head>
 <body>
     <div>
-        <ui-tree class='ct' x-model='data1'>
-            <div icon='max minus data' data='rows' activeName='active'>{{title}}</div>
+        <ui-tree class='ct' x-model='data1' data='rows' 
+            icon='pullup,pulldown,data' showName='title' itemClick='clickItem' 
+            checkbox activeName='active'
+            maxLevels='3'
+            >
         </ui-tree>
     </div>
 </body>
@@ -36,30 +39,39 @@
             data:{
                 rows:[
                     {title:'商品管理',active:true,rows:[
-                        {name:'商品上架'},
-                        {name:'商品下架'},
-                        {name:'商品编辑'},
-                        {name:'商品统计'}
+                        {title:'商品上架'},
+                        {title:'商品下架'},
+                        {title:'商品编辑'},
+                        {title:'商品统计',active:true,rows:[
+                            {title:'上架统计'},
+                            {title:'下架统计'},
+                            {title:'销售统计'}
+                        ]}
                     ]},
                     {title:'商家管理',rows:[
-                        {name:'商家审核'},
-                        {name:'商家关店'},
-                        {name:'临时关闭'},
-                        {name:'商家统计'}
+                        {title:'商家审核'},
+                        {title:'商家关店'},
+                        {title:'临时关闭'},
+                        {title:'商家统计'}
                     ]},
                     {title:'订单管理',rows:[
-                        {name:'发货'},
-                        {name:'取消申请'},
-                        {name:'删除订单'}
+                        {title:'发货'},
+                        {title:'取消申请'},
+                        {title:'删除订单'}
                     ]},
                     {title:'安全管理',rows:[
-                        {name:'角色管理'},
-                        {name:'用户管理'},
-                        {name:'资源管理'},
-                        {name:'权限管理'}
+                        {title:'角色管理'},
+                        {title:'用户管理'},
+                        {title:'资源管理'},
+                        {title:'权限管理'}
                     ]}
                 ]    
                 
+            },
+            methods:{
+                clickItem:function(e,module){
+                    console.log(module);
+                }
             }
         }
     })

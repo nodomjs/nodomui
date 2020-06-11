@@ -1455,12 +1455,17 @@ var nodom;
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
                 valueArr.unshift(module);
+                
                 return this.execFunc.apply(null, valueArr);
                 function getFieldValue(module, dataObj, field) {
                     if (dataObj.hasOwnProperty(field)) {
                         return dataObj[field];
                     }
-                    return module.model.query(field);
+                    //$开头，则从根开始找
+                    if(field.startsWith('$$')){
+                        return module.model.query(field.substr(2));
+                    }
+                    
                 }
             }
             addField(field) {
@@ -3560,6 +3565,7 @@ var nodom;
                 if (r instanceof nodom.Expression) {
                     r = r.val(model);
                 }
+                    
                 let ind = clsArr.indexOf(key);
                 if (!r || r === 'false') {
                     if (ind !== -1) {

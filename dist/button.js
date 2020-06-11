@@ -93,7 +93,7 @@ class UIButton {
                 img.addClass('nd-btn-vert');
                 break;
         }
-        oe.defineType = 'UI_BUTTON';
+        oe.defineType = this.tagName;
         return oe;
     }
 }

@@ -14,159 +14,117 @@ class UITree implements nodom.IDefineElement{
         ct.tmpData = {};
         ct.tagName = 'DIV';
         nodom.Compiler.handleAttributes(ct,el);
-        nodom.Compiler.handleChildren(ct,el);
         ct.addClass('nd-tree');
-
-        let firstDom:nodom.Element = new nodom.Element();
-        let secondDom:nodom.Element = new nodom.Element();   
-        firstDom.tagName = 'DIV';
-        secondDom.tagName = 'DIV';
-        firstDom.addClass('nd-accordion-item');
-        //第一级active field name
-        let activeName1:string;
-        //第二级active field name
-        let activeName2:string;
-        for(let i=0;i<ct.children.length;i++){
-            let item = ct.children[i];
-            if(!item.tagName){
-                continue;
+        //数据字段名
+        let dataName:string = ct.props['data'];
+        //图标数组
+        let icons:string[];
+        //显示字段名
+        let showName:string = ct.props['showname'];
+        //激活字段名
+        let activeName:string = ct.props['activename'];
+        if(ct.props['icon']){
+            icons = ct.props['icon'].trim().replace(/\s+/g,'').split(',');
+        }
+        //最大级数，默认5
+        let maxLevels:number = ct.props['maxlevels']?parseInt(ct.props['maxlevels']):5;
+        //展开收拢事件
+        let methodId = '$nodomGenMethod' + nodom.Util.genId();
+        let closeOpenEvent:nodom.NodomEvent = new nodom.NodomEvent('click', methodId);
+        //暂存数据
+        ct.tmpData = {
+            dataName:dataName,
+            activeName:activeName,
+            closeOpenMid:methodId
+        };
+        
+        //item click 事件
+        let itemClickEvent:nodom.NodomEvent;
+        if(ct.props['itemclick']){
+            itemClickEvent = new nodom.NodomEvent('click', ct.props['itemclick']);
+        }
+        let parentCt:nodom.Element = ct;
+        let item:nodom.Element;
+        for(let i=0;i<maxLevels;i++){
+            let itemCt:nodom.Element = new nodom.Element();
+            itemCt.tagName = 'div';
+            itemCt.directives.push(new nodom.Directive('repeat',dataName,itemCt));
+            itemCt.addClass('nd-tree-nodect');
+            item = new nodom.Element();
+            item.addClass('nd-tree-node');
+            item.tagName = 'DIV';
+            //绑定item click事件
+            if(itemClickEvent){
+                item.events['click'] = itemClickEvent;
             }
             
-            if(item.props.hasOwnProperty('first')){
-                //添加repeat指令
-                firstDom.directives.push(new nodom.Directive('repeat',item.props['data'],firstDom));
-                item.addClass('nd-accordion-first');
-                //增加事件
-                let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.events['click'] = new nodom.NodomEvent('click', methodId);
-                ct.tmpData['firstLevelMid'] = methodId;
-                
-                activeName1 = item.props['activename'] || 'active';
-                //存激活field name
-                ct.tmpData['activeName1'] = activeName1;
+            if(icons && icons.length>0){
+                let a:string[] = [];
+                a.push("'nd-icon-" + icons[0] + "':'" + dataName + "&&" + dataName + ".length>0 && "+ activeName + "'");
 
-                firstDom.add(item);
-                //保存第二级field
-                ct.tmpData['field1'] = item.props['data'];
-                //图标
-                if(item.props['icon']){
-                    let cls = item.props['icon'].trim();
-                    //去掉多余空格
-                    cls = cls.replace(/\s+/,' ');
-                    let arr:string = cls.split(' ');
-                    let iconDown = 'nd-icon-' + arr[0];
-                    let iconUp = 'nd-icon-' + arr[1];
-                    let icon:nodom.Element = new nodom.Element();
-                    icon.tagName = 'B';
-                    icon.directives.push(new nodom.Directive('class',"{'" + iconUp + "':'"+ activeName1 +"','"
-                        + iconDown + "':'!"+ activeName1 +"'}",item));
-                    item.children.push(icon);
+                if(icons.length>1){
+                    a.push("'nd-icon-" + icons[1] + "':'" +  dataName + "&&" + dataName + ".length>0 && !"+ activeName +"'");
                 }
-                
-                delete item.props['data']; 
-                delete item.props['activename']; 
-                delete item.props['icon'];
-                delete item.props['first'];
-            }else if(item.props.hasOwnProperty('second')){
-                activeName2 = item.props['activename'] || 'active';
-                //存激活field name
-                ct.tmpData['activeName2'] = activeName2;
-                item.directives.push(new nodom.Directive('repeat',item.props['data'],item));
-                //保存第二级field
-                ct.tmpData['field2'] = item.props['data'];
-                item.addClass('nd-accordion-second');
-                let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.events['click'] = new nodom.NodomEvent('click', methodId);
-                item.directives.push(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}",item));
-                ct.tmpData['secondLevelMid'] = methodId;
-                secondDom.addClass('nd-accordion-secondct');
-                secondDom.tmpData = {};
-                secondDom.add(item);
-                secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}",secondDom));
-                delete item.props['data'];
-                delete item.props['second'];
+                //叶子节点图标
+                if(icons.length===3){
+                    a.push("'nd-icon-" + icons[2] + "':'!" + dataName + "||" + dataName + ".length===0'");
+                }
+                let icon:nodom.Element = new nodom.Element();
+                icon.tagName = 'B';
+                let cls:string = '{' + a.join(',') + '}';
+                icon.directives.push(new nodom.Directive('class',cls,item));
+                //绑定展开收起事件
+                icon.events['click'] = closeOpenEvent;
+                itemCt.add(icon);
             }
+            
+            itemCt.add(item);
+            //显示文本
+            let txt = new nodom.Element();
+            txt.expressions = [new nodom.Expression(showName)];
+            item.add(txt);
+
+            //子节点容器
+            let subCt = new nodom.Element();
+            subCt.props['class'] = 'nd-tree-subct';
+            subCt.tagName = 'DIV';
+            subCt.directives.push(new nodom.Directive('class',"{'nd-tree-show':'" + activeName + "'}",item));
+            itemCt.add(subCt);
+            parentCt.add(itemCt);
+            parentCt = subCt;
         }
-        //指令按优先级排序
-        firstDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
-        secondDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
-
-        firstDom.add(secondDom);
-
-        ct.children = [firstDom];
-        ct.defineType=this.tagName;      
+        
+        delete ct.props['data'];
+        delete ct.props['icon'];
+        delete ct.props['check'];
+        delete ct.props['activename'];
+        delete ct.props['itemclick'];
+        delete ct.props['maxlevels'];
+        ct.defineType=this.tagName;
         return ct;
     }
+    
     /**
      * 渲染前执行
      * @param module 
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
-        //添加第一层click事件
-        module.methodFactory.add(uidom.tmpData['firstLevelMid'],
+        //展开收拢事件
+        module.methodFactory.add(uidom.tmpData['closeOpenMid'],
             (e, module, view,dom) => {
-                let model:nodom.Model = module.modelFactory.get(uidom.modelId);
-                let data = model.data[uidom.tmpData['field1']];
-                //选中字段名
-                let f:string = uidom.tmpData['activeName1'];
-                //取消之前选中
-                for(let d of data){
-                    if(d[f] === true){
-                        d[f] = false;
-                    }
+                let model:nodom.Model = module.modelFactory.get(dom.modelId);
+                let rows = model.data[uidom.tmpData['dataName']]
+                //叶子节点不处理
+                if(!rows || rows.length === 0){
+                    return;
                 }
-                model = module.modelFactory.get(dom.modelId);
-                model.set(f,true);
+                //选中字段名
+                let f:string = uidom.tmpData['activeName'];
+                model.set(f,!model.data[f]);
             }
         );
 
-        //添加第二层click事件
-        module.methodFactory.add(uidom.tmpData['secondLevelMid'],
-            (e, module, view,dom) => {
-                let model:nodom.Model = module.modelFactory.get(uidom.modelId);
-                let data = model.data[uidom.tmpData['field1']];
-                //选中字段名
-                let f:string = uidom.tmpData['activeName2'];
-                //取消之前选中
-                for(let d of data){
-                    for(let d1 of d[uidom.tmpData['field2']]){
-                        if(d1[f] === true){
-                            d1[f] = false;
-                        }
-                    }
-                }
-
-                model = module.modelFactory.get(dom.modelId);
-                model.set(f,true);
-                
-                /*const an = '$active';
-                let p:nodom.Element = dom.getParent(module);
-                let model:nodom.Model;
-                //清除之前的active
-                if(p.tmpData['current']){
-                    if(p.tmpData['current'] === dom.key){
-                        return;
-                    }
-                    let old:nodom.Element = p.query(p.tmpData['current']);
-                    console.log(old,dom);
-                    if(old){
-                        model = module.modelFactory.get(old.modelId);
-                        if(model){
-                            model.set(an,false);
-                        }    
-                    }
-                    //设置active dom key
-                    p.tmpData['current'] = dom.key;
-                }
-                model = module.modelFactory.get(dom.modelId);
-                model.set(an,true); */
-            }
-        );
     }
 }
 
-nodom.DefineElementManager.add(new UIAccordion());
+nodom.DefineElementManager.add(new UITree());

@@ -52,7 +52,7 @@ class UILayout {
         if (items['south']) {
             oe.children.push(items['south']);
         }
-        oe.defineType = 'UI-LAYOUT';
+        oe.defineType = this.tagName;
         return oe;
     }
 }

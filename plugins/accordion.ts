@@ -50,10 +50,9 @@ class UIAccordion implements nodom.IDefineElement{
                 ct.tmpData['field1'] = item.props['data'];
                 //图标
                 if(item.props['icon']){
-                    let cls = item.props['icon'].trim();
                     //去掉多余空格
-                    cls = cls.replace(/\s+/,' ');
-                    let arr:string = cls.split(' ');
+                    let cls = item.props['icon'].trim().replace(/\s+/g,'');
+                    let arr:string = cls.split(',');
                     let iconDown = 'nd-icon-' + arr[0];
                     let iconUp = 'nd-icon-' + arr[1];
                     let icon:nodom.Element = new nodom.Element();

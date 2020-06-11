@@ -47,10 +47,9 @@ class UIAccordion {
                 ct.tmpData['field1'] = item.props['data'];
                 //图标
                 if (item.props['icon']) {
-                    let cls = item.props['icon'].trim();
                     //去掉多余空格
-                    cls = cls.replace(/\s+/, ' ');
-                    let arr = cls.split(' ');
+                    let cls = item.props['icon'].trim().replace(/\s+/g, '');
+                    let arr = cls.split(',');
                     let iconDown = 'nd-icon-' + arr[0];
                     let iconUp = 'nd-icon-' + arr[1];
                     let icon = new nodom.Element();
@@ -132,27 +131,6 @@ class UIAccordion {
             }
             model = module.modelFactory.get(dom.modelId);
             model.set(f, true);
-            /*const an = '$active';
-            let p:nodom.Element = dom.getParent(module);
-            let model:nodom.Model;
-            //清除之前的active
-            if(p.tmpData['current']){
-                if(p.tmpData['current'] === dom.key){
-                    return;
-                }
-                let old:nodom.Element = p.query(p.tmpData['current']);
-                console.log(old,dom);
-                if(old){
-                    model = module.modelFactory.get(old.modelId);
-                    if(model){
-                        model.set(an,false);
-                    }
-                }
-                //设置active dom key
-                p.tmpData['current'] = dom.key;
-            }
-            model = module.modelFactory.get(dom.modelId);
-            model.set(an,true); */
         });
     }
 }

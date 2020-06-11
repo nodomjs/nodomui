@@ -1,38 +1,28 @@
 @import "base.less";
 /********** tree ***********/
 .nd-tree{
-    .nd-accordion-item{
-        border-bottom:1px solid @lightgrey;
-        .nd-accordion-first{
-            padding:@title-padding;
-            background-color:@white;
-            font-size:@fontnormal;
-            width:100%;
-            box-sizing: border-box;
-            display:inline-flex;
-            justify-content: space-between;
-        }
-    
-        .nd-accordion-secondct{
-            .nd-accordion-second{
-                height:30px;
-                line-height:30px;
-                text-indent: 2em;
-                font-size:@fontsmall;
-                display:block;
-                background-color:@white;
-            }
-         
-            .nd-accordion-selected{
-                background-color:@lightgrey;
-            }
-    
-            .nd-accordion-second:hover{
-                background-color:@lightgrey;
-            }
-        }
-        .nd-accordion-hide{
-            display:none;
-        }    
+    font-size:@fontnormal;
+    .nd-tree-nodect{
+        padding:5px;
+    }
+    .nd-tree-node{
+        display:inline-block;
+    }
+
+    .nd-tree-node:hover{
+        background-color:@lightgrey;
+    }
+
+    .nd-tree-subct{
+        display:none;
+        padding:5px 1em;
+    }
+
+    .nd-tree-show{
+        display:block;
+    }
+
+    .nd-tree-level{
+        padding:5px 10px;
     }
 }

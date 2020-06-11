@@ -15,7 +15,7 @@ class UIToolbar {
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
         oe.addClass('nd-toolbar');
-        oe.defineType = 'UI-TOOLBAR';
+        oe.defineType = this.tagName;
         return oe;
     }
 }

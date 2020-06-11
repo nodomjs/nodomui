@@ -15,7 +15,7 @@ class UIButtonGroup {
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
         oe.addClass('nd-buttongroup');
-        oe.defineType = 'UI-BUTTONGROUP';
+        oe.defineType = this.tagName;
         return oe;
     }
 }

@@ -95,7 +95,7 @@ class UIPanel {
         panel.children.push(btnGrp);
         panel.tagName = 'DIV';
         panel.extraData = data;
-        panel.defineType = 'UI-PANEL';
+        panel.defineType = this.tagName;
         return panel;
     }
 }
