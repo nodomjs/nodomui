@@ -37,7 +37,7 @@ class UIAccordion {
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.events['click'] = new nodom.NodomEvent('click', methodId);
+                item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
                 ct.tmpData['firstLevelMid'] = methodId;
                 activeName1 = item.props['activename'] || 'active';
                 //存激活field name
@@ -72,7 +72,7 @@ class UIAccordion {
                 ct.tmpData['field2'] = item.props['data'];
                 item.addClass('nd-accordion-second');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.events['click'] = new nodom.NodomEvent('click', methodId);
+                item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
                 item.directives.push(new nodom.Directive('class', "{'nd-accordion-selected':'" + activeName2 + "'}", item));
                 ct.tmpData['secondLevelMid'] = methodId;
                 secondDom.addClass('nd-accordion-secondct');
@@ -101,9 +101,9 @@ class UIAccordion {
      */
     beforeRender(module, uidom) {
         //添加第一层click事件
-        module.methodFactory.add(uidom.tmpData['firstLevelMid'], (e, module, view, dom) => {
-            let model = module.modelFactory.get(uidom.modelId);
-            let data = model.data[uidom.tmpData['field1']];
+        module.methodFactory.add(uidom.tmpData['firstLevelMid'], (dom, model, module, e) => {
+            let pmodel = module.modelFactory.get(uidom.modelId);
+            let data = pmodel.data[uidom.tmpData['field1']];
             //选中字段名
             let f = uidom.tmpData['activeName1'];
             //取消之前选中
@@ -112,13 +112,12 @@ class UIAccordion {
                     d[f] = false;
                 }
             }
-            model = module.modelFactory.get(dom.modelId);
             model.set(f, true);
         });
         //添加第二层click事件
-        module.methodFactory.add(uidom.tmpData['secondLevelMid'], (e, module, view, dom) => {
-            let model = module.modelFactory.get(uidom.modelId);
-            let data = model.data[uidom.tmpData['field1']];
+        module.methodFactory.add(uidom.tmpData['secondLevelMid'], (dom, model, module, e) => {
+            let pmodel = module.modelFactory.get(uidom.modelId);
+            let data = pmodel.data[uidom.tmpData['field1']];
             //选中字段名
             let f = uidom.tmpData['activeName2'];
             //取消之前选中
@@ -129,7 +128,6 @@ class UIAccordion {
                     }
                 }
             }
-            model = module.modelFactory.get(dom.modelId);
             model.set(f, true);
         });
     }

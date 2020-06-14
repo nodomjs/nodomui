@@ -30,7 +30,7 @@
     
         <ui-accordion  class='ct' x-model='data2'>
         <div first data='levels' icon='pulldown,pullup' activeName='active'>{{title}}</div>
-        <a second data='rows' activeName='a1'>{{name}}</a>
+        <a second data='rows' activeName='a1' e-click='clickItem'>{{name}}</a>
         </ui-accordion>
     </div>
 </body>
@@ -92,6 +92,11 @@
                             {name:'权限管理'}
                         ]}
                     ]    
+                }
+            },
+            methods:{
+                clickItem:(dom,model,module,e)=>{
+                    console.log('hello',dom,model,module,e)
                 }
             }
         }

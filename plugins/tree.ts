@@ -41,7 +41,7 @@ class UITree implements nodom.IDefineElement{
         //item click 事件
         let itemClickEvent:nodom.NodomEvent;
         if(ct.props['itemclick']){
-            itemClickEvent = new nodom.NodomEvent('click', ct.props['itemclick']);
+            itemClickEvent = new nodom.NodomEvent('click', ct.props['itemclick']+':delg');
         }
         let parentCt:nodom.Element = ct;
         let item:nodom.Element;
@@ -55,7 +55,7 @@ class UITree implements nodom.IDefineElement{
             item.tagName = 'DIV';
             //绑定item click事件
             if(itemClickEvent){
-                item.events['click'] = itemClickEvent;
+                item.addEvent(itemClickEvent);
             }
             
             if(icons && icons.length>0){
@@ -71,10 +71,11 @@ class UITree implements nodom.IDefineElement{
                 }
                 let icon:nodom.Element = new nodom.Element();
                 icon.tagName = 'B';
+                icon.addClass('nd-tree-icon');
                 let cls:string = '{' + a.join(',') + '}';
                 icon.directives.push(new nodom.Directive('class',cls,item));
                 //绑定展开收起事件
-                icon.events['click'] = closeOpenEvent;
+                icon.addEvent(closeOpenEvent);
                 itemCt.add(icon);
             }
             
@@ -111,9 +112,9 @@ class UITree implements nodom.IDefineElement{
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         //展开收拢事件
         module.methodFactory.add(uidom.tmpData['closeOpenMid'],
-            (e, module, view,dom) => {
-                let model:nodom.Model = module.modelFactory.get(dom.modelId);
-                let rows = model.data[uidom.tmpData['dataName']]
+            (dom,model, module, e) => {
+                let pmodel:nodom.Model = module.modelFactory.get(dom.modelId);
+                let rows = pmodel.data[uidom.tmpData['dataName']]
                 //叶子节点不处理
                 if(!rows || rows.length === 0){
                     return;
