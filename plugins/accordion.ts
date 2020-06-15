@@ -31,10 +31,9 @@ class UIAccordion implements nodom.IDefineElement{
             if(!item.tagName){
                 continue;
             }
-            
             if(item.props.hasOwnProperty('first')){
                 //添加repeat指令
-                firstDom.directives.push(new nodom.Directive('repeat',item.props['data'],firstDom));
+                firstDom.addDirective(new nodom.Directive('repeat',item.props['data'],firstDom));
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
@@ -46,25 +45,26 @@ class UIAccordion implements nodom.IDefineElement{
                 ct.tmpData['activeName1'] = activeName1;
 
                 firstDom.add(item);
-                //保存第二级field
-                ct.tmpData['field1'] = item.props['data'];
+
+                //替换children
+                let span = new nodom.Element();
+                span.tagName = 'span';
+                span.children = item.children;
+                item.children = [span];
                 //图标
                 if(item.props['icon']){
-                    //去掉多余空格
-                    let cls = item.props['icon'].trim().replace(/\s+/g,'');
-                    let arr:string = cls.split(',');
-                    let iconDown = 'nd-icon-' + arr[0];
-                    let iconUp = 'nd-icon-' + arr[1];
-                    let icon:nodom.Element = new nodom.Element();
-                    icon.tagName = 'B';
-                    icon.directives.push(new nodom.Directive('class',"{'" + iconUp + "':'"+ activeName1 +"','"
-                        + iconDown + "':'!"+ activeName1 +"'}",item));
-                    item.children.push(icon);
+                    span.addClass('nd-icon-' + item.props['icon']);
                 }
+                //保存第一级field
+                ct.tmpData['field1'] = item.props['data'];
+                //展开图标
+                let icon:nodom.Element = new nodom.Element();
+                icon.tagName = 'B';
+                icon.addClass('nd-accordion-icon nd-icon-right');
+                icon.directives.push(new nodom.Directive('class',"{'nd-accordion-open':'"+ activeName1 + "'}",item));
+                item.add(icon);
                 
-                delete item.props['data']; 
                 delete item.props['activename']; 
-                delete item.props['icon'];
                 delete item.props['first'];
             }else if(item.props.hasOwnProperty('second')){
                 activeName2 = item.props['activename'] || 'active';
@@ -82,9 +82,16 @@ class UIAccordion implements nodom.IDefineElement{
                 secondDom.tmpData = {};
                 secondDom.add(item);
                 secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}",secondDom));
-                delete item.props['data'];
+                if(item.props['icon']){
+                    item.addClass('nd-icon-' + item.props['icon']);
+                }
+            
                 delete item.props['second'];
             }
+            
+            delete item.props['data'];
+            delete item.props['icon'];
+
         }
         //指令按优先级排序
         firstDom.directives.sort((a, b) => {

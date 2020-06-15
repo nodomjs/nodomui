@@ -23,6 +23,9 @@ class UITree implements nodom.IDefineElement{
         let showName:string = ct.props['showname'];
         //激活字段名
         let activeName:string = ct.props['activename'];
+        //checkbox绑定name，如果存在，则显示checkbox
+        let checkName:string = ct.props['checkname'];
+
         if(ct.props['icon']){
             icons = ct.props['icon'].trim().replace(/\s+/g,'').split(',');
         }
@@ -41,7 +44,7 @@ class UITree implements nodom.IDefineElement{
         //item click 事件
         let itemClickEvent:nodom.NodomEvent;
         if(ct.props['itemclick']){
-            itemClickEvent = new nodom.NodomEvent('click', ct.props['itemclick']+':delg');
+            itemClickEvent = new nodom.NodomEvent('change', ct.props['itemclick']+':delg');
         }
         let parentCt:nodom.Element = ct;
         let item:nodom.Element;
@@ -57,26 +60,53 @@ class UITree implements nodom.IDefineElement{
             if(itemClickEvent){
                 item.addEvent(itemClickEvent);
             }
+                
+            //icon处理
+            //树形结构左边箭头图标
+            let icon1 = new nodom.Element();
+            icon1.tagName = 'SPAN';
+            icon1.addClass('nd-tree-icon');
+            icon1.addDirective(new nodom.Directive('class',
+                "{'nd-tree-node-open':'" + activeName + "'," +
+                "'nd-icon-right':'" + dataName + "&&" + dataName + ".length>0'}",
+            icon1));
             
+
+            //绑定展开收起事件
+            icon1.addEvent(closeOpenEvent);
+            itemCt.add(icon1);
+
+            //folder和叶子节点图标
             if(icons && icons.length>0){
                 let a:string[] = [];
-                a.push("'nd-icon-" + icons[0] + "':'" + dataName + "&&" + dataName + ".length>0 && "+ activeName + "'");
 
-                if(icons.length>1){
-                    a.push("'nd-icon-" + icons[1] + "':'" +  dataName + "&&" + dataName + ".length>0 && !"+ activeName +"'");
-                }
+                a.push("'nd-icon-" + icons[0] + "':'" + dataName + "&&" + dataName + ".length>0'");
                 //叶子节点图标
-                if(icons.length===3){
-                    a.push("'nd-icon-" + icons[2] + "':'!" + dataName + "||" + dataName + ".length===0'");
+                if(icons.length>1){
+                    a.push("'nd-icon-" + icons[1] + "':'!" + dataName + "||" + dataName + ".length===0'");
                 }
                 let icon:nodom.Element = new nodom.Element();
-                icon.tagName = 'B';
+                icon.tagName = 'SPAN';
                 icon.addClass('nd-tree-icon');
                 let cls:string = '{' + a.join(',') + '}';
                 icon.directives.push(new nodom.Directive('class',cls,item));
-                //绑定展开收起事件
-                icon.addEvent(closeOpenEvent);
                 itemCt.add(icon);
+            }
+
+            if(checkName){
+                let cb:nodom.Element = new nodom.Element();
+                cb.tagName = 'input';
+                cb.props['type']='checkbox';
+                cb.addDirective(new nodom.Directive('field',checkName,cb));
+                cb.props['yes-value'] = 'true';
+                cb.props['no-value'] = 'false';
+                itemCt.add(cb);
+
+                cb.addEvent(new nodom.NodomEvent('change','',
+                    (dom,model,module,e)=>{
+                        handleCheck(model.data,module); 
+                    }
+                ));
             }
             
             itemCt.add(item);
@@ -97,12 +127,36 @@ class UITree implements nodom.IDefineElement{
         
         delete ct.props['data'];
         delete ct.props['icon'];
-        delete ct.props['check'];
+        delete ct.props['checkname'];
+        delete ct.props['dataname'];
         delete ct.props['activename'];
         delete ct.props['itemclick'];
         delete ct.props['maxlevels'];
         ct.defineType=this.tagName;
         return ct;
+
+        /**
+         * 处理子孙节点check状态
+         * @param data      当前dom的数据
+         * @param module    模块
+         */
+        function handleCheck(data:object,module:nodom.Module){
+            let rows = data[dataName];
+            if(!rows){
+                return;
+            }
+            //当前是选中状态
+            for(let d of rows){
+                let b:boolean = data[checkName] === 'true' || data[checkName] === true ? true : false;
+                if(!d.hasOwnProperty(checkName)){
+                    let m:nodom.Model = module.modelFactory.get(d.$modelId);
+                    m.set(checkName,b);
+                }else{
+                    d[checkName] = b;
+                }
+                handleCheck(d,module);
+            }
+        }
     }
     
     /**

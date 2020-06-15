@@ -9,20 +9,22 @@ class UIButton implements nodom.IDefineElement{
      * 编译后执行代码
      */
     init(el:HTMLElement){
+        let oe:nodom.Element = new nodom.Element('button');
+        nodom.Compiler.handleAttributes(oe,el);
+        nodom.Compiler.handleChildren(oe,el);
         //图标
         let icon:string;
-        if(el.hasAttribute('icon')){
-            icon = el.getAttribute('icon');
-            el.removeAttribute('icon');
+        if(oe.props['icon']){
+            icon = oe.props['icon'];
         } 
         
         //图标大小
         let arr = ['small','normal','big'];
         let size:string;
         for(let l of arr){
-            if(el.hasAttribute(l)){
+            if(oe.props.hasOwnProperty(l)){
                 size = l;
-                el.removeAttribute(l);
+                delete oe.props[l];
                 break;
             }
         }
@@ -36,9 +38,9 @@ class UIButton implements nodom.IDefineElement{
         let loc:string;
         arr = ['left','top','right','bottom'];
         for(let l of arr){
-            if(el.hasAttribute(l)){
+            if(oe.props.hasOwnProperty(l)){
                 loc = l;
-                el.removeAttribute(l);
+                delete oe.props[l];
                 break;
             }
         }
@@ -50,18 +52,18 @@ class UIButton implements nodom.IDefineElement{
         
         let bg:string;
             
-        if(el.hasAttribute('nobg')){
+        if(oe.props.hasOwnProperty('nobg')){
             bg = 'nd-btn-nobg';
-            el.removeAttribute('nobg');
+            delete oe.props['nobg'];
         }else{
             //背景色
             arr = ['warn','active','emphasis'];
             for(let l of arr){
-                if(el.hasAttribute(l)){
-                    bg = 'nd-bg-' + l ;
-                    el.removeAttribute(l);
+                if(oe.props.hasOwnProperty(l)){
+                    bg = 'nd-bg-' + l;
+                    delete oe.props[l];
                     break;
-                }    
+                }
             }
             //默认灰色
             if(!bg){
@@ -72,10 +74,7 @@ class UIButton implements nodom.IDefineElement{
         let notext:string = icon && el.innerHTML.trim() === ''?'nd-btn-notext':'';
 
         let cls:string = 'nd-btn ' + notext + ' nd-btn-' + size + ' ' + bg;
-        let oe:nodom.Element = new nodom.Element();
-        oe.tagName = 'BUTTON';
-        nodom.Compiler.handleAttributes(oe,el);
-        nodom.Compiler.handleChildren(oe,el);
+        
         //把btn类加入到class
         oe.addClass(cls);
 

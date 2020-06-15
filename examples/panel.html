@@ -19,7 +19,7 @@
     <script src='../dist/buttongroup.js'></script>
     <style>
         .panel{
-            height:600px;
+            height:300px;
         }
     </style>
 </head>
@@ -27,16 +27,16 @@
     <div>
         <ui-panel class='panel' title='测试panel' buttons='min,max,close'>
             <ui-toolbar>
-                <ui-button nobg left icon='menu'></ui-button>
-                <ui-button nobg right icon='pulldown' >颜色</ui-button>
-                <ui-button  nobg icon='setting'></ui-button>
-                <ui-button  nobg icon='publish'></ui-button>
+                <ui-button nobg icon='category'></ui-button>
+                <ui-button nobg right icon='right' >颜色</ui-button>
+                <ui-button nobg icon='set'></ui-button>
+                <ui-button nobg icon='home'></ui-button>
             </ui-toolbar>
             <div>hello world!</div>
             <ui-buttongroup>
-                <ui-button active small icon='plus'>添加</ui-button>
+                <ui-button active small icon='add'>添加</ui-button>
                 <ui-button emphasis small icon='close'>删除</ui-button>
-                <ui-button warn small icon='info'>编辑</ui-button>
+                <ui-button warn small icon='editor'>编辑</ui-button>
                 <ui-button small icon='search'>查询</ui-button>
             </ui-buttongroup>
         </ui-panel>

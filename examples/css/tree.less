@@ -3,31 +3,33 @@
 .nd-tree{
     font-size:@fontnormal;
     .nd-tree-nodect{
-        padding:5px;
+        // padding:5px;
         .nd-tree-node{
             display:inline-block;
+            padding:@padding;
         }
         .nd-tree-checkbox{
             border:@grey;
+            width:1em;
         }
 
         .nd-tree-icon{
-            margin-right:5px;
+            display:inline-block;
+            margin-right:@padding;
+            width:1em;
+        }        
+        
+        .nd-tree-node-open{
+            transform:rotate(90deg);
         }
-
     }
-    
-
-    
     .nd-tree-node:hover{
         background-color:@lightgrey;
     }
 
-
-
     .nd-tree-subct{
         display:none;
-        padding:5px 1em;
+        padding-left:1em;
     }
 
     .nd-tree-show{

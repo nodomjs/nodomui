@@ -25,9 +25,9 @@
 <body>
     <div>
         <ui-tree class='ct' x-model='data1' data='rows' 
-            icon='pullup,pulldown,data' showName='title' itemClick='clickItem' 
-            checkbox activeName='active'
-            maxLevels='3'
+            icon='category,data' showName='title' itemClick='clickItem' 
+            checkName='checked' activeName='active'
+            maxLevels='4'
             >
         </ui-tree>
     </div>
@@ -38,14 +38,19 @@
             el:'div',
             data:{
                 rows:[
-                    {title:'商品管理',active:true,rows:[
+                    {title:'商品管理',active:true,checked:true,rows:[
                         {title:'商品上架'},
                         {title:'商品下架'},
                         {title:'商品编辑'},
-                        {title:'商品统计',active:true,rows:[
+                        {title:'商品统计',active:true,checked:true,rows:[
                             {title:'上架统计'},
                             {title:'下架统计'},
-                            {title:'销售统计'}
+                            {title:'销售统计',rows:[
+                                {title:'日统计'},
+                                {title:'周统计'},
+                                {title:'月统计'},
+                                {title:'年统计'}
+                            ]}
                         ]}
                     ]},
                     {title:'商家管理',rows:[
@@ -66,7 +71,6 @@
                         {title:'权限管理'}
                     ]}
                 ]    
-                
             },
             methods:{
                 clickItem:function(e,module){
