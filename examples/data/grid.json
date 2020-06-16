@@ -1,0 +1,17 @@
+{
+    "columns":[
+        {"width":30,"field":"id","title":"编号"},
+        {"width":100,"field":"id","title":"姓名"},
+        {"width":50,"field":"id","title":"年龄"},
+        {"width":100,"field":"id","title":"性别"},
+        {"width":200,"field":"id","title":"头像","type":"img"}
+    ],
+    "rows":[
+        {"id":1,"name":"yang lei","age":42,"sexy":"M","head":"imgs/1.jpg"},
+        {"id":2,"name":"fieldyang","age":42,"sexy":"M","head":"imgs/2.jpg"},
+        {"id":3,"name":"张三","age":42,"sexy":"M","head":"imgs/3.jpg"},
+        {"id":4,"name":"步惊云","age":42,"sexy":"M","head":"imgs/4.jpg"},
+        {"id":5,"name":"令狐冲","age":42,"sexy":"M","head":"imgs/5.jpg"},
+        {"id":6,"name":"呱呱","age":42,"sexy":"M","head":"imgs/1.jpg"}
+    ]
+}

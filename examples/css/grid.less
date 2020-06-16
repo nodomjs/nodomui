@@ -1,0 +1,68 @@
+@import "base.less";
+/*表格css*/
+
+.nd-grid{
+    border-spacing: 1px;
+    display:flex;
+    flex-direction: column;
+
+    .nd-grid-row-item{
+        flex:1;
+        display:flex;
+        justify-content:center;
+        padding:@padding;
+        align-items:center;
+        img{
+            max-width:100px;
+            max-height:100px;
+        }
+    }
+
+    .nd-grid-head{
+        display:flex;
+        flex-direction: row;
+        text-align:center;
+        background-color:@grey;
+        font-weight:bold;
+        div{
+            padding:@padding+@padding @padding;
+        }
+    }
+
+    /*图标列*/
+    .nd-grid-iconcol{
+        flex:0;
+        width:25px;
+    }
+
+    /*tbody*/
+    .nd-grid-body{
+        .nd-grid-row{
+            display: flex;
+        }
+    }
+
+    /*显示sub的图标旋转*/
+    .nd-grid-showsub{
+        transform:rotate(90deg);
+    }
+
+    .nd-grid-row-line{
+        border-bottom:1px solid @grey;
+    }
+
+    .nd-grid-col-line{
+        >div{
+            border-right:1px solid @grey;
+        }
+
+        >div:last-child{
+            border-right:0px solid @grey;
+        }
+    }
+    
+    /*每行颜色交错*/
+    .nd-grid-body-rowalt >div:nth-child(even){
+        background-color:@lightgrey;
+    }
+}

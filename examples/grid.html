@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/accordion.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/grid.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/grid.js'></script>
+    <style>
+        .ct{
+            width:600px !important;
+        }
+        body{
+            padding:5px;
+        }
+        .sub{
+            background-color:burlywood;
+            padding:10px;
+        }
+        .sub label{
+            display:inline-block;
+            width:100px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ui-grid  class='ct' rowalt>
+            <ui-row data='rows'>
+                <div width='0.6' title='编号'>{{id}}</div>
+                <div width='2' title='姓名'>{{name}}</div>
+                <div width='1' title='年龄'>{{age}}</div>
+                <div width='1' title='性别'>{{sexy}}</div>
+                <div width='3' title='头像' type='img'>{{head}}</div>
+            </ui-row>
+            <ui-sub class='sub'>
+                <div><label>编号：</label><span>{{id}}</span></div>
+                <div><label>姓名：</label><span>{{name}}</span></div>
+                <div><label>年龄：</label><span>{{age}}</span></div>
+                <div><label>性别：</label><span>{{sexy}}</span></div>
+                <div><label>头像：</label><span>{{head}}</span></div>
+            </ui-sub>
+        </ui-grid>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:"data/grid.json",
+            
+            methods:{
+                clickItem:(dom,model,module,e)=>{
+                    console.log('hello',dom,model,module,e)
+                }
+            }
+        }
+    })
+</script>
+</html>

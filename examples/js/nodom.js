@@ -767,7 +767,7 @@ var nodom;
     class Element {
         constructor(tag) {
             this.directives = [];
-            this.asserts = new Map();
+            this.assets = new Map();
             this.props = {};
             this.exprProps = {};
             this.events = new Map();
@@ -840,7 +840,7 @@ var nodom;
             if (!el) {
                 return;
             }
-            this.handleAsserts(el);
+            this.handleAssets(el);
             switch (type) {
                 case 'fresh':
                     if (this.tagName) {
@@ -912,7 +912,7 @@ var nodom;
                 });
                 el.setAttribute('key', vdom.key);
                 vdom.handleEvents(module, el, parent, parentEl);
-                vdom.handleAsserts(el);
+                vdom.handleAssets(el);
                 return el;
             }
             function newText(text, dom) {
@@ -944,7 +944,7 @@ var nodom;
         }
         clone() {
             let dst = new Element();
-            let notCopyProps = ['parent', 'directives', 'asserts', 'props', 'exprProps', 'events', 'children'];
+            let notCopyProps = ['parent', 'directives', 'assets', 'props', 'exprProps', 'events', 'children'];
             nodom.Util.getOwnProps(this).forEach((p) => {
                 if (notCopyProps.includes(p)) {
                     return;
@@ -954,8 +954,8 @@ var nodom;
             for (let d of this.directives) {
                 dst.directives.push(d);
             }
-            for (let key of this.asserts.keys()) {
-                dst.asserts.set(key, this.asserts.get(key));
+            for (let key of this.assets.keys()) {
+                dst.assets.set(key, this.assets.get(key));
             }
             nodom.Util.getOwnProps(this.props).forEach((k) => {
                 dst.props[k] = this.props[k];
@@ -1029,12 +1029,12 @@ var nodom;
                 }
             });
         }
-        handleAsserts(el) {
+        handleAssets(el) {
             if (!this.tagName && !el) {
                 return;
             }
-            for (let key of this.asserts.keys()) {
-                el[key] = this.asserts.get(key);
+            for (let key of this.assets.keys()) {
+                el[key] = this.assets.get(key);
             }
         }
         handleTextContent(module) {
@@ -3696,29 +3696,29 @@ var nodom;
             let value = dom.props['value'];
             if (type === 'radio') {
                 if (dataValue + '' === value) {
-                    dom.asserts.set('checked', true);
+                    dom.assets.set('checked', true);
                 }
                 else {
-                    dom.asserts.set('checked', false);
+                    dom.assets.set('checked', false);
                 }
             }
             else if (type === 'checkbox') {
                 let yv = dom.props['yes-value'];
                 if (dataValue + '' === yv) {
                     dom.props['value'] = yv;
-                    dom.asserts.set('checked', true);
+                    dom.assets.set('checked', true);
                 }
                 else {
                     dom.props['value'] = dom.props['no-value'];
-                    dom.asserts.set('checked', false);
+                    dom.assets.set('checked', false);
                 }
             }
             else if (tgname === 'select') {
                 dom.props['value'] = dataValue;
-                dom.asserts.set('value', dataValue);
+                dom.assets.set('value', dataValue);
             }
             else {
-                dom.asserts.set('value', value);
+                dom.assets.set('value', value);
             }
         }
     });

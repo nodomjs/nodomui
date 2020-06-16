@@ -1,0 +1,29 @@
+@import "base.less";
+/*表格css*/
+
+.nd-grid{
+    border-spacing: 1px;
+    .nd-grid-head{
+        text-align:center;
+        background-color:@grey;
+        th{
+            padding:@padding+@padding;
+        }
+    }
+
+    /*tbody*/
+    .nd-grid-body{
+        td>img{
+            max-width:100px;
+            max-height:100px;
+        }
+
+        td{
+            padding:@padding;
+        }
+    }
+    /*每行颜色交错*/
+    .nd-grid-body-colorsplit >tr:nth-child(even){
+        background-color:@lightgrey;
+    }
+}

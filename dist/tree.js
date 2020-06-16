@@ -105,7 +105,7 @@ class UITree {
             let subCt = new nodom.Element();
             subCt.props['class'] = 'nd-tree-subct';
             subCt.tagName = 'DIV';
-            subCt.directives.push(new nodom.Directive('class', "{'nd-tree-show':'" + activeName + "'}", item));
+            subCt.addDirective(new nodom.Directive('class', "{'nd-tree-show':'" + activeName + "'}", item));
             itemCt.add(subCt);
             parentCt.add(itemCt);
             parentCt = subCt;
