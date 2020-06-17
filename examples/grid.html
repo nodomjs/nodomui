@@ -34,15 +34,15 @@
 </head>
 <body>
     <div>
-        <ui-grid  class='ct' rowalt>
+        <ui-grid  class='ct' rowalt sortable gridline='both'>
             <ui-row data='rows'>
-                <div width='0.6' title='编号'>{{id}}</div>
+                <div width='1' title='编号' notsort>{{id}}</div>
                 <div width='2' title='姓名'>{{name}}</div>
                 <div width='1' title='年龄'>{{age}}</div>
                 <div width='1' title='性别'>{{sexy}}</div>
                 <div width='3' title='头像' type='img'>{{head}}</div>
             </ui-row>
-            <ui-sub class='sub'>
+            <ui-sub class='sub' labelwidth='100' cols='2'>
                 <div><label>编号：</label><span>{{id}}</span></div>
                 <div><label>姓名：</label><span>{{name}}</span></div>
                 <div><label>年龄：</label><span>{{age}}</span></div>

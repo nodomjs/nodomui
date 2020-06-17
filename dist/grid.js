@@ -1,6 +1,30 @@
 ///<reference types='nodom'/>
 /**
  * panel 插件
+ * ui-grid参数
+ *  rowalt      行颜色交替标志，不用设置值
+ *  sortable    排序标志，不用设置值
+ *  gridline    网格线类型，包括column(列) row(行) both(行列)，不设置则不显示
+ * ui-row参数
+ *  data        表格数据数组对应名，如rows等
+ *  子元素(列)，用div元素
+ *  width       宽度，表示整个行宽度的几份，栅格方式，默认1
+ *  title       该列表头显示
+ *  notsort     当表格设置sortable时，该设置表示该列不显示排序按钮
+ *  editable    是否可编辑
+ *  inputtype   输入类型，参考ui-form，默认text
+ *
+ * ui-sub参数(详细显示框)
+ *  auto        自动生成详细显示框标志，设置该标志后，点击左侧箭头，自动生成显示框
+ *  cols        一行显示列数，auto设置时有效
+ *  labelwidth  label宽度，默认100，auto设置时有效
+ *
+ * ui-form参数(编辑window)
+ *  如果设置编辑，需要设置ui-row子元素
+ *  auto        自动生成编辑框标志，设置该标志后，点击左侧箭头，自动生成编辑框
+ *  cols        一行显示列数，auto设置时有效
+ *  labelwidth  label宽度，默认100，auto设置时有效
+ *
  */
 class UIGrid {
     constructor() {
@@ -44,19 +68,6 @@ class UIGrid {
             //第一个孩子
             let firstDom = new nodom.Element('div');
             firstDom.addClass('nd-grid-row');
-            if (gridLine) {
-                switch (gridLine) {
-                    case 'column':
-                        firstDom.addClass('nd-grid-col-line');
-                        break;
-                    case 'row':
-                        firstDom.addClass('nd-grid-row-line');
-                        break;
-                    case 'both':
-                        firstDom.addClass('nd-grid-row-line nd-grid-col-line');
-                        break;
-                }
-            }
             //处理所有td
             for (let c of rowDom.children) {
                 if (!c.tagName) {
@@ -66,7 +77,18 @@ class UIGrid {
                 let th = new nodom.Element('div');
                 th.addClass('nd-grid-row-item');
                 th.props['style'] = 'flex:' + c.props['width'] || 0;
-                th.assets.set('innerHTML', c.props['title']);
+                console.log(c.children);
+                //表头内容
+                let span = new nodom.Element('span');
+                span.assets.set('innerHTML', c.props['title']);
+                th.add(span);
+                //允许排序
+                if (grid.props.hasOwnProperty('sortable')) {
+                    //图片不排序，设置notsort属性不排序
+                    if (c.props['type'] !== 'img' && !c.props.hasOwnProperty('notsort')) {
+                        th.add(this.addSortBtn());
+                    }
+                }
                 thead.add(th);
                 //td
                 //表格body
@@ -81,7 +103,10 @@ class UIGrid {
                 }
                 c.tagName = 'div';
                 c.addClass('nd-grid-row-item');
-                c.props['style'] = 'flex:' + c.props['width'];
+                //设置自定义flex
+                if (c.props['width'] && nodom.Util.isNumberString(c.props['width'])) {
+                    c.props['style'] = 'flex:' + c.props['width'];
+                }
                 firstDom.add(c);
                 delete c.props['title'];
                 delete c.props['type'];
@@ -89,20 +114,7 @@ class UIGrid {
             }
             //网格线
             if (gridLine) {
-                switch (gridLine) {
-                    case 'column':
-                        thead.addClass('nd-grid-col-line');
-                        firstDom.addClass('nd-grid-col-line');
-                        break;
-                    case 'row':
-                        thead.addClass('nd-grid-row-line');
-                        firstDom.addClass('nd-grid-row-line');
-                        break;
-                    case 'both':
-                        thead.addClass('nd-grid-row-line nd-grid-col-line');
-                        firstDom.addClass('nd-grid-row-line nd-grid-col-line');
-                        break;
-                }
+                this.addGridLine(gridLine, thead, firstDom);
             }
             //替换孩子节点
             rowDom.children = [firstDom];
@@ -116,7 +128,7 @@ class UIGrid {
                 let td = new nodom.Element('div');
                 td.addClass('nd-icon-right nd-grid-iconcol nd-grid-row-item');
                 td.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", td));
-                td.addEvent(new nodom.NodomEvent('click', '', (dom, model, module, e) => {
+                td.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                     model.set('$showSub', !model.data['$showSub']);
                 }));
                 firstDom.children.unshift(td);
@@ -129,9 +141,62 @@ class UIGrid {
         }
         delete grid.props['rowalt'];
         grid.children = [thead, tbody];
-        grid.defineType = this.tagName;
+        grid.defineElement = this;
         return grid;
     }
+    /**
+     * 添加排序按钮
+     */
+    addSortBtn() {
+        let updown = new nodom.Element('span');
+        updown.addClass('nd-grid-sort');
+        let up = new nodom.Element('B');
+        up.addClass('nd-icon-arrow-down nd-grid-sort-raise');
+        let down = new nodom.Element('B');
+        down.addClass('nd-icon-arrow-down nd-grid-sort-down');
+        const defineElement = this;
+        /**
+         * 升序按钮事件
+         */
+        up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            // defineElement.addSort()
+        }));
+        /**
+         * 降序按钮事件
+         */
+        up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+        }));
+        updown.add(up);
+        updown.add(down);
+        return updown;
+    }
+    /**
+     * 添加网格线
+     * @param gridLine  网格线类型 column row both
+     * @param headDom   表格头
+     * @param rowDom    表格体
+     */
+    addGridLine(gridLine, headDom, rowDom) {
+        switch (gridLine) {
+            case 'column':
+                headDom.addClass('nd-grid-col-line');
+                rowDom.addClass('nd-grid-col-line');
+                break;
+            case 'row':
+                headDom.addClass('nd-grid-row-line');
+                rowDom.addClass('nd-grid-row-line');
+                break;
+            case 'both':
+                headDom.addClass('nd-grid-row-line nd-grid-col-line');
+                rowDom.addClass('nd-grid-row-line nd-grid-col-line');
+                break;
+        }
+    }
+    /**
+     * 设置排序
+     */
+    setSort() {
+    }
 }
-nodom.DefineElementManager.add(new UIGrid());
+nodom.DefineElementManager.add('UI-GRID', UIGrid);
 //# sourceMappingURL=grid.js.map

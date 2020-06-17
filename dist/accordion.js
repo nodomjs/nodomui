@@ -96,7 +96,7 @@ class UIAccordion {
         });
         firstDom.add(secondDom);
         ct.children = [firstDom];
-        ct.defineType = this.tagName;
+        ct.defineElement = this;
         return ct;
     }
     /**
@@ -136,5 +136,5 @@ class UIAccordion {
         });
     }
 }
-nodom.DefineElementManager.add(new UIAccordion());
+nodom.DefineElementManager.add('UI-ACCORDION', UIAccordion);
 //# sourceMappingURL=accordion.js.map

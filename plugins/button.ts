@@ -99,9 +99,9 @@ class UIButton implements nodom.IDefineElement{
                 break;    
         }
         
-        oe.defineType=this.tagName;
+        oe.defineElement=this;
         return oe;
     }
 }
 
-nodom.DefineElementManager.add(new UIButton());
+nodom.DefineElementManager.add('UI-BUTTON',UIButton);

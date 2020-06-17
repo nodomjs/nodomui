@@ -102,7 +102,7 @@ class UITree implements nodom.IDefineElement{
                 cb.props['no-value'] = 'false';
                 itemCt.add(cb);
 
-                cb.addEvent(new nodom.NodomEvent('change','',
+                cb.addEvent(new nodom.NodomEvent('change',
                     (dom,model,module,e)=>{
                         handleCheck(model.data,module); 
                     }
@@ -132,7 +132,7 @@ class UITree implements nodom.IDefineElement{
         delete ct.props['activename'];
         delete ct.props['itemclick'];
         delete ct.props['maxlevels'];
-        ct.defineType=this.tagName;
+        ct.defineElement=this;
         return ct;
 
         /**
@@ -182,4 +182,4 @@ class UITree implements nodom.IDefineElement{
     }
 }
 
-nodom.DefineElementManager.add(new UITree());
+nodom.DefineElementManager.add('UI-TREE',UITree);

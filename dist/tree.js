@@ -92,7 +92,7 @@ class UITree {
                 cb.props['yes-value'] = 'true';
                 cb.props['no-value'] = 'false';
                 itemCt.add(cb);
-                cb.addEvent(new nodom.NodomEvent('change', '', (dom, model, module, e) => {
+                cb.addEvent(new nodom.NodomEvent('change', (dom, model, module, e) => {
                     handleCheck(model.data, module);
                 }));
             }
@@ -117,7 +117,7 @@ class UITree {
         delete ct.props['activename'];
         delete ct.props['itemclick'];
         delete ct.props['maxlevels'];
-        ct.defineType = this.tagName;
+        ct.defineElement = this;
         return ct;
         /**
          * 处理子孙节点check状态
@@ -162,5 +162,5 @@ class UITree {
         });
     }
 }
-nodom.DefineElementManager.add(new UITree());
+nodom.DefineElementManager.add('UI-TREE', UITree);
 //# sourceMappingURL=tree.js.map

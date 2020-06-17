@@ -1,4 +1,5 @@
 @import "base.less";
+@import "icon.less";
 /*表格css*/
 
 .nd-grid{
@@ -24,8 +25,29 @@
         text-align:center;
         background-color:@grey;
         font-weight:bold;
-        div{
+        > div{
             padding:@padding+@padding @padding;
+            display:flex;
+            justify-content: center;
+            /*排序容器*/
+            .nd-grid-sort{
+                display:flex;
+                flex-direction: column;
+                align-items: center;
+                margin-left:@padding * 2;
+                line-height:10px;
+                color:@deepgrey;
+                /*升序箭头*/
+                .nd-grid-sort-raise{
+                    transform:rotate(180deg);
+                }
+
+                >b:hover{
+                    color:@activecolor;
+                    cursor: pointer;
+                }
+            }
+
         }
     }
 
@@ -60,7 +82,7 @@
             border-right:0px solid @grey;
         }
     }
-    
+
     /*每行颜色交错*/
     .nd-grid-body-rowalt >div:nth-child(even){
         background-color:@lightgrey;

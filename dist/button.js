@@ -91,9 +91,9 @@ class UIButton {
                 img.addClass('nd-btn-vert');
                 break;
         }
-        oe.defineType = this.tagName;
+        oe.defineElement = this;
         return oe;
     }
 }
-nodom.DefineElementManager.add(new UIButton());
+nodom.DefineElementManager.add('UI-BUTTON', UIButton);
 //# sourceMappingURL=button.js.map

@@ -611,7 +611,7 @@ var nodom;
             if (!de) {
                 return;
             }
-            return de.init(el);
+            return Reflect.construct(de, []).init(el);
         }
         static handleAttributes(oe, el) {
             for (let i = 0; i < el.attributes.length; i++) {
@@ -781,7 +781,7 @@ var nodom;
             if (this.dontRender) {
                 return;
             }
-            if (this.defineType) {
+            if (this.defineElement) {
                 nodom.DefineElementManager.beforeRender(module, this);
             }
             if (parent) {
@@ -817,7 +817,7 @@ var nodom;
                     i--;
                 }
             }
-            if (this.defineType) {
+            if (this.defineElement) {
                 nodom.DefineElementManager.afterRender(module, this);
             }
         }
@@ -2446,28 +2446,34 @@ var nodom;
         constructor(eventName, eventStr, handler) {
             this.name = eventName;
             if (eventStr) {
-                eventStr.split(':').forEach((item, i) => {
-                    item = item.trim();
-                    if (i === 0) {
-                        this.handler = item;
-                    }
-                    else {
-                        switch (item) {
-                            case 'delg':
-                                this.delg = true;
-                                break;
-                            case 'nopopo':
-                                this.nopopo = true;
-                                break;
-                            case 'once':
-                                this.once = true;
-                                break;
-                            case 'capture':
-                                this.capture = true;
-                                break;
+                let tp = typeof eventStr;
+                if (tp === 'string') {
+                    eventStr.split(':').forEach((item, i) => {
+                        item = item.trim();
+                        if (i === 0) {
+                            this.handler = item;
                         }
-                    }
-                });
+                        else {
+                            switch (item) {
+                                case 'delg':
+                                    this.delg = true;
+                                    break;
+                                case 'nopopo':
+                                    this.nopopo = true;
+                                    break;
+                                case 'once':
+                                    this.once = true;
+                                    break;
+                                case 'capture':
+                                    this.capture = true;
+                                    break;
+                            }
+                        }
+                    });
+                }
+                else if (tp === 'function') {
+                    handler = eventStr;
+                }
             }
             if (handler) {
                 this.handler = handler;
@@ -4133,23 +4139,23 @@ var nodom;
 (function (nodom) {
     let DefineElementManager = (() => {
         class DefineElementManager {
-            static add(cfg) {
-                if (this.elementMap.has(cfg.tagName)) {
-                    throw new nodom.NodomError('exist1', nodom.TipWords.element, cfg.tagName);
+            static add(name, cfg) {
+                if (this.elementMap.has(name)) {
+                    throw new nodom.NodomError('exist1', nodom.TipWords.element, name);
                 }
-                this.elementMap.set(cfg.tagName, cfg);
+                this.elementMap.set(name, cfg);
             }
             static get(tagName) {
                 return this.elementMap.get(tagName);
             }
             static beforeRender(module, dom) {
-                let de = this.get(dom.defineType);
+                let de = dom.defineElement;
                 if (de && de.beforeRender) {
                     de.beforeRender(module, dom);
                 }
             }
             static afterRender(module, dom) {
-                let de = this.get(dom.defineType);
+                let de = dom.defineElement;
                 if (de && de.afterRender) {
                     de.afterRender(module, dom);
                 }

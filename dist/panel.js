@@ -45,18 +45,6 @@ class UIPanel {
         };
         delete oe.props['title'];
         delete oe.props['buttons'];
-        // const str:string = `
-        // <div class='nd-panel'>
-        //     <div class='nd-panel-header'>
-        //     <span class='nd-panel-title' x-if='$uidata.showHead'>{{$uidata.title}}</span>
-        //     <div class='nd-panel-header-bar' x-if='$uidata.showHeaderbar'>
-        //         <ui-button x-if='$uidata.showMin' small nobg icon='minus'></ui-button>
-        //         <ui-button x-if='$uidata.showMax' small nobg icon='plus'></ui-button>
-        //         <ui-button x-if='$uidata.showClose' small nobg icon='close'></ui-button>
-        //     </div>
-        //     </div>
-        // </div>`;
-        // let parentDom:nodom.Element = nodom.Compiler.compile(str);
         let parentDom = new nodom.Element('div');
         //header
         let headerDom = new nodom.Element('div');
@@ -107,10 +95,10 @@ class UIPanel {
         let btnGrp;
         for (let i = 0; i < oe.children.length; i++) {
             let item = oe.children[i];
-            if (item.defineType === 'UI-TOOLBAR') {
+            if (item.tagName === 'UI-TOOLBAR') {
                 tbar = item;
             }
-            else if (item.defineType === 'UI-BUTTONGROUP') {
+            else if (item.tagName === 'UI-BUTTONGROUP') {
                 btnGrp = item;
             }
             else { //普通节点，放入panelbody
@@ -126,9 +114,9 @@ class UIPanel {
             parentDom.add(btnGrp);
         }
         parentDom.extraData = data;
-        parentDom.defineType = this.tagName;
+        parentDom.defineElement = this;
         return parentDom;
     }
 }
-nodom.DefineElementManager.add(new UIPanel());
+nodom.DefineElementManager.add('UI-PANEL', UIPanel);
 //# sourceMappingURL=panel.js.map

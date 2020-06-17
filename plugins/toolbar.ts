@@ -14,9 +14,9 @@ class UIToolbar implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
         oe.addClass('nd-toolbar');
-        oe.defineType=this.tagName;
+        oe.defineElement=this;
         return oe;
     }
 }
 
-nodom.DefineElementManager.add(new UIToolbar());
+nodom.DefineElementManager.add('UI-TOOLBAR',UIToolbar);

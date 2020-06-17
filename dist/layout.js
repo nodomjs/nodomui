@@ -52,9 +52,9 @@ class UILayout {
         if (items['south']) {
             oe.children.push(items['south']);
         }
-        oe.defineType = this.tagName;
+        oe.defineElement = this;
         return oe;
     }
 }
-nodom.DefineElementManager.add(new UILayout());
+nodom.DefineElementManager.add('UI-LAYOUT', UILayout);
 //# sourceMappingURL=layout.js.map
