@@ -10,20 +10,20 @@ class UITree {
      * 编译后执行代码
      */
     init(el) {
-        let ct = new nodom.Element();
+        let ct = new nodom.Element('div');
         //增加暂存数据
-        ct.tmpData = {};
-        ct.tagName = 'DIV';
         nodom.Compiler.handleAttributes(ct, el);
         ct.addClass('nd-tree');
         //数据字段名
         let dataName = ct.props['data'];
+        this.dataName = dataName;
         //图标数组
         let icons;
         //显示字段名
         let showName = ct.props['showname'];
         //激活字段名
         let activeName = ct.props['activename'];
+        this.activeName = activeName;
         //checkbox绑定name，如果存在，则显示checkbox
         let checkName = ct.props['checkname'];
         if (ct.props['icon']) {
@@ -33,13 +33,8 @@ class UITree {
         let maxLevels = ct.props['maxlevels'] ? parseInt(ct.props['maxlevels']) : 5;
         //展开收拢事件
         let methodId = '$nodomGenMethod' + nodom.Util.genId();
-        let closeOpenEvent = new nodom.NodomEvent('click', methodId);
-        //暂存数据
-        ct.tmpData = {
-            dataName: dataName,
-            activeName: activeName,
-            closeOpenMid: methodId
-        };
+        this.arrowClickId = methodId;
+        let closeOpenEvent = new nodom.NodomEvent('click', methodId + ':delg');
         //item click 事件
         let itemClickEvent;
         if (ct.props['itemclick']) {
@@ -148,16 +143,17 @@ class UITree {
      * @param module
      */
     beforeRender(module, uidom) {
+        let me = this;
         //展开收拢事件
-        module.methodFactory.add(uidom.tmpData['closeOpenMid'], (dom, model, module, e) => {
+        module.methodFactory.add(me.arrowClickId, (dom, model, module, e) => {
             let pmodel = module.modelFactory.get(dom.modelId);
-            let rows = pmodel.data[uidom.tmpData['dataName']];
+            let rows = pmodel.data[me.dataName];
             //叶子节点不处理
             if (!rows || rows.length === 0) {
                 return;
             }
             //选中字段名
-            let f = uidom.tmpData['activeName'];
+            let f = me.activeName;
             model.set(f, !model.data[f]);
         });
     }

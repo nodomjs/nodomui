@@ -6,13 +6,34 @@
 class UIAccordion implements nodom.IDefineElement{
     tagName:string = 'UI-ACCORDION';
     /**
+     * 第一级字段名
+     */
+    active1:string;
+    /**
+     * 第二级字段名
+     */
+    active2:string;
+    /**
+     * 第一级事件名
+     */
+    method1:string;
+
+    /**
+     * 第一级事件名
+     */
+    method2:string;
+
+    //第一级数据字段名
+    field1:string;
+
+    //第二级数据字段名
+    field2:string;
+    
+    /**
      * 编译后执行代码
      */
     init(el:HTMLElement){
-        let ct:nodom.Element = new nodom.Element();
-        //增加暂存数据
-        ct.tmpData = {};
-        ct.tagName = 'DIV';
+        let ct:nodom.Element = new nodom.Element('div');
         nodom.Compiler.handleAttributes(ct,el);
         nodom.Compiler.handleChildren(ct,el);
         ct.addClass('nd-accordion');
@@ -38,17 +59,16 @@ class UIAccordion implements nodom.IDefineElement{
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId+':delg'));
-                ct.tmpData['firstLevelMid'] = methodId;
+                this.method1 = methodId;
                 
                 activeName1 = item.props['activename'] || 'active';
                 //存激活field name
-                ct.tmpData['activeName1'] = activeName1;
+                this.active1 = activeName1;
 
                 firstDom.add(item);
 
                 //替换children
-                let span = new nodom.Element();
-                span.tagName = 'span';
+                let span = new nodom.Element('span');
                 span.children = item.children;
                 item.children = [span];
                 //图标
@@ -56,10 +76,9 @@ class UIAccordion implements nodom.IDefineElement{
                     span.addClass('nd-icon-' + item.props['icon']);
                 }
                 //保存第一级field
-                ct.tmpData['field1'] = item.props['data'];
+                this.field1 = item.props['data'];
                 //展开图标
-                let icon:nodom.Element = new nodom.Element();
-                icon.tagName = 'B';
+                let icon:nodom.Element = new nodom.Element('b');
                 icon.addClass('nd-accordion-icon nd-icon-right');
                 icon.directives.push(new nodom.Directive('class',"{'nd-accordion-open':'"+ activeName1 + "'}",item));
                 item.add(icon);
@@ -69,23 +88,21 @@ class UIAccordion implements nodom.IDefineElement{
             }else if(item.props.hasOwnProperty('second')){
                 activeName2 = item.props['activename'] || 'active';
                 //存激活field name
-                ct.tmpData['activeName2'] = activeName2;
+                this.active2 = activeName2;
                 item.directives.push(new nodom.Directive('repeat',item.props['data'],item));
                 //保存第二级field
-                ct.tmpData['field2'] = item.props['data'];
+                this.field2 = item.props['data'];
                 item.addClass('nd-accordion-second');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId+':delg'));
                 item.directives.push(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}",item));
-                ct.tmpData['secondLevelMid'] = methodId;
+                this.method2 = methodId;
                 secondDom.addClass('nd-accordion-secondct');
-                secondDom.tmpData = {};
                 secondDom.add(item);
                 secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}",secondDom));
                 if(item.props['icon']){
                     item.addClass('nd-icon-' + item.props['icon']);
                 }
-            
                 delete item.props['second'];
             }
             
@@ -111,13 +128,14 @@ class UIAccordion implements nodom.IDefineElement{
      * @param module 
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
+        let me = this;
         //添加第一层click事件
-        module.methodFactory.add(uidom.tmpData['firstLevelMid'],
+        module.methodFactory.add(this.method1,
             (dom,model,module,e) => {
                 let pmodel:nodom.Model = module.modelFactory.get(uidom.modelId);
-                let data = pmodel.data[uidom.tmpData['field1']];
+                let data = pmodel.data[me.field1];
                 //选中字段名
-                let f:string = uidom.tmpData['activeName1'];
+                let f:string = me.active1;
                 //取消之前选中
                 for(let d of data){
                     if(d[f] === true){
@@ -129,15 +147,15 @@ class UIAccordion implements nodom.IDefineElement{
         );
 
         //添加第二层click事件
-        module.methodFactory.add(uidom.tmpData['secondLevelMid'],
+        module.methodFactory.add(this.method2,
             (dom,model,module,e) => {
                 let pmodel:nodom.Model = module.modelFactory.get(uidom.modelId);
-                let data = pmodel.data[uidom.tmpData['field1']];
+                let data = pmodel.data[me.field1];
                 //选中字段名
-                let f:string = uidom.tmpData['activeName2'];
+                let f:string = me.active2;
                 //取消之前选中
                 for(let d of data){
-                    for(let d1 of d[uidom.tmpData['field2']]){
+                    for(let d1 of d[me.field2]){
                         if(d1[f] === true){
                             d1[f] = false;
                         }

@@ -6,23 +6,36 @@
 class UITree implements nodom.IDefineElement{
     tagName:string = 'UI-TREE';
     /**
+     * 左侧箭头点击事件id
+     */
+    arrowClickId:string;
+    /**
+     * 数据项字段名
+     */
+    dataName:string;
+    /**
+     * 激活字段名
+     */
+    activeName:string;
+
+    /**
      * 编译后执行代码
      */
     init(el:HTMLElement){
-        let ct:nodom.Element = new nodom.Element();
+        let ct:nodom.Element = new nodom.Element('div');
         //增加暂存数据
-        ct.tmpData = {};
-        ct.tagName = 'DIV';
         nodom.Compiler.handleAttributes(ct,el);
         ct.addClass('nd-tree');
         //数据字段名
         let dataName:string = ct.props['data'];
+        this.dataName = dataName;
         //图标数组
         let icons:string[];
         //显示字段名
         let showName:string = ct.props['showname'];
         //激活字段名
         let activeName:string = ct.props['activename'];
+        this.activeName = activeName;
         //checkbox绑定name，如果存在，则显示checkbox
         let checkName:string = ct.props['checkname'];
 
@@ -33,13 +46,8 @@ class UITree implements nodom.IDefineElement{
         let maxLevels:number = ct.props['maxlevels']?parseInt(ct.props['maxlevels']):5;
         //展开收拢事件
         let methodId = '$nodomGenMethod' + nodom.Util.genId();
-        let closeOpenEvent:nodom.NodomEvent = new nodom.NodomEvent('click', methodId);
-        //暂存数据
-        ct.tmpData = {
-            dataName:dataName,
-            activeName:activeName,
-            closeOpenMid:methodId
-        };
+        this.arrowClickId = methodId;
+        let closeOpenEvent:nodom.NodomEvent = new nodom.NodomEvent('click', methodId + ':delg');
         
         //item click 事件
         let itemClickEvent:nodom.NodomEvent;
@@ -164,21 +172,21 @@ class UITree implements nodom.IDefineElement{
      * @param module 
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
+        let me = this;
         //展开收拢事件
-        module.methodFactory.add(uidom.tmpData['closeOpenMid'],
+        module.methodFactory.add(me.arrowClickId,
             (dom,model, module, e) => {
                 let pmodel:nodom.Model = module.modelFactory.get(dom.modelId);
-                let rows = pmodel.data[uidom.tmpData['dataName']]
+                let rows = pmodel.data[me.dataName]
                 //叶子节点不处理
                 if(!rows || rows.length === 0){
                     return;
                 }
                 //选中字段名
-                let f:string = uidom.tmpData['activeName'];
+                let f:string = me.activeName;
                 model.set(f,!model.data[f]);
             }
         );
-
     }
 }
 

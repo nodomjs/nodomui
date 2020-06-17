@@ -17,7 +17,7 @@
     <script src='../dist/grid.js'></script>
     <style>
         .ct{
-            width:600px !important;
+            width:1000px !important;
         }
         body{
             padding:5px;
@@ -34,20 +34,22 @@
 </head>
 <body>
     <div>
-        <ui-grid  class='ct' rowalt sortable gridline='both'>
+        <ui-grid  class='' rowalt sortable gridline='both'>
             <ui-row data='rows'>
                 <div width='1' title='编号' notsort>{{id}}</div>
-                <div width='2' title='姓名'>{{name}}</div>
-                <div width='1' title='年龄'>{{age}}</div>
-                <div width='1' title='性别'>{{sexy}}</div>
-                <div width='3' title='头像' type='img'>{{head}}</div>
+                <div width='2' title='图片' type='img'>{{head}}</div>
+                <div width='3' title='商品名'>{{name}}</div>
+                <div width='1' title='价格'>{{(oprice*discount)|currency}}</div>
+                <div width='1' title='原价'>{{oprice|currency}}</div>
+                <div width='1' title='超级vip'>{{(oprice*discount*$$vip)|currency}}</div>
+                <div width='1' title='折扣'>{{(discount*10)|number:2}}</div>
             </ui-row>
             <ui-sub class='sub' labelwidth='100' cols='2'>
                 <div><label>编号：</label><span>{{id}}</span></div>
-                <div><label>姓名：</label><span>{{name}}</span></div>
-                <div><label>年龄：</label><span>{{age}}</span></div>
-                <div><label>性别：</label><span>{{sexy}}</span></div>
-                <div><label>头像：</label><span>{{head}}</span></div>
+                <div><label>商品名：</label><span>{{name}}</span></div>
+                <div><label>价格：</label><span>{{price}}</span></div>
+                <div><label>原价：</label><span>{{oprice}}</span></div>
+                <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div>
             </ui-sub>
         </ui-grid>
     </div>
@@ -59,6 +61,9 @@
             data:"data/grid.json",
             
             methods:{
+                cacDis:(data)=>{
+                    return data * 10;
+                },
                 clickItem:(dom,model,module,e)=>{
                     console.log('hello',dom,model,module,e)
                 }

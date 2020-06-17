@@ -8,7 +8,7 @@
  * ui-row参数
  *  data        表格数据数组对应名，如rows等
  *  子元素(列)，用div元素
- *  width       宽度，表示整个行宽度的几份，栅格方式，默认1
+ *  width       宽度，表示整个列宽度为几份，所有列的宽度合在一起表示总份数，栅格方式，默认1
  *  title       该列表头显示
  *  notsort     当表格设置sortable时，该设置表示该列不显示排序按钮
  *  editable    是否可编辑
@@ -77,7 +77,7 @@ class UIGrid {
                 let th = new nodom.Element('div');
                 th.addClass('nd-grid-row-item');
                 th.props['style'] = 'flex:' + c.props['width'] || 0;
-                console.log(c.children);
+                console.log(c.expressions);
                 //表头内容
                 let span = new nodom.Element('span');
                 span.assets.set('innerHTML', c.props['title']);
