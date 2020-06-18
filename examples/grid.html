@@ -22,34 +22,28 @@
         body{
             padding:5px;
         }
-        .sub{
-            background-color:burlywood;
-            padding:10px;
-        }
-        .sub label{
-            display:inline-block;
-            width:100px;
-        }
+        
     </style>
 </head>
 <body>
     <div>
-        <ui-grid  class='' rowalt sortable gridline='both'>
+        <ui-grid  class='' rowalt sortable gridline='column' theme='black'>
             <ui-row data='rows'>
-                <div width='1' title='编号' notsort>{{id}}</div>
-                <div width='2' title='图片' type='img'>{{head}}</div>
-                <div width='3' title='商品名'>{{name}}</div>
-                <div width='1' title='价格'>{{(oprice*discount)|currency}}</div>
-                <div width='1' title='原价'>{{oprice|currency}}</div>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='2' title='图片' type='img' field='head'>{{head}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
                 <div width='1' title='超级vip'>{{(oprice*discount*$$vip)|currency}}</div>
-                <div width='1' title='折扣'>{{(discount*10)|number:2}}</div>
+                <div width='1' title='折扣' field='discount'>{{(discount*10)|number:2}}</div>
+                <div width='1' title='商品描述' hide>{{desc}}</div>
             </ui-row>
-            <ui-sub class='sub' labelwidth='100' cols='2'>
-                <div><label>编号：</label><span>{{id}}</span></div>
+            <ui-sub class='sub' labelwidth='1' contentwidth='6' cols='1' auto>
+                <!-- <div><label>编号：</label><span>{{id}}</span></div>
                 <div><label>商品名：</label><span>{{name}}</span></div>
                 <div><label>价格：</label><span>{{price}}</span></div>
                 <div><label>原价：</label><span>{{oprice}}</span></div>
-                <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div>
+                <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div> -->
             </ui-sub>
         </ui-grid>
     </div>

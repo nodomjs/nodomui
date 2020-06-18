@@ -3511,12 +3511,12 @@ var nodom;
         handle: (directive, dom, module, parent) => {
             const modelFac = module.modelFactory;
             let rows = modelFac.get(dom.modelId + '').data;
-            if (directive.filter !== undefined) {
-                rows = directive.filter.exec(rows, module);
-            }
             if (rows === undefined || rows.length === 0) {
                 dom.dontRender = true;
                 return true;
+            }
+            if (directive.filter !== undefined) {
+                rows = directive.filter.exec(rows, module);
             }
             let chds = [];
             let key = dom.key;
@@ -3524,7 +3524,7 @@ var nodom;
             for (let i = 0; i < rows.length; i++) {
                 let node = dom.clone();
                 node.modelId = rows[i].$modelId;
-                setKey(node, key, node.modelId);
+                setKey(node, key, i);
                 rows[i].$index = i;
                 chds.push(node);
             }
@@ -3537,6 +3537,7 @@ var nodom;
                     }
                 }
             }
+            console.log(chds);
             dom.dontRender = true;
             return false;
             function setKey(node, key, id) {
@@ -3923,7 +3924,7 @@ var nodom;
                 ret.sort((a, b) => a[field] >= b[field] ? 1 : -1);
             }
             else {
-                ret.sort((a, b) => b[field] <= a[field] ? 1 : -1);
+                ret.sort((a, b) => a[field] <= b[field] ? 1 : -1);
             }
         }
         else {
@@ -3931,7 +3932,7 @@ var nodom;
                 ret.sort((a, b) => a >= b ? 1 : -1);
             }
             else {
-                ret.sort((a, b) => b <= a ? 1 : -1);
+                ret.sort((a, b) => a <= b ? 1 : -1);
             }
         }
         return ret;

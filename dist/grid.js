@@ -29,6 +29,10 @@
 class UIGrid {
     constructor() {
         this.tagName = 'UI-GRID';
+        /**
+         * 字段对象数组，{title:标题,field:字段,expressions:表达式}
+         */
+        this.fields = [];
     }
     /**
      * 编译后执行代码
@@ -38,11 +42,12 @@ class UIGrid {
         nodom.Compiler.handleAttributes(grid, el);
         nodom.Compiler.handleChildren(grid, el);
         grid.addClass('nd-grid');
+        this.theme = grid.props['theme'] || 'green';
         //网格线
         let gridLine = grid.props['gridline'];
         //thead
         let thead = new nodom.Element('div');
-        thead.addClass('nd-grid-head');
+        thead.addClass('nd-grid-head nd-title-' + this.theme);
         //tbody
         let tbody = new nodom.Element('div');
         tbody.addClass('nd-grid-body');
@@ -63,30 +68,49 @@ class UIGrid {
             }
         }
         if (rowDom) {
+            this.rowDomKey = rowDom.key;
+            //每一行包括行数据和subpanel，所以需要rowDom作为容器，dataDom作为数据行，subDom最为子panel
             //增加repeat指令
             rowDom.addDirective(new nodom.Directive('repeat', rowDom.props['data'], rowDom));
+            rowDom.tagName = 'div';
             //第一个孩子
-            let firstDom = new nodom.Element('div');
-            firstDom.addClass('nd-grid-row');
+            let dataDom = new nodom.Element('div');
+            dataDom.addClass('nd-grid-row');
             //处理所有td
-            for (let c of rowDom.children) {
+            for (let i = 0; i < rowDom.children.length; i++) {
+                let c = rowDom.children[i];
+                //不带tagname的直接删除
                 if (!c.tagName) {
+                    rowDom.children.splice(i--, 1);
+                    continue;
+                }
+                let field = c.props['field'];
+                if (field) {
+                    field = field.trim();
+                }
+                //暂存field
+                this.fields.push({
+                    title: c.props['title'],
+                    field: field,
+                    expressions: c.children[0].expressions
+                });
+                if (c.props.hasOwnProperty('hide')) {
+                    delete c.props['hide'];
                     continue;
                 }
                 //th
                 let th = new nodom.Element('div');
                 th.addClass('nd-grid-row-item');
                 th.props['style'] = 'flex:' + c.props['width'] || 0;
-                console.log(c.expressions);
                 //表头内容
                 let span = new nodom.Element('span');
                 span.assets.set('innerHTML', c.props['title']);
                 th.add(span);
                 //允许排序
                 if (grid.props.hasOwnProperty('sortable')) {
-                    //图片不排序，设置notsort属性不排序
-                    if (c.props['type'] !== 'img' && !c.props.hasOwnProperty('notsort')) {
-                        th.add(this.addSortBtn());
+                    //图片不排序，设置notsort属性，无field属性不排序
+                    if (c.props['type'] !== 'img' && !c.props.hasOwnProperty('notsort') && field) {
+                        th.add(this.addSortBtn(i, rowDom));
                     }
                 }
                 thead.add(th);
@@ -107,39 +131,29 @@ class UIGrid {
                 if (c.props['width'] && nodom.Util.isNumberString(c.props['width'])) {
                     c.props['style'] = 'flex:' + c.props['width'];
                 }
-                firstDom.add(c);
+                dataDom.add(c);
                 delete c.props['title'];
                 delete c.props['type'];
                 delete c.props['width'];
+                delete c.props['field'];
+                delete c.props['notsort'];
             }
             //网格线
             if (gridLine) {
-                this.addGridLine(gridLine, thead, firstDom);
+                this.addGridLine(gridLine, thead, dataDom);
             }
             //替换孩子节点
-            rowDom.children = [firstDom];
+            rowDom.children = [dataDom];
             //带子容器
             if (subDom) {
-                //表头加一列
-                let th = new nodom.Element('div');
-                th.addClass('nd-icon-right nd-grid-iconcol nd-grid-row-item');
-                thead.children.unshift(th);
-                //行前添加箭头
-                let td = new nodom.Element('div');
-                td.addClass('nd-icon-right nd-grid-iconcol nd-grid-row-item');
-                td.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", td));
-                td.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-                    model.set('$showSub', !model.data['$showSub']);
-                }));
-                firstDom.children.unshift(td);
-                subDom.addDirective(new nodom.Directive('show', '$showSub', subDom));
-                subDom.tagName = 'div';
-                rowDom.add(subDom);
+                this.handleSub(subDom, thead, dataDom, rowDom);
             }
-            rowDom.tagName = 'div';
             tbody.add(rowDom);
         }
         delete grid.props['rowalt'];
+        delete grid.props['theme'];
+        delete grid.props['sortable'];
+        delete grid.props['gridline'];
         grid.children = [thead, tbody];
         grid.defineElement = this;
         return grid;
@@ -147,28 +161,98 @@ class UIGrid {
     /**
      * 添加排序按钮
      */
-    addSortBtn() {
+    addSortBtn(index, rowDom) {
         let updown = new nodom.Element('span');
         updown.addClass('nd-grid-sort');
         let up = new nodom.Element('B');
         up.addClass('nd-icon-arrow-down nd-grid-sort-raise');
+        //保存index
+        up.tmpData = { index: index };
         let down = new nodom.Element('B');
         down.addClass('nd-icon-arrow-down nd-grid-sort-down');
+        //保存index
+        down.tmpData = { index: index };
         const defineElement = this;
         /**
          * 升序按钮事件
          */
         up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            // defineElement.addSort()
+            defineElement.sort(parseInt(dom.tmpData['index']), 'asc', module);
         }));
         /**
          * 降序按钮事件
          */
-        up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+        down.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            defineElement.sort(parseInt(dom.tmpData['index']), 'desc', module);
         }));
         updown.add(up);
         updown.add(down);
         return updown;
+    }
+    /**
+     * 添加sub panel
+     * @param subDom    ui-sub dom
+     * @param thead     表格头部dom
+     * @param dataDom   数据行dom
+     * @param rowDom    数据行dom容器
+     */
+    handleSub(subDom, thead, dataDom, rowDom) {
+        //表头加一列
+        let th = new nodom.Element('div');
+        th.addClass('nd-icon-right nd-grid-iconcol nd-grid-row-item');
+        thead.children.unshift(th);
+        //行前添加箭头
+        let td = new nodom.Element('div');
+        td.addClass('nd-grid-iconcol nd-grid-row-item');
+        let b = new nodom.Element('b');
+        b.addClass('nd-icon-right');
+        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", td));
+        b.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            model.set('$showSub', !model.data['$showSub']);
+        }));
+        td.add(b);
+        dataDom.children.unshift(td);
+        subDom.tagName = 'div';
+        rowDom.add(subDom);
+        //子panel处理
+        //增加显示指令，$showSub作为新增数据项，用于控制显示
+        subDom.addDirective(new nodom.Directive('show', '$showSub', subDom));
+        subDom.addClass('nd-grid-sub');
+        //自动
+        if (subDom.props.hasOwnProperty('auto')) {
+            subDom.children = [];
+            //label宽度
+            let lw = subDom.props['labelwidth'] || 1;
+            //content宽度
+            let cw = subDom.props['contentwidth'] || 5;
+            //每行显示数
+            let cols = subDom.props.hasOwnProperty('cols') ? parseInt(subDom.props['cols']) : 1;
+            let cnt = 0;
+            let rowCt;
+            this.fields.forEach((item) => {
+                if (cnt++ % cols === 0) {
+                    rowCt = new nodom.Element('div');
+                    rowCt.addClass('nd-grid-sub-row');
+                    subDom.add(rowCt);
+                }
+                let itemCt = new nodom.Element('div');
+                itemCt.addClass('nd-grid-sub-item');
+                let label = new nodom.Element('label');
+                label.assets.set('innerHTML', item['title'] + ':');
+                label.assets.set('style', 'flex:' + lw);
+                itemCt.add(label);
+                let span = new nodom.Element('span');
+                span.assets.set('style', 'flex:' + cw);
+                let txt = new nodom.Element();
+                txt.expressions = item['expressions'];
+                span.add(txt);
+                itemCt.add(span);
+                rowCt.add(itemCt);
+                delete subDom.props['auto'];
+                delete subDom.props['cols'];
+                delete subDom.props['labelwidth'];
+            });
+        }
     }
     /**
      * 添加网格线
@@ -193,9 +277,26 @@ class UIGrid {
         }
     }
     /**
-     * 设置排序
+     * 排序
+     * @param module        模块
+     * @param fieldIndex    排序字段名
+     * @param asc           desc 降序 asc升序
      */
-    setSort() {
+    sort(index, asc, module) {
+        let dom = module.virtualDom.query(this.rowDomKey);
+        let directive = dom.getDirective('repeat');
+        if (!directive) {
+            return;
+        }
+        //找到字段
+        let f = this.fields[index];
+        if (!f || !f['field']) {
+            return;
+        }
+        let arr = ['orderby', f['field'], asc];
+        directive.filter = new nodom.Filter(arr);
+        //重新渲染
+        nodom.Renderer.add(module);
     }
 }
 nodom.DefineElementManager.add('UI-GRID', UIGrid);
