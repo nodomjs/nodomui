@@ -1,0 +1,52 @@
+@import "base.less";
+/*dialog*/
+.nd-dialog{
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index: 1000000;
+    /*蒙版*/
+    .nd-dialog-cover{
+        background-color:@black;
+        opacity:0.4;
+        position:inherit;
+        left:0;
+        top:0;
+        width:100%;
+        height:100%;
+        z-index:1;
+    }
+
+    .nd-dialog-body{
+        position:inherit;
+        left:0;
+        top:0;
+        width:100%;
+        height:100%;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        z-index:2;
+    }
+}
+.nd-dialog-hide{
+    width:0px;
+    height:0px;
+    
+    .nd-dialog-cover{
+        width: 0;
+        height:0;
+    }
+    .nd-dialog-body{
+        width: 0;
+        height:0px;
+        overflow:hidden;
+        .nd-panel-body{
+            height:0px;
+            width:0px;
+        }
+    }
+    
+}

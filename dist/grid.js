@@ -144,6 +144,7 @@ class UIGrid {
             }
             //替换孩子节点
             rowDom.children = [dataDom];
+            delete rowDom.props['data'];
             //带子容器
             if (subDom) {
                 this.handleSub(subDom, thead, dataDom, rowDom);
@@ -207,7 +208,7 @@ class UIGrid {
         let b = new nodom.Element('b');
         b.addClass('nd-icon-right');
         b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", td));
-        b.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+        b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
             model.set('$showSub', !model.data['$showSub']);
         }));
         td.add(b);

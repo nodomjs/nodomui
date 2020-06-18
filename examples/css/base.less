@@ -18,6 +18,8 @@
 @emphasiscolordeep:#FF6600;
 @warncolor:#FFCC00;
 @warncolordeep:#EEBB00;
+@linkcolor:#669933;
+@linkcolorvisted:#99CC99;
 
 @fonttiny:10px;
 @fontsmall:12px;
@@ -41,4 +43,19 @@
 body{
     padding:0;
     margin:0;
+}
+
+
+/*link*/
+a:link{
+    color:@linkcolor;
+    text-decoration: none;
+}
+
+a:hover{
+    color:@linkcolorvisted;
+}
+
+a:visited{
+    color:@linkcolorvisted;
 }

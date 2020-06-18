@@ -30,7 +30,8 @@
         <ui-grid  class='' rowalt sortable gridline='column' theme='black'>
             <ui-row data='rows'>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
-                <div width='2' title='图片' type='img' field='head'>{{head}}</div>
+                <div width='2' title='头像' field='head' type='img'>{{head}}</div>
+                <div width='2' title='头像链接' field='head'><a href='{{head}}' target='blank'>{{head}}</a></div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
                 <div width='1' title='价格' field='price'>{{price|currency}}</div>
                 <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/dialog.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/panel.js'></script>
+    <script src='../dist/button.js'></script>
+    <script src='../dist/toolbar.js'></script>
+    <script src='../dist/buttongroup.js'></script>
+    <script src='../dist/dialog.js'></script>
+    <style>
+        .panel{
+            height:300px;
+        }
+        .dialog{
+            width:400px !important;
+            height:300px !important;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ui-panel class='panel' title='测试panel' buttons='min,max,close'>
+            <ui-toolbar>
+                <ui-button nobg icon='category'></ui-button>
+                <ui-button nobg right icon='arrow-down' >颜色</ui-button>
+                <ui-button nobg icon='set'></ui-button>
+                <ui-button nobg icon='home'></ui-button>
+            </ui-toolbar>
+            <ui-buttongroup>
+                <ui-button active small icon='add' e-click='showDlg'>添加</ui-button>
+                <ui-button emphasis small icon='close'>删除</ui-button>
+                <ui-button warn small icon='editor'>编辑</ui-button>
+                <ui-button small icon='search'>查询</ui-button>
+            </ui-buttongroup>
+            <!--panel body,可以有多个-->
+            <div>hello world!</div>
+        </ui-panel>
+
+        <ui-dialog class='dialog' title='测试Dialog' data='showdlg'>
+            <div>this is a dialog</div>
+            <ui-buttongroup>
+                <ui-button active small icon='close' e-click='hideDlg'>关闭</ui-button>
+                
+            </ui-buttongroup>
+        </ui-dialog>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                showdlg:true
+            },
+            methods:{
+                showDlg:function(dom,model,module,e){
+                    model.set('showdlg', true);
+                },
+                hideDlg:function(dom,model,module,e){
+                    model.set('showdlg', false);
+                }
+            }
+        }
+    })
+</script>
+</html>

@@ -3,7 +3,7 @@
 
 .nd-panel{
     border-radius:@radius;
-    border:1px solid @lightgrey;
+    background-color:@white;
     box-sizing: border-box;
     width:100%;
     height:100%;
@@ -27,23 +27,26 @@
         /* 标题 */
         .nd-panel-title{
             font-size:@fontnormal;
-            
         }
 
         /*头部工具栏*/
         .nd-panel-header-bar{
             .nd-btn{
                 color:@white;
-                font-size:@fontlarge;
+                font-size:@fontlarger;
+            }
+            .nd-btn:hover{
+                color:@activecolor;
+                background-color:transparent;
             }
         }
-        
     }
 
     .nd-panel-body{
         padding:@padding;
-        font-size:@fontsmall;
+        font-size:@fontnormal;
         flex:1;
+        overflow:auto;
     }
 
     /* toolbar */
