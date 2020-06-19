@@ -1,0 +1,36 @@
+@import "base.less";
+@import "icon.less";
+/*表格css*/
+.nd-form{
+
+}
+
+
+.nd-combo,.nd-radio,.nd-select{
+    b{
+        padding-right:@padding;
+    }
+}
+
+.nd-select{
+    .nd-select-content{
+        border:1px solid @grey;
+        border-radius:@padding;
+        b{
+            float:right;
+        }
+    }
+
+    .nd-select-list{
+        z-index:@combo-index;
+        border:1px solid @grey;
+        border-bottom-left-radius: @padding;
+        border-bottom-right-radius: @padding;
+    }
+
+    >*{
+        display:block;
+    }
+}
+
+

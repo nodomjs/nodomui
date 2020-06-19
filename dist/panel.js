@@ -80,7 +80,7 @@ class UIPanel {
             //min max close按钮
             if (showMin) {
                 let btn = new nodom.Element('BUTTON');
-                btn.addClass('nd-btn nd-icon-reduce nd-btn-nobg nd-btn-notext');
+                btn.addClass('nd-btn nd-icon-minus nd-btn-nobg nd-btn-notext');
                 headbarDom.add(btn);
                 this.setMinHandler(btn);
             }

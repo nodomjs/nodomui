@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/dialog.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/form.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/panel.js'></script>
+    <script src='../dist/button.js'></script>
+    <script src='../dist/toolbar.js'></script>
+    <script src='../dist/buttongroup.js'></script>
+    <script src='../dist/dialog.js'></script>
+    <script src='../dist/checkbox.js'></script>
+    <script src='../dist/radio.js'></script>
+    <script src='../dist/select.js'></script>
+    <style>
+        .form{
+            height:400px;
+            padding:10px;
+        }
+        
+        label{
+            width:100px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form class='form'>
+            <div>
+                <label>性别:</label>
+                <ui-radio field='sexy'>
+                    <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span value='F'>女</span>
+                </ui-radio>
+            </div>
+            <ui-select field='education' show='title'>
+                <div x-repeat='edus' value='{{id}}'>{{title}}</div>
+                <!--<div value='1'>高中</div>
+                <div value='2'>专科</div>
+                <div value='3'>本科</div>
+                <div value='4'>硕士</div>
+                <div value='5'>博士</div>-->
+            </ui-select>
+            <div>
+                <label>同意条款:</label>
+                <ui-checkbox yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                sexy:'F',
+                agree:'Y',
+                education:1,
+                edus:[
+                    {id:1,title:'高中'},
+                    {id:2,title:'专科'},
+                    {id:3,title:'本科'},
+                    {id:4,title:'硕士'},
+                    {id:5,title:'博士'}
+                ]
+            },
+            methods:{
+                showDlg:function(dom,model,module,e){
+                    model.set('showdlg', true);
+                },
+                hideDlg:function(dom,model,module,e){
+                    model.set('showdlg', false);
+                }
+            }
+        }
+    })
+</script>
+</html>
