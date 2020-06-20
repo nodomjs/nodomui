@@ -1194,6 +1194,9 @@ var nodom;
         getProp(propName) {
             return this.props[propName];
         }
+        setProp(propName, v) {
+            this.props[propName] = v;
+        }
         delProp(props) {
             if (nodom.Util.isArray(props)) {
                 for (let p of props) {

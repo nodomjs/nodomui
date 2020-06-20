@@ -103,10 +103,10 @@ class UITree implements nodom.IDefineElement{
 
             if(checkName){
                 let cb:nodom.Element = new nodom.Element('input');
-                cb.props['type']='checkbox';
+                cb.setProp('type','checkbox');
                 cb.addDirective(new nodom.Directive('field',checkName,cb));
-                cb.props['yes-value'] = 'true';
-                cb.props['no-value'] = 'false';
+                cb.setProp('yes-value', 'true');
+                cb.setProp('no-value','false');
                 itemCt.add(cb);
 
                 cb.addEvent(new nodom.NodomEvent('change',

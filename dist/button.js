@@ -15,16 +15,16 @@ class UIButton {
         nodom.Compiler.handleChildren(oe, el);
         //图标
         let icon;
-        if (oe.props['icon']) {
-            icon = oe.props['icon'];
+        if (oe.hasProp('icon')) {
+            icon = oe.getProp('icon');
         }
         //图标大小
         let arr = ['small', 'normal', 'big'];
         let size;
         for (let l of arr) {
-            if (oe.props.hasOwnProperty(l)) {
+            if (oe.hasProp(l)) {
                 size = l;
-                delete oe.props[l];
+                oe.delProp(l);
                 break;
             }
         }
@@ -36,9 +36,9 @@ class UIButton {
         let loc;
         arr = ['left', 'top', 'right', 'bottom'];
         for (let l of arr) {
-            if (oe.props.hasOwnProperty(l)) {
+            if (oe.hasProp(l)) {
                 loc = l;
-                delete oe.props[l];
+                oe.delProp(l);
                 break;
             }
         }
@@ -47,17 +47,17 @@ class UIButton {
             loc = 'left';
         }
         let bg;
-        if (oe.props.hasOwnProperty('nobg')) {
+        if (oe.hasProp('nobg')) {
             bg = 'nd-btn-nobg';
-            delete oe.props['nobg'];
+            oe.delProp('nobg');
         }
         else {
             //背景色
             arr = ['warn', 'active', 'emphasis'];
             for (let l of arr) {
-                if (oe.props.hasOwnProperty(l)) {
+                if (oe.hasProp(l)) {
                     bg = 'nd-bg-' + l;
-                    delete oe.props[l];
+                    oe.delProp(l);
                     break;
                 }
             }

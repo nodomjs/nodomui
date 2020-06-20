@@ -19,16 +19,14 @@ class UISelect {
         nodom.Compiler.handleChildren(selectDom, el);
         selectDom.tagName = 'div';
         selectDom.addClass('nd-select');
-        this.dataName = selectDom.props['name'];
-        this.valueName = selectDom.props['valuefield'];
-        this.showName = selectDom.props['displayfield'];
-        this.multi = selectDom.props.hasOwnProperty('multiselect');
-        delete selectDom.props['name'];
-        delete selectDom.props['valuefield'];
-        delete selectDom.props['multiselect'];
+        this.dataName = selectDom.getProp('name');
+        this.valueName = selectDom.getProp('valuefield');
+        this.showName = selectDom.getProp('displayfield');
+        this.multi = selectDom.hasProp('multiselect');
+        selectDom.delProp(['name', 'valuefield', 'multiselect']);
         //值框(隐藏框)
         let inputDom = new nodom.Element('input');
-        inputDom.props['name'] = this.dataName;
+        inputDom.setProp('name', this.dataName);
         inputDom.addClass('nd-select-value');
         inputDom.exprProps['value'] = [new nodom.Expression(this.dataName)];
         //显示框
@@ -43,6 +41,10 @@ class UISelect {
         firstDom.addClass('nd-select-firstct');
         let input = new nodom.Element('input');
         input.addClass('nd-select-show');
+        //多选择，不允许输入
+        if (this.multi) {
+            input.setProp('readonly', true);
+        }
         input.exprProps['value'] = [new nodom.Expression(me.displayName)];
         firstDom.add(input);
         let icon = new nodom.Element('b');
@@ -76,13 +78,13 @@ class UISelect {
             c.children.unshift(icon);
             //点击事件
             c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                me.switchValue(module, model, dom.props['show']);
+                me.switchValue(module, model, dom.getProp('show'));
             }));
             listDom.add(c);
         }
         showDom.add(listDom);
         selectDom.children = [inputDom, showDom];
-        delete selectDom.props['field'];
+        selectDom.delProp('field');
         selectDom.defineElement = this;
         return selectDom;
     }

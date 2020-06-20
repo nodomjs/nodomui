@@ -81,7 +81,7 @@ class UIGrid implements nodom.IDefineElement{
             this.rowDomKey = rowDom.key;
             //每一行包括行数据和subpanel，所以需要rowDom作为容器，dataDom作为数据行，subDom最为子panel
             //增加repeat指令
-            rowDom.addDirective(new nodom.Directive('repeat',rowDom.props['data'],rowDom));
+            rowDom.addDirective(new nodom.Directive('repeat',rowDom.getProp('data'),rowDom));
             rowDom.tagName = 'div';
 
             //第一个孩子
@@ -113,7 +113,7 @@ class UIGrid implements nodom.IDefineElement{
                 //th
                 let th:nodom.Element = new nodom.Element('div');
                 th.addClass('nd-grid-row-item');
-                th.props['style'] = 'flex:' + c.getProp('width')||0;
+                th.setProp('style','flex:' + c.getProp('width')||0);
                 //表头内容
                 let span:nodom.Element = new nodom.Element('span');
                 span.assets.set('innerHTML',c.getProp('title'));
@@ -144,7 +144,7 @@ class UIGrid implements nodom.IDefineElement{
                 
                 //设置自定义flex
                 if(c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))){
-                    c.props['style'] = 'flex:' + c.getProp('width');
+                    c.setProp('style','flex:' + c.getProp('width'));
                 }
                 
                 dataDom.add(c);
@@ -273,9 +273,7 @@ class UIGrid implements nodom.IDefineElement{
                 itemCt.add(span);
 
                 rowCt.add(itemCt);
-                delete subDom.props['auto'];
-                delete subDom.props['cols'];
-                delete subDom.props['labelwidth'];
+                subDom.delProp(['auto','cols','labelwidth']);
             });
         }
         

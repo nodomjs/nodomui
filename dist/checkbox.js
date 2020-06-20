@@ -11,12 +11,10 @@ class UICheckbox {
         nodom.Compiler.handleAttributes(checkDom, el);
         nodom.Compiler.handleChildren(checkDom, el);
         checkDom.addClass('nd-combo');
-        let dataName = checkDom.props['field'];
-        let yesValue = checkDom.props['yes-value'];
-        let noValue = checkDom.props['no-value'];
-        delete checkDom.props['field'];
-        delete checkDom.props['yes-value'];
-        delete checkDom.props['no-value'];
+        let dataName = checkDom.getProp('field');
+        let yesValue = checkDom.getProp('yes-value');
+        let noValue = checkDom.getProp('no-value');
+        checkDom.delProp(['field', 'yes-value', 'no-value']);
         let icon = new nodom.Element('b');
         icon.addClass('nd-icon-checkbox');
         icon.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'" + dataName + "==\"" + yesValue + "\"'}", icon));

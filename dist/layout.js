@@ -28,7 +28,7 @@ class UILayout {
                 continue;
             }
             for (let l of locs) {
-                if (item.props.hasOwnProperty(l)) {
+                if (item.hasProp(l)) {
                     item.addClass('nd-layout-' + l);
                     items[l] = item;
                     break;

@@ -12,7 +12,7 @@ class UIDialog extends UIPanel{
         el.setAttribute('buttons','close');
         let panelDom:nodom.Element = super.init(el);
         
-        this.dataName = panelDom.props['data'] || '$showDialog';
+        this.dataName = panelDom.getProp('data') || '$showDialog';
         
         //设置默认title
         // title = title?title.trim():'';

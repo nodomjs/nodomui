@@ -28,15 +28,15 @@ class UIAccordion {
             if (!item.tagName) {
                 continue;
             }
-            if (item.props.hasOwnProperty('first')) {
+            if (item.hasProp('first')) {
                 //添加repeat指令
-                firstDom.addDirective(new nodom.Directive('repeat', item.props['data'], firstDom));
+                firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom));
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
                 this.method1 = methodId;
-                activeName1 = item.props['activename'] || 'active';
+                activeName1 = item.getProp('activename') || 'active';
                 //存激活field name
                 this.active1 = activeName1;
                 firstDom.add(item);
@@ -45,26 +45,25 @@ class UIAccordion {
                 span.children = item.children;
                 item.children = [span];
                 //图标
-                if (item.props['icon']) {
-                    span.addClass('nd-icon-' + item.props['icon']);
+                if (item.hasProp('icon')) {
+                    span.addClass('nd-icon-' + item.getProp('icon'));
                 }
                 //保存第一级field
-                this.field1 = item.props['data'];
+                this.field1 = item.getProp('data');
                 //展开图标
                 let icon = new nodom.Element('b');
                 icon.addClass('nd-accordion-icon nd-icon-right');
                 icon.directives.push(new nodom.Directive('class', "{'nd-accordion-open':'" + activeName1 + "'}", item));
                 item.add(icon);
-                delete item.props['activename'];
-                delete item.props['first'];
+                item.delProp(['activename', 'first']);
             }
-            else if (item.props.hasOwnProperty('second')) {
-                activeName2 = item.props['activename'] || 'active';
+            else if (item.hasProp('second')) {
+                activeName2 = item.getProp('activename') || 'active';
                 //存激活field name
                 this.active2 = activeName2;
-                item.directives.push(new nodom.Directive('repeat', item.props['data'], item));
+                item.directives.push(new nodom.Directive('repeat', item.getProp('data'), item));
                 //保存第二级field
-                this.field2 = item.props['data'];
+                this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
@@ -73,13 +72,11 @@ class UIAccordion {
                 secondDom.addClass('nd-accordion-secondct');
                 secondDom.add(item);
                 secondDom.directives.push(new nodom.Directive('class', "{'nd-accordion-hide':'!" + activeName1 + "'}", secondDom));
-                if (item.props['icon']) {
-                    item.addClass('nd-icon-' + item.props['icon']);
+                if (item.hasProp('icon')) {
+                    item.addClass('nd-icon-' + item.getProp('icon'));
                 }
-                delete item.props['second'];
             }
-            delete item.props['data'];
-            delete item.props['icon'];
+            item.delProp(['data', 'icon', 'second']);
         }
         //指令按优先级排序
         firstDom.directives.sort((a, b) => {

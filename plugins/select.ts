@@ -74,7 +74,7 @@ class UISelect implements nodom.IDefineElement{
         selectDom.delProp(['name','valuefield','multiselect']);
         //值框(隐藏框)
         let inputDom:nodom.Element = new nodom.Element('input');
-        inputDom.props['name'] = this.dataName;
+        inputDom.setProp('name',this.dataName);
         inputDom.addClass('nd-select-value');
         inputDom.exprProps['value'] = [new nodom.Expression(this.dataName)];
         
@@ -92,6 +92,10 @@ class UISelect implements nodom.IDefineElement{
         firstDom.addClass('nd-select-firstct');
         let input:nodom.Element = new nodom.Element('input');
         input.addClass('nd-select-show');
+        //多选择，不允许输入
+        if(this.multi){
+            input.setProp('readonly',true);
+        }
         input.exprProps['value'] = [new nodom.Expression(me.displayName)];
         firstDom.add(input);
         let icon:nodom.Element = new nodom.Element('b');
@@ -131,7 +135,7 @@ class UISelect implements nodom.IDefineElement{
             //点击事件
             c.addEvent(new nodom.NodomEvent('click',
                 (dom,model,module)=>{
-                    me.switchValue(module,model,dom.getProp('show');
+                    me.switchValue(module,model,dom.getProp('show'));
                 }
             ));
             listDom.add(c);

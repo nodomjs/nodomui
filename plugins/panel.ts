@@ -21,7 +21,7 @@ class UIPanel implements nodom.IDefineElement{
         let showMax:boolean = false;
         let showClose:boolean = false;
         
-        if(oe.hasProp('buttons'){
+        if(oe.hasProp('buttons')){
             let buttons = oe.getProp('buttons').split(',');
             if(buttons.includes('min')){
                 showMin = true;    
@@ -40,7 +40,7 @@ class UIPanel implements nodom.IDefineElement{
         let panelDom:nodom.Element = new nodom.Element('div');
         //拷贝属性
         Object.getOwnPropertyNames(oe.props).forEach((p)=>{
-            panelDom.props[p] = oe.getProp(p);
+            panelDom.setProp(p,oe.getProp(p));
         });
         Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
             panelDom.exprProps[p] = oe.exprProps[p];
