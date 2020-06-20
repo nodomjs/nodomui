@@ -12,7 +12,7 @@ class UIPanel implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
 
-        let title:string = oe.props['title'];
+        let title:string = oe.getProp('title');
         //设置默认title
         title = title?title.trim():'';
         title = title!==''?title:'Panel';
@@ -21,8 +21,8 @@ class UIPanel implements nodom.IDefineElement{
         let showMax:boolean = false;
         let showClose:boolean = false;
         
-        if(oe.props['buttons']){
-            let buttons = oe.props['buttons'].split(',');
+        if(oe.hasProp('buttons'){
+            let buttons = oe.getProp('buttons').split(',');
             if(buttons.includes('min')){
                 showMin = true;    
             }
@@ -34,14 +34,13 @@ class UIPanel implements nodom.IDefineElement{
             }
         }
         
-        delete oe.props['title'];
-        delete oe.props['buttons'];
+        oe.delProp(['title','buttons']);
 
         //panel dom
         let panelDom:nodom.Element = new nodom.Element('div');
         //拷贝属性
         Object.getOwnPropertyNames(oe.props).forEach((p)=>{
-            panelDom.props[p] = oe.props[p];
+            panelDom.props[p] = oe.getProp(p);
         });
         Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
             panelDom.exprProps[p] = oe.exprProps[p];

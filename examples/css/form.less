@@ -13,20 +13,48 @@
 }
 
 .nd-select{
+    display:inline-block;
+    /*值框*/
+    .nd-select-value{
+        display:none;
+        position:relative;
+    }
     .nd-select-content{
         border:1px solid @grey;
         border-radius:@padding;
-        b{
-            float:right;
+        position: relative;
+        
+        /*输入框，下箭头容器*/
+        .nd-select-firstct{
+            padding:0 25px 0 @padding;
+        
+            > b{
+                right:0;
+                position:absolute;
+            }
+            /*显示框*/
+            .nd-select-show{
+                width:100%;
+                box-sizing: border-box;
+                border:0;
+            }
+        }
+        
+
+        .nd-select-list{
+            background-color:@white;
+            z-index:@combo-index;
+            padding:@padding * 2;
+            position:absolute;
+            width:100%;
+            box-sizing: border-box;
+            border:1px solid @grey;
+            border-bottom-left-radius: @padding;
+            border-bottom-right-radius: @padding;
         }
     }
 
-    .nd-select-list{
-        z-index:@combo-index;
-        border:1px solid @grey;
-        border-bottom-left-radius: @padding;
-        border-bottom-right-radius: @padding;
-    }
+    
 
     >*{
         display:block;

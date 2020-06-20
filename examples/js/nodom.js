@@ -409,7 +409,7 @@ var nodom;
             }
             static width(el, value) {
                 if (!this.isEl(el)) {
-                    throw new nodom.NodomError('invoke', 'nodom.width', '0', 'Element');
+                    throw new nodom.NodomError('invoke', 'Util.width', '0', 'Element');
                 }
                 if (this.isNumber(value)) {
                     el.style.width = value + 'px';
@@ -1114,6 +1114,9 @@ var nodom;
             }
         }
         getParent(module) {
+            if (!module) {
+                throw new nodom.NodomError('invoke', 'Element.getParent', '0', 'Module');
+            }
             if (this.parent) {
                 return this.parent;
             }
@@ -1184,6 +1187,22 @@ var nodom;
                 clazz = sa.join(' ');
             }
             this.props['class'] = clazz;
+        }
+        hasProp(propName) {
+            return this.props.hasOwnProperty(propName);
+        }
+        getProp(propName) {
+            return this.props[propName];
+        }
+        delProp(props) {
+            if (nodom.Util.isArray(props)) {
+                for (let p of props) {
+                    delete this.props[p];
+                }
+            }
+            else {
+                delete this.props[props];
+            }
         }
         query(key) {
             if (this.key === key) {

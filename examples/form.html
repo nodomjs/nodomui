@@ -44,14 +44,13 @@
                     <span value='F'>女</span>
                 </ui-radio>
             </div>
-            <ui-select field='education' show='title'>
-                <div x-repeat='edus' value='{{id}}'>{{title}}</div>
-                <!--<div value='1'>高中</div>
-                <div value='2'>专科</div>
-                <div value='3'>本科</div>
-                <div value='4'>硕士</div>
-                <div value='5'>博士</div>-->
-            </ui-select>
+            <div>
+                <label>学历:</label>
+                <ui-select name='education' valueField='id' displayField='title' listField='edus' multiselect>
+                    <div x-repeat='edus' value='{{id}}' show='{{title}}'>{{id}}-{{title}}</div>
+                </ui-select>
+            </div>
+            
             <div>
                 <label>同意条款:</label>
                 <ui-checkbox yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
@@ -66,7 +65,7 @@
             data:{
                 sexy:'F',
                 agree:'Y',
-                education:1,
+                education:'2,3',
                 edus:[
                     {id:1,title:'高中'},
                     {id:2,title:'专科'},

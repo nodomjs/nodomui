@@ -50,9 +50,9 @@ class UIGrid implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(grid,el);
         nodom.Compiler.handleChildren(grid,el);
         grid.addClass('nd-grid');
-        this.theme = grid.props['theme'] || 'green';
+        this.theme = grid.getProp('theme') || 'green';
         //网格线
-        let gridLine:string = grid.props['gridline'];
+        let gridLine:string = grid.getProp('gridline');
         //thead
         let thead:nodom.Element = new nodom.Element('div');
         thead.addClass('nd-grid-head nd-title-' + this.theme);
@@ -60,7 +60,7 @@ class UIGrid implements nodom.IDefineElement{
         //tbody
         let tbody:nodom.Element = new nodom.Element('div');
         tbody.addClass('nd-grid-body');
-        if(grid.props.hasOwnProperty('rowalt')){
+        if(grid.hasProp('rowalt')){
             tbody.addClass('nd-grid-body-rowalt');
         }
 
@@ -95,33 +95,33 @@ class UIGrid implements nodom.IDefineElement{
                     rowDom.children.splice(i--,1);
                     continue;
                 }
-                let field:string = c.props['field'];
+                let field:string = c.getProp('field');
                 if(field){
                     field = field.trim();
                 }
                 //暂存field
                 this.fields.push( {
-                    title:c.props['title'],
+                    title:c.getProp('title'),
                     field:field,
                     expressions:c.children[0].expressions
                 });
 
-                if(c.props.hasOwnProperty('hide')){
-                    delete c.props['hide'];
+                if(c.hasProp('hide')){
+                    c.delProp('hide');
                     continue;
                 }
                 //th
                 let th:nodom.Element = new nodom.Element('div');
                 th.addClass('nd-grid-row-item');
-                th.props['style'] = 'flex:' + c.props['width']||0;
+                th.props['style'] = 'flex:' + c.getProp('width')||0;
                 //表头内容
                 let span:nodom.Element = new nodom.Element('span');
-                span.assets.set('innerHTML',c.props['title']);
+                span.assets.set('innerHTML',c.getProp('title'));
                 th.add(span);
                 //允许排序
-                if(grid.props.hasOwnProperty('sortable')){
+                if(grid.hasProp('sortable')){
                     //图片不排序，设置notsort属性，无field属性不排序
-                    if(c.props['type'] !== 'img' && !c.props.hasOwnProperty('notsort') && field){
+                    if(c.getProp('type') !== 'img' && !c.hasProp('notsort') && field){
                         th.add(this.addSortBtn(i,rowDom));
                     }
                 }
@@ -131,7 +131,7 @@ class UIGrid implements nodom.IDefineElement{
                 //表格body
                 let tdIn:nodom.Element = c.children[0];
 
-                switch(c.props['type']){
+                switch(c.getProp('type')){
                     case 'img':
                         tdIn.tagName = 'img';
                         tdIn.exprProps['src'] = tdIn.expressions;
@@ -143,16 +143,12 @@ class UIGrid implements nodom.IDefineElement{
                 c.addClass('nd-grid-row-item');
                 
                 //设置自定义flex
-                if(c.props['width'] && nodom.Util.isNumberString(c.props['width'])){
-                    c.props['style'] = 'flex:' + c.props['width'];
+                if(c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))){
+                    c.props['style'] = 'flex:' + c.getProp('width');
                 }
                 
                 dataDom.add(c);
-                delete c.props['title'];
-                delete c.props['type'];
-                delete c.props['width'];
-                delete c.props['field'];
-                delete c.props['notsort'];
+                c.delProp(['title','type','width','field','notsort']);
             }
 
             //网格线
@@ -161,7 +157,7 @@ class UIGrid implements nodom.IDefineElement{
             }
             //替换孩子节点
             rowDom.children = [dataDom];
-            delete rowDom.props['data'];
+            rowDom.delProp('data');
             //带子容器
             if(subDom){
                 this.handleSub(subDom,thead,dataDom,rowDom);
@@ -169,10 +165,7 @@ class UIGrid implements nodom.IDefineElement{
             tbody.add(rowDom);
         }
         
-        delete grid.props['rowalt'];
-        delete grid.props['theme'];
-        delete grid.props['sortable'];
-        delete grid.props['gridline'];
+        grid.delProp(['rowalt','theme','sortable','gridline']);
         grid.children=[thead,tbody];
         grid.defineElement = this;
         return grid;
@@ -248,14 +241,14 @@ class UIGrid implements nodom.IDefineElement{
         subDom.addDirective(new nodom.Directive('show','$showSub',subDom));
         subDom.addClass('nd-grid-sub');
         //自动
-        if(subDom.props.hasOwnProperty('auto')){
+        if(subDom.hasProp('auto')){
             subDom.children = [];
             //label宽度
-            let lw:string = subDom.props['labelwidth']||1;
+            let lw:string = subDom.getProp('labelwidth')||1;
             //content宽度
-            let cw:string = subDom.props['contentwidth']||5;
+            let cw:string = subDom.getProp('contentwidth')||5;
             //每行显示数
-            let cols:number = subDom.props.hasOwnProperty('cols')?parseInt(subDom.props['cols']):1;
+            let cols:number = subDom.hasProp('cols')?parseInt(subDom.getProp('cols')):1;
             let cnt = 0;
             let rowCt:nodom.Element;
             this.fields.forEach((item)=>{

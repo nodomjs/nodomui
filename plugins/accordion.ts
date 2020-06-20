@@ -52,7 +52,7 @@ class UIAccordion implements nodom.IDefineElement{
             if(!item.tagName){
                 continue;
             }
-            if(item.props.hasOwnProperty('first')){
+            if(item.hasProp('first')){
                 //添加repeat指令
                 firstDom.addDirective(new nodom.Directive('repeat',item.props['data'],firstDom));
                 item.addClass('nd-accordion-first');
@@ -85,7 +85,7 @@ class UIAccordion implements nodom.IDefineElement{
                 
                 delete item.props['activename']; 
                 delete item.props['first'];
-            }else if(item.props.hasOwnProperty('second')){
+            }else if(item.hasProp('second')){
                 activeName2 = item.props['activename'] || 'active';
                 //存激活field name
                 this.active2 = activeName2;

@@ -10,13 +10,11 @@ class UICheckbox implements nodom.IDefineElement{
         nodom.Compiler.handleChildren(checkDom,el);
         checkDom.addClass('nd-combo');
 
-        let dataName:string = checkDom.props['field'];
-        let yesValue:string = checkDom.props['yes-value'];
-        let noValue:string = checkDom.props['no-value'];
+        let dataName:string = checkDom.getProp('field');
+        let yesValue:string = checkDom.getProp('yes-value');
+        let noValue:string = checkDom.getProp('no-value');
         
-        delete checkDom.props['field'];
-        delete checkDom.props['yes-value'];
-        delete checkDom.props['no-value'];
+        checkDom.delProp(['field','yes-value','no-value']);
 
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-icon-checkbox');

@@ -27,23 +27,23 @@ class UITree implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(ct,el);
         ct.addClass('nd-tree');
         //数据字段名
-        let dataName:string = ct.props['data'];
+        let dataName:string = ct.getProp('data');
         this.dataName = dataName;
         //图标数组
         let icons:string[];
         //显示字段名
-        let showName:string = ct.props['showname'];
+        let showName:string = ct.getProp('showname');
         //激活字段名
-        let activeName:string = ct.props['activename'];
+        let activeName:string = ct.getProp('activename');
         this.activeName = activeName;
         //checkbox绑定name，如果存在，则显示checkbox
-        let checkName:string = ct.props['checkname'];
+        let checkName:string = ct.getProp('checkname');
 
-        if(ct.props['icon']){
-            icons = ct.props['icon'].trim().replace(/\s+/g,'').split(',');
+        if(ct.hasProp('icon')){
+            icons = ct.getProp('icon').trim().replace(/\s+/g,'').split(',');
         }
-        //最大级数，默认5
-        let maxLevels:number = ct.props['maxlevels']?parseInt(ct.props['maxlevels']):5;
+        //最大级数，默认3
+        let maxLevels:number = ct.getProp('maxlevels')?parseInt(ct.getProp('maxlevels')):3;
         //展开收拢事件
         let methodId = '$nodomGenMethod' + nodom.Util.genId();
         this.arrowClickId = methodId;
@@ -51,8 +51,8 @@ class UITree implements nodom.IDefineElement{
         
         //item click 事件
         let itemClickEvent:nodom.NodomEvent;
-        if(ct.props['itemclick']){
-            itemClickEvent = new nodom.NodomEvent('change', ct.props['itemclick']+':delg');
+        if(ct.hasProp('itemclick')){
+            itemClickEvent = new nodom.NodomEvent('change', ct.getProp('itemclick')+':delg');
         }
         let parentCt:nodom.Element = ct;
         let item:nodom.Element;
@@ -102,8 +102,7 @@ class UITree implements nodom.IDefineElement{
             }
 
             if(checkName){
-                let cb:nodom.Element = new nodom.Element();
-                cb.tagName = 'input';
+                let cb:nodom.Element = new nodom.Element('input');
                 cb.props['type']='checkbox';
                 cb.addDirective(new nodom.Directive('field',checkName,cb));
                 cb.props['yes-value'] = 'true';
@@ -125,7 +124,7 @@ class UITree implements nodom.IDefineElement{
 
             //子节点容器
             let subCt = new nodom.Element();
-            subCt.props['class'] = 'nd-tree-subct';
+            subCt.addClass('nd-tree-subct');
             subCt.tagName = 'DIV';
             subCt.addDirective(new nodom.Directive('class',"{'nd-tree-show':'" + activeName + "'}",item));
             itemCt.add(subCt);
@@ -133,13 +132,7 @@ class UITree implements nodom.IDefineElement{
             parentCt = subCt;
         }
         
-        delete ct.props['data'];
-        delete ct.props['icon'];
-        delete ct.props['checkname'];
-        delete ct.props['dataname'];
-        delete ct.props['activename'];
-        delete ct.props['itemclick'];
-        delete ct.props['maxlevels'];
+        ct.delProp(['data','icon','checkname','dataname','activename','itemclick','maxlevels']);
         ct.defineElement=this;
         return ct;
 
