@@ -781,9 +781,6 @@ var nodom;
             if (this.dontRender) {
                 return;
             }
-            if (this.defineElement) {
-                nodom.DefineElementManager.beforeRender(module, this);
-            }
             if (parent) {
                 this.parentKey = parent.key;
                 if (!this.modelId) {
@@ -801,6 +798,9 @@ var nodom;
                         model.set(item, this.extraData[item]);
                     });
                 }
+            }
+            if (this.defineElement) {
+                nodom.DefineElementManager.beforeRender(module, this);
             }
             if (this.tagName !== undefined) {
                 this.handleProps(module);

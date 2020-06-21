@@ -1,89 +1,117 @@
 @import "base.less";
-
 @font-face {font-family: "nd-iconfont";
     src:url('font/iconfont.ttf'),
     url('font/iconfont.woff')
 }
 
-.nd-icon-small{
+/*icon size*/
+.nd-icon-sizesmall{
     font-size:@fontsmall;
 }
 
-.nd-icon-normal{
+.nd-icon-sizenormal{
     font-size:@fontnormal;
 }
 
-.nd-icon-big{
+.nd-icon-sizebig{
     font-size:@fontlargest;
 }
 
-
-.nd-icon-arrow-right::before{
+/*icon class*/
+.nd-icon-arrow-right{
     font-family: nd-iconfont;
-    content:'\e743';
+    &:before{
+        content:'\e743';
+    }
 }
-.nd-icon-right::before{
+.nd-icon-right{
     font-family: nd-iconfont;
-    content:'\e61a';
-}
-
-.nd-icon-checkbox::before{
-    font-family: nd-iconfont;
-    content:'\e638';
-}
-
-.nd-icon-checked::before{
-    font-family: nd-iconfont;
-    content:'\e7cc';
+    &:before{
+        content:'\e61a';
+    }
 }
 
-.nd-icon-radio::before{
+.nd-icon-checkbox{
     font-family: nd-iconfont;
-    content:'\e6ed';
+    &:before{
+        content:'\e638';
+    }
 }
 
-.nd-icon-radio-active::before{
+.nd-icon-checked{
     font-family: nd-iconfont;
-    content:'\e75f';
+    &:before{
+        content:'\e7cc';
+    }
+}
+
+.nd-icon-radio{
+    font-family: nd-iconfont;
+    &:before{
+        content:'\e6ed';
+    }
+}
+
+.nd-icon-radio-active{
+    font-family: nd-iconfont;
+    &:before{
+        content:'\e75f';
+    }
 }
 
 
-.nd-icon-checked-fill::before{
+.nd-icon-checked-fill{
     font-family: nd-iconfont;
-    content:'\e78d';
+    &:before{
+        content:'\e78d';
+    }
 }
 
-.nd-icon-arrow-up::before{
+.nd-icon-arrow-up{
     font-family: nd-iconfont;
-    content:'\e746';
+    &:before{
+        content:'\e746';
+    }
 }
 
-.nd-icon-arrow-down::before{
+.nd-icon-arrow-down{
     font-family: nd-iconfont;
-    content:'\e7b2';
+    &:before{
+        content:'\e7b2';
+    }
 }
 
-.nd-icon-minus::before{
+.nd-icon-minus{
     font-family: nd-iconfont;
-    content:'\e761';
+    &:before{
+        content:'\e761';
+    }
 }
 
-.nd-icon-add::before{
+.nd-icon-add{
     font-family: nd-iconfont;
-    content:'\e742';
+    &:before{
+        content:'\e742';
+    }
 }
 
-.nd-icon-close::before{
+.nd-icon-close{
     font-family: nd-iconfont;
-    content:'\e760';
+    &:before{
+        content:'\e760';
+    }
 }
 
-.nd-icon-prompt::before{
+.nd-icon-prompt{
     font-family: nd-iconfont;
-    content:'\e751';
+    &:before{
+        content:'\e751';
+    }
 }
 
-.nd-icon-search::before{
+.nd-icon-search{
     font-family: nd-iconfont;
-    content:'\e7b6';
+    &:before{
+        content:'\e7b6';
+    }
 }

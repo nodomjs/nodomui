@@ -1,0 +1,44 @@
+@import "base.less";
+@import "icon.less";
+/********** menu ***********/
+.nd-menu{
+    background-color:@lightgrey;
+    z-index: @menu-index;
+    font-size:@fontnormal;
+    position:absolute;
+    .nd-menu-subct{
+        width:150px;
+        display:none;
+        position:absolute;
+        background-color:@lightgrey;
+        // width:100%;
+        .nd-menu-nodect{
+            position:relative;
+            padding:@padding;
+            width:100%;
+            .nd-menu-node{
+                padding:@padding @padding * 2;
+                span{
+                    &:hover{
+                        background-color:@grey;        
+                    }
+                }
+                /*子菜单箭头*/
+                .nd-menu-subicon{
+                    float:right;
+                    .nd-icon-right;
+                }
+            }
+        }
+    }
+    
+
+    
+    .nd-menu-show{
+        display:inline-block;
+    }
+
+    .nd-menu-first{
+        display:inline-block;
+    }
+}

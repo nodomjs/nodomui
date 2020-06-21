@@ -17,8 +17,8 @@ class UICheckbox implements nodom.IDefineElement{
         checkDom.delProp(['field','yes-value','no-value']);
 
         let icon:nodom.Element = new nodom.Element('b');
-        icon.addClass('nd-icon-checkbox');
-        icon.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'" + dataName + "==\""+ yesValue +"\"'}",icon));
+        icon.addClass('nd-uncheck');
+        icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + dataName + "==\""+ yesValue +"\"'}",icon));
         checkDom.children.unshift(icon);
 
         //点击事件

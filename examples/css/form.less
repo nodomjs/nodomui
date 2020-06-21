@@ -2,9 +2,39 @@
 @import "icon.less";
 /*表格css*/
 .nd-form{
-
+    
 }
 
+form{
+    label{
+        display:inline-block;
+    }
+    input{
+        padding:@padding;
+        border:1px solid @grey;
+        border-radius:@padding;
+    }
+
+    .nd-form-item{
+        padding:@padding;
+        display:flex;
+        label{
+            flex:1;
+        }
+        .nd-form-input{
+            flex:2;
+        }
+    }
+
+    .nd-uncheck{
+        margin-right:@padding;
+        .nd-icon-checkbox;
+    }
+    .nd-checked{
+        margin-right:@padding;
+        .nd-icon-checked;
+    }
+}
 
 .nd-combo,.nd-radio,.nd-select{
     b{
@@ -26,10 +56,10 @@
         
         /*输入框，下箭头容器*/
         .nd-select-firstct{
-            padding:0 25px 0 @padding;
-        
+            // padding:0 0px 0 @padding;
             > b{
                 right:0;
+                top:5px;
                 position:absolute;
             }
             /*显示框*/
@@ -39,8 +69,7 @@
                 border:0;
             }
         }
-        
-
+    
         .nd-select-list{
             background-color:@white;
             z-index:@combo-index;
@@ -53,12 +82,39 @@
             border-bottom-right-radius: @padding;
         }
     }
-
-    
-
     >*{
         display:block;
     }
+}
+
+/*list box*/
+.nd-list{
+    overflow:auto;
+    display:flex;
+    flex-direction: column;
+    border:1px solid @grey;
+    padding:@padding;
+    border-radius:@padding;
+    .nd-list-item{
+        line-height:30px;
+        display:flex;
+        flex-direction: row;
+        .nd-list-item-col{
+            flex:1;
+        }
+    }
+}
+/*横向*/
+.nd-list-horizontal{
+    border:1px solid @grey;
+    padding:@padding;
+    border-radius:@padding;
+    overflow:auto;
+    .nd-list-item{
+        display:inline-block;
+        margin:@padding*3;
+    }
+    
 }
 
 

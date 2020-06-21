@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/accordion.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/menu.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/menu.js'></script>
+    <style>
+        .ct{
+            width:300px !important;
+            display:inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ui-menu data='rows'
+            type='pop' showFirst 
+            icon='category,data' showName='title' itemClick='clickItem' 
+            checkName='checked' activeName='active'
+            maxLevels='4' width='150px'
+            >
+        </ui-menu>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                rows:[
+                    {title:'商品管理',active:true,checked:true,rows:[
+                        {title:'商品上架'},
+                        {title:'商品下架'},
+                        {title:'商品编辑'},
+                        {title:'商品统计',active:true,checked:true,rows:[
+                            {title:'上架统计'},
+                            {title:'下架统计'},
+                            {title:'销售统计',rows:[
+                                {title:'日统计'},
+                                {title:'周统计'},
+                                {title:'月统计'},
+                                {title:'年统计'}
+                            ]}
+                        ]}
+                    ]},
+                    {title:'商家管理',rows:[
+                        {title:'商家审核'},
+                        {title:'商家关店'},
+                        {title:'临时关闭'},
+                        {title:'商家统计'}
+                    ]},
+                    {title:'订单管理',rows:[
+                        {title:'发货'},
+                        {title:'取消申请'},
+                        {title:'删除订单'}
+                    ]},
+                    {title:'安全管理',rows:[
+                        {title:'角色管理'},
+                        {title:'用户管理'},
+                        {title:'资源管理'},
+                        {title:'权限管理'}
+                    ]}
+                ]    
+            },
+            methods:{
+                clickItem:function(e,module){
+                    console.log(module);
+                }
+            }
+        }
+    })
+</script>
+</html>

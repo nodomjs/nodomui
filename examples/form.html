@@ -15,6 +15,7 @@
     <link rel="stylesheet/less" type="text/css" href="css/color.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
+    <script src='../dist/uibase.js'></script>
     <script src='../dist/panel.js'></script>
     <script src='../dist/button.js'></script>
     <script src='../dist/toolbar.js'></script>
@@ -23,37 +24,57 @@
     <script src='../dist/checkbox.js'></script>
     <script src='../dist/radio.js'></script>
     <script src='../dist/select.js'></script>
+    <script src='../dist/list.js'></script>
     <style>
         .form{
             height:400px;
+            width:400px;
             padding:10px;
         }
         
         label{
             width:100px;
         }
+
+        .hobby{
+            width:300px;
+            height:100px;
+        }
     </style>
 </head>
 <body>
     <div>
         <form class='form'>
-            <div>
+            <div class='nd-form-item'>
+                <label>姓名:</label>
+                <input  class='nd-form-input' type='text' x-field='userName' value='{{userName}}'>
+            </div>
+            <div class='nd-form-item'>
                 <label>性别:</label>
-                <ui-radio field='sexy'>
+                <ui-radio  class='nd-form-input' field='sexy'>
                     <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span value='F'>女</span>
                 </ui-radio>
             </div>
-            <div>
+            <div class='nd-form-item'>
                 <label>学历:</label>
-                <ui-select name='education' valueField='id' displayField='title' listField='edus' multiselect>
+                <ui-select class='nd-form-input' name='education' valueField='id' displayField='title' listField='edus'>
                     <div x-repeat='edus' value='{{id}}' show='{{title}}'>{{id}}-{{title}}</div>
                 </ui-select>
             </div>
             
-            <div>
+            <div class='nd-form-item'>
+                <label>爱好</label>
+                <!-- displayField='icon|1|icon,hid|1,htitle|2,desc|3'  displayField='icon|1|icon,htitle|2'-->
+                <ui-list class='nd-form-input hobby' name='hobby' valueField='hid' 
+                    displayField='icon|1|icon,hid|1,htitle|2,desc|3'
+                    listField='hobbies' 
+                    listtype='row'>
+                </ui-list>
+            </div>
+            <div class='nd-form-item'>
                 <label>同意条款:</label>
-                <ui-checkbox yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
+                <ui-checkbox  class='nd-form-input' yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
             </div>
         </form>
     </div>
@@ -63,15 +84,27 @@
         module:{
             el:'div',
             data:{
+                userName:'yang',
                 sexy:'F',
                 agree:'Y',
                 education:'2,3',
+                hobby:2,
                 edus:[
                     {id:1,title:'高中'},
                     {id:2,title:'专科'},
                     {id:3,title:'本科'},
                     {id:4,title:'硕士'},
                     {id:5,title:'博士'}
+                ],
+                hobbies:[
+                    {hid:1,htitle:'体育',icon:'prompt',desc:'体育运动很不错'},
+                    {hid:2,htitle:'阅读',icon:'search',desc:'阅读让人睿智'},
+                    {hid:3,htitle:'健身',icon:'close',desc:'健身让人上瘾'},
+                    {hid:4,htitle:'电脑游戏',icon:'minus',desc:'好玩可别贪玩'},
+                    {hid:5,htitle:'户外运动',icon:'add',desc:'感受大自然，轻呼吸'},
+                    {hid:6,htitle:'旅游',icon:'prompt',desc:'读万卷书，行万里路'},
+                    {hid:7,htitle:'吐槽',icon:'prompt',desc:'吐吐更健康'},
+                    {hid:8,htitle:'发呆',icon:'prompt',desc:'人生那么长，歇一下又何妨'},
                 ]
             },
             methods:{

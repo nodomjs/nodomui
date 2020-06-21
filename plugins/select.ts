@@ -70,14 +70,8 @@ class UISelect implements nodom.IDefineElement{
         this.valueName = selectDom.getProp('valuefield');
         this.showName = selectDom.getProp('displayfield');
         this.multi = selectDom.hasProp('multiselect');
-
-        selectDom.delProp(['name','valuefield','multiselect']);
-        //值框(隐藏框)
-        let inputDom:nodom.Element = new nodom.Element('input');
-        inputDom.setProp('name',this.dataName);
-        inputDom.addClass('nd-select-value');
-        inputDom.exprProps['value'] = [new nodom.Expression(this.dataName)];
         
+        selectDom.delProp(['name','valuefield','multiselect']);
         //显示框
         let showDom:nodom.Element = new nodom.Element('div');
         showDom.addClass('nd-select-content');
@@ -101,19 +95,9 @@ class UISelect implements nodom.IDefineElement{
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-icon-arrow-down');
         //点击展开或收拢
-        icon.addEvent(new nodom.NodomEvent('click',':nopopo',
-            (dom,model,module,e,el)=>{
-                //设置显示宽度（作用在源虚拟dom）
-                model.set(me.switchName,!model.data[me.switchName]);
-            }
-        ));
-
-        //关闭select列表
         firstDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                if(model.data[me.switchName]){
-                    model.set(me.switchName,false);
-                }     
+                model.set(me.switchName,!model.data[me.switchName]);
             }
         ));
         firstDom.add(icon);
@@ -129,8 +113,8 @@ class UISelect implements nodom.IDefineElement{
                 this.listName = d.value[0];
             }
             let icon:nodom.Element = new nodom.Element('b');
-            icon.addClass('nd-icon-checkbox');
-            icon.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'" + this.checkName + "'}",icon));    
+            icon.addClass('nd-uncheck');
+            icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.checkName + "'}",icon));    
             c.children.unshift(icon);
             //点击事件
             c.addEvent(new nodom.NodomEvent('click',
@@ -140,8 +124,9 @@ class UISelect implements nodom.IDefineElement{
             ));
             listDom.add(c);
         }
+        
         showDom.add(listDom);
-        selectDom.children = [inputDom,showDom];
+        selectDom.children = [showDom];
         selectDom.delProp('field');
         selectDom.defineElement = this;
         return selectDom;
@@ -151,17 +136,18 @@ class UISelect implements nodom.IDefineElement{
      * @param module 
      * @param dom 
      */
-    afterRender(module:nodom.Module,dom:nodom.Element){
+    beforeRender(module:nodom.Module,dom:nodom.Element){
+        let me = this;
         this.modelId = dom.modelId;
         let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
         let value = pmodel.query(this.dataName);
         let valueArr:string[];
-        if(value && value!==''){
-            console.log(value);
-            valueArr = value.split(',');
-        }
-        let txtArr:string[] = [];
+        
         if(!this.initDataFlag && this.listName){
+            if(value && value!==''){
+                valueArr = value.toString().split(',');
+            }
+            let txtArr:string[] = [];
             let rows = pmodel.query(this.listName);
             for(let d of rows){
                 if(valueArr && valueArr.includes(d[this.valueName]+'')){
@@ -175,6 +161,17 @@ class UISelect implements nodom.IDefineElement{
             if(txtArr.length>0){
                 pmodel.set(this.displayName,txtArr.join(','));
             }
+
+            //注册click事件到全局事件管理器
+            UIEventRegister.addEvent('click',module.name,dom.key,
+                (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
+                    let model:nodom.Model = module.modelFactory.get(dom.modelId);
+                    //外部点击则关闭
+                    if(!inOrout && model.data[me.switchName]){
+                        pmodel.set(me.switchName,false);
+                    }
+                }
+            );
             this.initDataFlag = true;
         }
     }
@@ -235,13 +232,14 @@ class UISelect implements nodom.IDefineElement{
                 pmodel.set(this.dataName,a.join(','));
                 pmodel.set(this.displayName,display+',' + txt);
             }else{
-                pmodel.set(this.dataName,v.toString());
+                pmodel.set(this.dataName,v);
                 pmodel.set(this.displayName,txt);
             }
         }else{
-            pmodel.set(this.valueName,v.toString());
-            pmodel.set(this.displayName,txt);
             this.unseleceAll(module);
+            pmodel.set(this.valueName,v);
+            pmodel.set(this.displayName,txt);
+            pmodel.set(this.switchName,false);
         }
     }
 
@@ -256,30 +254,29 @@ class UISelect implements nodom.IDefineElement{
         let value:string = pmodel.query(this.dataName);
         //显示串
         let display:string = pmodel.query(this.displayName);
-        let v = model.query(this.valueName).toString();
-
+        let v = model.query(this.valueName);
         model.set(this.checkName,false);
+        if(!value || value === ''){
+            return;
+        }
         //多选
         if(this.multi){
-            if(value){
-                let a = value.toString().split(',');
-                if(!a.includes(v)){
-                    return;
-                }
-                let ind = a.indexOf(v);
-                
-                a.splice(ind,1);
-                let a1 = display.split(',');
-                a1.splice(ind,1);
-                pmodel.set(this.dataName,a.join(','));
-                pmodel.set(this.displayName,a1.join(','));
-            }else{
-                pmodel.set(this.dataName,v);
-                pmodel.set(this.displayName,'');
+            let a = value.toString().split(',');
+            v = v.toString();
+            if(!a.includes(v)){
+                return;
             }
+            let ind = a.indexOf(v);
+            
+            a.splice(ind,1);
+            let a1 = display.split(',');
+            a1.splice(ind,1);
+            pmodel.set(this.dataName,a.join(','));
+            pmodel.set(this.displayName,a1.join(','));
         }else{
             pmodel.set(this.dataName,'');
             pmodel.set(this.displayName,'');
+            pmodel.set(this.switchName,false);
         }
     }
 
