@@ -43,15 +43,13 @@ class UIPanel implements nodom.IDefineElement{
             panelDom.setProp(p,oe.getProp(p));
         });
         Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
-            panelDom.exprProps[p] = oe.exprProps[p];
+            panelDom.setProp(p, oe.getProp(p,true),true);
         });
         panelDom.addClass('nd-panel');
-        
         //处理头部
         this.handleHead(panelDom,title,showMin,showMax,showClose);
         //处理body
         this.handleBody(panelDom,oe);
-        
         panelDom.defineElement=this;
         return panelDom;
     }

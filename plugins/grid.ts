@@ -134,7 +134,7 @@ class UIGrid implements nodom.IDefineElement{
                 switch(c.getProp('type')){
                     case 'img':
                         tdIn.tagName = 'img';
-                        tdIn.exprProps['src'] = tdIn.expressions;
+                        tdIn.setProp('src',tdIn.expressions,true);
                         c.children = [tdIn];
                         delete tdIn.expressions;
                         break;
@@ -178,11 +178,11 @@ class UIGrid implements nodom.IDefineElement{
         let updown:nodom.Element = new nodom.Element('span');
         updown.addClass('nd-grid-sort');
         let up:nodom.Element = new nodom.Element('B');
-        up.addClass('nd-icon-arrow-down nd-grid-sort-raise');
+        up.addClass('nd-grid-sort-raise');
         //保存index
         up.tmpData = {index:index};
         let down:nodom.Element = new nodom.Element('B');
-        down.addClass('nd-icon-arrow-down nd-grid-sort-down');
+        down.addClass('nd-grid-sort-down');
         //保存index
         down.tmpData = {index:index};
         const defineElement:UIGrid = this;
@@ -225,7 +225,7 @@ class UIGrid implements nodom.IDefineElement{
         let td:nodom.Element = new nodom.Element('div');
         td.addClass('nd-grid-iconcol nd-grid-row-item');
         let b:nodom.Element = new nodom.Element('b');
-        b.addClass('nd-icon-right');
+        b.addClass('nd-grid-sub-btn');
         b.addDirective(new nodom.Directive('class',"{'nd-grid-showsub':'$showSub'}",td));
         b.addEvent(new nodom.NodomEvent('click', ':delg',
             (dom,model,module,e)=>{

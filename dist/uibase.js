@@ -1,3 +1,21 @@
+//关闭右键菜单
+document.oncontextmenu = function (e) {
+    e.preventDefault();
+};
+/**
+ * 工具类
+ */
+class UITool {
+    /**
+     * 去掉字符串的空格
+     * @param src
+     */
+    static clearSpace(src) {
+        if (src && typeof src === 'string') {
+            return src.replace(/\s+/g, '');
+        }
+    }
+}
 /**
  * window事件注册器
  */

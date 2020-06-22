@@ -1018,7 +1018,13 @@ var nodom;
             }
             nodom.Util.getOwnProps(this.exprProps).forEach((k) => {
                 if (nodom.Util.isArray(this.exprProps[k])) {
-                    this.props[k] = this.handleExpression(this.exprProps[k], module);
+                    let pv = this.handleExpression(this.exprProps[k], module);
+                    if (k === 'class') {
+                        this.addClass(pv);
+                    }
+                    else {
+                        this.props[k] = pv;
+                    }
                 }
                 else if (this.exprProps[k] instanceof nodom.Expression) {
                     this.props[k] = this.exprProps[k].val(module.modelFactory.get(this.modelId));
@@ -1140,6 +1146,16 @@ var nodom;
                 ;
             return dom !== undefined;
         }
+        hasClass(cls) {
+            let clazz = this.props['class'];
+            if (!clazz) {
+                return false;
+            }
+            else {
+                let sa = clazz.split(' ');
+                return sa.includes(cls);
+            }
+        }
         addClass(cls) {
             let clazz = this.props['class'];
             let finded = false;
@@ -1188,23 +1204,50 @@ var nodom;
             }
             this.props['class'] = clazz;
         }
-        hasProp(propName) {
-            return this.props.hasOwnProperty(propName);
+        hasProp(propName, isExpr) {
+            if (isExpr) {
+                return this.exprProps.hasOwnProperty(propName);
+            }
+            else {
+                return this.props.hasOwnProperty(propName);
+            }
         }
-        getProp(propName) {
-            return this.props[propName];
+        getProp(propName, isExpr) {
+            if (isExpr) {
+                return this.exprProps[propName];
+            }
+            else {
+                return this.props[propName];
+            }
         }
-        setProp(propName, v) {
-            this.props[propName] = v;
+        setProp(propName, v, isExpr) {
+            if (isExpr) {
+                this.exprProps[propName] = v;
+            }
+            else {
+                this.props[propName] = v;
+            }
         }
-        delProp(props) {
+        delProp(props, isExpr) {
             if (nodom.Util.isArray(props)) {
-                for (let p of props) {
-                    delete this.props[p];
+                if (isExpr) {
+                    for (let p of props) {
+                        delete this.exprProps[p];
+                    }
+                }
+                else {
+                    for (let p of props) {
+                        delete this.props[p];
+                    }
                 }
             }
             else {
-                delete this.props[props];
+                if (isExpr) {
+                    delete this.exprProps[props];
+                }
+                else {
+                    delete this.props[props];
+                }
             }
         }
         query(key) {

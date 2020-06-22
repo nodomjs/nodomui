@@ -2,24 +2,32 @@
 @padding:5px;
 @radius:5px;
 @title-padding:15px;
-/*color*/
-@titlecolor-black:#333333;
-@titlecolor-blue:#0099cc;
-@titlecolor-green:#99cc33;
 
-@white:#fff;
-@black:#000;
-@lightgrey:#eeeeee;
-@grey:#cccccc;
-@deepgrey:#666666;
-@activecolor:#99CC66;
-@activecolordeep:#88BB55;
+/*主背景色深，根据这个依次设置5个背景色*/
+@maincolor:#000000;
+/*如果为100，则最浅色为白色*/
+@maincolorpercent:100;
+/*前景色，深色和浅色*/
+@forecolor1:#000000;
+@forecolor2:white;
+
+@activecolor:#66cc99;
 @emphasiscolor:#FF9900;
-@emphasiscolordeep:#FF6600;
 @warncolor:#FFCC00;
-@warncolordeep:#EEBB00;
+
+/*颜色*/
+/*颜色系，根据主color逐次变浅*/
+@nd-color1:@maincolor;
+@nd-add-percent:@maincolorpercent/5;
+@nd-color2:fadeout(@maincolor,@nd-add-percent);
+@nd-color3:fadeout(@maincolor,@nd-add-percent*2);
+@nd-color4:fadeout(@maincolor,@nd-add-percent*3);
+@nd-color5:fadeout(@maincolor,@nd-add-percent*4);
+@nd-color6:fadeout(@maincolor,@nd-add-percent*5);
+
 @linkcolor:#669933;
 @linkcolorvisted:#99CC99;
+
 
 @fonttiny:10px;
 @fontsmall:12px;
@@ -44,6 +52,7 @@
 @menu-index:999;
 @combo-index:998;
 
+
 /*global*/
 body{
     padding:0;
@@ -67,4 +76,60 @@ a:hover{
 
 a:visited{
     color:@linkcolorvisted;
+}
+
+/*背景加前景色系，1-5逐次背景减轻*/
+.nd-color1{
+    background-color:@nd-color1;
+    color:@forecolor2;
+}
+
+.nd-color2{
+    background-color:@nd-color2;
+    color:@forecolor2;
+}
+
+.nd-color3{
+    background-color:@nd-color3;
+    color:@forecolor1;
+}
+
+.nd-color4{
+    background-color:@nd-color4;
+    color:@forecolor1;
+}
+
+.nd-color5{
+    background-color:@nd-color5;
+    color:@forecolor1;
+}
+
+.nd-color6{
+    background-color:@nd-color6;
+    color:@forecolor1;
+}
+
+/*激活背景色*/
+
+.nd-active{
+    background-color:@activecolor;
+    &:hover{
+        background-color:multiply(@activecolor,#eeeeee);
+    }
+}
+
+/*强调背景色*/
+.nd-emphasis{
+    background-color:@emphasiscolor;
+    &:hover{
+        background-color:multiply(@emphasiscolor,#eeeeee);
+    }
+}
+
+/*警告背景色*/
+.nd-warn{
+    background-color:@warncolor;
+    &:hover{
+        background-color:multiply(@warncolor,#eeeeee);
+    }
 }

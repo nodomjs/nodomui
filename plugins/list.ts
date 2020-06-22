@@ -107,7 +107,7 @@ class UIList implements nodom.IDefineElement{
                 switch(fa[2]){
                     case 'icon':
                     subItem = new nodom.Element('b');
-                    subItem.exprProps['class'] = ['nd-icon-',new nodom.Expression(fa[0])];
+                    subItem.setProp('class',['nd-icon-',new nodom.Expression(fa[0])],true);
                     break;
                 }
             }

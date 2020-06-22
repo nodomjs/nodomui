@@ -1,12 +1,36 @@
-/**
- * window事件注册器
- */
 
+//关闭右键菜单
+document.oncontextmenu = function(e){
+    e.preventDefault();
+};
+
+/**
+ * 工具类
+ */
+class UITool{
+    /**
+     * 去掉字符串的空格
+     * @param src 
+     */
+    static clearSpace(src:string):string{
+        if(src && typeof src === 'string'){
+            return src.replace(/\s+/g,'');
+        }
+    }
+}
+
+/**
+ * 事件对象接口
+ */
 interface IEventObj{
     module:string;
     dom:string;
     handler:Function;
 }
+
+/**
+ * window事件注册器
+ */
 class UIEventRegister{
     static listeners:Map<string,Array<IEventObj>> = new Map();
     static addEvent(eventName:string,moduleName:string,domKey:string,handler:Function){

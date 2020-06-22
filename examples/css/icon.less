@@ -17,101 +17,123 @@
     font-size:@fontlargest;
 }
 
+.func-nd-genicon(@code){
+    font-family: nd-iconfont;
+    &:before{
+        content:@code;
+    }
+}
+
 /*icon class*/
-.nd-icon-arrow-right{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e743';
-    }
-}
+/*菜单，树右向箭头*/
 .nd-icon-right{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e61a';
-    }
+    .func-nd-genicon('\e61a');
 }
 
+/*复选框，未选中*/
 .nd-icon-checkbox{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e638';
-    }
+    .func-nd-genicon('\e638');
 }
 
+/*复选框，已选中*/
 .nd-icon-checked{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e7cc';
-    }
+    .func-nd-genicon('\e7cc');
 }
 
+/*单选框，未选中*/
 .nd-icon-radio{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e6ed';
-    }
+    .func-nd-genicon('\e6ed');
 }
-
+/*单选框，已选中*/
 .nd-icon-radio-active{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e75f';
-    }
+    .func-nd-genicon('\e75f');
 }
 
 
-.nd-icon-checked-fill{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e78d';
-    }
-}
-
-.nd-icon-arrow-up{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e746';
-    }
-}
-
-.nd-icon-arrow-down{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e7b2';
-    }
-}
-
+/*减号*/
 .nd-icon-minus{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e761';
-    }
+    .func-nd-genicon('\e761');
 }
-
+/*加号*/
 .nd-icon-add{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e742';
-    }
+    .func-nd-genicon('\e742');
 }
 
+/*关闭*/
 .nd-icon-close{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e760';
-    }
+    .func-nd-genicon('\e761');
 }
 
+/*提示*/
 .nd-icon-prompt{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e751';
-    }
+    .func-nd-genicon('\e760');
 }
 
+/*查询*/
 .nd-icon-search{
-    font-family: nd-iconfont;
-    &:before{
-        content:'\e7b6';
-    }
+    .func-nd-genicon('\e7b6');
+}
+
+/*上箭头*/
+.nd-icon-arrow-up{
+    .func-nd-genicon('\e746');
+}
+/*下箭头*/
+.nd-icon-arrow-down{
+    .func-nd-genicon('\e7b2');
+}
+
+/*右箭头*/
+.nd-icon-arrow-right{
+    .func-nd-genicon('\e743');
+}
+
+/*双右箭头*/
+.nd-icon-double-arrow-right{
+    .func-nd-genicon('\e751');
+}
+
+/*左箭头*/
+.nd-icon-arrow-left{
+    .func-nd-genicon('\e744');
+}
+
+/*双左箭头*/
+.nd-icon-double-arrow-left{
+    .func-nd-genicon('\e752');
+}
+
+/*编辑*/
+.nd-icon-edit{
+    .func-nd-genicon('\e753');
+}
+
+/*删除*/
+.nd-icon-del{
+    .func-nd-genicon('\e747');
+}
+
+/*菜单*/
+.nd-icon-menu{
+    .func-nd-genicon('\e74a');
+}
+
+/*设置*/
+.nd-icon-menu{
+    .func-nd-genicon('\e74a');
+}
+
+/*购物车*/
+.nd-icon-shopping-cart{
+    .func-nd-genicon('\e7b4');
+}
+
+/*用户*/
+.nd-icon-user{
+    .func-nd-genicon('\e7b7');
+}
+
+/*安全*/
+.nd-icon-insurance{
+    .func-nd-genicon('\e772');
 }

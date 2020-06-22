@@ -3,7 +3,7 @@
 
 .nd-panel{
     border-radius:@radius;
-    background-color:@white;
+    .nd-color5;
     box-sizing: border-box;
     width:100%;
     height:100%;
@@ -16,11 +16,10 @@
     }
     /* 头部 */
     .nd-panel-header{
+        .nd-color1;
         height: 40px;
         line-height:40px;
         padding:0  @padding 0 @title-padding;
-        background-color:@titlecolor-black;
-        color:@white;
         border-radius:@radius @radius 0 0;
         display:inline-flex;
         justify-content: space-between;
@@ -32,7 +31,7 @@
         /*头部工具栏*/
         .nd-panel-header-bar{
             .nd-btn{
-                color:@white;
+                .nd-color1;
                 font-size:@fontlarger;
             }
             .nd-btn:hover{
@@ -52,8 +51,8 @@
     /* toolbar */
 
     .nd-toolbar{
-        background-color:@lightgrey;
-        border-bottom:1px solid @grey;
+        .nd-color5;
+        border-bottom:1px solid @nd-color3;
         display:inline-flex;
         .nd-btn{
             padding:@btn-padding-top;
@@ -63,7 +62,7 @@
     /* button group*/
     .nd-buttongroup{
         padding:@padding;
-        background-color:@lightgrey;
+        .nd-color5;
         display:inline-flex;
         justify-content: flex-end;
         .nd-btn{

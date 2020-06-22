@@ -90,7 +90,7 @@ class UISelect implements nodom.IDefineElement{
         if(this.multi){
             input.setProp('readonly',true);
         }
-        input.exprProps['value'] = [new nodom.Expression(me.displayName)];
+        input.setProp('value', new nodom.Expression(me.displayName),true);
         firstDom.add(input);
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-icon-arrow-down');

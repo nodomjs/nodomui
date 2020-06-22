@@ -8,29 +8,43 @@
     <link rel="stylesheet/less" type="text/css" href="css/base.less" />
     <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
     <link rel="stylesheet/less" type="text/css" href="css/button.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/accordion.less" />
     <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/color.less" />
     <link rel="stylesheet/less" type="text/css" href="css/menu.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
+    <script src='../dist/uibase.js'></script>
     <script src='../dist/menu.js'></script>
     <style>
         .ct{
             width:300px !important;
             display:inline-block;
         }
+
+        .menu{
+            display:inline;
+        }
     </style>
 </head>
 <body>
     <div>
-        <ui-menu data='rows'
-            type='pop' showFirst 
-            icon='category,data' showName='title' itemClick='clickItem' 
-            checkName='checked' activeName='active'
-            maxLevels='4' width='150px'
-            >
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        菜单测试
+        <ui-menu class='menu' dataName='rows' 
+            maxLevels='4' width='150'>
+            <a x-route='{{url}}' class="{{'nd-icon-' + icon}}" e-click='clickItem'>{{title}}</a>
         </ui-menu>
+
+        用户你好
     </div>
 </body>
 <script>
@@ -38,40 +52,46 @@
         module:{
             el:'div',
             data:{
-                rows:[
-                    {title:'商品管理',active:true,checked:true,rows:[
-                        {title:'商品上架'},
-                        {title:'商品下架'},
-                        {title:'商品编辑'},
-                        {title:'商品统计',active:true,checked:true,rows:[
-                            {title:'上架统计'},
-                            {title:'下架统计'},
-                            {title:'销售统计',rows:[
-                                {title:'日统计'},
-                                {title:'周统计'},
-                                {title:'月统计'},
-                                {title:'年统计'}
+                // rows:[{
+                    // icon:'menu',
+                    // title:'主菜单',
+                    rows:[
+                        
+                        {title:'商家管理',icon:'search',rows:[
+                            {title:'商家审核',icon:'search'},
+                            {title:'商家关店',icon:'search'},
+                            {title:'临时关闭',icon:'search'},
+                            {title:'商家统计'}
+                        ]},
+                        {title:'订单管理',icon:'edit',rows:[
+                            {title:'发货',icon:'add'},
+                            {title:'取消申请',icon:'close'},
+                            {title:'删除订单',icon:'del'}
+                        ]},
+                        {title:'安全管理',icon:'insurance',rows:[
+                            {title:'角色管理',icon:'insurance'},
+                            {title:'用户管理',icon:'user'},
+                            {title:'资源管理',icon:'insurance'},
+                            {title:'权限管理',icon:'insurance'}
+                        ]},{title:'商品管理',icon:'shopping-cart',checked:true,rows:[
+                            {title:'商品上架',icon:'add'},
+                            {title:'商品下架',icon:'minus'},
+                            {title:'商品编辑'},
+                            {title:'商品审核'},
+                            {title:'商品冻结'},
+                            {title:'商品统计',active:true,checked:true,rows:[
+                                {title:'上架统计'},
+                                {title:'下架统计'},
+                                {title:'销售统计',rows:[
+                                    {title:'日统计'},
+                                    {title:'周统计'},
+                                    {title:'月统计'},
+                                    {title:'年统计'}
+                                ]}
                             ]}
                         ]}
-                    ]},
-                    {title:'商家管理',rows:[
-                        {title:'商家审核'},
-                        {title:'商家关店'},
-                        {title:'临时关闭'},
-                        {title:'商家统计'}
-                    ]},
-                    {title:'订单管理',rows:[
-                        {title:'发货'},
-                        {title:'取消申请'},
-                        {title:'删除订单'}
-                    ]},
-                    {title:'安全管理',rows:[
-                        {title:'角色管理'},
-                        {title:'用户管理'},
-                        {title:'资源管理'},
-                        {title:'权限管理'}
-                    ]}
-                ]    
+                    ]
+                // }]
             },
             methods:{
                 clickItem:function(e,module){

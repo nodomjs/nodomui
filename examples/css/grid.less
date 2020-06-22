@@ -1,4 +1,5 @@
 @import "base.less";
+@import "icon.less";
 /*表格css*/
 .nd-grid{
     border-spacing: 1px;
@@ -15,9 +16,14 @@
             max-width:100px;
             max-height:100px;
         }
+
+        .nd-grid-sub-btn{
+            .nd-icon-right;
+        }
     }
 
     .nd-grid-head{
+        .nd-color2;
         display:flex;
         flex-direction: row;
         text-align:center;
@@ -33,14 +39,18 @@
                 align-items: center;
                 margin-left:@padding * 2;
                 line-height:10px;
-                color:@deepgrey;
+                .nd-color1;
                 /*升序箭头*/
                 .nd-grid-sort-raise{
-                    transform:rotate(180deg);
+                    .nd-icon-arrow-up;
+                }
+                /*降序箭头*/
+                .nd-grid-sort-down{
+                    .nd-icon-arrow-down;
                 }
 
                 >b:hover{
-                    color:@activecolor;
+                    color:@nd-color3;
                     cursor: pointer;
                 }
             }
@@ -67,30 +77,31 @@
     }
 
     .nd-grid-row-line{
-        border-bottom:1px solid @grey;
+        border-bottom:1px solid @nd-color3;
     }
 
     .nd-grid-col-line{
         >div{
-            border-right:1px solid @grey;
+            border-right:1px solid @nd-color4;
         }
 
         >div:last-child{
-            border-right:0px solid @grey;
+            border-right:0px solid @nd-color4;
         }
     }
 
     /*每行颜色交错*/
     .nd-grid-body-rowalt >div:nth-child(even){
-        background-color:@lightgrey;
+        .nd-color4;
     }
 
     .nd-grid-sub{
+        .nd-color5;
         display:flex;
         flex-direction: column;
         padding:@padding;
-        background-color:@white;
-        border:1px solid @deepgrey;
+        
+        border:1px solid @nd-color2;
         .nd-grid-sub-row{
             display:flex;
             min-height:30px;

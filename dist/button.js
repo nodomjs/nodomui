@@ -56,7 +56,7 @@ class UIButton {
             arr = ['warn', 'active', 'emphasis'];
             for (let l of arr) {
                 if (oe.hasProp(l)) {
-                    bg = 'nd-bg-' + l;
+                    bg = 'nd-' + l;
                     oe.delProp(l);
                     break;
                 }

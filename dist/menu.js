@@ -5,6 +5,10 @@
 class UIMenu {
     constructor() {
         this.tagName = 'UI-MENU';
+        /**
+         * 方向  0:右 1:左
+         */
+        this.direction = 0;
     }
     /**
      * 编译后执行代码
@@ -14,72 +18,129 @@ class UIMenu {
         let menuDom = new nodom.Element();
         //增加暂存数据
         nodom.Compiler.handleAttributes(menuDom, el);
+        nodom.Compiler.handleChildren(menuDom, el);
         menuDom.tagName = ('div');
-        menuDom.addClass('nd-menu');
+        this.popupMenu = menuDom.hasProp('pop');
         //数据字段名
-        this.dataName = menuDom.getProp('data');
-        //显示字段名
-        let showName = menuDom.getProp('showname');
+        this.dataName = menuDom.getProp('dataname');
+        //显示字段名，数组[显示字段，图标]
+        let showName;
         //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
         //最大级数，默认3
-        let maxLevels = menuDom.hasProp('maxlevels') ? parseInt(menuDom.getProp('maxlevels')) : 3;
+        this.maxLevels = menuDom.hasProp('maxlevels') ? parseInt(menuDom.getProp('maxlevels')) : 3;
         //宽度
-        let menuWidth = menuDom.getProp('width') || '200px';
-        //展开收拢事件
-        let methodId = '$nodomGenMethod' + nodom.Util.genId();
-        let closeOpenEvent = new nodom.NodomEvent('mouseover', (dom, model, module, e, el) => {
+        if (!menuDom.hasProp('width')) {
+            throw "menu插件缺少width参数";
+        }
+        this.menuWidth = parseInt(menuDom.getProp('width')) || 150;
+        menuDom.addClass('nd-menu');
+        if (this.popupMenu) {
+            menuDom.addClass('nd-menu-popup');
+        }
+        //菜单展开
+        let openEvent = new nodom.NodomEvent('mouseenter', (dom, model, module, e, el) => {
             if (model) {
-                model.set(me.activeName, true);
-                let compStyle;
-                if (window.getComputedStyle) {
-                    compStyle = window.getComputedStyle(el, null);
+                let rows = model.query(this.dataName);
+                if (!rows || rows.length === 0) {
+                    return;
                 }
-                if (!compStyle) {
-                    return null;
+                let parent = dom.getParent(module);
+                let top;
+                let left;
+                let w = this.menuWidth;
+                let h = rows.length * 30;
+                let firstNopop = parent.hasClass('nd-menu-first-nopop');
+                if (firstNopop) {
+                    left = 0;
+                    top = 30;
                 }
-                let w = el.offsetWidth;
-                let left = el.offsetLeft;
-                let top = el.offsetTop;
-                console.log(w, left, top);
-                model.set(me.menuStyleName, 'width:' + menuWidth + ';left:' + (w) + 'px;top:' + top + 'px');
+                else {
+                    top = 0;
+                    left = w;
+                }
+                let cx = e.clientX;
+                let cy = e.clientY;
+                let x = e.offsetX;
+                let y = e.offsetY;
+                if (this.direction === 0) {
+                    if (cx + w - x + w > window.innerWidth) {
+                        this.direction = 1;
+                    }
+                }
+                if (this.direction === 1 && !firstNopop) {
+                    left = -w;
+                }
+                if (cy + h - y + h > window.innerHeight) {
+                    top = -h + 30;
+                }
+                model.set(this.menuStyleName, 'width:' + me.menuWidth + 'px;left:' + left + 'px;top:' + top + 'px');
+                model.set(this.activeName, true);
             }
         });
-        //item click 事件
-        let itemClickEvent;
-        if (menuDom.hasProp('itemclick')) {
-            itemClickEvent = new nodom.NodomEvent('click', menuDom.getProp('itemclick') + ':delg');
+        //菜单关闭
+        let closeEvent = new nodom.NodomEvent('mouseleave', (dom, model, module, e, el) => {
+            if (model) {
+                let rows = model.query(this.dataName);
+                if (rows && rows.length > 0) {
+                    //设置当前model的显示参数
+                    model.set(me.activeName, false);
+                }
+            }
+        });
+        //menu 节点,menuDom 下第一个带tagName的节点
+        let menuNode;
+        for (let i = 0; i < menuDom.children.length; i++) {
+            if (menuDom.children[i].tagName) {
+                menuNode = menuDom.children[i];
+                menuNode.addClass('nd-menu-node');
+                break;
+            }
         }
+        menuDom.children = [];
         let parentCt = new nodom.Element('div');
         parentCt.addClass('nd-menu-subct');
-        if (menuDom.hasProp('showfirst')) {
+        if (this.popupMenu) {
             parentCt.addClass('nd-menu-first');
+            parentCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
+        }
+        else {
+            parentCt.addClass('nd-menu-first-nopop');
         }
         menuDom.add(parentCt);
-        let item;
-        for (let i = 0; i < maxLevels; i++) {
-            parentCt.addDirective(new nodom.Directive('class', "{'nd-menu-show':'" + this.activeName + "'}", item));
+        //popup 菜单，需要非激活状态下隐藏
+        if (this.popupMenu) {
+            parentCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
+                let parent = dom.getParent(module);
+                let pmodel = module.modelFactory.get(parent.modelId);
+                pmodel.set(me.activeName, false);
+                //第一级需要还原direction
+                console.log(dom.getProp('class'));
+                if (dom.hasClass('nd-menu-first')) {
+                    this.direction = 0;
+                }
+            }));
+        }
+        //增加显示指令
+        if (this.popupMenu) {
+            parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
+        }
+        for (let i = 0; i < this.maxLevels; i++) {
             let itemCt = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat', this.dataName, itemCt));
             itemCt.addClass('nd-menu-nodect');
-            item = new nodom.Element('div');
-            item.addClass('nd-menu-node');
-            //显示文本
-            let txt = new nodom.Element();
-            txt.expressions = [new nodom.Expression(showName)];
-            item.add(txt);
-            //绑定item click事件
-            if (itemClickEvent) {
-                item.addEvent(itemClickEvent);
-            }
+            let item = menuNode.clone();
             itemCt.add(item);
             //子菜单箭头图标
-            let icon1 = new nodom.Element('b');
-            icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.dataName + "&&" + this.dataName + ".length>0'}", icon1));
-            item.add(icon1);
+            if (this.popupMenu || i > 0) {
+                let icon1 = new nodom.Element('b');
+                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.dataName + "&&" + this.dataName + ".length>0'}", icon1));
+                item.add(icon1);
+            }
             //绑定展开收起事件
-            item.addEvent(closeOpenEvent);
+            itemCt.addEvent(openEvent);
+            itemCt.addEvent(closeEvent);
             parentCt.add(itemCt);
             let subCt = new nodom.Element('div');
             subCt.addClass('nd-menu-subct');
@@ -88,12 +149,12 @@ class UIMenu {
                 let pmodel = module.modelFactory.get(parent.modelId);
                 pmodel.set(me.activeName, false);
             }));
-            subCt.tmpData = { width: menuWidth };
-            subCt.exprProps['style'] = new nodom.Expression(this.menuStyleName);
+            subCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
+            subCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
             itemCt.add(subCt);
             parentCt = subCt;
         }
-        menuDom.delProp(['data', 'icon', 'checkname', 'dataname', 'activename', 'itemclick', 'maxlevels']);
+        menuDom.delProp(['dataname', 'width', , 'maxlevels']);
         menuDom.defineElement = this;
         return menuDom;
     }
@@ -103,17 +164,50 @@ class UIMenu {
      */
     beforeRender(module, uidom) {
         let me = this;
-        // function gen
-        // //注册click事件到全局事件管理器
-        // UIEventRegister.addEvent('mousemove',module.name,subCt.key,
-        //     (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
-        //         let model:nodom.Model = module.modelFactory.get(dom.modelId);
-        //         //外部点击则关闭
-        //         if(!inOrout && model.data[me.switchName]){
-        //             pmodel.set(me.switchName,false);
-        //         }
-        //     }
-        // );
+        if (this.popupMenu) {
+            UIEventRegister.addEvent('mousedown', module.name, uidom.key, (module, dom, inOrOut, e) => {
+                //非右键不打开
+                if (e.button !== 2) {
+                    return;
+                }
+                let x = e.clientX;
+                let y = e.clientY;
+                let w = me.menuWidth;
+                let model = module.modelFactory.get(uidom.modelId);
+                let rows = model.query(me.dataName);
+                if (rows && rows.length > 0) {
+                    let h = rows * 30;
+                    //根据最大级数计算pop方向
+                    if (this.direction === 0) {
+                        if (x + w * this.maxLevels > window.innerWidth - 10) {
+                            this.direction = 1;
+                        }
+                    }
+                    if (this.direction === 1) {
+                        x -= w + 2;
+                    }
+                    else {
+                        x += 2;
+                    }
+                    if (y + h > window.innerHeight - 10) {
+                        y = window.innerHeight - h - 10;
+                    }
+                }
+                model.set(me.menuStyleName, 'width:' + me.menuWidth + 'px;left:' + x + 'px;top:' + y + 'px');
+                model.set(me.activeName, true);
+            });
+        }
+    }
+    /**
+     * 计算位置
+     * @param dom
+     * @param model
+     */
+    cacPos(x, y, w, h) {
+        return [0, 0];
+        // if(x + w > window.innerWidth-10){
+        // }
+        // return [left,top];
     }
 }
 nodom.DefineElementManager.add('UI-MENU', UIMenu);
