@@ -57,7 +57,7 @@ class UIList implements nodom.IDefineElement{
     fields:string[];
     
 
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let me = this;
         //生成id
         let gid:number = nodom.Util.genId();

@@ -4,7 +4,7 @@
  */
 class UICheckbox implements nodom.IDefineElement{
     tagName:string = 'UI-CHECKBOX';
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let checkDom:nodom.Element = new nodom.Element('span');
         nodom.Compiler.handleAttributes(checkDom,el);
         nodom.Compiler.handleChildren(checkDom,el);

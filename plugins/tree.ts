@@ -21,7 +21,7 @@ class UITree implements nodom.IDefineElement{
     /**
      * 编译后执行代码
      */
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let ct:nodom.Element = new nodom.Element('div');
         //增加暂存数据
         nodom.Compiler.handleAttributes(ct,el);

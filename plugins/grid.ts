@@ -45,7 +45,7 @@ class UIGrid implements nodom.IDefineElement{
     /**
      * 编译后执行代码
      */
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let grid:nodom.Element = new nodom.Element('div');
         nodom.Compiler.handleAttributes(grid,el);
         nodom.Compiler.handleChildren(grid,el);

@@ -1,6 +1,15 @@
 ///<reference types='nodom'/>
 /**
  * panel 插件
+ * 配置
+ *  dataName:   菜单数组数据项名，如rows，各级菜单的必须保持一致
+ *  pop:        是否为popup菜单，不设置值
+ *  maxLevels:  菜单最大级数，默认三级
+ *  width:      菜单宽度(如果为非popup，则第一级不用这个宽度)
+ *
+ * 子节点
+ *  只能包括一个子节点(带tagname)
+ *  icon:       菜单项图标对应数据字段名
  */
 class UIMenu {
     constructor() {

@@ -7,7 +7,7 @@ class UIPanel implements nodom.IDefineElement{
     /**
      * 编译后执行代码
      */
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let oe:nodom.Element = new nodom.Element();
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);

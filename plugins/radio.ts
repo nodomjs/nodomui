@@ -4,7 +4,7 @@
  */
 class UIRadio implements nodom.IDefineElement{
     tagName:string = 'UI-RADIO';
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let radioDom:nodom.Element = new nodom.Element('span');
         nodom.Compiler.handleAttributes(radioDom,el);
         nodom.Compiler.handleChildren(radioDom,el);

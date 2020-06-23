@@ -53,7 +53,7 @@ class UISelect implements nodom.IDefineElement{
 
     //设置显示内容
 
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let me = this;
         //生成id
         let gid:number = nodom.Util.genId();

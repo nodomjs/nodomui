@@ -32,7 +32,7 @@ class UIAccordion implements nodom.IDefineElement{
     /**
      * 编译后执行代码
      */
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         let ct:nodom.Element = new nodom.Element('div');
         nodom.Compiler.handleAttributes(ct,el);
         nodom.Compiler.handleChildren(ct,el);

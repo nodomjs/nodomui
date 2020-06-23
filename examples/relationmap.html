@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/relationmap.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/uibase.js'></script>
+    <script src='../dist/relationmap.js'></script>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div>
+        <ui-relationmap field='groupUser' datas='users,groups'  idFields='uid,gid' showFields='userName,groupName'>
+        </ui-relationmap>
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                groupUser:[
+                    {gid:1,uid:2},
+                    {gid:1,uid:3},
+                    {gid:3,uid:4},
+                    {gid:2,uid:1}
+                ],
+                groups:[
+                    {gid:1,groupName:'系统管理员'},
+                    {gid:2,groupName:'店铺管理员'},
+                    {gid:3,groupName:'用户管理员'},
+                    {gid:4,groupName:'用户'}
+                ],
+                users:[
+                    {uid:1,userName:'yang'},
+                    {uid:2,userName:'张三'},
+                    {uid:3,userName:'李四'},
+                    {uid:4,userName:'王武'},
+                    {uid:5,userName:'field'}
+                ]
+            },
+            methods:{
+                clickItem:function(e,module){
+                    console.log(module);
+                }
+            }
+        }
+    })
+</script>
+</html>

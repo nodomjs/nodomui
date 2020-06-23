@@ -8,7 +8,7 @@ class UIDialog extends UIPanel{
     /**
      * 编译后执行代码
      */
-    init(el:HTMLElement){
+    init(el:HTMLElement):nodom.Element{
         el.setAttribute('buttons','close');
         let panelDom:nodom.Element = super.init(el);
         
