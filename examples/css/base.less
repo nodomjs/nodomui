@@ -1,56 +1,57 @@
 
-@padding:5px;
-@radius:5px;
+@nd-padding:5px;
+@nd-radius:5px;
 @title-padding:15px;
 
 /*主背景色深，根据这个依次设置5个背景色*/
-@maincolor:#000000;
+// @nd-maincolor:hsl(10,10%,10%);
+@nd-maincolor:#333333;
 /*如果为100，则最浅色为白色*/
-@maincolorpercent:100;
+@nd-maincolorpercent:100;
 /*前景色，深色和浅色*/
-@forecolor1:#000000;
-@forecolor2:white;
+@nd-forecolor1:#333;
+@nd-forecolor2:white;
 
-@activecolor:#66cc99;
-@emphasiscolor:#FF9900;
-@warncolor:#FFCC00;
+@nd-activecolor:#66cc99;
+@nd-emphasiscolor:#FF9900;
+@nd-warncolor:#FFCC00;
+@nd-errorcolor:#900;
 
 /*颜色*/
 /*颜色系，根据主color逐次变浅*/
-@nd-color1:@maincolor;
-@nd-add-percent:@maincolorpercent/5;
-@nd-color2:fadeout(@maincolor,@nd-add-percent);
-@nd-color3:fadeout(@maincolor,@nd-add-percent*2);
-@nd-color4:fadeout(@maincolor,@nd-add-percent*3);
-@nd-color5:fadeout(@maincolor,@nd-add-percent*4);
-@nd-color6:fadeout(@maincolor,@nd-add-percent*5);
+@nd-color-percent:@nd-maincolorpercent/5;
+@nd-rr:red(@nd-maincolor);
+@nd-gg:green(@nd-maincolor);
+@nd-bb:blue(@nd-maincolor);
+@nd-color1:@nd-maincolor;
+@nd-color2:tint(@nd-maincolor,@nd-color-percent);
+@nd-color3:tint(@nd-maincolor,@nd-color-percent*2);
+@nd-color4:tint(@nd-maincolor,@nd-color-percent*3);
+@nd-color5:tint(@nd-maincolor,@nd-color-percent*4);
+@nd-color6:tint(@nd-maincolor,@nd-color-percent*5);
 
-@linkcolor:#669933;
-@linkcolorvisted:#99CC99;
+@nd-linkcolor:#669933;
+@nd-linkcolorvisted:#99CC99;
 
 
-@fonttiny:10px;
-@fontsmall:12px;
-@fontnormal:14px;
-@fontlarge:16px;
-@fontlarger:18px;
-@fontlargest:20px;
-
-/* panel 参数 */
-@panel-padding-left:15px;
-@panel-padding-top:8px;
+@nd-fonttiny:10px;
+@nd-fontsmall:12px;
+@nd-fontnormal:14px;
+@nd-fontlarge:16px;
+@nd-fontlarger:18px;
+@nd-fontlargest:20px;
 
 /*按钮*/
 /*padding*/
-@btn-padding-left:15px;
-@btn-padding-top:8px;
+@nd-btn-padding-left:15px;
+@nd-btn-padding-top:8px;
 /*圆角半径*/
-@btn-corner:6px; 
+@nd-btn-corner:6px; 
 
 /*zindex*/
-@dialog-index:1000;
-@menu-index:999;
-@combo-index:998;
+@nd-dialog-index:1000;
+@nd-menu-index:999;
+@nd-combo-index:998;
 
 
 /*global*/
@@ -66,70 +67,70 @@ button,input{
 
 /*link*/
 a:link{
-    color:@linkcolor;
+    color:@nd-linkcolor;
     text-decoration: none;
 }
 
 a:hover{
-    color:@linkcolorvisted;
+    color:@nd-linkcolorvisted;
 }
 
 a:visited{
-    color:@linkcolorvisted;
+    color:@nd-linkcolorvisted;
 }
 
 /*背景加前景色系，1-5逐次背景减轻*/
 .nd-color1{
     background-color:@nd-color1;
-    color:@forecolor2;
+    color:@nd-forecolor2;
 }
 
 .nd-color2{
     background-color:@nd-color2;
-    color:@forecolor2;
+    color:@nd-forecolor2;
 }
 
 .nd-color3{
     background-color:@nd-color3;
-    color:@forecolor1;
+    color:@nd-forecolor1;
 }
 
 .nd-color4{
     background-color:@nd-color4;
-    color:@forecolor1;
+    color:@nd-forecolor1;
 }
 
 .nd-color5{
     background-color:@nd-color5;
-    color:@forecolor1;
+    color:@nd-forecolor1;
 }
 
 .nd-color6{
     background-color:@nd-color6;
-    color:@forecolor1;
+    color:@nd-forecolor1;
 }
 
 /*激活背景色*/
 
 .nd-active{
-    background-color:@activecolor;
+    background-color:@nd-activecolor;
     &:hover{
-        background-color:multiply(@activecolor,#eeeeee);
+        background-color:multiply(@nd-activecolor,#eeeeee);
     }
 }
 
 /*强调背景色*/
 .nd-emphasis{
-    background-color:@emphasiscolor;
+    background-color:@nd-emphasiscolor;
     &:hover{
-        background-color:multiply(@emphasiscolor,#eeeeee);
+        background-color:multiply(@nd-emphasiscolor,#eeeeee);
     }
 }
 
 /*警告背景色*/
 .nd-warn{
-    background-color:@warncolor;
+    background-color:@nd-warncolor;
     &:hover{
-        background-color:multiply(@warncolor,#eeeeee);
+        background-color:multiply(@nd-warncolor,#eeeeee);
     }
 }

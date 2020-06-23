@@ -39,9 +39,10 @@
         菜单测试
         菜单测试
         菜单测试
-        <ui-menu class='menu' dataName='rows' 
-            maxLevels='4' width='150'>
-            <a x-route='{{url}}' class="{{'nd-icon-' + icon}}" e-click='clickItem'>{{title}}</a>
+        测试
+        <ui-menu class='menu' dataName='rows' pop
+            maxLevels='5' width='150'>
+            <a x-route='{{url}}' icon="icon" e-click='clickItem'>{{title}}</a>
         </ui-menu>
 
         用户你好
@@ -61,19 +62,18 @@
                             {title:'商家审核',icon:'search'},
                             {title:'商家关店',icon:'search'},
                             {title:'临时关闭',icon:'search'},
-                            {title:'商家统计'}
+                            {title:'商家统计',rows:[
+                                {title:'发货',icon:'add'},
+                                {title:'取消申请',icon:'close'},
+                                {title:'删除订单',icon:'del'}    
+                            ]}
                         ]},
                         {title:'订单管理',icon:'edit',rows:[
                             {title:'发货',icon:'add'},
                             {title:'取消申请',icon:'close'},
                             {title:'删除订单',icon:'del'}
                         ]},
-                        {title:'安全管理',icon:'insurance',rows:[
-                            {title:'角色管理',icon:'insurance'},
-                            {title:'用户管理',icon:'user'},
-                            {title:'资源管理',icon:'insurance'},
-                            {title:'权限管理',icon:'insurance'}
-                        ]},{title:'商品管理',icon:'shopping-cart',checked:true,rows:[
+                        {title:'商品管理',icon:'shopping-cart',checked:true,rows:[
                             {title:'商品上架',icon:'add'},
                             {title:'商品下架',icon:'minus'},
                             {title:'商品编辑'},
@@ -85,11 +85,25 @@
                                 {title:'销售统计',rows:[
                                     {title:'日统计'},
                                     {title:'周统计'},
-                                    {title:'月统计'},
+                                    {title:'月统计',rows:[
+                                        {title:'日统计'},
+                                        {title:'周统计'},
+                                        {title:'月统计'},
+                                        {title:'年统计'}
+                                        ]
+                                    },
                                     {title:'年统计'}
                                 ]}
                             ]}
-                        ]}
+                        ]},
+                        
+                        {title:'安全管理',icon:'insurance',rows:[
+                            {title:'角色管理',icon:'insurance'},
+                            {title:'用户管理',icon:'user'},
+                            {title:'资源管理',icon:'insurance'},
+                            {title:'权限管理',icon:'insurance'}
+                        ]},
+                        
                     ]
                 // }]
             },

@@ -10,7 +10,7 @@
         flex:1;
         display:flex;
         justify-content:center;
-        padding:@padding;
+        padding:@nd-padding;
         align-items:center;
         img{
             max-width:100px;
@@ -29,7 +29,7 @@
         text-align:center;
         font-weight:bold;
         > div{
-            padding:@padding+@padding @padding;
+            padding:@nd-padding+@nd-padding @nd-padding;
             display:flex;
             justify-content: center;
             /*排序容器*/
@@ -37,9 +37,9 @@
                 display:flex;
                 flex-direction: column;
                 align-items: center;
-                margin-left:@padding * 2;
+                margin-left:@nd-padding * 2;
                 line-height:10px;
-                .nd-color1;
+                .nd-color2;
                 /*升序箭头*/
                 .nd-grid-sort-raise{
                     .nd-icon-arrow-up;
@@ -50,7 +50,7 @@
                 }
 
                 >b:hover{
-                    color:@nd-color3;
+                    color:@nd-activecolor;
                     cursor: pointer;
                 }
             }
@@ -66,6 +66,7 @@
 
     /*tbody*/
     .nd-grid-body{
+        .nd-color6;
         .nd-grid-row{
             display: flex;
         }
@@ -92,14 +93,14 @@
 
     /*每行颜色交错*/
     .nd-grid-body-rowalt >div:nth-child(even){
-        .nd-color4;
+        .nd-color5;
     }
 
     .nd-grid-sub{
         .nd-color5;
         display:flex;
         flex-direction: column;
-        padding:@padding;
+        padding:@nd-padding;
         
         border:1px solid @nd-color2;
         .nd-grid-sub-row{

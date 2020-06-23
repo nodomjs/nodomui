@@ -2,32 +2,40 @@
 @import "icon.less";
 /********** menu ***********/
 .nd-menu{
-    z-index: @menu-index;
-    font-size:@fontnormal;
+    z-index: @nd-menu-index;
+    font-size:@nd-fontnormal;
     position:relative;
     .nd-menu-subct{
-        z-index:@menu-index;
+        z-index:@nd-menu-index;
         display:block;
         position:absolute;
         top:0px;
-        .nd-color5;
+        .nd-color2;
         .nd-menu-nodect{
             position:relative;
             line-height:30px;
             height:30px;
             width:100%;
             .nd-menu-node, a.nd-menu-node{
-                color:@nd-color2;
-                padding:0 @padding*2;
+                color:@nd-forecolor2;
+                padding:0 @nd-padding*2;
                 /*子菜单箭头*/
                 .nd-menu-subicon{
                     float:right;
-                    margin-right:@padding;
+                    margin-right:@nd-padding;
                     .nd-icon-right;
+                }
+
+                b{
+                    width:20px;
+                    display:inline-block;
+                }
+                &:hover{
+                    color:@nd-forecolor1;
                 }
             }
             &:hover{
-                .nd-color4;        
+                .nd-color5;
             }
         }
     }

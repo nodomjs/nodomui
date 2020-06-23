@@ -10,13 +10,13 @@ form{
         display:inline-block;
     }
     input{
-        padding:@padding;
+        padding:@nd-padding;
         border:1px solid @grey;
-        border-radius:@padding;
+        border-radius:@nd-padding;
     }
 
     .nd-form-item{
-        padding:@padding;
+        padding:@nd-padding;
         display:flex;
         label{
             flex:1;
@@ -27,18 +27,18 @@ form{
     }
 
     .nd-uncheck{
-        margin-right:@padding;
+        margin-right:@nd-padding;
         .nd-icon-checkbox;
     }
     .nd-checked{
-        margin-right:@padding;
+        margin-right:@nd-padding;
         .nd-icon-checked;
     }
 }
 
 .nd-combo,.nd-radio,.nd-select{
     b{
-        padding-right:@padding;
+        padding-right:@nd-padding;
     }
 }
 
@@ -51,12 +51,12 @@ form{
     }
     .nd-select-content{
         border:1px solid @nd-color3;
-        border-radius:@padding;
+        border-radius:@nd-padding;
         position: relative;
         
         /*输入框，下箭头容器*/
         .nd-select-firstct{
-            // padding:0 0px 0 @padding;
+            // padding:0 0px 0 @nd-padding;
             > b{
                 right:0;
                 top:5px;
@@ -72,14 +72,14 @@ form{
     
         .nd-select-list{
             .nd-color5;
-            z-index:@combo-index;
-            padding:@padding * 2;
+            z-index:@nd-combo-index;
+            padding:@nd-padding * 2;
             position:absolute;
             width:100%;
             box-sizing: border-box;
             border:1px solid @grey;
-            border-bottom-left-radius: @padding;
-            border-bottom-right-radius: @padding;
+            border-bottom-left-radius: @nd-padding;
+            border-bottom-right-radius: @nd-padding;
         }
     }
     >*{
@@ -93,8 +93,8 @@ form{
     display:flex;
     flex-direction: column;
     border:1px solid @nd-color3;
-    padding:@padding;
-    border-radius:@padding;
+    padding:@nd-padding;
+    border-radius:@nd-padding;
     .nd-list-item{
         line-height:30px;
         display:flex;
@@ -107,11 +107,11 @@ form{
 /*横向*/
 .nd-list-horizontal{
     border:1px solid @nd-color3;
-    padding:@padding;
-    border-radius:@padding;
+    padding:@nd-padding;
+    border-radius:@nd-padding;
     overflow:auto;
     .nd-list-item{
         display:inline-block;
-        margin:@padding*3;
+        margin:@nd-padding*3;
     }
 }
