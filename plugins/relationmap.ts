@@ -1,7 +1,12 @@
 ///<reference types='nodom'/>
 
 /**
- * panel 插件
+ * relation map 插件
+ * 配置
+ *  field 绑定数据项名，数据格式为[{列数据id名:值1,行数据id名:值2},...]
+ *  datas='列数据名,行数据名'  
+ *  idFields='列数据id名,行数据id名' 
+ *  showFields='列数据显示数据项名,行数据显示数据项名'
  */
 class UIRelationMap implements nodom.IDefineElement{
     tagName:string = 'UI-RELATIONMAP';
@@ -156,9 +161,7 @@ class UIRelationMap implements nodom.IDefineElement{
                     }
                 }
             }
-            console.log(data);
         }
-        
         model.set('active',!active);
     }
 }
