@@ -15,12 +15,15 @@
     <script src='../dist/uibase.js'></script>
     <script src='../dist/listtransfer.js'></script>
     <style>
-        
+        .ct{
+            height:150px;
+            width:600px;
+        }
     </style>
 </head>
 <body>
     <div>
-        <ui-listtransfer field='selectedUser' data='users'  idField='uid' showField='userName'>
+        <ui-listtransfer class='ct' field='selectedUser' data='users'  idField='uid' showFields='uid,userName,company'>
         </ui-listtransfer>
     </div>
 </body>
@@ -31,12 +34,12 @@
             data:{
                 selectedUser:[3,4],
                 users:[
-                    {uid:1,userName:'yang lei'},
-                    {uid:2,userName:'张三'},
-                    {uid:3,userName:'李四'},
-                    {uid:4,userName:'王武'},
-                    {uid:5,userName:'fieldyang'},
-                    {uid:6,userName:'路人甲'}
+                    {uid:1,userName:'yang lei','company':'swust'},
+                    {uid:2,userName:'张三','company':'阿里'},
+                    {uid:3,userName:'李四','company':'华为'},
+                    {uid:4,userName:'王武','company':'腾讯'},
+                    {uid:5,userName:'fieldyang','company':'京东'},
+                    {uid:6,userName:'路人甲','company':'google'}
                 ]
             },
             methods:{

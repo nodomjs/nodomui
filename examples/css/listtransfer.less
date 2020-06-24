@@ -3,25 +3,29 @@
 @import "button.less";
 /*表格css*/
 .nd-listtransfer{
-    overflow:auto;
-    // border:1px solid @nd-color3;
+    overflow:hidden;
     padding:@nd-padding;
-    // border-radius:@nd-padding;
     display:flex;
     flex-direction: row;
     justify-content: space-around;
 
-    > *{
-        flex:1;
-    }
     .nd-nd-listtransfer-box{
+        overflow:auto;
         border:1px solid @nd-color4;
         border-radius:@nd-padding;
         .nd-color6;
-
+        padding:@nd-padding;
+        flex:1;
+        display:flex;
+        flex-direction: column;
         .nd-listtransfer-item{
             line-height:30px;
-    
+            display:flex;
+            flex-direction: row;
+            justify-content: space-around;
+            .nd-listtransfer-item-col{
+                flex:1;
+            }
             .nd-listtransfer-uncheck{
                 margin-right:@nd-padding;
                 .nd-icon-checkbox;
@@ -35,7 +39,7 @@
     }
     
     .nd-listtransfer-btngrp{
-        flex:0.5;
+        padding:@nd-padding*2;
         display:flex;
         flex-direction: column;
         align-items: center;
