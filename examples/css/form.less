@@ -11,7 +11,7 @@ form{
     }
     input{
         padding:@nd-padding;
-        border:1px solid @grey;
+        border:1px solid @nd-color5;
         border-radius:@nd-padding;
     }
 
@@ -71,13 +71,13 @@ form{
         }
     
         .nd-select-list{
-            .nd-color5;
+            .nd-color6;
             z-index:@nd-combo-index;
             padding:@nd-padding * 2;
             position:absolute;
             width:100%;
             box-sizing: border-box;
-            border:1px solid @grey;
+            border:1px solid @nd-color5;
             border-bottom-left-radius: @nd-padding;
             border-bottom-right-radius: @nd-padding;
         }
@@ -115,3 +115,36 @@ form{
         margin:@nd-padding*3;
     }
 }
+
+.nd-file{
+    position:relative;
+
+    .nd-file-ct{
+        overflow:hidden;
+        position:relative;
+        width:200px;
+        height:200px;
+        .nd-file-input{
+            opacity:0;
+            position:absolute;
+            left:0px;
+            top:0px;
+            height:100%;
+            width:100%;
+        }
+
+        img{
+            max-width:200px;
+            max-height:200px;
+        }
+
+        .nd-file-del{
+            .nd-icon-del;
+            position:absolute;
+            right:0px;
+            top:0px;
+        }
+    }
+    
+}
+

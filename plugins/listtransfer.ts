@@ -4,10 +4,6 @@
  */
 class UIListTransfer implements nodom.IDefineElement{
     tagName:string = 'UI-LISTTRANSFER';
-    /**
-     * 显示数据name(在model中新增)
-     */
-    displayName:string;
     
     /**
      * 绑定的数据字段名
@@ -27,7 +23,7 @@ class UIListTransfer implements nodom.IDefineElement{
     /**
      * 列表项显示字段名（显示在content输入框）
      */
-    showName:string[];
+    displayName:string[];
     /**
      * 选中的数据name(在model中新增)
      */
@@ -40,11 +36,6 @@ class UIListTransfer implements nodom.IDefineElement{
      * select 对象的modelId
      */
     modelId:number;
-
-    /**
-     * 多选
-     */
-    multi:boolean;
 
     /**
      * 显示字段集合
@@ -61,18 +52,13 @@ class UIListTransfer implements nodom.IDefineElement{
         //生成check id
         this.checkName = '$ui_listtransfer_' + nodom.Util.genId();
         this.selectedName = '$ui_listtransfer_' + nodom.Util.genId();
-
         let transferDom:nodom.Element = new nodom.Element();
         nodom.Compiler.handleAttributes(transferDom,el);
+        UITool.handleUIParam(transferDom,this,
+            ['field','valuefield','displayfield|array','data'],
+            ['fieldName','valueName','displayName','listName']);
         transferDom.tagName = 'div';
         transferDom.addClass('nd-listtransfer');
-        this.fieldName = transferDom.getProp('field');
-        this.valueName = transferDom.getProp('idfield');
-        this.showName = transferDom.getProp('showfields').split(',');
-        console.log(this.showName);
-        this.listName = transferDom.getProp('data');
-        
-        transferDom.delProp(['field','idfield','showfield']);
         
         //左列表
         let listDom:nodom.Element = new nodom.Element('div');
@@ -89,7 +75,7 @@ class UIListTransfer implements nodom.IDefineElement{
         icon.addDirective(new nodom.Directive('class',"{'nd-listtransfer-checked':'" + this.checkName + "'}",icon));
         itemDom.add(icon);
         //显示文本
-        for(let f of this.showName){
+        for(let f of this.displayName){
             let span:nodom.Element = new nodom.Element('span');
             span.addClass('nd-listtransfer-item-col')
             let txt = new nodom.Element();
@@ -124,7 +110,7 @@ class UIListTransfer implements nodom.IDefineElement{
         itemDom1.add(icon1);
 
         //显示文本
-        for(let f of this.showName){
+        for(let f of this.displayName){
             let span:nodom.Element = new nodom.Element('span');
             span.addClass('nd-listtransfer-item-col')
             let txt = new nodom.Element();
@@ -171,6 +157,7 @@ class UIListTransfer implements nodom.IDefineElement{
         }));
 
         transferDom.children = [listDom,btnGrp,listDom1];
+        transferDom.delProp(['data','field','valuefield','displayfield']);
         transferDom.defineElement = this;
         return transferDom;
     }

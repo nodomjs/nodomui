@@ -13,14 +13,9 @@ class UIListTransfer {
         this.selectedName = '$ui_listtransfer_' + nodom.Util.genId();
         let transferDom = new nodom.Element();
         nodom.Compiler.handleAttributes(transferDom, el);
+        UITool.handleUIParam(transferDom, this, ['field', 'valuefield', 'displayfield|array', 'data'], ['fieldName', 'valueName', 'displayName', 'listName']);
         transferDom.tagName = 'div';
         transferDom.addClass('nd-listtransfer');
-        this.fieldName = transferDom.getProp('field');
-        this.valueName = transferDom.getProp('idfield');
-        this.showName = transferDom.getProp('showfields').split(',');
-        console.log(this.showName);
-        this.listName = transferDom.getProp('data');
-        transferDom.delProp(['field', 'idfield', 'showfield']);
         //左列表
         let listDom = new nodom.Element('div');
         listDom.addClass('nd-nd-listtransfer-box');
@@ -35,7 +30,7 @@ class UIListTransfer {
         icon.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}", icon));
         itemDom.add(icon);
         //显示文本
-        for (let f of this.showName) {
+        for (let f of this.displayName) {
             let span = new nodom.Element('span');
             span.addClass('nd-listtransfer-item-col');
             let txt = new nodom.Element();
@@ -63,7 +58,7 @@ class UIListTransfer {
         icon1.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}", icon1));
         itemDom1.add(icon1);
         //显示文本
-        for (let f of this.showName) {
+        for (let f of this.displayName) {
             let span = new nodom.Element('span');
             span.addClass('nd-listtransfer-item-col');
             let txt = new nodom.Element();
@@ -104,6 +99,7 @@ class UIListTransfer {
             me.transfer(module, 2, true);
         }));
         transferDom.children = [listDom, btnGrp, listDom1];
+        transferDom.delProp(['data', 'field', 'valuefield', 'displayfield']);
         transferDom.defineElement = this;
         return transferDom;
     }
