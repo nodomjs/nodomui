@@ -2,8 +2,8 @@
 /**
  * panel 插件
  * 配置
- *  dataName:   菜单数组数据项名，如rows，各级菜单的必须保持一致
- *  pop:        是否为popup菜单，不设置值
+ *  listName:   菜单数组数据项名，如rows，各级菜单的必须保持一致
+ *  popup:      是否为popup菜单，不设置值
  *  maxLevels:  菜单最大级数，默认三级
  *  width:      菜单宽度(如果为非popup，则第一级不用这个宽度)
  *
@@ -33,25 +33,16 @@ class UIMenu {
         nodom.Compiler.handleAttributes(menuDom, el);
         nodom.Compiler.handleChildren(menuDom, el);
         menuDom.tagName = ('div');
-        this.popupMenu = menuDom.hasProp('pop');
-        //数据字段名
-        this.dataName = menuDom.getProp('dataname');
-        //显示字段名，数组[显示字段，图标]
-        let showName;
+        UITool.handleUIParam(menuDom, this, ['pop', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listName', 'maxLevels', 'menuWidth'], [false, null, 3, 150]);
+        console.log(this.listName);
         //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
-        //最大级数，默认3
-        this.maxLevels = menuDom.hasProp('maxlevels') ? parseInt(menuDom.getProp('maxlevels')) : 3;
-        //宽度
-        if (!menuDom.hasProp('width')) {
-            throw "menu插件缺少width参数";
-        }
-        this.menuWidth = parseInt(menuDom.getProp('width')) || 150;
         menuDom.addClass('nd-menu');
         if (this.popupMenu) {
             menuDom.addClass('nd-menu-popup');
         }
+        console.log(1);
         //menu 节点,menuDom 下第一个带tagName的节点
         let menuNode;
         for (let i = 0; i < menuDom.children.length; i++) {
@@ -101,16 +92,16 @@ class UIMenu {
         for (let i = 0; i < this.maxLevels; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
-            itemCt.directives.push(new nodom.Directive('repeat', this.dataName, itemCt));
+            itemCt.directives.push(new nodom.Directive('repeat', this.listName, itemCt));
             itemCt.addClass('nd-menu-nodect');
-            let item = menuNode.clone();
+            let item = menuNode.clone(true);
             itemCt.add(item);
             //缓存item级
             itemCt.tmpData = { level: (i + 1) };
             //子菜单箭头图标
             if (this.popupMenu || i > 0) {
                 let icon1 = new nodom.Element('b');
-                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.dataName + "&&" + this.dataName + ".length>0'}", icon1));
+                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}", icon1));
                 item.add(icon1);
             }
             //初始化菜单打开关闭
@@ -131,7 +122,7 @@ class UIMenu {
             itemCt.add(subCt);
             parentCt = subCt;
         }
-        menuDom.delProp(['dataname', 'width', , 'maxlevels']);
+        menuDom.delProp(['listName', 'width', , 'maxlevels']);
         menuDom.defineElement = this;
         return menuDom;
     }
@@ -151,7 +142,7 @@ class UIMenu {
                 let x = e.clientX;
                 let w = me.menuWidth;
                 let model = module.modelFactory.get(uidom.modelId);
-                let rows = model.query(me.dataName);
+                let rows = model.query(me.listName);
                 if (rows && rows.length > 0) {
                     let h = rows * me.menuHeight;
                     //根据最大级数计算pop方向
@@ -176,7 +167,7 @@ class UIMenu {
         //菜单展开
         let openEvent = new nodom.NodomEvent('mouseenter', (dom, model, module, e, el) => {
             if (model) {
-                let rows = model.query(this.dataName);
+                let rows = model.query(this.listName);
                 if (!rows || rows.length === 0) {
                     return;
                 }
@@ -200,7 +191,7 @@ class UIMenu {
         //菜单关闭
         let closeEvent = new nodom.NodomEvent('mouseleave', (dom, model, module, e, el) => {
             if (model) {
-                let rows = model.query(this.dataName);
+                let rows = model.query(this.listName);
                 if (rows && rows.length > 0) {
                     //设置当前model的显示参数
                     model.set(me.activeName, false);

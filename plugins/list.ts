@@ -15,7 +15,7 @@ class UIList implements nodom.IDefineElement{
     /**
      * select绑定的数据字段名
      */
-    dataName:string;
+    fieldName:string;
 
     /**
      * 初始化数据标志
@@ -32,10 +32,7 @@ class UIList implements nodom.IDefineElement{
      */
     valueName:string;
 
-    /**
-     * 列表项显示字段名（显示在content输入框）
-     */
-    showName:string;
+    
     /**
      * 选中的数据name(在model中新增)
      */
@@ -47,14 +44,9 @@ class UIList implements nodom.IDefineElement{
     modelId:number;
 
     /**
-     * 多选
+     * 类型
      */
-    multi:boolean;
-
-    /**
-     * 显示字段集合
-     */
-    fields:string[];
+    listType:string;
     
 
     init(el:HTMLElement):nodom.Element{
@@ -67,26 +59,16 @@ class UIList implements nodom.IDefineElement{
         nodom.Compiler.handleAttributes(listDom,el);
         nodom.Compiler.handleChildren(listDom,el);
         listDom.tagName = 'div';
-        
-        this.dataName = listDom.getProp('name');
-        this.valueName = listDom.getProp('valuefield');
-        this.showName = listDom.getProp('displayfield');
-        this.listName = listDom.getProp('listfield');
-        let listType:string = listDom.getProp('listtype') || 'row';
-        if(listType === 'row'){
+        UITool.handleUIParam(listDom,this,
+            ['field','valuefield','displayfield|array','listfield','listtype'],
+            ['fieldName','valueName','displayName','listName','listType'],
+            [null,null,null,null,'row']);
+
+        if(this.listType === 'row'){
             listDom.addClass('nd-list');
         }else{
             listDom.addClass('nd-list-horizontal');
         }
-        
-        listDom.delProp(['name','valuefield','multiselect']);
-        //显示字段
-        let df:string = listDom.getProp('displayfield');
-        if(!df){
-            throw new nodom.NodomError('list参数配置错误')
-        }
-        
-        this.fields = listDom.getProp('displayfield').replace(/\s+/g,'').split(',');
         
         // 列表节点
         let itemDom:nodom.Element = new nodom.Element('div');
@@ -98,8 +80,8 @@ class UIList implements nodom.IDefineElement{
         icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.checkName + "'}",icon));
         itemDom.add(icon);
 
-        for(let i=0;i<this.fields.length;i++){
-            let f = this.fields[i];
+        for(let i=0;i<this.displayName.length;i++){
+            let f = this.displayName[i];
             //带类型
             let subItem:nodom.Element;
             let fa = f.split('|');
@@ -143,7 +125,7 @@ class UIList implements nodom.IDefineElement{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         this.modelId = dom.modelId;
         let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
-        let value = pmodel.query(this.dataName);
+        let value = pmodel.query(this.fieldName);
         let valueArr:string[];
         
         if(!this.initDataFlag && this.listName){
@@ -198,7 +180,7 @@ class UIList implements nodom.IDefineElement{
     addValue(module:nodom.Module,model:nodom.Model){
         let pmodel = module.modelFactory.get(this.modelId);
         //值串
-        let value:string = pmodel.query(this.dataName);
+        let value:string = pmodel.query(this.fieldName);
         let v = model.query(this.valueName);
         //多选
         if(value){
@@ -207,9 +189,9 @@ class UIList implements nodom.IDefineElement{
                 return;
             }
             a.push(v);
-            pmodel.set(this.dataName,a.join(','));
+            pmodel.set(this.fieldName,a.join(','));
         }else{
-            pmodel.set(this.dataName,v);
+            pmodel.set(this.fieldName,v);
         }
     }
 
@@ -221,7 +203,7 @@ class UIList implements nodom.IDefineElement{
     removeValue(module:nodom.Module,model:nodom.Model){
         let pmodel = module.modelFactory.get(this.modelId);
         //值串
-        let value:string = pmodel.query(this.dataName);
+        let value:string = pmodel.query(this.fieldName);
         let v = model.query(this.valueName);
         model.set(this.checkName,false);
         if(!value || value === ''){
@@ -234,7 +216,7 @@ class UIList implements nodom.IDefineElement{
         }
         let ind = a.indexOf(v);
         a.splice(ind,1);
-        pmodel.set(this.dataName,a.join(','));
+        pmodel.set(this.fieldName,a.join(','));
     }
 }
 
