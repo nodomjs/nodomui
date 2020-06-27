@@ -117,34 +117,77 @@ form{
 }
 
 .nd-file{
-    position:relative;
-
-    .nd-file-ct{
-        overflow:hidden;
+    display:flex;
+    flex-direction: row;
+    .nd-file-showct{
         position:relative;
-        width:200px;
-        height:200px;
-        .nd-file-input{
-            opacity:0;
-            position:absolute;
-            left:0px;
-            top:0px;
-            height:100%;
+        flex:1;
+        width:100px;
+        height:100px;
+        // line-height:100px;
+        margin-right:@nd-padding * 2;
+        
+        a.nd-file-content{
+            display:inline-block;
             width:100%;
-        }
-
-        img{
-            max-width:200px;
-            max-height:200px;
+            height:100%;
+            
+            .nd-color5;
+            background-position: 0 0;
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            text-align:center;
+            
+            img{
+                width:100px;
+            }
         }
 
         .nd-file-del{
-            .nd-icon-del;
-            position:absolute;
+            position: absolute;
+            .nd-icon-close;
             right:0px;
-            top:0px;
+            font-size:@nd-fontlarger;
+            cursor: pointer;
+            &:hover{
+                color:@nd-activecolor;
+            }
         }
     }
-    
+
+    .nd-file-uploadct{
+        flex:1;
+        width:100px;
+        height:100px;
+        overflow:hidden;
+        box-sizing: border-box;
+        .nd-color5;
+        padding:0;
+        position:relative;
+            
+        .nd-file-input{
+            opacity:0;
+            display:block;
+            height:100%;
+            width:100%;
+            padding:0;
+            margin:0;
+        }
+
+        .nd-file-uploading{
+            position: absolute;
+            left:0px;
+            top:0px;
+            width:100px;
+            height:100px;
+            text-align:center;
+            line-height:100px;    
+            /*加号按钮*/
+            .nd-file-add{
+                .nd-icon-add-select;
+                font-size:30pt;
+            }
+        }
+    }
 }
 

@@ -14,6 +14,7 @@
     <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
+    <script src='../dist/msg_zh.js'></script>
     <script src='../dist/uibase.js'></script>
     <script src='../dist/panel.js'></script>
     <script src='../dist/button.js'></script>
@@ -25,6 +26,7 @@
     <script src='../dist/file.js'></script>
     <script src='../dist/select.js'></script>
     <script src='../dist/list.js'></script>
+    
     <style>
         .form{
             height:400px;
@@ -65,8 +67,10 @@
 
             <div class='nd-form-item'>
                 <label>生活照:</label>
-                <ui-file field='photos' multiple='single' valueFields='imgId,imgUrl' returnFields='id,url,result.rows' type='image'></ui-file>
-                </ui-file>
+                <ui-file field='photos' multiple='multi' valueField='imgId' displayField="fileName" 
+                 returnFields='id,url,result.rows' uploadMethod='uploadFile' delMethod='delFile'
+                 type='' maxCount='5'></ui-file>
+                
             </div>
             
             
@@ -96,6 +100,7 @@
                 agree:'Y',
                 education:'2,3',
                 hobby:2,
+                photos:[],
                 edus:[
                     {id:1,title:'高中'},
                     {id:2,title:'专科'},
@@ -120,6 +125,39 @@
                 },
                 hideDlg:function(dom,model,module,e){
                     model.set('showdlg', false);
+                },
+                uploadFile:function(dom,model,module,e){
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST','http://localhost:3000/upload');
+                    let form = new FormData();
+                    let files = model.data['$file_photos'];
+                    console.log(files);
+                    for(let f of files){
+                        form.append('photo',f);
+                    }
+                    xhr.setRequestHeader('Content-Type','multipart/form-data');
+                    xhr.send(form);
+                    xhr.onload = (x)=>{
+                        let r = JSON.parse(xhr.responseText);
+                        for(let r1 of r.rows){
+                            model.data['photos'].push({
+                                imgId:r1.id,
+                                imgUrl:r1.url,
+                                fileName:r1.fileName
+                            });
+                        }
+                        model.set('$uploadstate_photos',0);
+                    }
+                },
+                delFile:function(dom,model,module,e){
+                    let rows = module.model.data['photos'];
+                    for(let i=0;i<rows.length;i++){
+                        if(rows[i].imgId === model.data['imgId']){
+                            rows.splice(i,1);
+                            break;
+                        }
+                    }
+                    
                 }
             }
         }

@@ -1984,6 +1984,7 @@ var nodom;
             }
         }
         addSetterGetter(data) {
+            let me = this;
             const excludes = ['$modelId'];
             if (nodom.Util.isObject(data)) {
                 nodom.Util.getOwnProps(data).forEach((p) => {
@@ -2034,6 +2035,7 @@ var nodom;
                                 new Model(arg, module);
                             }
                         });
+                        nodom.Renderer.add(nodom.ModuleFactory.get(me.moduleName));
                     };
                 });
                 data.forEach((item) => {
