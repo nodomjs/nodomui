@@ -42,33 +42,43 @@ class UIListTransfer {
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             model.set(this.checkName, !model.data[this.checkName]);
         }));
-        // let listDom1:nodom.Element = listDom.clone();
-        // listDom1.children[0].getDirective('repeat').filter = new nodom.Filter("select:value:{"+ this.selectedName + ":true}");
+        console.log(listDom.children[0]);
+        //右列表(克隆来)
+        let listDom1 = listDom.clone(true);
+        let dir = listDom1.children[0].getDirective('repeat');
+        dir.filter = new nodom.Filter("select:value:{" + this.selectedName + ":true}");
+        console.log(listDom1.children[0]);
+        // console.log(dir.value);
         //右列表
-        let listDom1 = new nodom.Element('div');
+        /*let listDom1:nodom.Element = new nodom.Element('div');
         listDom1.addClass('nd-nd-listtransfer-box');
         // 列表节点
-        let itemDom1 = new nodom.Element('div');
+        let itemDom1:nodom.Element = new nodom.Element('div');
         itemDom1.addClass('nd-listtransfer-item');
-        itemDom1.addDirective(new nodom.Directive('repeat', this.listName, itemDom1, "select:value:{" + this.selectedName + ":true}"));
+        itemDom1.addDirective(new nodom.Directive('repeat',this.listName,itemDom1,"select:value:{"+ this.selectedName + ":true}"));
         listDom1.add(itemDom1);
+
         //复选框
-        let icon1 = new nodom.Element('b');
+        let icon1:nodom.Element = new nodom.Element('b');
         icon1.addClass('nd-listtransfer-uncheck');
-        icon1.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}", icon1));
+        icon1.addDirective(new nodom.Directive('class',"{'nd-listtransfer-checked':'" + this.checkName + "'}",icon1));
         itemDom1.add(icon1);
+
         //显示文本
-        for (let f of this.displayName) {
-            let span = new nodom.Element('span');
-            span.addClass('nd-listtransfer-item-col');
+        for(let f of this.displayName){
+            let span:nodom.Element = new nodom.Element('span');
+            span.addClass('nd-listtransfer-item-col')
             let txt = new nodom.Element();
             txt.expressions = [new nodom.Expression(f)];
             span.add(txt);
             itemDom1.add(span);
         }
-        itemDom1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            model.set(this.checkName, !model.data[this.checkName]);
-        }));
+    
+        itemDom1.addEvent(new nodom.NodomEvent('click',
+            (dom,model,module)=>{
+                model.set(this.checkName,!model.data[this.checkName]);
+            }
+        ));*/
         //按钮>>
         //按钮容器
         let btnGrp = new nodom.Element('div');
