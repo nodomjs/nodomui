@@ -34,7 +34,6 @@ class UIMenu {
         nodom.Compiler.handleChildren(menuDom, el);
         menuDom.tagName = ('div');
         UITool.handleUIParam(menuDom, this, ['pop', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listName', 'maxLevels', 'menuWidth'], [false, null, 3, 150]);
-        console.log(this.listName);
         //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
@@ -42,7 +41,6 @@ class UIMenu {
         if (this.popupMenu) {
             menuDom.addClass('nd-menu-popup');
         }
-        console.log(1);
         //menu 节点,menuDom 下第一个带tagName的节点
         let menuNode;
         for (let i = 0; i < menuDom.children.length; i++) {
@@ -83,9 +81,7 @@ class UIMenu {
                     this.direction = 0;
                 }
             }));
-        }
-        //增加显示指令
-        if (this.popupMenu) {
+            //增加显示指令
             parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
         }
         //初始化各级
@@ -260,7 +256,6 @@ class UIMenu {
             if (dom && !firstNopop) {
                 left = w;
             }
-            console.log(w);
         }
         return [left, top];
     }
