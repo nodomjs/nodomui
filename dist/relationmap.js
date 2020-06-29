@@ -7,8 +7,9 @@
  *  idFields='列数据id名,行数据id名'
  *  showFields='列数据显示数据项名,行数据显示数据项名'
  */
-class UIRelationMap {
+class UIRelationMap extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-RELATIONMAP';
     }
     init(el) {

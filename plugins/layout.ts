@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UILayout implements nodom.IDefineElement{
+class UILayout extends nodom.DefineElement{
     tagName:string = 'UI-LAYOUT';
     /**
      * 编译后执行代码

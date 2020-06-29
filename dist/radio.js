@@ -2,8 +2,9 @@
 /**
  * checkbox
  */
-class UIRadio {
+class UIRadio extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-RADIO';
     }
     init(el) {

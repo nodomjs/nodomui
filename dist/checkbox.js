@@ -2,8 +2,9 @@
 /**
  * checkbox
  */
-class UICheckbox {
+class UICheckbox extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-CHECKBOX';
     }
     init(el) {

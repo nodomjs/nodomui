@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIList {
+class UIList extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-LIST';
     }
     init(el) {
@@ -14,7 +15,7 @@ class UIList {
         nodom.Compiler.handleAttributes(listDom, el);
         nodom.Compiler.handleChildren(listDom, el);
         listDom.tagName = 'div';
-        UITool.handleUIParam(listDom, this, ['listfield', 'displayfield|array', 'listtype', 'itemclick'], ['listName', 'displayName', 'listType', 'clickEvent'], [null, 'row']);
+        UITool.handleUIParam(listDom, this, ['listfield', 'displayfield|array', 'listtype', 'itemclick'], ['listName', 'displayName', 'listType', 'clickEvent'], [null, null, 'row', null]);
         if (this.listType === 'row') {
             listDom.addClass('nd-list');
         }

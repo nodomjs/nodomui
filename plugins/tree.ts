@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UITree implements nodom.IDefineElement{
+class UITree extends nodom.DefineElement{
     tagName:string = 'UI-TREE';
     /**
      * 左侧箭头点击事件id

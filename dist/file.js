@@ -2,8 +2,9 @@
 /**
  * checkbox
  */
-class UIFile {
+class UIFile extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-FILE';
         /**
          * 状态  0初始化 1上传中 2上传结束

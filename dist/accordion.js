@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIAccordion {
+class UIAccordion extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-ACCORDION';
     }
     /**

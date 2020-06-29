@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UITree {
+class UITree extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-TREE';
     }
     /**

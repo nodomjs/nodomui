@@ -2,7 +2,7 @@
 /**
  * list元素移动插件
  */
-class UIListTransfer implements nodom.IDefineElement{
+class UIListTransfer extends nodom.DefineElement{
     tagName:string = 'UI-LISTTRANSFER';
     
     /**

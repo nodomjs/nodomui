@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UISelectList {
+class UISelectList extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-SELECTLIST';
     }
     init(el) {
@@ -59,7 +60,6 @@ class UISelectList {
             me.switchValue(module, model);
         }));
         listDom.children = [itemDom];
-        listDom.delProp('field');
         listDom.defineElement = this;
         return listDom;
     }

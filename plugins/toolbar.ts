@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIToolbar implements nodom.IDefineElement{
+class UIToolbar extends nodom.DefineElement{
     tagName:string = 'UI-TOOLBAR';
     /**
      * 编译后执行代码

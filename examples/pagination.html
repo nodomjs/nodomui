@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/pagination.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='../dist/msg_zh.js'></script>
+    <script src='../dist/uibase.js'></script>
+    <script src='../dist/panel.js'></script>
+    <script src='../dist/button.js'></script>
+    <script src='../dist/toolbar.js'></script>
+    <script src='../dist/buttongroup.js'></script>
+    <script src='../dist/pagination.js'></script>
+    
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div>
+        <ui-pagination field='pages' totalName='total' pageSize='10' showTotal showGo>
+        </ui-pagination>
+
+    </div>
+</body>
+<script>
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                pages:{
+                    total:300
+                } 
+            },
+            methods:{
+                clickItem:function(dom,model,module,e){
+                    console.log(model.data);
+                }
+            }
+        }
+    })
+</script>
+</html>

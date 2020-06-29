@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UILayout {
+class UILayout extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-LAYOUT';
     }
     /**

@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIPanel {
+class UIPanel extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-PANEL';
     }
     /**

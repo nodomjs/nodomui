@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIButtonGroup implements nodom.IDefineElement{
+class UIButtonGroup extends nodom.DefineElement{
     tagName:string = 'UI-BUTTONGROUP';
     /**
      * 编译后执行代码

@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIButton {
+class UIButton extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-BUTTON';
     }
     /**

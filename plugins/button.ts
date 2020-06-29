@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIButton implements nodom.IDefineElement{
+class UIButton extends nodom.DefineElement{
     tagName:string = 'UI-BUTTON';
     /**
      * 编译后执行代码

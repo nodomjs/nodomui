@@ -3,7 +3,7 @@
 /**
  * checkbox
  */
-class UIFile implements nodom.IDefineElement{
+class UIFile extends nodom.DefineElement{
     tagName:string = 'UI-FILE';
     /**
      * 绑定字段名

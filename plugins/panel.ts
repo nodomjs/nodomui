@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIPanel implements nodom.IDefineElement{
+class UIPanel extends nodom.DefineElement{
     tagName:string = 'UI-PANEL';
     /**
      * 编译后执行代码

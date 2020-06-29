@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UISelect implements nodom.IDefineElement{
+class UISelect extends nodom.DefineElement{
     tagName:string = 'UI-SELECT';
     /**
      * 显示数据name(在model中新增)

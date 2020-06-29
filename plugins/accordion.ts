@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIAccordion implements nodom.IDefineElement{
+class UIAccordion extends nodom.DefineElement{
     tagName:string = 'UI-ACCORDION';
     /**
      * 第一级字段名

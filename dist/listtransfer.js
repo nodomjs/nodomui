@@ -2,8 +2,9 @@
 /**
  * list元素移动插件
  */
-class UIListTransfer {
+class UIListTransfer extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-LISTTRANSFER';
     }
     init(el) {

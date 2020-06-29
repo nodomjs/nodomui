@@ -119,7 +119,6 @@ var nodom;
                         let co = null;
                         if (!map.has(value)) {
                             co = clone(value, expKey, extra);
-                            console.log(co);
                         }
                         else {
                             co = map.get(value);
@@ -3628,7 +3627,6 @@ var nodom;
                 setKey(node, key, i);
                 rows[i].$index = i;
                 chds.push(node);
-                console.log('repeat:' + node.modelId);
             }
             if (chds.length > 0) {
                 for (let i = 0, len = parent.children.length; i < len; i++) {
@@ -4227,6 +4225,23 @@ var nodom;
         min: "最小输入值为{0}",
         max: "最大输入值为{0}"
     };
+})(nodom || (nodom = {}));
+var nodom;
+(function (nodom) {
+    class DefineElement {
+        init(el) { }
+        ;
+        beforeRender(module, uidom) { }
+        afterRender(module, uidom) { }
+        clone() {
+            let ele = Reflect.construct(this.constructor, []);
+            nodom.Util.getOwnProps(this).forEach((prop) => {
+                ele[prop] = nodom.Util.clone(this[prop]);
+            });
+            return ele;
+        }
+    }
+    nodom.DefineElement = DefineElement;
 })(nodom || (nodom = {}));
 var nodom;
 (function (nodom) {

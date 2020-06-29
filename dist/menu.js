@@ -11,8 +11,9 @@
  *  只能包括一个子节点(带tagname)
  *  icon:       菜单项图标对应数据字段名
  */
-class UIMenu {
+class UIMenu extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-MENU';
         /**
          * 菜单项高度

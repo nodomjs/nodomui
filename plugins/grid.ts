@@ -27,7 +27,7 @@
  *  labelwidth  label宽度，默认100，auto设置时有效
  *  
  */
-class UIGrid implements nodom.IDefineElement{
+class UIGrid extends nodom.DefineElement{
     tagName:string = 'UI-GRID';
     /**
      * 字段对象数组，{title:标题,field:字段,expressions:表达式}

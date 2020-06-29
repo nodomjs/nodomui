@@ -1,0 +1,55 @@
+@import "base.less";
+@import "icon.less";
+@import "button.less";
+/*pagenation*/
+.nd-pagination{
+    .nd-color6;
+    > div{
+        margin-right:@nd-padding*2;
+        display:inline-block;
+    }
+    .nd-pagination-pagect{
+        .nd-pagination-page{
+            padding:0 @nd-padding;
+        }
+        .nd-pagination-leftarrow{
+            .nd-icon-arrow-left;
+
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
+        .nd-pagination-leftarrow1{
+            .nd-icon-double-arrow-left;
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
+
+        .nd-pagination-rightarrow{
+            .nd-icon-arrow-right;
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
+
+        .nd-pagination-rightarrow1{
+            .nd-icon-double-arrow-right;
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
+    }
+
+    .nd-pagination-total{
+
+    }
+
+    .nd-pagination-go{
+        
+        input{
+            width:60px;
+            border:1px solid @nd-color4;
+        }
+    }
+}

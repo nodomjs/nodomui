@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UIRadio implements nodom.IDefineElement{
+class UIRadio extends nodom.DefineElement{
     tagName:string = 'UI-RADIO';
     init(el:HTMLElement):nodom.Element{
         let radioDom:nodom.Element = new nodom.Element('span');

@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIButtonGroup {
+class UIButtonGroup extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-BUTTONGROUP';
     }
     /**

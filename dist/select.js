@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UISelect {
+class UISelect extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-SELECT';
     }
     //设置显示内容

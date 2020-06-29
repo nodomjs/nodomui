@@ -28,7 +28,7 @@ class UITool{
      */
     static handleUIParam(
         dom:nodom.Element,
-        defDom:nodom.IDefineElement,
+        defDom:nodom.DefineElement,
         paramArr:string[],
         props:string[],
         defaultValues?:any[]){
@@ -81,7 +81,6 @@ class UITool{
             }
             //默认值
             if(!v || v === ''){
-                
                 if(defaultValues && defaultValues[i] !== null){
                     defDom[pName] = defaultValues[i];
                 }else{

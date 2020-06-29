@@ -2,8 +2,9 @@
 /**
  * panel 插件
  */
-class UIToolbar {
+class UIToolbar extends nodom.DefineElement {
     constructor() {
+        super(...arguments);
         this.tagName = 'UI-TOOLBAR';
     }
     /**

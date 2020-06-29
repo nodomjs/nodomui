@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIList implements nodom.IDefineElement{
+class UIList extends nodom.DefineElement{
     tagName:string = 'UI-LIST';
     /**
      * 显示数据name
@@ -37,7 +37,7 @@ class UIList implements nodom.IDefineElement{
         UITool.handleUIParam(listDom,this,
             ['listfield','displayfield|array','listtype','itemclick'],
             ['listName','displayName','listType','clickEvent'],
-            [null,'row']);
+            [null,null,'row',null]);
 
         if(this.listType === 'row'){
             listDom.addClass('nd-list');

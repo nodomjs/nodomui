@@ -12,7 +12,7 @@
  *  只能包括一个子节点(带tagname)
  *  icon:       菜单项图标对应数据字段名
  */
-class UIMenu implements nodom.IDefineElement{
+class UIMenu extends nodom.DefineElement{
     tagName:string = 'UI-MENU';
     /**
      * 数据项字段名
