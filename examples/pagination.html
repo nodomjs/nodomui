@@ -27,7 +27,8 @@
 </head>
 <body>
     <div>
-        <ui-pagination field='pages' totalName='total' pageSize='10' showTotal showGo>
+        <div>显示所有内容</div>
+        <ui-pagination totalName='total' currentName='currentPage' sizeName='pageSize' sizeChange='10,50,100,200' showTotal showGo showNum='10'>
         </ui-pagination>
 
     </div>
@@ -37,9 +38,9 @@
         module:{
             el:'div',
             data:{
-                pages:{
-                    total:300
-                } 
+                total:300,
+                pageSize:10,
+                currentPage:2
             },
             methods:{
                 clickItem:function(dom,model,module,e){

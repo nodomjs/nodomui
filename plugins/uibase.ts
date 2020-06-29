@@ -62,11 +62,28 @@ class UITool{
                             break;
                         case 'array':
                             let va = v.split(',');
-                            if(pa.length===3 && nodom.Util.isNumberString(pa[2]) && parseInt(pa[2]) > va.length){
-                                error = true;
-                            }else{
+                            if(pa.length===3){
+                                if(nodom.Util.isNumberString(pa[2])){ //数组长度判断
+                                    if(parseInt(pa[2]) > va.length){
+                                        error = true;
+                                    }
+                                }else{
+                                    if(pa[2] === 'number'){
+                                        for(let i=0;i<va.length;i++){
+                                            let v1 = va[i];
+                                            if(!nodom.Util.isNumberString(v1)){
+                                                error = true;
+                                                break;
+                                            }
+                                            va[i] = parseInt(v1);
+                                        }
+                                    }
+                                } 
+                            }
+                            if(!error){
                                 defDom[pName] = va;
                             }
+                            
                             break;
                         case 'bool':
                             //bool型可以不设置值，只需要设置该属性名即可

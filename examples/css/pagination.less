@@ -4,52 +4,63 @@
 /*pagenation*/
 .nd-pagination{
     .nd-color6;
-    > div{
-        margin-right:@nd-padding*2;
+    input,select{
+        border:1px solid @nd-color3;
+        border-radius:@nd-padding;
+        padding:@nd-padding;
+    }
+    > *{
+        margin-right:@nd-padding*4;
         display:inline-block;
     }
     .nd-pagination-pagect{
+        > * {
+            cursor: pointer;
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
+
+        .nd-pagination-active{
+            color:@nd-activecolor;
+        }
+
+        .nd-pagination-disable{
+            color:@nd-color4;
+            cursor: default;
+            &:hover{
+                color:@nd-activecolor;
+            }
+        }
         .nd-pagination-page{
             padding:0 @nd-padding;
         }
         .nd-pagination-leftarrow{
             .nd-icon-arrow-left;
-
-            &:hover{
-                color:@nd-activecolor;
-            }
         }
         .nd-pagination-leftarrow1{
             .nd-icon-double-arrow-left;
-            &:hover{
-                color:@nd-activecolor;
-            }
         }
 
         .nd-pagination-rightarrow{
             .nd-icon-arrow-right;
-            &:hover{
-                color:@nd-activecolor;
-            }
         }
 
         .nd-pagination-rightarrow1{
             .nd-icon-double-arrow-right;
-            &:hover{
-                color:@nd-activecolor;
-            }
         }
     }
 
     .nd-pagination-total{
-
+        padding:0 @nd-padding;
     }
 
     .nd-pagination-go{
         
         input{
-            width:60px;
+            width:50px;
             border:1px solid @nd-color4;
+            margin:0 @nd-padding;
         }
     }
 }
