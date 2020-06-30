@@ -1631,10 +1631,7 @@ var nodom;
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
                 valueArr.unshift(module);
-                let ret = this.execFunc.apply(null, valueArr);
-                console.log(valueArr);
-                console.log(this.execString,ret);
-                return ret;
+                return this.execFunc.apply(null, valueArr);
                 function getFieldValue(module, dataObj, field) {
                     if (dataObj.hasOwnProperty(field)) {
                         return dataObj[field];
@@ -2025,6 +2022,43 @@ var nodom;
             }
             if (change) {
                 nodom.ModuleFactory.get(this.moduleName).dataChange();
+            }
+        }
+        getData(dirty) {
+            if (dirty) {
+                return this.data;
+            }
+            return copy(this.data);
+            function copy(src) {
+                let dst;
+                if (nodom.Util.isObject(src)) {
+                    dst = new Object();
+                    Object.getOwnPropertyNames(src).forEach((prop) => {
+                        if (prop.startsWith('$')) {
+                            return;
+                        }
+                        dst[prop] = copy(src);
+                    });
+                }
+                else if (nodom.Util.isMap(src)) {
+                    dst = new Map();
+                    src.forEach((value, key) => {
+                        if (key.startsWith('$')) {
+                            return;
+                        }
+                        dst.set(key, copy(value));
+                    });
+                }
+                else if (nodom.Util.isArray(src)) {
+                    dst = new Array();
+                    src.forEach(function (item, i) {
+                        dst[i] = copy(item);
+                    });
+                }
+                else {
+                    dst = src;
+                }
+                return dst;
             }
         }
         addSetterGetter(data) {

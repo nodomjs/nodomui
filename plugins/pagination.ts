@@ -202,24 +202,36 @@ class UIPagination extends nodom.DefineElement{
         ));
         left.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                if(dom.hasClass('nd-pagination-disable')){
+                    return;
+                }
                 me.update(module,-1,true);
             }
         ));
 
         right.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                if(dom.hasClass('nd-pagination-disable')){
+                    return;
+                }
                 me.update(module,1,true);
             }
         ));
 
         left1.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                if(dom.hasClass('nd-pagination-disable')){
+                    return;
+                }
                 me.update(module,-me.steps,true);
             }
         ));
 
         right1.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                if(dom.hasClass('nd-pagination-disable')){
+                    return;
+                }
                 me.update(module,me.steps,true);
             }
         ));
@@ -231,7 +243,7 @@ class UIPagination extends nodom.DefineElement{
             txt.textContent = TipWords.NO;
             goDom.add(txt);
             let input:nodom.Element = new nodom.Element('input');
-            input.setProp('type','text');
+            input.setProp('type','number');
             input.addDirective(new nodom.Directive('field',this.currentName,input));
             input.setProp('value',new nodom.Expression(this.currentName),true);
             goDom.add(input);
@@ -271,19 +283,27 @@ class UIPagination extends nodom.DefineElement{
         if(total === 0){
             return;
         }
+        //表示是步数
+        if(isStep){
+            current = this.currentPage + current;
+        }
+
         //页面大小
         let pageSize:number = data[this.pageSizeName];
+        
+        //设置pagesize，切换到第一页
+        if(!current){
+            let d = model.query(this.currentName);
+            if(typeof d === 'string' && d!==''){
+                //转换为数值
+                d = parseInt(d);
+            }
+            current = d||1;
+        }
+        
         //页面
         if(this.pageSize === pageSize && (!current || this.currentPage === current)){
             return;
-        }
-        //设置pagesize，切换到第一页
-        if(!current){
-            current = 1;
-        }
-
-        if(isStep){
-            current = this.currentPage + current;
         }
         
         //页面数
@@ -295,6 +315,7 @@ class UIPagination extends nodom.DefineElement{
         }else if(current < 1){
             current = 1;
         }
+        
         
         let min:number=1;
         let max:number;
@@ -311,12 +332,13 @@ class UIPagination extends nodom.DefineElement{
             }else if (min + this.showNum - 1 > pageCount) {
                 min = pageCount - this.showNum + 1;
             }
+            
+            max = min + this.showNum - 1;
             if(current === pageCount){
                 btnAllow = 4;
             }else if(current === 1){
-                btnAllow = 1;
+                btnAllow = 2;
             }
-            max = min + this.showNum - 1;
             if(min === 1){
                 btnAllow += 1;
             }
@@ -337,10 +359,9 @@ class UIPagination extends nodom.DefineElement{
         //页面号数据数组
         let pageArr = [];
         for(let i=min;i<=max;i++){
-            let ind = i;
-            let active:boolean = ind===current?true:false;
+            let active:boolean = i===current?true:false;
             pageArr.push({
-                no:ind,
+                no:i,
                 active:active
             });
         }
@@ -352,7 +373,6 @@ class UIPagination extends nodom.DefineElement{
         //设置当前页
         model.set(this.currentName,this.currentPage);
         model.set(this.pageDataName,pageArr);
-        console.log(btnAllow);
         //设置箭头状态值
         model.set(this.btnAllowName,btnAllow);
     }
