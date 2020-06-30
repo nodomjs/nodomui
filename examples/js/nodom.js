@@ -1631,7 +1631,10 @@ var nodom;
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
                 valueArr.unshift(module);
-                return this.execFunc.apply(null, valueArr);
+                let ret = this.execFunc.apply(null, valueArr);
+                console.log(valueArr);
+                console.log(this.execString,ret);
+                return ret;
                 function getFieldValue(module, dataObj, field) {
                     if (dataObj.hasOwnProperty(field)) {
                         return dataObj[field];
