@@ -2,7 +2,7 @@
 @nd-padding:5px;
 @nd-radius:5px;
 @title-padding:15px;
-
+@nd-gridhead-height:60px;
 /*主背景色深，根据这个依次设置5个背景色*/
 // @nd-maincolor:hsl(10,10%,10%);
 @nd-maincolor:#333333;
@@ -24,10 +24,10 @@
 @nd-gg:green(@nd-maincolor);
 @nd-bb:blue(@nd-maincolor);
 @nd-color1:@nd-maincolor;
-@nd-color2:tint(@nd-maincolor,@nd-color-percent);
-@nd-color3:tint(@nd-maincolor,@nd-color-percent*2);
-@nd-color4:tint(@nd-maincolor,@nd-color-percent*3);
-@nd-color5:tint(@nd-maincolor,@nd-color-percent*4);
+@nd-color2:tint(@nd-maincolor,@nd-color-percent*0.5);
+@nd-color3:tint(@nd-maincolor,@nd-color-percent*2.5);
+@nd-color4:tint(@nd-maincolor,@nd-color-percent*4);
+@nd-color5:tint(@nd-maincolor,@nd-color-percent*4.5);
 @nd-color6:tint(@nd-maincolor,@nd-color-percent*5);
 
 @nd-linkcolor:#669933;
@@ -133,4 +133,23 @@ a:visited{
     &:hover{
         background-color:multiply(@nd-warncolor,#eeeeee);
     }
+}
+
+/**滚动条**/
+::-webkit-scrollbar{
+    width:10px;
+}
+
+// ::-webkit-scrollbar-track
+// {
+//     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+//     border-radius: 10px;
+//     background-color: #F5F5F5;
+// }
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb{
+    border-radius: @nd-padding;
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color:@nd-color3;
 }

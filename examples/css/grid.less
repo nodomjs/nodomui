@@ -2,36 +2,37 @@
 @import "icon.less";
 /*表格css*/
 .nd-grid{
-    border-spacing: 1px;
+    box-sizing: border-box;
     display:flex;
     flex-direction: column;
-
-    .nd-grid-row-item{
-        flex:1;
-        display:flex;
-        justify-content:center;
-        padding:@nd-padding;
-        align-items:center;
-        img{
-            max-width:100px;
-            max-height:100px;
+    overflow:auto;
+    .nd-grid-row{
+        display: flex;
+        .nd-grid-row-item{
+            flex:1;
+            display:flex;
+            justify-content:center;
+            padding:@nd-padding;
+            align-items:center;
+            img{
+                max-width:100px;
+                max-height:100px;
+            }
         }
-
         .nd-grid-sub-btn{
             .nd-icon-right;
         }
     }
-
     .nd-grid-head{
-        .nd-color2;
+        .nd-color6;
         display:flex;
         flex-direction: row;
         text-align:center;
         font-weight:bold;
-        > div{
-            padding:@nd-padding+@nd-padding @nd-padding;
-            display:flex;
-            justify-content: center;
+        .nd-grid-row{
+            width:100%;
+            height:@nd-gridhead-height;
+            line-height:@nd-gridhead-height;
             /*排序容器*/
             .nd-grid-sort{
                 display:flex;
@@ -39,7 +40,7 @@
                 align-items: center;
                 margin-left:@nd-padding * 2;
                 line-height:10px;
-                .nd-color2;
+                .nd-color6;
                 /*升序箭头*/
                 .nd-grid-sort-raise{
                     .nd-icon-arrow-up;
@@ -55,21 +56,27 @@
                 }
             }
 
+            .nd-grid-sub-btn{
+                width:25px;
+                display:inline-block;
+                &:before{
+                    content:'';
+                }
+            }
         }
     }
 
     /*图标列*/
     .nd-grid-iconcol{
-        flex:0;
         width:25px;
+        display:flex;
+        justify-content:center;
+        align-items: center;
     }
 
     /*tbody*/
     .nd-grid-body{
         .nd-color6;
-        .nd-grid-row{
-            display: flex;
-        }
     }
 
     /*显示sub的图标旋转*/
@@ -78,16 +85,16 @@
     }
 
     .nd-grid-row-line{
-        border-bottom:1px solid @nd-color3;
+        border-bottom:1px solid @nd-color5;
     }
 
     .nd-grid-col-line{
         >div{
-            border-right:1px solid @nd-color4;
+            border-right:1px solid @nd-color5;
         }
 
         >div:last-child{
-            border-right:0px solid @nd-color4;
+            border-right:0px solid @nd-color5;
         }
     }
 
@@ -97,12 +104,11 @@
     }
 
     .nd-grid-sub{
-        .nd-color5;
+        .nd-color6;
         display:flex;
         flex-direction: column;
         padding:@nd-padding;
-        
-        border:1px solid @nd-color2;
+
         .nd-grid-sub-row{
             display:flex;
             min-height:30px;
@@ -124,4 +130,27 @@
             }
         }
     }
+}
+
+.nd-grid-fixed{
+    position:relative;
+    overflow:hidden;
+    padding-top:@nd-gridhead-height;
+    .nd-grid-head{
+        box-sizing: border-box;
+        padding-right:10px;
+        position:absolute;
+        width:100%;
+        top:0px;
+        left:0px;
+    }
+
+    .nd-grid-body{
+        overflow-y:auto;
+    }
+}
+
+.nd-grid-pager{
+    padding-top:@nd-padding * 2;
+    text-align:right;
 }

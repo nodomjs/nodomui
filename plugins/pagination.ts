@@ -93,6 +93,11 @@ class UIPagination extends nodom.DefineElement{
     modelId:number;
 
     /**
+     * 变化事件 方法名或函数，如果为方法名，则属于module的method factory
+     */
+    onChange:string|Function;
+
+    /**
      * 按钮允许使用name(自动创建)
      * 包括左双箭头、左箭头、右箭头、右双箭头
      * 对应数据 1左双箭头禁用 2左箭头禁用 4右箭头禁用 8右双箭头禁用,组合值则禁用多个:如6禁用左箭头和右箭头
@@ -109,13 +114,14 @@ class UIPagination extends nodom.DefineElement{
         rootDom.tagName = 'div';
 
         UITool.handleUIParam(rootDom,this,
-            ['totalname','currentname','sizename','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number'],
-            ['totalName','currentName','pageSizeName','showTotal','showGo','showNum','pageSizeData','steps'],
-            [null,10,null,null,8,[],5]);
-        
+            ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange'],
+            ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange'],
+            ['total',10,1,null,null,10,[],5,'']);
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
         this.pageDataName = '$ui_pagination_' + nodom.Util.genId();
+        this.pageSizeName = '$ui_pagination_' + nodom.Util.genId();
+        this.currentName = '$ui_pagination_' + nodom.Util.genId();
         this.pageSizeDataName = '$ui_pagination_' + nodom.Util.genId();
         this.btnAllowName = '$ui_pagination_' + nodom.Util.genId();
         //显示共x条
@@ -137,7 +143,7 @@ class UIPagination extends nodom.DefineElement{
         }
         
         //选择页面大小
-        if(this.pageSizeData){
+        if(this.pageSizeData && this.pageSizeData.length>0){
             let datas = [];
             for(let d of this.pageSizeData){
                 datas.push({
@@ -149,7 +155,6 @@ class UIPagination extends nodom.DefineElement{
             this.pageSizeDatas = datas;
             let sizeDom:nodom.Element = new nodom.Element('select');
             sizeDom.addDirective(new nodom.Directive('field',this.pageSizeName,sizeDom));
-            sizeDom.setProp('value',new nodom.Expression(this.pageSizeName),true);
             let optDom:nodom.Element = new nodom.Element('option');
             optDom.addDirective(new nodom.Directive('repeat',this.pageSizeDataName,optDom));
             optDom.setProp('value',new nodom.Expression('value'),true);
@@ -235,7 +240,7 @@ class UIPagination extends nodom.DefineElement{
                 me.update(module,me.steps,true);
             }
         ));
-        //显示第x页
+        //显示第x页及输入框
         if(this.showGo){
             let goDom:nodom.Element = new nodom.Element('div');
             goDom.addClass('nd-pagination-go');
@@ -264,7 +269,6 @@ class UIPagination extends nodom.DefineElement{
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         this.handleInit(uidom,module);
-        this.update(module);
     }
     
     /**
@@ -273,14 +277,18 @@ class UIPagination extends nodom.DefineElement{
      * @param current   当前页或位移量
      * @param isStep    如果true current为位移量
      */
-    update(module:nodom.Module,current?:number,isStep?:boolean){
-        let model = module.modelFactory.get(this.modelId);
+    update(module?:any,current?:number,isStep?:boolean){
+        let model:nodom.Model = module.modelFactory.get(this.modelId);
         let data = model.data;
-        let total;
+        let total:number;
+        //获取total
         if(data){
-            total = data[this.totalName] || 0;
+            total = data[this.totalName];
+        }else{
+            total = this.total;
         }
-        if(total === 0){
+        
+        if(!total){
             return;
         }
         //表示是步数
@@ -290,7 +298,10 @@ class UIPagination extends nodom.DefineElement{
 
         //页面大小
         let pageSize:number = data[this.pageSizeName];
-        
+        if(typeof pageSize === 'string'){
+            pageSize = parseInt(pageSize);
+        }
+
         //设置pagesize，切换到第一页
         if(!current){
             let d = model.query(this.currentName);
@@ -302,7 +313,7 @@ class UIPagination extends nodom.DefineElement{
         }
         
         //页面
-        if(this.pageSize === pageSize && (!current || this.currentPage === current)){
+        if(this.initFlag && this.pageSize === pageSize && (!current || this.currentPage === current)){
             return;
         }
         
@@ -334,28 +345,32 @@ class UIPagination extends nodom.DefineElement{
             }
             
             max = min + this.showNum - 1;
-            if(current === pageCount){
-                btnAllow = 4;
-            }else if(current === 1){
-                btnAllow = 2;
-            }
+            
             if(min === 1){
                 btnAllow += 1;
             }
             if(max === pageCount){
                 btnAllow += 8;
-            }
+            }    
             
         }else{
             min = 1;
             max = pageCount;
-            btnAllow = 15;
+            btnAllow = 9;
         }
 
+        if(current === pageCount){
+            btnAllow += 4;
+        }else if(current === 1){
+            btnAllow += 2;
+        }
+        
+
         //参数未改变，则不渲染
-        if(current === this.currentPage && min === this.minPage && max === this.maxPage){
+        if(this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage){
             return;
         }
+        
         //页面号数据数组
         let pageArr = [];
         for(let i=min;i<=max;i++){
@@ -365,7 +380,7 @@ class UIPagination extends nodom.DefineElement{
                 active:active
             });
         }
-        
+        this.total = total;
         this.pageSize = pageSize;
         this.currentPage = current;
         this.minPage = min;
@@ -375,6 +390,19 @@ class UIPagination extends nodom.DefineElement{
         model.set(this.pageDataName,pageArr);
         //设置箭头状态值
         model.set(this.btnAllowName,btnAllow);
+        
+        //onchange 事件执行
+        if(this.onChange && this.onChange !== ''){
+            let foo:Function;
+            if(typeof this.onChange === 'string'){
+                foo = module.methodFactory.get(this.onChange);
+            }else if(nodom.Util.isFunction(this.onChange)){
+                foo = this.onChange;
+            }
+            if(foo){
+                foo.apply(this,[module,this.currentPage,this.pageSize]);
+            }
+        }
     }
     /**
      * 只执行一次的初始化
@@ -382,15 +410,30 @@ class UIPagination extends nodom.DefineElement{
      * @param module
      */
     handleInit(dom:nodom.Element,module:nodom.Module){
+        let me = this;
         if(this.initFlag){
             return;
         }
+        
         let model = module.modelFactory.get(dom.modelId);
-        this.initFlag = true;
         this.modelId = model.id;
-        model.set(this.pageSizeName,model.query(this.pageSizeName) || 10);
+
+        if(this.pageSize){
+            model.set(this.pageSizeName,this.pageSize);
+        }
+        if(this.currentPage){
+            model.set(this.currentName,this.currentPage);
+        }
         model.set(this.pageSizeDataName,this.pageSizeDatas);
+        //增加观察方法
+        let watchFunc = function(model,key,value){
+            me.update(module);
+        }
+        model.watch(this.pageSizeName,watchFunc);
+        model.watch(this.currentName,watchFunc);
+        
         this.update(module,1);
+        this.initFlag = true;
     }
 }
 

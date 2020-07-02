@@ -24,12 +24,26 @@
             height:100%;
         }
     </style>
+    <script>
+        // class TreeElement extends HTMLElement{
+        //     constructor(){
+        //         super();
+        //         let shadow = this.attachShadow({mode:'open'});
+        //         // this.innerHTML = "<div style='color:red'>hello world</div>"
+        //         let root = this.shadowRoot;
+        //         root.innerHTML = "<div style='color:red'>hello world</div>";
+        //     }
+        // }
+        // customElements.define('ui-tree',TreeElement);
+    </script>
 </head>
+
 <body>
-    <a href='openfile()'>
-        
-        <input type='file'>
-        打开文件
-    </a>
+    <ui-tree></ui-tree>
 </body>
+<script>
+    let tree = document.querySelector('ui-tree');
+    let root = tree.shadowRoot;
+    // tree.innerHTML = "<div style='color:red'>hello world</div>"
+</script>
 </html>

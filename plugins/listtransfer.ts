@@ -94,7 +94,7 @@ class UIListTransfer extends nodom.DefineElement{
         //右列表(克隆来)
         let listDom1:nodom.Element = listDom.clone(true);
         let dir = listDom1.children[0].getDirective('repeat');
-        dir.filter = new nodom.Filter("select:value:{"+ this.selectedName + ":true}");
+        dir.filters = [new nodom.Filter("select:value:{"+ this.selectedName + ":true}")];
         
         //按钮>>
         //按钮容器

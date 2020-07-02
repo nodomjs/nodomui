@@ -28,9 +28,12 @@
 <body>
     <div>
         <div>显示所有内容</div>
-        <ui-pagination totalName='total' currentName='currentPage' sizeName='pageSize' sizeChange='10,50,100,200' 
-            showTotal showGo showNum='10'
-            steps='10'
+        <ui-pagination totalName='total' pageSize='50' sizeChange='10,50,100,200' 
+            showTotal showGo showNum='15'
+            steps='10' onchange='changePage'
+            requestParam='pageno,pagesize'
+            dataUrl='http://localhost:3000/commodity/getdata'
+            dataName='gridData'
         >
         </ui-pagination>
 
@@ -48,6 +51,9 @@
             methods:{
                 clickItem:function(dom,model,module,e){
                     console.log(model.data);
+                },
+                changePage:function(module,currentPage,pageSize){
+                    console.log(module,currentPage,pageSize);
                 }
             }
         }
