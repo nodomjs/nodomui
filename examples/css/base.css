@@ -1,0 +1,155 @@
+/*前景色，深色和浅色*/
+/*颜色*/
+/*颜色系，根据主color逐次变浅*/
+/**
+ * 计算颜色
+ * @param color1 主背景色
+ * @param color2 相对(主背景)背景色
+ * @param n      第几个颜色
+ */
+.nd-color1 {
+  background-color: #9b9b9b;
+  color: #848484;
+}
+.nd-color2 {
+  background-color: #8c8c8c;
+  color: #848484;
+}
+.nd-color3 {
+  background-color: #7f7f7f;
+  color: white;
+}
+.nd-color4 {
+  background-color: #727272;
+  color: white;
+}
+.nd-color5 {
+  background-color: #656565;
+  color: white;
+}
+.nd-color6 {
+  background-color: #585858;
+  color: white;
+}
+.nd-color7 {
+  background-color: #4b4b4b;
+  color: white;
+}
+.nd-color8 {
+  background-color: #3e3e3e;
+  color: white;
+}
+.nd-color9 {
+  background-color: #313131;
+  color: white;
+}
+.nd-color10 {
+  background-color: #242424;
+  color: white;
+}
+.nd-color1 {
+  background-color: #171717;
+  color: white;
+}
+/*超链接颜色*/
+/*字体大小*/
+/*按钮*/
+/*padding*/
+/*圆角半径*/
+/*zindex*/
+/*global*/
+body {
+  padding: 0;
+  margin: 0;
+  background-color: #9b9b9b;
+}
+button,
+input {
+  outline: none;
+}
+/*link*/
+a:link {
+  color: #669933;
+  text-decoration: none;
+}
+a:hover {
+  color: #99CC99;
+}
+a:visited {
+  color: #99CC99;
+}
+/*背景加前景色系，1-5逐次背景减轻*/
+.nd-color1 {
+  background-color: #9b9b9b;
+  color: #848484;
+}
+.nd-color2 {
+  background-color: #8c8c8c;
+  color: #848484;
+}
+.nd-color3 {
+  background-color: #7f7f7f;
+  color: #848484;
+}
+.nd-color4 {
+  background-color: #727272;
+  color: #848484;
+}
+.nd-color5 {
+  background-color: #656565;
+  color: #848484;
+}
+.nd-color6 {
+  background-color: #585858;
+  color: #848484;
+}
+.nd-color7 {
+  background-color: #4b4b4b;
+  color: white;
+}
+.nd-color8 {
+  background-color: #3e3e3e;
+  color: white;
+}
+.nd-color9 {
+  background-color: #313131;
+  color: white;
+}
+.nd-color10 {
+  background-color: #242424;
+  color: white;
+}
+.nd-color1 {
+  background-color: #242424;
+  color: white;
+}
+/*激活背景色*/
+.nd-active {
+  background-color: #1949c9;
+}
+.nd-active:hover {
+  background-color: #1744bc;
+}
+/*强调背景色*/
+.nd-emphasis {
+  background-color: #a96e57;
+}
+.nd-emphasis:hover {
+  background-color: #9e6751;
+}
+/*警告背景色*/
+.nd-warn {
+  background-color: #957f4f;
+}
+.nd-warn:hover {
+  background-color: #8b774a;
+}
+/**滚动条**/
+::-webkit-scrollbar {
+  width: 10px;
+}
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #7f7f7f;
+}

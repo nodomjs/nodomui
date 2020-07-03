@@ -1,0 +1,47 @@
+//主背景
+@nd-maincolor1:rgb(23,23,23);
+//相对背景
+@nd-maincolor2:rgb(85,85,85);
+
+/*前景色，深色和浅色*/
+@nd-forecolor2:white;
+@nd-forecolor1:rgb(132,132,132);
+
+.nd-func-gencolor(@color1,@color2){
+    @r1:red(@color1);
+    @g1:green(@color1);
+    @b1:blue(@color1);
+    @r2:red(@color2);
+    @g2:green(@color2);
+    @b2:blue(@color2);
+    @dr:round((@r1 - @r2) / 10);
+    @dg:round((@g1 - @g2) / 10);
+    @db:round((@b1 - @b2) / 10);
+    
+    .mixin (@a) when (lightness(@a) >= 50%) {
+        color:@nd-forecolor2;
+    }
+
+    .mixin (@a) when (lightness(@a) < 50%) {
+        color:@nd-forecolor1;
+    }
+
+    .gen(7);
+    .gen(@n,@i:1) when (@i < @n){
+        @color:rgb(@r1 - @dr * @i,@g1 - @dg * @i, @b1 - @db * @i);
+        /*背景及前景色*/
+        .nd-color@{i}{
+            background-color:@color;
+            .mixin(@color);
+        }
+
+        /*线颜色*/
+        .nd-line-color@{i}{
+            border-color:@color;
+        }
+
+        .gen(@n,@i + 1);
+    }
+}
+
+.nd-func-gencolor(@nd-maincolor1,@nd-maincolor2);

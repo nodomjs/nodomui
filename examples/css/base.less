@@ -3,37 +3,79 @@
 @nd-radius:5px;
 @title-padding:15px;
 @nd-gridhead-height:60px;
-/*主背景色深，根据这个依次设置5个背景色*/
-// @nd-maincolor:hsl(10,10%,10%);
-@nd-maincolor:#333333;
-/*如果为100，则最浅色为白色*/
-@nd-maincolorpercent:100;
+//主背景
+@nd-maincolor1:rgb(23,23,23);
+//相对背景
+@nd-maincolor2:rgb(85,85,85);
+
 /*前景色，深色和浅色*/
-@nd-forecolor1:#333;
+@nd-forecolor1:white;
 @nd-forecolor2:white;
 
-@nd-activecolor:#66cc99;
-@nd-emphasiscolor:#FF9900;
-@nd-warncolor:#FFCC00;
+@nd-activecolor:rgb(25, 73, 201);
+@nd-emphasiscolor:rgb(169,110,87);
+@nd-warncolor:rgb(149,127,79);
 @nd-errorcolor:#900;
 
 /*颜色*/
 /*颜色系，根据主color逐次变浅*/
-@nd-color-percent:@nd-maincolorpercent/5;
-@nd-rr:red(@nd-maincolor);
-@nd-gg:green(@nd-maincolor);
-@nd-bb:blue(@nd-maincolor);
-@nd-color1:@nd-maincolor;
-@nd-color2:tint(@nd-maincolor,@nd-color-percent*0.5);
-@nd-color3:tint(@nd-maincolor,@nd-color-percent*2.5);
-@nd-color4:tint(@nd-maincolor,@nd-color-percent*4);
-@nd-color5:tint(@nd-maincolor,@nd-color-percent*4.5);
-@nd-color6:tint(@nd-maincolor,@nd-color-percent*5);
+/**
+ * 计算颜色
+ * @param color1    主背景色
+ * @param color2    相对(主背景)背景色
+ * @param n         分成的份数      
+ */
+ .nd-func-gencolor(@color1,@color2,@count){
+    @r1:red(@color1);
+    @g1:green(@color1);
+    @b1:blue(@color1);
+    @r2:red(@color2);
+    @g2:green(@color2);
+    @b2:blue(@color2);
+    @dr:round((@r1 - @r2) / @count);
+    @dg:round((@g1 - @g2) / @count);
+    @db:round((@b1 - @b2) / @count);
+    
+    .mixin (@a) when (lightness(@a) >= 50%) {
+        color:@nd-forecolor1;
+    }
 
+    .mixin (@a) when (lightness(@a) < 50%) {
+        color:@nd-forecolor2;
+    }
+
+    .gen(@count);
+
+    .gen(@n,@i:0) when (@i < @n){
+        @color:rgb(@r1 - @dr * @i,@g1 - @dg * @i, @b1 - @db * @i);
+        @index:@i+1;
+        /*背景及前景色*/
+        .nd-color@{index}{
+            background-color:@color;
+            .mixin(@color);
+        }
+
+        /*背景色*/
+        .nd-bgcolor@{index}{
+            background-color:@color;
+        }
+
+        /*线颜色*/
+        .nd-line-color@{index}{
+            border-color:@color;
+        }
+
+        .gen(@n,@i + 1);
+    }
+}
+
+.nd-func-gencolor(@nd-maincolor1,@nd-maincolor2,6);
+
+/*超链接颜色*/
 @nd-linkcolor:#669933;
 @nd-linkcolorvisted:#99CC99;
 
-
+/*字体大小*/
 @nd-fonttiny:10px;
 @nd-fontsmall:12px;
 @nd-fontnormal:14px;
@@ -58,6 +100,7 @@
 body{
     padding:0;
     margin:0;
+    .nd-color1;
 }
 
 
@@ -79,36 +122,6 @@ a:visited{
     color:@nd-linkcolorvisted;
 }
 
-/*背景加前景色系，1-5逐次背景减轻*/
-.nd-color1{
-    background-color:@nd-color1;
-    color:@nd-forecolor2;
-}
-
-.nd-color2{
-    background-color:@nd-color2;
-    color:@nd-forecolor2;
-}
-
-.nd-color3{
-    background-color:@nd-color3;
-    color:@nd-forecolor1;
-}
-
-.nd-color4{
-    background-color:@nd-color4;
-    color:@nd-forecolor1;
-}
-
-.nd-color5{
-    background-color:@nd-color5;
-    color:@nd-forecolor1;
-}
-
-.nd-color6{
-    background-color:@nd-color6;
-    color:@nd-forecolor1;
-}
 
 /*激活背景色*/
 
@@ -151,5 +164,5 @@ a:visited{
 ::-webkit-scrollbar-thumb{
     border-radius: @nd-padding;
     // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color:@nd-color3;
+    .nd-bgcolor3;
 }

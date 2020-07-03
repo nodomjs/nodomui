@@ -1,0 +1,55 @@
+/*前景色，深色和浅色*/
+/*背景及前景色*/
+.nd-color1 {
+  background-color: #1d1d1d;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color1 {
+  border-color: #1d1d1d;
+}
+/*背景及前景色*/
+.nd-color2 {
+  background-color: #232323;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color2 {
+  border-color: #232323;
+}
+/*背景及前景色*/
+.nd-color3 {
+  background-color: #292929;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color3 {
+  border-color: #292929;
+}
+/*背景及前景色*/
+.nd-color4 {
+  background-color: #2f2f2f;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color4 {
+  border-color: #2f2f2f;
+}
+/*背景及前景色*/
+.nd-color5 {
+  background-color: #353535;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color5 {
+  border-color: #353535;
+}
+/*背景及前景色*/
+.nd-color6 {
+  background-color: #3b3b3b;
+  color: #848484;
+}
+/*线颜色*/
+.nd-line-color6 {
+  border-color: #3b3b3b;
+}
