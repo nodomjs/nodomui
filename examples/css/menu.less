@@ -5,19 +5,20 @@
     z-index: @nd-menu-index;
     font-size:@nd-fontnormal;
     position:relative;
+    .nd-color3;
     .nd-menu-subct{
         z-index:@nd-menu-index;
         display:block;
         position:absolute;
         top:0px;
-        .nd-color5;
+        .nd-color3;
         .nd-menu-nodect{
             position:relative;
             line-height:30px;
             height:30px;
             width:100%;
             .nd-menu-node, a.nd-menu-node{
-                color:@nd-forecolor2;
+                color:@nd-forecolor1;
                 padding:0 @nd-padding*2;
                 /*子菜单箭头*/
                 .nd-menu-subicon{
@@ -31,11 +32,11 @@
                     display:inline-block;
                 }
                 &:hover{
-                    color:@nd-forecolor1;
+                    .nd-menu-active;
                 }
             }
             &:hover{
-                .nd-color6;
+                .nd-menu-active;
             }
         }
     }

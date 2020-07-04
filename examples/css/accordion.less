@@ -2,10 +2,10 @@
 /********** accordion ***********/
 .nd-accordion{
     .nd-accordion-item{
-        border-bottom:1px solid;
-        .nd-line-color5;
+        border-bottom:1px solid @nd-color5;
+        
         .nd-accordion-first{
-            .nd-color5;
+            .nd-color2;
             padding:@nd-padding*2;
             font-size:@nd-fontnormal;
             width:100%;
@@ -29,15 +29,15 @@
                 text-indent: 2em;
                 font-size:@nd-fontnormal;
                 display:block;
-                .nd-color3;
+                .nd-color2;
             }
          
             .nd-accordion-selected{
-                .nd-color5;
+                .nd-item-active;
             }
     
             .nd-accordion-second:hover{
-                .nd-color6;
+                .nd-menu-active;
             }
         }
         .nd-accordion-hide{

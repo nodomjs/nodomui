@@ -76,7 +76,13 @@
 
     /*tbody*/
     .nd-grid-body{
-        .nd-colo11;
+        .nd-color1;
+
+        .nd-grid-row{
+            &:hover{
+                .nd-menu-active;
+            }
+        }
     }
 
     /*显示sub的图标旋转*/
@@ -85,26 +91,26 @@
     }
 
     .nd-grid-row-line{
-        border-bottom:1px solid @nd-color10;
+        border-top:1px solid @nd-color5;
     }
 
     .nd-grid-col-line{
         >div{
-            border-right:1px solid @nd-color10;
+            border-right:1px solid @nd-color5;
         }
 
         >div:last-child{
-            border-right:0px solid @nd-color10;
+            border-right:0px solid @nd-color5;
         }
     }
 
     /*每行颜色交错*/
     .nd-grid-body-rowalt >div:nth-child(even){
-        .nd-color10;
+        .nd-color2;
     }
 
     .nd-grid-sub{
-        .nd-colo11;
+        .nd-color1;
         display:flex;
         flex-direction: column;
         padding:@nd-padding;

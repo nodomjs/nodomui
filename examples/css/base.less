@@ -3,20 +3,29 @@
 @nd-radius:5px;
 @title-padding:15px;
 @nd-gridhead-height:60px;
-//主背景
-@nd-maincolor1:rgb(23,23,23);
-//相对背景
-@nd-maincolor2:rgb(85,85,85);
+
 
 /*前景色，深色和浅色*/
-@nd-forecolor1:white;
+//normal color
+@nd-forecolor1:rgb(193,193,193);
+//current color
 @nd-forecolor2:white;
 
-@nd-activecolor:rgb(25, 73, 201);
+@nd-activecolor:rgb(26, 78, 202);
 @nd-emphasiscolor:rgb(169,110,87);
 @nd-warncolor:rgb(149,127,79);
 @nd-errorcolor:#900;
 
+/*背景色*/
+//主背景
+@nd-color1:rgb(23,23,23);  //主背景
+@nd-color2:rgb(27,27,27);  //tree、accordion、form、toolbar、button group
+@nd-color2:rgb(34,34,34);  //tab
+@nd-color3:rgb(39,39,39);  //menu
+@nd-color4:rgb(46,46,46);  //input、panel-title、selected
+@nd-color5:rgb(50,50,50);  //line
+@nd-color6:rgb(63,63,63);  //滚动条 mouseover
+@nd-color7:rgb(85,85,85);  //按钮
 /*颜色*/
 /*颜色系，根据主color逐次变浅*/
 /**
@@ -25,51 +34,51 @@
  * @param color2    相对(主背景)背景色
  * @param n         分成的份数      
  */
- .nd-func-gencolor(@color1,@color2,@count){
-    @r1:red(@color1);
-    @g1:green(@color1);
-    @b1:blue(@color1);
-    @r2:red(@color2);
-    @g2:green(@color2);
-    @b2:blue(@color2);
-    @dr:round((@r1 - @r2) / @count);
-    @dg:round((@g1 - @g2) / @count);
-    @db:round((@b1 - @b2) / @count);
+//  .nd-func-gencolor(@color1,@color2,@count){
+//     @r1:red(@color1);
+//     @g1:green(@color1);
+//     @b1:blue(@color1);
+//     @r2:red(@color2);
+//     @g2:green(@color2);
+//     @b2:blue(@color2);
+//     @dr:round((@r1 - @r2) / @count);
+//     @dg:round((@g1 - @g2) / @count);
+//     @db:round((@b1 - @b2) / @count);
     
-    .mixin (@a) when (lightness(@a) >= 50%) {
-        color:@nd-forecolor1;
-    }
+//     .mixin (@a) when (lightness(@a) >= 50%) {
+//         color:@nd-forecolor1;
+//     }
 
-    .mixin (@a) when (lightness(@a) < 50%) {
-        color:@nd-forecolor2;
-    }
+//     .mixin (@a) when (lightness(@a) < 50%) {
+//         color:@nd-forecolor2;
+//     }
 
-    .gen(@count);
+//     .gen(@count);
 
-    .gen(@n,@i:0) when (@i < @n){
-        @color:rgb(@r1 - @dr * @i,@g1 - @dg * @i, @b1 - @db * @i);
-        @index:@i+1;
-        /*背景及前景色*/
-        .nd-color@{index}{
-            background-color:@color;
-            .mixin(@color);
-        }
+//     .gen(@n,@i:0) when (@i < @n){
+//         @color:rgb(@r1 - @dr * @i,@g1 - @dg * @i, @b1 - @db * @i);
+//         @index:@i+1;
+//         /*背景及前景色*/
+//         .nd-color@{index}{
+//             background-color:@color;
+//             .mixin(@color);
+//         }
 
-        /*背景色*/
-        .nd-bgcolor@{index}{
-            background-color:@color;
-        }
+//         /*背景色*/
+//         .nd-bgcolor@{index}{
+//             background-color:@color;
+//         }
 
-        /*线颜色*/
-        .nd-line-color@{index}{
-            border-color:@color;
-        }
+//         /*线颜色*/
+//         .nd-line-color@{index}{
+//             border-color:@color;
+//         }
 
-        .gen(@n,@i + 1);
-    }
-}
+//         .gen(@n,@i + 1);
+//     }
+// }
 
-.nd-func-gencolor(@nd-maincolor1,@nd-maincolor2,6);
+// .nd-func-gencolor(@nd-maincolor1,@nd-maincolor2,6);
 
 /*超链接颜色*/
 @nd-linkcolor:#669933;
@@ -96,6 +105,19 @@
 @nd-combo-index:998;
 
 
+/*生成 .nd-color1 - 6 */
+.genback(@counter,@i:0) when (@i < @counter){
+    @index:@i + 1;
+    .nd-color@{index}{
+        @nc:'nd-color@{index}';
+        background-color:@@nc;
+        color:@nd-forecolor1;
+    }
+    .genback(@counter,@index);
+}
+.genback(7);
+
+
 /*global*/
 body{
     padding:0;
@@ -106,6 +128,18 @@ body{
 
 button,input{
     outline:none;
+}
+
+
+/*item active*/
+.nd-item-active{
+    background-color:@nd-activecolor;
+    color:@nd-forecolor2;
+}
+/*menu active*/
+.nd-menu-active{
+    background-color:@nd-color6;
+    color:@nd-forecolor2;
 }
 
 /*link*/
@@ -153,16 +187,17 @@ a:visited{
     width:10px;
 }
 
-// ::-webkit-scrollbar-track
-// {
-//     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-//     border-radius: 10px;
-//     background-color: #F5F5F5;
-// }
+::-webkit-scrollbar-track
+{
+    .nd-color1;
+    // border-left:1px solid @nd-color5;
+}
 
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb{
     border-radius: @nd-padding;
-    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    .nd-bgcolor3;
+    .nd-color5;
+    &:hover{
+        .nd-color6;
+    }
 }

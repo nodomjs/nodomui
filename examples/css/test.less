@@ -1,47 +1,26 @@
-//主背景
-@nd-maincolor1:rgb(23,23,23);
-//相对背景
-@nd-maincolor2:rgb(85,85,85);
-
-/*前景色，深色和浅色*/
+@nd-forecolor1:rgb(193,193,193);
+//current color
 @nd-forecolor2:white;
-@nd-forecolor1:rgb(132,132,132);
 
-.nd-func-gencolor(@color1,@color2){
-    @r1:red(@color1);
-    @g1:green(@color1);
-    @b1:blue(@color1);
-    @r2:red(@color2);
-    @g2:green(@color2);
-    @b2:blue(@color2);
-    @dr:round((@r1 - @r2) / 10);
-    @dg:round((@g1 - @g2) / 10);
-    @db:round((@b1 - @b2) / 10);
-    
-    .mixin (@a) when (lightness(@a) >= 50%) {
-        color:@nd-forecolor2;
-    }
-
-    .mixin (@a) when (lightness(@a) < 50%) {
+@nd-color1:rgb(23,23,23);  //主背景
+@nd-color2:rgb(27,27,27);  //tree、accordion、form
+@nd-color2:rgb(34,34,34);  //tab
+@nd-color3:rgb(39,39,39);  //menu
+@nd-color4:rgb(46,46,46);  //input、panel-title、selected
+@nd-color5:rgb(50,50,50);  //line
+@nd-color6:rgb(63,63,63);  //滚动条
+/*生成 .nd-color1 - 6 */
+.genback(@counter,@i:0) when (@i < @counter){
+    @index:@i + 1;
+    .nd-color@{index}{
+        @nc:'nd-color@{index}';
+        background-color:@@nc;
         color:@nd-forecolor1;
     }
-
-    .gen(7);
-    .gen(@n,@i:1) when (@i < @n){
-        @color:rgb(@r1 - @dr * @i,@g1 - @dg * @i, @b1 - @db * @i);
-        /*背景及前景色*/
-        .nd-color@{i}{
-            background-color:@color;
-            .mixin(@color);
-        }
-
-        /*线颜色*/
-        .nd-line-color@{i}{
-            border-color:@color;
-        }
-
-        .gen(@n,@i + 1);
-    }
+    .genback(@counter,@index);
 }
+.genback(6);
 
-.nd-func-gencolor(@nd-maincolor1,@nd-maincolor2);
+body{
+    .nd-color1;
+}
