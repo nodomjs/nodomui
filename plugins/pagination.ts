@@ -12,6 +12,10 @@ class UIPagination extends nodom.DefineElement{
     totalName:string;
 
     /**
+     * row数据名
+     */
+    rowDataName:string;
+    /**
      * 总记录数
      */
     total:number;
@@ -103,6 +107,11 @@ class UIPagination extends nodom.DefineElement{
      * 对应数据 1左双箭头禁用 2左箭头禁用 4右箭头禁用 8右双箭头禁用,组合值则禁用多个:如6禁用左箭头和右箭头
      */
     btnAllowName:string;
+
+    /**
+     * 请求参数名 [页号,页面大小] 默认为[]
+     */
+    requestName:string[];
     /**
      * 编译后执行代码
      */
@@ -114,9 +123,9 @@ class UIPagination extends nodom.DefineElement{
         rootDom.tagName = 'div';
 
         UITool.handleUIParam(rootDom,this,
-            ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange'],
-            ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange'],
-            ['total',10,1,null,null,10,[],5,'']);
+            ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange','requestname|array|2'],
+            ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange','requestName'],
+            ['total',10,1,null,null,10,[],5,'',[]]);
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
         this.pageDataName = '$ui_pagination_' + nodom.Util.genId();
@@ -154,9 +163,9 @@ class UIPagination extends nodom.DefineElement{
             
             this.pageSizeDatas = datas;
             let sizeDom:nodom.Element = new nodom.Element('select');
-            sizeDom.addDirective(new nodom.Directive('field',this.pageSizeName,sizeDom));
+            sizeDom.addDirective(new nodom.Directive('field',this.pageSizeName));
             let optDom:nodom.Element = new nodom.Element('option');
-            optDom.addDirective(new nodom.Directive('repeat',this.pageSizeDataName,optDom));
+            optDom.addDirective(new nodom.Directive('repeat',this.pageSizeDataName));
             optDom.setProp('value',new nodom.Expression('value'),true);
             let txt:nodom.Element = new nodom.Element();
             txt.expressions = [new nodom.Expression('text')];
@@ -171,12 +180,12 @@ class UIPagination extends nodom.DefineElement{
         //左双箭头
         let left1:nodom.Element = new nodom.Element('b');
         left1.addClass('nd-pagination-leftarrow1');
-        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes("+ this.btnAllowName + ")'}",left1));
+        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes("+ this.btnAllowName + ")'}"));
         pageCt.add(left1);
         //左箭头
         let left:nodom.Element = new nodom.Element('b');
         left.addClass('nd-pagination-leftarrow');
-        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes("+ this.btnAllowName + ")'}",left));
+        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes("+ this.btnAllowName + ")'}"));
         pageCt.add(left);
         //页面数字
         let page:nodom.Element = new nodom.Element('span');
@@ -190,12 +199,12 @@ class UIPagination extends nodom.DefineElement{
         //右箭头
         let right:nodom.Element = new nodom.Element('b');
         right.addClass('nd-pagination-rightarrow');
-        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes("+ this.btnAllowName + ")'}",right));
+        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes("+ this.btnAllowName + ")'}"));
         pageCt.add(right);
         //右双箭头
         let right1:nodom.Element = new nodom.Element('b');
         right1.addClass('nd-pagination-rightarrow1');
-        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes("+ this.btnAllowName + ")'}",right1));
+        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes("+ this.btnAllowName + ")'}"));
         pageCt.add(right1);
 
         rootDom.add(pageCt);
@@ -249,7 +258,7 @@ class UIPagination extends nodom.DefineElement{
             goDom.add(txt);
             let input:nodom.Element = new nodom.Element('input');
             input.setProp('type','number');
-            input.addDirective(new nodom.Directive('field',this.currentName,input));
+            input.addDirective(new nodom.Directive('field',this.currentName));
             input.setProp('value',new nodom.Expression(this.currentName),true);
             goDom.add(input);
             txt = new nodom.Element();

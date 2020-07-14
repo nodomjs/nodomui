@@ -152,4 +152,29 @@ let UIEventRegister = /** @class */ (() => {
     UIEventRegister.listeners = new Map();
     return UIEventRegister;
 })();
+/**
+ * http请求（用户可根据自己的情况改写该方法）
+ * @param config 	url 				请求地址
+ *					method 			    请求类型 GET(默认) POST
+ *					params 				参数，json格式
+ *					async 				异步，默认true
+ *  				timeout 			超时时间
+ *					withCredentials 	同源策略，跨域时cookie保存，默认false
+ *                  header              request header 对象
+ *                  user                需要认证的情况需要用户名和密码
+ *                  pwd                 密码
+ *                  success             成功回调
+ *                  failuer             失败回调
+ */
+function request(cfg) {
+    nodom.Linker.gen('ajax', cfg).then((r) => {
+        if (cfg.success && typeof cfg.success === 'function') {
+            cfg.success(r);
+        }
+    }).catch((r) => {
+        if (cfg.failure && typeof cfg.failure === 'function') {
+            cfg.failure(r);
+        }
+    });
+}
 //# sourceMappingURL=uibase.js.map

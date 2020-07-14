@@ -78,7 +78,6 @@ class UIGrid extends nodom.DefineElement {
                 pagination = c;
             }
         }
-        console.log(rowDom.children.length);
         if (rowDom) {
             this.rowDomKey = rowDom.key;
             //每一行包括行数据和subpanel，所以需要rowDom作为容器，dataDom作为数据行，subDom最为子panel
@@ -152,7 +151,6 @@ class UIGrid extends nodom.DefineElement {
             }
             tbody.add(rowDom);
         }
-        console.log(thead);
         if (thead) {
             grid.children = [thead, tbody];
         }
@@ -387,14 +385,39 @@ class UIGrid extends nodom.DefineElement {
         if (df.pageSize) {
             this.pageSize = df.pageSize;
         }
+        let reqName = df.requestName;
+        console.log(df.onChange);
         //如果已经有change事件了，则不再设置
         if (!df.onChange) {
+            
             //增加onchange事件
             df.onChange = (module, pageNo, pageSize) => {
-                me.currentPage = pageNo;
-                me.pageSize = pageSize;
-                //渲染模块
-                nodom.Renderer.add(module);
+                
+                //无请求
+                if (reqName.length === 0) {
+                    me.currentPage = pageNo;
+                    me.pageSize = pageSize;
+                    //渲染模块
+                    nodom.Renderer.add(module);
+                }
+                else {
+                    let params = [];
+                    params[reqName[0]] = pageNo;
+                    params[reqName[1]] = pageSize;
+                    console.log(params);
+                    request({
+                        url: module.dataUrl,
+                        params: params,
+                        type: 'json',
+                        success: function (r) {
+                            console.log(r);
+                            if (r[df.totalName]) {
+                                module.model.set(df.totalName, r[df.totalName]);
+                            }
+                            module.model.set(me.dataName, r[me.dataName]);
+                        }
+                    });
+                }
             };
         }
     }

@@ -24,7 +24,7 @@ class UIPagination extends nodom.DefineElement {
         nodom.Compiler.handleAttributes(rootDom, el);
         nodom.Compiler.handleChildren(rootDom, el);
         rootDom.tagName = 'div';
-        UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange'], ['total', 10, 1, null, null, 10, [], 5, '']);
+        UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName'], ['total', 10, 1, null, null, 10, [], 5, '', []]);
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
         this.pageDataName = '$ui_pagination_' + nodom.Util.genId();

@@ -924,9 +924,6 @@ var nodom;
                     }
                     if (params.changeProps) {
                         params.changeProps.forEach((p) => {
-                            if(p.v === undefined){
-                                return;
-                            }
                             el.setAttribute(p.k, p.v);
                         });
                     }
@@ -1097,10 +1094,6 @@ var nodom;
                 return;
             }
             for (let key of this.assets.keys()) {
-                let v = this.assets.get(key);
-                if(v === undefined){
-                    continue;
-                }
                 el[key] = this.assets.get(key);
             }
         }
@@ -1833,7 +1826,7 @@ var nodom;
                     const async = config.async === false ? false : true;
                     const req = new XMLHttpRequest();
                     req.withCredentials = config.withCredentials;
-                    const reqType = config.reqType || 'GET';
+                    const method = config.method || 'GET';
                     req.timeout = async ? config.timeout : 0;
                     req.onload = () => {
                         if (req.status === 200) {
@@ -1854,7 +1847,8 @@ var nodom;
                     };
                     req.ontimeout = () => reject({ type: 'timeout' });
                     req.onerror = () => reject({ type: 'error', url: url });
-                    switch (reqType) {
+                    let data = null;
+                    switch (method) {
                         case 'GET':
                             let pa;
                             if (nodom.Util.isObject(config.params)) {
@@ -1872,18 +1866,23 @@ var nodom;
                                     url += '?' + pa;
                                 }
                             }
-                            req.open(reqType, url, async, config.user, config.pwd);
-                            req.send(null);
                             break;
                         case 'POST':
                             let fd = new FormData();
                             for (let o in config.params) {
                                 fd.append(o, config.params[o]);
                             }
-                            req.open(reqType, url, async, config.user, config.pwd);
-                            req.send(fd);
+                            req.open(method, url, async, config.user, config.pwd);
+                            data = fd;
                             break;
                     }
+                    req.open(method, url, async, config.user, config.pwd);
+                    if (config.header) {
+                        nodom.Util.getOwnProps(config.header).forEach((item) => {
+                            req.setRequestHeader(item, config.header[item]);
+                        });
+                    }
+                    req.send(data);
                 }).catch((re) => {
                     switch (re.type) {
                         case "error":

@@ -54,7 +54,7 @@ class UIAccordion extends nodom.DefineElement{
             }
             if(item.hasProp('first')){
                 //添加repeat指令
-                firstDom.addDirective(new nodom.Directive('repeat',item.getProp('data'),firstDom));
+                firstDom.addDirective(new nodom.Directive('repeat',item.getProp('data')));
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
