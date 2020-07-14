@@ -23,12 +23,12 @@ class UIListTransfer extends nodom.DefineElement {
         // 列表节点
         let itemDom = new nodom.Element('div');
         itemDom.addClass('nd-listtransfer-item');
-        itemDom.addDirective(new nodom.Directive('repeat', this.listName, itemDom, "select:value:{" + this.selectedName + ":false}"));
+        itemDom.addDirective(new nodom.Directive('repeat', this.listName, "select:value:{" + this.selectedName + ":false}"));
         listDom.add(itemDom);
         //复选框
         let icon = new nodom.Element('b');
         icon.addClass('nd-listtransfer-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}", icon));
+        icon.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}"));
         itemDom.add(icon);
         //显示文本
         for (let f of this.displayName) {

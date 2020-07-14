@@ -79,7 +79,7 @@ class UISelect extends nodom.DefineElement{
         //下拉框
         let listDom:nodom.Element = new nodom.Element('div');
         listDom.addClass('nd-select-list');
-        listDom.addDirective(new nodom.Directive('show',me.switchName,listDom));    
+        listDom.addDirective(new nodom.Directive('show',me.switchName));    
 
         //显示框
         let firstDom:nodom.Element = new nodom.Element('div');
@@ -114,7 +114,7 @@ class UISelect extends nodom.DefineElement{
             }
             let icon:nodom.Element = new nodom.Element('b');
             icon.addClass('nd-uncheck');
-            icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.checkName + "'}",icon));    
+            icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.checkName + "'}"));    
             c.children.unshift(icon);
             //点击事件
             c.addEvent(new nodom.NodomEvent('click',

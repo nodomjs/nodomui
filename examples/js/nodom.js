@@ -58,9 +58,90 @@ var nodom;
         });
     }
     nodom.createDirective = createDirective;
-    function createPlugin(name, init, handler) {
+    function request(config) {
+        return new Promise((resolve, reject) => {
+            if (typeof config === 'string') {
+                config = {
+                    url: config
+                };
+            }
+            config.params = config.params || {};
+            if (config.rand) {
+                config.params.$rand = Math.random();
+            }
+            let url = config.url;
+            const async = config.async === false ? false : true;
+            const req = new XMLHttpRequest();
+            req.withCredentials = config.withCredentials;
+            const method = config.method || 'GET';
+            req.timeout = async ? config.timeout : 0;
+            req.onload = () => {
+                if (req.status === 200) {
+                    let r = req.responseText;
+                    if (config.type === 'json') {
+                        try {
+                            r = JSON.parse(r);
+                        }
+                        catch (e) {
+                            reject({ type: "jsonparse" });
+                        }
+                    }
+                    resolve(r);
+                }
+                else {
+                    reject({ type: 'error', url: url });
+                }
+            };
+            req.ontimeout = () => reject({ type: 'timeout' });
+            req.onerror = () => reject({ type: 'error', url: url });
+            let data = null;
+            switch (method) {
+                case 'GET':
+                    let pa;
+                    if (nodom.Util.isObject(config.params)) {
+                        let ar = [];
+                        nodom.Util.getOwnProps(config.params).forEach(function (key) {
+                            ar.push(key + '=' + config.params[key]);
+                        });
+                        pa = ar.join('&');
+                    }
+                    if (pa !== undefined) {
+                        if (url.indexOf('?') !== -1) {
+                            url += '&' + pa;
+                        }
+                        else {
+                            url += '?' + pa;
+                        }
+                    }
+                    break;
+                case 'POST':
+                    let fd = new FormData();
+                    for (let o in config.params) {
+                        fd.append(o, config.params[o]);
+                    }
+                    req.open(method, url, async, config.user, config.pwd);
+                    data = fd;
+                    break;
+            }
+            req.open(method, url, async, config.user, config.pwd);
+            if (config.header) {
+                nodom.Util.getOwnProps(config.header).forEach((item) => {
+                    req.setRequestHeader(item, config.header[item]);
+                });
+            }
+            req.send(data);
+        }).catch((re) => {
+            switch (re.type) {
+                case "error":
+                    throw new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url);
+                case "timeout":
+                    throw new nodom.NodomError("timeout");
+                case "jsonparse":
+                    throw new nodom.NodomError("jsonparse");
+            }
+        });
     }
-    nodom.createPlugin = createPlugin;
+    nodom.request = request;
 })(nodom || (nodom = {}));
 var nodom;
 (function (nodom) {
@@ -634,7 +715,7 @@ var nodom;
                 let attr = el.attributes[i];
                 let v = attr.value.trim();
                 if (attr.name.startsWith('x-')) {
-                    oe.addDirective(new nodom.Directive(attr.name.substr(2), v, oe), true);
+                    oe.addDirective(new nodom.Directive(attr.name.substr(2), v), true);
                 }
                 else if (attr.name.startsWith('e-')) {
                     let en = attr.name.substr(2);
@@ -692,7 +773,7 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Directive {
-        constructor(type, value, vdom, filters) {
+        constructor(type, value, filters) {
             this.id = nodom.Util.genId();
             this.type = type;
             if (nodom.Util.isString(value)) {
@@ -719,15 +800,14 @@ var nodom;
                 }
             }
             if (type !== undefined) {
-                nodom.DirectiveManager.init(this, vdom);
+                nodom.DirectiveManager.init(this);
             }
         }
-        exec(value) {
-            let args = [this.module, this.type, value];
-            return nodom.Util.apply(nodom.DirectiveManager.exec, nodom.DirectiveManager, args);
+        exec(module, dom, parent) {
+            return nodom.DirectiveManager.exec(this, dom, module, parent);
         }
-        clone(vdom) {
-            let dir = new Directive(this.type, this.value, vdom);
+        clone() {
+            let dir = new Directive(this.type, this.value);
             if (this.filters) {
                 dir.filters = [];
                 for (let f of this.filters) {
@@ -774,10 +854,10 @@ var nodom;
             static hasType(name) {
                 return this.directiveTypes.has(name);
             }
-            static init(directive, dom) {
+            static init(directive) {
                 let dt = this.directiveTypes.get(directive.type);
                 if (dt) {
-                    return dt.init(directive, dom);
+                    return dt.init(directive);
                 }
             }
             static exec(directive, dom, module, parent) {
@@ -822,6 +902,7 @@ var nodom;
                 return;
             }
             if (parent) {
+                this.parent = parent;
                 this.parentKey = parent.key;
                 if (!this.modelId) {
                     this.modelId = parent.modelId;
@@ -862,12 +943,14 @@ var nodom;
             if (this.defineElement) {
                 nodom.DefineElementManager.afterRender(module, this);
             }
+            delete this.parent;
         }
         renderToHtml(module, params) {
             let el;
             let el1;
             let type = params.type;
             let parent = params.parent;
+            this.dontRender = false;
             if (!parent) {
                 el = module.container;
             }
@@ -924,7 +1007,7 @@ var nodom;
                     }
                     if (params.changeProps) {
                         params.changeProps.forEach((p) => {
-                            el.setAttribute(p.k, p.v);
+                            el.setAttribute(p['k'], p['v']);
                         });
                     }
                     break;
@@ -992,16 +1075,13 @@ var nodom;
             let dst = new Element();
             if (changeKey) {
                 dst.key = nodom.Util.genId() + '';
-                let notCopyProps = ['parent', 'directives', 'children'];
+                let notCopyProps = ['parent', 'children'];
                 nodom.Util.getOwnProps(this).forEach((p) => {
                     if (notCopyProps.includes(p)) {
                         return;
                     }
                     dst[p] = nodom.Util.clone(this[p], null, changeKey);
                 });
-                for (let d of this.directives) {
-                    dst.directives.push(d.clone(dst));
-                }
             }
             else {
                 let notCopyProps = ['parent', 'directives', 'props', 'exprProps', 'events', 'children'];
@@ -1047,7 +1127,7 @@ var nodom;
                 if (this.dontRender) {
                     return;
                 }
-                nodom.DirectiveManager.exec(d, this, module, parent);
+                d.exec(module, this, this.parent);
             }
         }
         handleExpression(exprArr, module) {
@@ -1151,7 +1231,7 @@ var nodom;
             return this.directives.find(item => item.type === directiveType);
         }
         add(dom) {
-            dom.parent = this;
+            dom.parentKey = this.key;
             this.children.push(dom);
         }
         remove(module, delHtml) {
@@ -1460,12 +1540,15 @@ var nodom;
 (function (nodom) {
     let Expression = (() => {
         class Expression {
-            constructor(exprStr) {
+            constructor(exprStr, execStr) {
                 this.replaceMap = new Map();
                 this.fields = [];
                 this.id = nodom.Util.genId();
                 if (exprStr) {
                     this.execString = this.compile(exprStr);
+                }
+                else if (execStr) {
+                    this.execString = execStr;
                 }
                 if (this.execString) {
                     let v = this.fields.length > 0 ? ',' + this.fields.join(',') : '';
@@ -1635,7 +1718,7 @@ var nodom;
                 }
             }
             val(model) {
-                if (!model) {
+                if (!model || !model.data) {
                     return '';
                 }
                 let module = nodom.ModuleFactory.get(model.moduleName);
@@ -1795,147 +1878,128 @@ var nodom;
 })(nodom || (nodom = {}));
 var nodom;
 (function (nodom) {
-    class Linker {
-        static gen(type, config) {
-            let p;
-            switch (type) {
-                case 'ajax':
-                    p = this.ajax(config);
-                    break;
-                case 'getfiles':
-                    p = this.getfiles(config);
-                    break;
-                case 'dolist':
-                    if (config.params) {
-                        p = this.dolist(config.funcs, config.params);
+    let ResourceManager = (() => {
+        class ResourceManager {
+            static getResource(url, type) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let rObj;
+                    type = type || this.getType(url);
+                    if (this.resources.has(url)) {
+                        rObj = this.resources.get(url);
+                        if (['js', 'css'].includes(type)) {
+                            return;
+                        }
                     }
                     else {
-                        p = this.dolist(config.funcs);
+                        rObj = { type: type };
+                        rObj.content = yield nodom.request({ url: url });
                     }
+                    this.handleOne(url, rObj);
+                    this.resources.set(url, rObj);
+                    return rObj.content;
+                });
             }
-            return p;
-        }
-        static ajax(config) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return new Promise((resolve, reject) => {
-                    if (config.rand) {
-                        config.params = config.params || {};
-                        config.params.$rand = Math.random();
-                    }
-                    let url = config.url;
-                    const async = config.async === false ? false : true;
-                    const req = new XMLHttpRequest();
-                    req.withCredentials = config.withCredentials;
-                    const method = config.method || 'GET';
-                    req.timeout = async ? config.timeout : 0;
-                    req.onload = () => {
-                        if (req.status === 200) {
-                            let r = req.responseText;
-                            if (config.type === 'json') {
-                                try {
-                                    r = JSON.parse(r);
-                                }
-                                catch (e) {
-                                    reject({ type: "jsonparse" });
-                                }
+            static getResources(reqs) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let me = this;
+                    let re = this.preHandle(reqs);
+                    let urls = re[1];
+                    let types = re[2];
+                    let rObjs = [];
+                    return Promise.all(re[0]).then(arr => {
+                        for (let i = 0; i < arr.length; i++) {
+                            let rObj;
+                            if (typeof arr[i] === 'string') {
+                                rObj = {
+                                    type: types[i],
+                                    content: arr[i]
+                                };
+                                me.handleOne(urls[i], rObj);
+                                rObjs.push(rObj);
                             }
-                            resolve(r);
                         }
-                        else {
-                            reject({ type: 'error', url: url });
-                        }
-                    };
-                    req.ontimeout = () => reject({ type: 'timeout' });
-                    req.onerror = () => reject({ type: 'error', url: url });
-                    let data = null;
-                    switch (method) {
-                        case 'GET':
-                            let pa;
-                            if (nodom.Util.isObject(config.params)) {
-                                let ar = [];
-                                nodom.Util.getOwnProps(config.params).forEach(function (key) {
-                                    ar.push(key + '=' + config.params[key]);
-                                });
-                                pa = ar.join('&');
-                            }
-                            if (pa !== undefined) {
-                                if (url.indexOf('?') !== -1) {
-                                    url += '&' + pa;
-                                }
-                                else {
-                                    url += '?' + pa;
-                                }
-                            }
-                            break;
-                        case 'POST':
-                            let fd = new FormData();
-                            for (let o in config.params) {
-                                fd.append(o, config.params[o]);
-                            }
-                            req.open(method, url, async, config.user, config.pwd);
-                            data = fd;
-                            break;
-                    }
-                    req.open(method, url, async, config.user, config.pwd);
-                    if (config.header) {
-                        nodom.Util.getOwnProps(config.header).forEach((item) => {
-                            req.setRequestHeader(item, config.header[item]);
-                        });
-                    }
-                    req.send(data);
-                }).catch((re) => {
-                    switch (re.type) {
-                        case "error":
-                            throw new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url);
-                        case "timeout":
-                            throw new nodom.NodomError("timeout");
-                        case "jsonparse":
-                            throw new nodom.NodomError("jsonparse");
-                    }
-                });
-            });
-        }
-        static getfiles(urls) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let promises = [];
-                urls.forEach((url) => {
-                    promises.push(new Promise((resolve, reject) => {
-                        const req = new XMLHttpRequest();
-                        req.onload = () => resolve(req.responseText);
-                        req.onerror = () => reject(url);
-                        req.open("GET", url);
-                        req.send();
-                    }));
-                });
-                return Promise.all(promises).catch((text) => {
-                    throw new nodom.NodomError("notexist1", nodom.TipWords.resource, text);
-                });
-            });
-        }
-        static dolist(funcArr, paramArr) {
-            return foo(funcArr, 0, paramArr);
-            function foo(fa, i, pa) {
-                if (fa.length === 0) {
-                    return Promise.resolve();
-                }
-                else {
-                    return new Promise((resolve, reject) => {
-                        if (nodom.Util.isArray(pa)) {
-                            fa[i](resolve, reject, pa[i]);
-                        }
-                        else {
-                            fa[i](resolve, reject);
-                        }
-                    }).then(() => {
-                        if (i < fa.length - 1) {
-                            return foo(fa, i + 1, pa);
-                        }
+                        return rObjs;
                     });
+                });
+            }
+            static getType(url) {
+                let ind = -1;
+                let type;
+                if ((ind = url.lastIndexOf('.')) !== -1) {
+                    type = url.substr(ind + 1);
+                    if (type === 'htm' || type === 'html') {
+                        type = 'template';
+                    }
+                }
+                return type || 'js';
+            }
+            static handleOne(url, rObj) {
+                switch (rObj.type) {
+                    case 'js':
+                        let head = document.querySelector('head');
+                        let script = nodom.Util.newEl('script');
+                        script.innerHTML = rObj.content;
+                        head.appendChild(script);
+                        head.removeChild(script);
+                        delete rObj.content;
+                        break;
+                    case 'template':
+                        rObj.content = nodom.Compiler.compile(rObj.content);
+                        break;
+                    case 'nd':
+                        rObj.content = nodom.Serializer.deserialize(rObj.content);
+                        break;
+                    case 'data':
+                        try {
+                            rObj.content = JSON.parse(rObj.content);
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                }
+                this.resources.set(url, rObj);
+            }
+            static preHandle(reqs) {
+                let promises = [];
+                let types = [];
+                let urls = [];
+                let head = document.querySelector('head');
+                for (let r of reqs) {
+                    let url;
+                    let type;
+                    if (typeof r === 'object') {
+                        url = r.url;
+                        type = r.type || this.getType(url);
+                    }
+                    else {
+                        url = r;
+                        type = this.getType(url);
+                    }
+                    urls.push(url);
+                    types.push(type);
+                    if (type === 'css') {
+                        let css = nodom.Util.newEl('link');
+                        css.type = 'text/css';
+                        css.rel = 'stylesheet';
+                        css.href = url;
+                        head.appendChild(css);
+                    }
+                    else {
+                        if (this.resources.has(url)) {
+                            promises.push(this.resources.get(url));
+                        }
+                        else {
+                            promises.push(nodom.request(url));
+                        }
+                    }
+                    return [promises, urls, types];
                 }
             }
         }
-    }
-    nodom.Linker = Linker;
+        ResourceManager.resources = new Map();
+        return ResourceManager;
+    })();
+    nodom.ResourceManager = ResourceManager;
 })(nodom || (nodom = {}));
 var nodom;
 (function (nodom) {
@@ -1989,7 +2053,6 @@ var nodom;
     class Model {
         constructor(data, module) {
             this.fields = {};
-            this.data = data;
             this.fields = {};
             this.id = nodom.Util.genId();
             if (module) {
@@ -1998,8 +2061,12 @@ var nodom;
                     module.modelFactory.add(this.id, this);
                 }
             }
+            if (!data || !nodom.Util.isObject(data) && !nodom.Util.isArray(data)) {
+                data = {};
+            }
             data['$modelId'] = this.id;
             this.addSetterGetter(data);
+            this.data = data;
         }
         set(key, value) {
             let fn, data;
@@ -2280,42 +2347,21 @@ var nodom;
         init() {
             return __awaiter(this, void 0, void 0, function* () {
                 let config = this.initConfig;
-                let typeArr = [];
                 let urlArr = [];
                 let appPath = nodom.Application.templatePath || '';
-                if (nodom.Util.isArray(config.requires) && config.requires.length > 0) {
-                    const head = document.head;
+                if (config && nodom.Util.isArray(config.requires) && config.requires.length > 0) {
                     config.requires.forEach((item) => {
                         let type;
                         let url = '';
                         if (nodom.Util.isObject(item)) {
                             type = item['type'] || 'js';
-                            url += item['url'];
+                            url = item['url'];
                         }
                         else {
                             type = 'js';
-                            url += item;
+                            url = item;
                         }
-                        if (type === 'css') {
-                            let css = nodom.Util.get("link[href='" + url + "']");
-                            if (css !== null) {
-                                return;
-                            }
-                            css = nodom.Util.newEl('link');
-                            css.type = 'text/css';
-                            css.rel = 'stylesheet';
-                            css.href = url;
-                            head.appendChild(css);
-                            return;
-                        }
-                        else if (type === 'js') {
-                            let cs = nodom.Util.get("script[dsrc='" + url + "']");
-                            if (cs !== null) {
-                                return;
-                            }
-                        }
-                        typeArr.push(type);
-                        urlArr.push(url);
+                        urlArr.push({ url: appPath + url, type: type });
                     });
                 }
                 let templateStr = this.template;
@@ -2325,13 +2371,10 @@ var nodom;
                         templateStr = config.template;
                     }
                     else {
-                        if (config.template.endsWith('.nd')) {
-                            typeArr.push('compiled');
-                        }
-                        else {
-                            typeArr.push('template');
-                        }
-                        urlArr.push(appPath + config.template);
+                        urlArr.push({
+                            url: appPath + config.template,
+                            type: config.template.endsWith('.nd') ? 'nd' : 'template'
+                        });
                     }
                 }
                 if (!nodom.Util.isEmpty(templateStr)) {
@@ -2342,35 +2385,23 @@ var nodom;
                         this.model = new nodom.Model(config.data, this);
                     }
                     else {
-                        typeArr.push('data');
-                        urlArr.push(config['data']);
+                        urlArr.push({
+                            url: config.data,
+                            type: 'data'
+                        });
                         this.dataUrl = config.data;
                     }
                 }
-                if (typeArr.length > 0) {
-                    let files = yield nodom.Linker.gen('getfiles', urlArr);
-                    let head = document.querySelector('head');
-                    files.forEach((file, ind) => {
-                        switch (typeArr[ind]) {
-                            case 'js':
-                                let script = nodom.Util.newEl('script');
-                                script.innerHTML = file;
-                                head.appendChild(script);
-                                script.setAttribute('dsrc', urlArr[ind]);
-                                script.innerHTML = '';
-                                head.removeChild(script);
-                                break;
-                            case 'template':
-                                this.virtualDom = nodom.Compiler.compile(file.trim());
-                                break;
-                            case 'compiled':
-                                let arr = nodom.Serializer.deserialize(file, this);
-                                this.virtualDom = arr[0];
-                                break;
-                            case 'data':
-                                this.model = new nodom.Model(JSON.parse(file), this);
+                if (urlArr.length > 0) {
+                    let rets = yield nodom.ResourceManager.getResources(urlArr);
+                    for (let r of rets) {
+                        if (r.type === 'template' || r.type === 'nd') {
+                            this.virtualDom = r.content;
                         }
-                    });
+                        else if (r.type === 'data') {
+                            this.model = new nodom.Model(r.content, this);
+                        }
+                    }
                 }
                 changeState(this);
                 if (nodom.Util.isArray(this.initConfig.modules)) {
@@ -2400,12 +2431,14 @@ var nodom;
             let root = this.virtualDom.clone();
             if (this.firstRender) {
                 if (this.loadNewData && this.dataUrl) {
-                    nodom.Linker.gen('ajax', {
+                    nodom.request({
                         url: this.dataUrl,
                         type: 'json'
                     }).then((r) => {
                         this.model = new nodom.Model(r, this);
                         this.doFirstRender(root);
+                    }).catch((e) => {
+                        console.log(e);
                     });
                     this.loadNewData = false;
                 }
@@ -3551,20 +3584,9 @@ var nodom;
 (function (nodom) {
     class Serializer {
         static serialize(module) {
-            let props = ['virtualDom', 'expressionFactory'];
-            let jsonStr = '[';
-            props.forEach((p, i) => {
-                addClsName(module[p]);
-                let s = JSON.stringify(module[p]);
-                jsonStr += s;
-                if (i < props.length - 1) {
-                    jsonStr += ',';
-                }
-                else {
-                    jsonStr += ']';
-                }
-            });
-            return jsonStr;
+            let dom = module.virtualDom;
+            addClsName(dom);
+            return JSON.stringify(dom);
             function addClsName(obj) {
                 if (typeof obj !== 'object') {
                     return;
@@ -3592,20 +3614,12 @@ var nodom;
                 });
             }
         }
-        static deserialize(jsonStr, module) {
-            let jsonArr = JSON.parse(jsonStr);
-            let arr = [];
-            let vdom;
-            jsonArr.forEach((item) => {
-                arr.push(handleCls(item));
-            });
-            return arr;
+        static deserialize(jsonStr) {
+            let jObj = JSON.parse(jsonStr);
+            return handleCls(jObj);
             function handleCls(jsonObj) {
                 if (!nodom.Util.isObject(jsonObj)) {
                     return jsonObj;
-                }
-                if (jsonObj.moduleName) {
-                    jsonObj.moduleName = module.name;
                 }
                 let retObj;
                 if (jsonObj.hasOwnProperty('className')) {
@@ -3613,16 +3627,20 @@ var nodom;
                     let param = [];
                     switch (cls) {
                         case 'Directive':
-                            param = [jsonObj['type'], jsonObj['value'], vdom, module];
+                            param = [jsonObj['type']];
                             break;
-                        case 'Event':
+                        case 'Expression':
+                            param = [jsonObj['execString']];
+                            break;
+                        case 'Element':
+                            param = [];
+                            break;
+                        case 'NodomEvent':
                             param = [jsonObj['name']];
                             break;
                     }
                     let clazz = eval(cls);
-                    if (cls === 'Element') {
-                        vdom = retObj;
-                    }
+                    retObj = Reflect.construct(clazz, param);
                 }
                 else {
                     retObj = {};
@@ -3661,7 +3679,7 @@ var nodom;
 (function (nodom) {
     nodom.DirectiveManager.addType('model', {
         prio: 1,
-        init: (directive, dom) => {
+        init: (directive) => {
             let value = directive.value;
             if (nodom.Util.isString(value)) {
                 if (value.startsWith('$$')) {
@@ -3692,9 +3710,12 @@ var nodom;
             }
             else if (dom.modelId) {
                 let model = module.modelFactory.get(dom.modelId);
-                if (model) {
+                if (model && model.data) {
                     data = model.data;
                 }
+            }
+            if (!data) {
+                return;
             }
             for (let i = startIndex; i < directive.value.length; i++) {
                 let item = directive.value[i];
@@ -3716,12 +3737,11 @@ var nodom;
     });
     nodom.DirectiveManager.addType('repeat', {
         prio: 2,
-        init: (directive, dom) => {
+        init: (directive) => {
             let value = directive.value;
             if (!value) {
                 throw new nodom.NodomError("paramException", "x-repeat");
             }
-            let ind;
             let modelName;
             let fa = value.split('|');
             modelName = fa[0];
@@ -3731,16 +3751,17 @@ var nodom;
                     directive.filters.push(new nodom.Filter(fa[i]));
                 }
             }
-            if (!dom.hasDirective('model')) {
-                dom.addDirective(new nodom.Directive('model', modelName, dom), true);
-            }
             if (modelName.startsWith('$$')) {
                 modelName = modelName.substr(2);
             }
             directive.value = modelName;
         },
         handle: (directive, dom, module, parent) => {
-            let rows = module.modelFactory.get(dom.modelId).data;
+            let model = module.modelFactory.get(dom.modelId);
+            if (!model || !model.data) {
+                return;
+            }
+            let rows = model.query(directive.value);
             if (rows === undefined || rows.length === 0) {
                 dom.dontRender = true;
                 return;
@@ -3752,7 +3773,7 @@ var nodom;
             }
             let chds = [];
             let key = dom.key;
-            dom.removeDirectives(['model', 'repeat']);
+            dom.removeDirectives(['repeat']);
             for (let i = 0; i < rows.length; i++) {
                 let node = dom.clone();
                 node.modelId = rows[i].$modelId;
@@ -3779,7 +3800,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('if', {
-        init: (directive, dom) => {
+        init: (directive) => {
             if (typeof directive.value === 'string') {
                 let value = directive.value;
                 if (!value) {
@@ -3823,7 +3844,7 @@ var nodom;
     });
     nodom.DirectiveManager.addType('else', {
         name: 'else',
-        init: (directive, dom) => {
+        init: (directive) => {
             return;
         },
         handle: (directive, dom, module, parent) => {
@@ -3831,7 +3852,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('show', {
-        init: (directive, dom) => {
+        init: (directive) => {
             if (typeof directive.value === 'string') {
                 let value = directive.value;
                 if (!value) {
@@ -3853,7 +3874,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('class', {
-        init: (directive, dom) => {
+        init: (directive) => {
             if (typeof directive.value === 'string') {
                 let obj = eval('(' + directive.value + ')');
                 if (!nodom.Util.isObject(obj)) {
@@ -3898,44 +3919,50 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('field', {
-        init: (directive, dom) => {
-            dom.setProp('name', directive.value);
-            let eventName = dom.getProp('tagName') === 'input' && ['text', 'checkbox', 'radio'].includes(dom.getProp('type')) ? 'input' : 'change';
-            dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
-                if (!el) {
-                    return;
-                }
-                let type = dom.getProp('type');
-                let field = dom.getDirective('field').value;
-                let v = el.value;
-                if (['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
-                    || dom.tagName === 'TEXTAREA') {
-                    dom.setProp('value', new nodom.Expression(field), true);
-                }
-                if (type === 'checkbox') {
-                    if (dom.getProp('yes-value') == v) {
-                        v = dom.getProp('no-value');
-                    }
-                    else {
-                        v = dom.getProp('yes-value');
-                    }
-                }
-                else if (type === 'radio') {
-                    if (!el.checked) {
-                        v = undefined;
-                    }
-                }
-                model.data[field] = v;
-                if (type !== 'radio') {
-                    dom.setProp('value', v);
-                    el.value = v;
-                }
-            }));
+        init: (directive) => {
         },
         handle: (directive, dom, module, parent) => {
+            if (!directive.extra) {
+                directive.extra = 1;
+                dom.setProp('name', directive.value);
+                let eventName = dom.getProp('tagName') === 'input' && ['text', 'checkbox', 'radio'].includes(dom.getProp('type')) ? 'input' : 'change';
+                dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
+                    if (!el) {
+                        return;
+                    }
+                    let type = dom.getProp('type');
+                    let field = dom.getDirective('field').value;
+                    let v = el.value;
+                    if (['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
+                        || dom.tagName === 'TEXTAREA') {
+                        dom.setProp('value', new nodom.Expression(field), true);
+                    }
+                    if (type === 'checkbox') {
+                        if (dom.getProp('yes-value') == v) {
+                            v = dom.getProp('no-value');
+                        }
+                        else {
+                            v = dom.getProp('yes-value');
+                        }
+                    }
+                    else if (type === 'radio') {
+                        if (!el.checked) {
+                            v = undefined;
+                        }
+                    }
+                    model.set(field, v);
+                    if (type !== 'radio') {
+                        dom.setProp('value', v);
+                        el.value = v;
+                    }
+                }));
+            }
             const type = dom.getProp('type');
             const tgname = dom.tagName.toLowerCase();
             const model = module.modelFactory.get(dom.modelId);
+            if (!model.data) {
+                return;
+            }
             const dataValue = model.data[directive.value];
             let value = dom.getProp('value');
             if (type === 'radio') {
@@ -3974,7 +4001,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('validity', {
-        init: (directive, dom) => {
+        init: (directive) => {
             let ind, fn, method;
             let value = directive.value;
             if ((ind = value.indexOf('|')) !== -1) {
@@ -3984,6 +4011,7 @@ var nodom;
             else {
                 fn = value;
             }
+            directive.extra = { initChild: false, initEvent: false };
             directive.value = fn;
             directive.params = {
                 enabled: false
@@ -3991,28 +4019,29 @@ var nodom;
             if (method) {
                 directive.params.method = method;
             }
-            setTimeout(() => {
+        },
+        handle: (directive, dom, module, parent) => {
+            if (!directive.extra.initChild) {
+                directive.extra.initChild = true;
                 if (dom.children.length === 0) {
                     let vd1 = new nodom.Element();
-                    vd1.textContent = '   ';
-                    dom.children.push(vd1);
+                    vd1.textContent = '';
+                    dom.add(vd1);
                 }
                 else {
                     dom.children.forEach((item) => {
                         if (item.children.length === 0) {
                             let vd1 = new nodom.Element();
                             vd1.textContent = '   ';
-                            item.children.push(vd1);
+                            item.add(vd1);
                         }
                     });
                 }
-            }, 0);
-        },
-        handle: (directive, dom, module, parent) => {
+            }
             setTimeout(() => {
                 const el = module.container.querySelector("[name='" + directive.value + "']");
-                if (!directive.extra) {
-                    directive.extra = true;
+                if (!directive.extra.initEvent) {
+                    directive.extra.initEvent = true;
                     el.addEventListener('focus', function () {
                         setTimeout(() => { directive.params.enabled = true; }, 0);
                     });

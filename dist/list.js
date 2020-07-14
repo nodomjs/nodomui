@@ -25,7 +25,7 @@ class UIList extends nodom.DefineElement {
         // 列表节点
         let itemDom = new nodom.Element('div');
         itemDom.addClass('nd-list-item');
-        itemDom.addDirective(new nodom.Directive('repeat', this.listName, itemDom));
+        itemDom.addDirective(new nodom.Directive('repeat', this.listName));
         for (let i = 0; i < this.displayName.length; i++) {
             let f = this.displayName[i];
             let subCt = new nodom.Element('div');

@@ -83,13 +83,13 @@ class UIMenu extends nodom.DefineElement {
                 }
             }));
             //增加显示指令
-            parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
+            parentCt.addDirective(new nodom.Directive('show', this.activeName));
         }
         //初始化各级
         for (let i = 0; i < this.maxLevels; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
-            itemCt.directives.push(new nodom.Directive('repeat', this.listName, itemCt));
+            itemCt.directives.push(new nodom.Directive('repeat', this.listName));
             itemCt.addClass('nd-menu-nodect');
             let item = menuNode.clone(true);
             itemCt.add(item);
@@ -98,7 +98,7 @@ class UIMenu extends nodom.DefineElement {
             //子菜单箭头图标
             if (this.popupMenu || i > 0) {
                 let icon1 = new nodom.Element('b');
-                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}", icon1));
+                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}"));
                 item.add(icon1);
             }
             //初始化菜单打开关闭
@@ -115,7 +115,7 @@ class UIMenu extends nodom.DefineElement {
                 pmodel.set(me.activeName, false);
             }));
             subCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
-            subCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
+            subCt.addDirective(new nodom.Directive('show', this.activeName));
             itemCt.add(subCt);
             parentCt = subCt;
         }

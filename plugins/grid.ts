@@ -502,18 +502,15 @@ class UIGrid extends nodom.DefineElement{
                     let params = [];
                     params[reqName[0]] = pageNo;
                     params[reqName[1]] = pageSize;
-                    console.log(params);
                     request({
                         url:module.dataUrl,
                         params:params,
-                        type:'json',
-                        success:function(r){
-                            console.log(r);
-                            if(r[df.totalName]){
-                                module.model.set(df.totalName,r[df.totalName]);
-                            }
-                            module.model.set(me.dataName,r[me.dataName]);
+                        type:'json'
+                    }).then(r=>{
+                        if(r[df.totalName]){
+                            module.model.set(df.totalName,r[df.totalName]);
                         }
+                        module.model.set(me.dataName,r[me.dataName]);
                     });
                 }
             }

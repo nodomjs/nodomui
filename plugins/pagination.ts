@@ -190,8 +190,8 @@ class UIPagination extends nodom.DefineElement{
         //页面数字
         let page:nodom.Element = new nodom.Element('span');
         page.addClass('nd-pagination-page');
-        page.addDirective(new nodom.Directive('repeat',this.pageDataName,page));
-        page.addDirective(new nodom.Directive('class',"{'nd-pagination-active':'active'}",page),true);
+        page.addDirective(new nodom.Directive('repeat',this.pageDataName));
+        page.addDirective(new nodom.Directive('class',"{'nd-pagination-active':'active'}"),true);
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('no')];
         page.add(txt);
@@ -296,109 +296,109 @@ class UIPagination extends nodom.DefineElement{
         }else{
             total = this.total;
         }
-        
-        if(!total){
-            return;
-        }
         //表示是步数
         if(isStep){
             current = this.currentPage + current;
         }
-
-        //页面大小
-        let pageSize:number = data[this.pageSizeName];
-        if(typeof pageSize === 'string'){
-            pageSize = parseInt(pageSize);
-        }
-
-        //设置pagesize，切换到第一页
-        if(!current){
-            let d = model.query(this.currentName);
-            if(typeof d === 'string' && d!==''){
-                //转换为数值
-                d = parseInt(d);
+        if(total>0){
+            //页面大小
+            let pageSize:number = data[this.pageSizeName];
+            if(typeof pageSize === 'string'){
+                pageSize = parseInt(pageSize);
             }
-            current = d||1;
-        }
-        
-        //页面
-        if(this.initFlag && this.pageSize === pageSize && (!current || this.currentPage === current)){
-            return;
-        }
-        
-        //页面数
-        let pageCount:number = Math.ceil(total/pageSize);
-        
-        //限定current在页面范围内
-        if(current > pageCount){
-            current = pageCount;
-        }else if(current < 1){
-            current = 1;
-        }
-        
-        
-        let min:number=1;
-        let max:number;
-        let btnAllow:number = 0;
-        //页面数>显示数
-        if(pageCount>this.showNum){
-            //中心的位置
-            let center:number = (this.showNum+1)/2 | 0;
-            if(current - center + 1 > 0){
-                min = current  - center  + 1;
+
+            //设置pagesize，切换到第一页
+            if(!current){
+                let d = model.query(this.currentName);
+                if(typeof d === 'string' && d!==''){
+                    //转换为数值
+                    d = parseInt(d);
+                }
+                current = d||1;
             }
-            if(min < 1){
+            
+            //页面
+            if(this.initFlag && this.pageSize === pageSize && (!current || this.currentPage === current)){
+                return;
+            }
+            
+            //页面数
+            let pageCount:number = Math.ceil(total/pageSize);
+            
+            //限定current在页面范围内
+            if(current > pageCount){
+                current = pageCount;
+            }else if(current < 1){
+                current = 1;
+            }
+            
+            
+            let min:number=1;
+            let max:number;
+            let btnAllow:number = 0;
+            //页面数>显示数
+            if(pageCount>this.showNum){
+                //中心的位置
+                let center:number = (this.showNum+1)/2 | 0;
+                if(current - center + 1 > 0){
+                    min = current  - center  + 1;
+                }
+                if(min < 1){
+                    min = 1;
+                }else if (min + this.showNum - 1 > pageCount) {
+                    min = pageCount - this.showNum + 1;
+                }
+                
+                max = min + this.showNum - 1;
+                
+                if(min === 1){
+                    btnAllow += 1;
+                }
+                if(max === pageCount){
+                    btnAllow += 8;
+                }    
+                
+            }else{
                 min = 1;
-            }else if (min + this.showNum - 1 > pageCount) {
-                min = pageCount - this.showNum + 1;
+                max = pageCount;
+                btnAllow = 9;
+            }
+
+            if(current === pageCount){
+                btnAllow += 4;
+            }else if(current === 1){
+                btnAllow += 2;
             }
             
-            max = min + this.showNum - 1;
-            
-            if(min === 1){
-                btnAllow += 1;
+
+            //参数未改变，则不渲染
+            if(this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage){
+                return;
             }
-            if(max === pageCount){
-                btnAllow += 8;
-            }    
             
-        }else{
-            min = 1;
-            max = pageCount;
-            btnAllow = 9;
-        }
+            //页面号数据数组
+            let pageArr = [];
+            for(let i=min;i<=max;i++){
+                let active:boolean = i===current?true:false;
+                pageArr.push({
+                    no:i,
+                    active:active
+                });
 
-        if(current === pageCount){
-            btnAllow += 4;
-        }else if(current === 1){
-            btnAllow += 2;
-        }
-        
+                this.total = total;
+            }
 
-        //参数未改变，则不渲染
-        if(this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage){
-            return;
+            
+            this.pageSize = pageSize;
+            this.currentPage = current;
+            this.minPage = min;
+            this.maxPage = max;
+            model.set(this.pageDataName,pageArr);
+            //设置当前页
+            model.set(this.currentName,current);
+            //设置箭头状态值
+            model.set(this.btnAllowName,btnAllow);    
         }
-        
-        //页面号数据数组
-        let pageArr = [];
-        for(let i=min;i<=max;i++){
-            let active:boolean = i===current?true:false;
-            pageArr.push({
-                no:i,
-                active:active
-            });
-        }
-        this.total = total;
-        this.pageSize = pageSize;
-        this.currentPage = current;
-        this.minPage = min;
-        this.maxPage = max;
-        //设置当前页
-        model.set(this.currentName,this.currentPage);
-        model.set(this.pageDataName,pageArr);
-        //设置箭头状态值
-        model.set(this.btnAllowName,btnAllow);
         
         //onchange 事件执行
         if(this.onChange && this.onChange !== ''){
@@ -408,6 +408,7 @@ class UIPagination extends nodom.DefineElement{
             }else if(nodom.Util.isFunction(this.onChange)){
                 foo = this.onChange;
             }
+            console.log(this.currentPage,this.pageSize);
             if(foo){
                 foo.apply(this,[module,this.currentPage,this.pageSize]);
             }

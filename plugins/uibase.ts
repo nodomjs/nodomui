@@ -185,14 +185,5 @@ class UIEventRegister{
  *                  failuer             失败回调
  */
 function request(cfg){
-    nodom.Linker.gen('ajax',cfg
-    ).then((r) => {
-        if(cfg.success && typeof cfg.success === 'function'){
-            cfg.success(r);
-        }
-    }).catch((r)=>{
-        if(cfg.failure && typeof cfg.failure === 'function'){
-            cfg.failure(r);
-        }    
-    });
+    return nodom.request(cfg);
 }

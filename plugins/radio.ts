@@ -16,7 +16,7 @@ class UIRadio extends nodom.DefineElement{
             if(c.tagName){
                 let icon:nodom.Element = new nodom.Element('b');
                 icon.addClass('nd-icon-radio');
-                icon.addDirective(new nodom.Directive('class',"{'nd-icon-radio-active':'" + dataName + "==\""+ c.getProp('value') +"\"'}",icon));
+                icon.addDirective(new nodom.Directive('class',"{'nd-icon-radio-active':'" + dataName + "==\""+ c.getProp('value') +"\"'}"));
                 c.children.unshift(icon);
                 //点击事件
                 c.addEvent(new nodom.NodomEvent('click',

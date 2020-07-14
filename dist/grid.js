@@ -89,7 +89,7 @@ class UIGrid extends nodom.DefineElement {
                 filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
             }
             let directive;
-            directive = new nodom.Directive('repeat', this.dataName, rowDom);
+            directive = new nodom.Directive('repeat', this.dataName);
             if (filter) {
                 directive.filters = [filter];
             }
@@ -258,7 +258,7 @@ class UIGrid extends nodom.DefineElement {
         td.addClass('nd-grid-iconcol');
         b = new nodom.Element('b');
         b.addClass('nd-grid-sub-btn');
-        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", td));
+        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}"));
         b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
             model.set('$showSub', !model.data['$showSub']);
         }));
@@ -268,7 +268,7 @@ class UIGrid extends nodom.DefineElement {
         rowDom.add(subDom);
         //子panel处理
         //增加显示指令，$showSub作为新增数据项，用于控制显示
-        subDom.addDirective(new nodom.Directive('show', '$showSub', subDom));
+        subDom.addDirective(new nodom.Directive('show', '$showSub'));
         subDom.addClass('nd-grid-sub');
         //自动
         if (subDom.hasProp('auto')) {
@@ -386,13 +386,11 @@ class UIGrid extends nodom.DefineElement {
             this.pageSize = df.pageSize;
         }
         let reqName = df.requestName;
-        console.log(df.onChange);
         //如果已经有change事件了，则不再设置
         if (!df.onChange) {
-            
             //增加onchange事件
             df.onChange = (module, pageNo, pageSize) => {
-                
+                console.log(reqName);
                 //无请求
                 if (reqName.length === 0) {
                     me.currentPage = pageNo;
@@ -404,18 +402,15 @@ class UIGrid extends nodom.DefineElement {
                     let params = [];
                     params[reqName[0]] = pageNo;
                     params[reqName[1]] = pageSize;
-                    console.log(params);
                     request({
                         url: module.dataUrl,
                         params: params,
-                        type: 'json',
-                        success: function (r) {
-                            console.log(r);
-                            if (r[df.totalName]) {
-                                module.model.set(df.totalName, r[df.totalName]);
-                            }
-                            module.model.set(me.dataName, r[me.dataName]);
+                        type: 'json'
+                    }).then(r => {
+                        if (r[df.totalName]) {
+                            module.model.set(df.totalName, r[df.totalName]);
                         }
+                        module.model.set(me.dataName, r[me.dataName]);
                     });
                 }
             };

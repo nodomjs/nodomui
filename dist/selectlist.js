@@ -26,11 +26,11 @@ class UISelectList extends nodom.DefineElement {
         // 列表节点
         let itemDom = new nodom.Element('div');
         itemDom.addClass('nd-selectlist-item');
-        itemDom.addDirective(new nodom.Directive('repeat', this.listName, itemDom));
+        itemDom.addDirective(new nodom.Directive('repeat', this.listName));
         //复选框
         let icon = new nodom.Element('b');
         icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.checkName + "'}", icon));
+        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.checkName + "'}"));
         itemDom.add(icon);
         for (let i = 0; i < this.displayName.length; i++) {
             let f = this.displayName[i];

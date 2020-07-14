@@ -116,42 +116,39 @@ class UITool {
 /**
  * window事件注册器
  */
-let UIEventRegister = /** @class */ (() => {
-    class UIEventRegister {
-        static addEvent(eventName, moduleName, domKey, handler) {
-            if (!this.listeners.has(eventName)) {
-                this.listeners.set(eventName, []);
-                window.addEventListener(eventName, (e) => {
-                    let target = e.target;
-                    let key = target.getAttribute('key');
-                    let evts = this.listeners.get(eventName);
-                    for (let evt of evts) {
-                        let module = nodom.ModuleFactory.get(evt.module);
-                        let dom = module.renderTree.query(evt.dom);
-                        //事件target在dom内则为true，否则为false
-                        let inOrOut = dom.key === key || dom.query(key) ? true : false;
-                        if (typeof evt.handler === 'function') {
-                            evt.handler.apply(dom, [module, dom, inOrOut, e]);
-                        }
+class UIEventRegister {
+    static addEvent(eventName, moduleName, domKey, handler) {
+        if (!this.listeners.has(eventName)) {
+            this.listeners.set(eventName, []);
+            window.addEventListener(eventName, (e) => {
+                let target = e.target;
+                let key = target.getAttribute('key');
+                let evts = this.listeners.get(eventName);
+                for (let evt of evts) {
+                    let module = nodom.ModuleFactory.get(evt.module);
+                    let dom = module.renderTree.query(evt.dom);
+                    //事件target在dom内则为true，否则为false
+                    let inOrOut = dom.key === key || dom.query(key) ? true : false;
+                    if (typeof evt.handler === 'function') {
+                        evt.handler.apply(dom, [module, dom, inOrOut, e]);
                     }
-                }, false);
-            }
-            let arr = this.listeners.get(eventName);
-            //同一个元素不注册相同事件
-            let find = arr.find(item => item.dom === domKey);
-            if (find) {
-                return;
-            }
-            arr.push({
-                module: moduleName,
-                dom: domKey,
-                handler: handler
-            });
+                }
+            }, false);
         }
+        let arr = this.listeners.get(eventName);
+        //同一个元素不注册相同事件
+        let find = arr.find(item => item.dom === domKey);
+        if (find) {
+            return;
+        }
+        arr.push({
+            module: moduleName,
+            dom: domKey,
+            handler: handler
+        });
     }
-    UIEventRegister.listeners = new Map();
-    return UIEventRegister;
-})();
+}
+UIEventRegister.listeners = new Map();
 /**
  * http请求（用户可根据自己的情况改写该方法）
  * @param config 	url 				请求地址
@@ -167,14 +164,6 @@ let UIEventRegister = /** @class */ (() => {
  *                  failuer             失败回调
  */
 function request(cfg) {
-    nodom.Linker.gen('ajax', cfg).then((r) => {
-        if (cfg.success && typeof cfg.success === 'function') {
-            cfg.success(r);
-        }
-    }).catch((r) => {
-        if (cfg.failure && typeof cfg.failure === 'function') {
-            cfg.failure(r);
-        }
-    });
+    return nodom.request(cfg);
 }
 //# sourceMappingURL=uibase.js.map

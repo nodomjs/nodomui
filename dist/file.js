@@ -34,7 +34,7 @@ class UIFile extends nodom.DefineElement {
         //文件显示container
         let ctDom = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
-        ctDom.addDirective(new nodom.Directive('repeat', this.fieldName, ctDom));
+        ctDom.addDirective(new nodom.Directive('repeat', this.fieldName));
         //显示框
         let showDom = new nodom.Element('a');
         showDom.addClass('nd-file-content');
@@ -63,7 +63,7 @@ class UIFile extends nodom.DefineElement {
         let uploadDom = new nodom.Element('div');
         uploadDom.addClass('nd-file-uploadct');
         //当文件数量==maxcount时不再显示
-        uploadDom.addDirective(new nodom.Directive('show', this.fieldName + '.length<' + this.maxCount, uploadDom));
+        uploadDom.addDirective(new nodom.Directive('show', this.fieldName + '.length<' + this.maxCount));
         //文件
         let fDom = new nodom.Element('input');
         fDom.setProp('type', 'file');
@@ -96,12 +96,12 @@ class UIFile extends nodom.DefineElement {
         //上传(+号)
         let span1 = new nodom.Element('span');
         span1.addClass('nd-file-add');
-        span1.addDirective(new nodom.Directive('show', this.stateName + '==0', span1));
+        span1.addDirective(new nodom.Directive('show', this.stateName + '==0'));
         uploadingDom.add(span1);
         //上传中
         let span2 = new nodom.Element('span');
         span2.addClass('nd-file-progress');
-        span2.addDirective(new nodom.Directive('show', this.stateName + '==1', span2));
+        span2.addDirective(new nodom.Directive('show', this.stateName + '==1'));
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression(this.uploadingName || TipWords.uploading)];
         span2.add(txt);

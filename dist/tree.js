@@ -46,7 +46,7 @@ class UITree extends nodom.DefineElement {
         for (let i = 0; i < maxLevels; i++) {
             let itemCt = new nodom.Element();
             itemCt.tagName = 'div';
-            itemCt.directives.push(new nodom.Directive('repeat', dataName, itemCt));
+            itemCt.directives.push(new nodom.Directive('repeat', dataName));
             itemCt.addClass('nd-tree-nodect');
             item = new nodom.Element();
             item.addClass('nd-tree-node');
@@ -61,7 +61,7 @@ class UITree extends nodom.DefineElement {
             icon1.tagName = 'SPAN';
             icon1.addClass('nd-tree-icon');
             icon1.addDirective(new nodom.Directive('class', "{'nd-tree-node-open':'" + activeName + "'," +
-                "'nd-icon-right':'" + dataName + "&&" + dataName + ".length>0'}", icon1));
+                "'nd-icon-right':'" + dataName + "&&" + dataName + ".length>0'}"));
             //绑定展开收起事件
             icon1.addEvent(closeOpenEvent);
             itemCt.add(icon1);
@@ -77,13 +77,13 @@ class UITree extends nodom.DefineElement {
                 icon.tagName = 'SPAN';
                 icon.addClass('nd-tree-icon');
                 let cls = '{' + a.join(',') + '}';
-                icon.directives.push(new nodom.Directive('class', cls, item));
+                icon.directives.push(new nodom.Directive('class', cls));
                 itemCt.add(icon);
             }
             if (checkName) {
                 let cb = new nodom.Element('input');
                 cb.setProp('type', 'checkbox');
-                cb.addDirective(new nodom.Directive('field', checkName, cb));
+                cb.addDirective(new nodom.Directive('field', checkName));
                 cb.setProp('yes-value', 'true');
                 cb.setProp('no-value', 'false');
                 itemCt.add(cb);
@@ -100,7 +100,7 @@ class UITree extends nodom.DefineElement {
             let subCt = new nodom.Element();
             subCt.addClass('nd-tree-subct');
             subCt.tagName = 'DIV';
-            subCt.addDirective(new nodom.Directive('class', "{'nd-tree-show':'" + activeName + "'}", item));
+            subCt.addDirective(new nodom.Directive('class', "{'nd-tree-show':'" + activeName + "'}"));
             itemCt.add(subCt);
             parentCt.add(itemCt);
             parentCt = subCt;
