@@ -390,7 +390,6 @@ class UIGrid extends nodom.DefineElement {
         if (!df.onChange) {
             //增加onchange事件
             df.onChange = (module, pageNo, pageSize) => {
-                console.log(reqName);
                 //无请求
                 if (reqName.length === 0) {
                     me.currentPage = pageNo;
@@ -399,7 +398,7 @@ class UIGrid extends nodom.DefineElement {
                     nodom.Renderer.add(module);
                 }
                 else {
-                    let params = [];
+                    let params = {};
                     params[reqName[0]] = pageNo;
                     params[reqName[1]] = pageSize;
                     request({
@@ -407,8 +406,12 @@ class UIGrid extends nodom.DefineElement {
                         params: params,
                         type: 'json'
                     }).then(r => {
+                        if (!r) {
+                            return;
+                        }
                         if (r[df.totalName]) {
                             module.model.set(df.totalName, r[df.totalName]);
+                            df.changeParams(module);
                         }
                         module.model.set(me.dataName, r[me.dataName]);
                     });

@@ -161,112 +161,12 @@ class UIPagination extends nodom.DefineElement {
     }
     /**
      * 设置当前值
-     * @param module
+     * @param module    模块
      * @param current   当前页或位移量
      * @param isStep    如果true current为位移量
      */
     update(module, current, isStep) {
-        let model = module.modelFactory.get(this.modelId);
-        let data = model.data;
-        let total;
-        //获取total
-        if (data) {
-            total = data[this.totalName];
-        }
-        else {
-            total = this.total;
-        }
-        //表示是步数
-        if (isStep) {
-            current = this.currentPage + current;
-        }
-        if (total > 0) {
-            //页面大小
-            let pageSize = data[this.pageSizeName];
-            if (typeof pageSize === 'string') {
-                pageSize = parseInt(pageSize);
-            }
-            //设置pagesize，切换到第一页
-            if (!current) {
-                let d = model.query(this.currentName);
-                if (typeof d === 'string' && d !== '') {
-                    //转换为数值
-                    d = parseInt(d);
-                }
-                current = d || 1;
-            }
-            //页面
-            if (this.initFlag && this.pageSize === pageSize && (!current || this.currentPage === current)) {
-                return;
-            }
-            //页面数
-            let pageCount = Math.ceil(total / pageSize);
-            //限定current在页面范围内
-            if (current > pageCount) {
-                current = pageCount;
-            }
-            else if (current < 1) {
-                current = 1;
-            }
-            let min = 1;
-            let max;
-            let btnAllow = 0;
-            //页面数>显示数
-            if (pageCount > this.showNum) {
-                //中心的位置
-                let center = (this.showNum + 1) / 2 | 0;
-                if (current - center + 1 > 0) {
-                    min = current - center + 1;
-                }
-                if (min < 1) {
-                    min = 1;
-                }
-                else if (min + this.showNum - 1 > pageCount) {
-                    min = pageCount - this.showNum + 1;
-                }
-                max = min + this.showNum - 1;
-                if (min === 1) {
-                    btnAllow += 1;
-                }
-                if (max === pageCount) {
-                    btnAllow += 8;
-                }
-            }
-            else {
-                min = 1;
-                max = pageCount;
-                btnAllow = 9;
-            }
-            if (current === pageCount) {
-                btnAllow += 4;
-            }
-            else if (current === 1) {
-                btnAllow += 2;
-            }
-            //参数未改变，则不渲染
-            if (this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage) {
-                return;
-            }
-            //页面号数据数组
-            let pageArr = [];
-            for (let i = min; i <= max; i++) {
-                let active = i === current ? true : false;
-                pageArr.push({
-                    no: i,
-                    active: active
-                });
-                this.total = total;
-            }
-            this.pageSize = pageSize;
-            this.currentPage = current;
-            this.minPage = min;
-            this.maxPage = max;
-            model.set(this.pageDataName, pageArr);
-            //设置当前页
-            model.set(this.currentName, current);
-            //设置箭头状态值
-            model.set(this.btnAllowName, btnAllow);
-        }
+        this.changeParams(module, current, isStep);
         //onchange 事件执行
         if (this.onChange && this.onChange !== '') {
             let foo;
@@ -276,11 +176,111 @@ class UIPagination extends nodom.DefineElement {
             else if (nodom.Util.isFunction(this.onChange)) {
                 foo = this.onChange;
             }
-            console.log(this.currentPage, this.pageSize);
             if (foo) {
                 foo.apply(this, [module, this.currentPage, this.pageSize]);
             }
         }
+    }
+    /**
+     * 改变pagination 参数
+     * @param module    模块
+     * @param current   当前页或位移量
+     * @param isStep    如果true current为位移量
+     */
+    changeParams(module, current, isStep) {
+        let model = module.modelFactory.get(this.modelId);
+        let data = model.data;
+        //获取total
+        if (data && data[this.totalName]) {
+            this.total = data[this.totalName];
+        }
+        //表示是步数
+        if (isStep) {
+            current = this.currentPage + current;
+        }
+        if (!this.total) {
+            return;
+        }
+        //页面大小
+        let pageSize = data[this.pageSizeName];
+        if (typeof pageSize === 'string') {
+            pageSize = parseInt(pageSize);
+        }
+        //设置pagesize，切换到第一页
+        if (!current) {
+            let d = model.query(this.currentName);
+            if (typeof d === 'string' && d !== '') {
+                //转换为数值
+                d = parseInt(d);
+            }
+            current = d || 1;
+        }
+        //页面数
+        let pageCount = Math.ceil(this.total / pageSize);
+        //限定current在页面范围内
+        if (current > pageCount) {
+            current = pageCount;
+        }
+        else if (current < 1) {
+            current = 1;
+        }
+        let min = 1;
+        let max;
+        let btnAllow = 0;
+        //页面数>显示数
+        if (pageCount > this.showNum) {
+            //中心的位置
+            let center = (this.showNum + 1) / 2 | 0;
+            if (current - center + 1 > 0) {
+                min = current - center + 1;
+            }
+            if (min < 1) {
+                min = 1;
+            }
+            else if (min + this.showNum - 1 > pageCount) {
+                min = pageCount - this.showNum + 1;
+            }
+            max = min + this.showNum - 1;
+            if (min === 1) {
+                btnAllow += 1;
+            }
+            if (max === pageCount) {
+                btnAllow += 8;
+            }
+        }
+        else {
+            min = 1;
+            max = pageCount;
+            btnAllow = 9;
+        }
+        if (current === pageCount) {
+            btnAllow += 4;
+        }
+        if (current === 1) {
+            btnAllow += 2;
+        }
+        //参数未改变，则不渲染
+        if (this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage) {
+            return;
+        }
+        //页面号数据数组
+        let pageArr = [];
+        for (let i = min; i <= max; i++) {
+            let active = i === current ? true : false;
+            pageArr.push({
+                no: i,
+                active: active
+            });
+        }
+        this.pageSize = pageSize;
+        this.currentPage = current;
+        this.minPage = min;
+        this.maxPage = max;
+        model.set(this.pageDataName, pageArr);
+        //设置当前页
+        model.set(this.currentName, current);
+        //设置箭头状态值
+        model.set(this.btnAllowName, btnAllow);
     }
     /**
      * 只执行一次的初始化

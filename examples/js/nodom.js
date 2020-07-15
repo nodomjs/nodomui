@@ -133,11 +133,11 @@ var nodom;
         }).catch((re) => {
             switch (re.type) {
                 case "error":
-                    throw new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url);
+                    console.log(new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url).message);
                 case "timeout":
-                    throw new nodom.NodomError("timeout");
+                    console.log(new nodom.NodomError("timeout").message);
                 case "jsonparse":
-                    throw new nodom.NodomError("jsonparse");
+                    console.log(new nodom.NodomError("jsonparse").message);
             }
         });
     }
