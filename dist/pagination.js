@@ -166,6 +166,7 @@ class UIPagination extends nodom.DefineElement {
      * @param isStep    如果true current为位移量
      */
     update(module, current, isStep) {
+        console.log(module, current, isStep);
         this.changeParams(module, current, isStep);
         //onchange 事件执行
         if (this.onChange && this.onChange !== '') {
@@ -303,7 +304,8 @@ class UIPagination extends nodom.DefineElement {
         model.set(this.pageSizeDataName, this.pageSizeDatas);
         //增加观察方法
         let watchFunc = function (model, key, value) {
-            me.update(module);
+            me.changeParams(module);
+            me.changeParams(module);
         };
         model.watch(this.pageSizeName, watchFunc);
         model.watch(this.currentName, watchFunc);

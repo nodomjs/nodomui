@@ -501,7 +501,6 @@ class UIGrid extends nodom.DefineElement{
                     let params = {};
                     params[reqName[0]] = pageNo;
                     params[reqName[1]] = pageSize;
-                    
                     request({
                         url:module.dataUrl,
                         params:params,
