@@ -82,7 +82,7 @@ class UIFile extends nodom.DefineElement {
                 //上传标志
                 model.set(me.stateName, 1);
                 //上传显示
-                model.set(me.uploadingName, TipWords.uploading);
+                model.set(me.uploadingName, NUITipWords.uploading);
                 //设置文件内容
                 model.set(me.fileName, el.files);
                 if (foo) {
@@ -103,7 +103,7 @@ class UIFile extends nodom.DefineElement {
         span2.addClass('nd-file-progress');
         span2.addDirective(new nodom.Directive('show', this.stateName + '==1'));
         let txt = new nodom.Element();
-        txt.expressions = [new nodom.Expression(this.uploadingName || TipWords.uploading)];
+        txt.expressions = [new nodom.Expression(this.uploadingName || NUITipWords.uploading)];
         span2.add(txt);
         uploadingDom.add(span2);
         uploadDom.add(uploadingDom);

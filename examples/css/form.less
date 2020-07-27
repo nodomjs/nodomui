@@ -10,8 +10,8 @@ form{
         display:inline-block;
     }
     input{
+        .nd-border;
         padding:@nd-padding;
-        border:1px solid @nd-color10;
         border-radius:@nd-padding;
     }
 
@@ -77,9 +77,9 @@ form{
             position:absolute;
             width:100%;
             box-sizing: border-box;
-            border:1px solid @nd-color10;
             border-bottom-left-radius: @nd-padding;
             border-bottom-right-radius: @nd-padding;
+            .nd-border;
         }
     }
     >*{
@@ -128,11 +128,10 @@ form{
         margin-right:@nd-padding * 2;
         
         a.nd-file-content{
+            .nd-color6;
             display:inline-block;
             width:100%;
             height:100%;
-            
-            .nd-color10;
             background-position: 0 0;
             background-size: 100% 100%;
             background-repeat: no-repeat;
@@ -161,7 +160,7 @@ form{
         height:100px;
         overflow:hidden;
         box-sizing: border-box;
-        .nd-color10;
+        .nd-color6;
         padding:0;
         position:relative;
             

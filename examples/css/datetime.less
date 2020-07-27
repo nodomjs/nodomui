@@ -1,0 +1,135 @@
+@import "base.less";
+@import "icon.less";
+@import "button.less";
+
+/*datetime css*/
+
+
+
+/*弹出选择框*/
+.nd-datetime{
+    position:relative;
+    .nd-datetime-field{
+        .nd-input-icon;
+        .nd-datetime-date{
+            .nd-icon-search;
+        }
+    }
+    .nd-datetime-picker{
+        // display:none;
+        position:absolute;
+        width:245px;
+        padding:@nd-padding;
+        .nd-border;
+        .nd-color6;
+
+        .nd-datetime-inputct{
+            display:flex;
+            justify-content: space-around;
+            > input{
+                .nd-input;
+                width:90px;
+                flex:1;
+            }
+            .nd-datetime-date{
+            
+            }
+            .nd-datetime-time{
+                .nd-input;
+            }
+        }
+
+        /*显示年月和箭头*/
+        .nd-datetime-ymct{
+            line-height:30px;
+            padding:@nd-padding;
+            font-size:@nd-fontlarge;
+            display:flex;
+            justify-content: space-between;
+            /*年月*/
+            .nd-datetime-ym{
+                text-align:center;
+                flex:1;
+            }
+
+            > b{
+                padding:0 @nd-padding;
+                .nd-canclick;
+            }
+
+            .nd-datetime-leftarrow{
+                .nd-icon-arrow-left;
+                flex:0;
+            }
+            .nd-datetime-leftarrow1{
+                .nd-icon-double-arrow-left;
+                flex:0;
+            }
+
+            .nd-datetime-rightarrow{
+                .nd-icon-arrow-right;
+                flex:0;
+            }
+
+            .nd-datetime-rightarrow1{
+                .nd-icon-double-arrow-right;
+                flex:0;
+            }
+        }
+
+        /*周日容器*/
+        .nd-datetime-weekdays,.nd-datetime-dates{
+            >span{
+                font-size:@nd-fontnormal;
+                display:inline-block;
+                height:35px;
+                width:35px;
+                text-align:center;
+                line-height: 35px;
+            }
+        }
+
+        /*日期容器*/
+        .nd-datetime-dates{
+            border-top:1px solid @nd-color4;
+            border-bottom:1px solid @nd-color4;
+            font-size:@nd-fontsmall;
+
+            > span{
+                .nd-canclick;
+            }
+            
+            .nd-datetime-today{
+                color:@nd-activecolor;
+            }
+
+            .nd-datetime-selected{
+                .nd-item-active;
+                border-radius:35px;
+            }
+
+            .nd-datetime-disable{
+                .nd-disable;
+            }
+        }
+
+        /*底行*/
+        .nd-datetime-btnct{
+            padding:@nd-padding*2 @nd-padding*2 0 0;
+            text-align:right;
+            >button{
+                .nd-btn;
+                .nd-btn-small;
+            }
+            :first-child{
+                margin-right:@nd-padding;
+            }
+            .nd-datetime-current{
+                margin-right:@nd-padding;
+            }
+            .nd-datetime-close{
+                .nd-btn;
+            }
+        }
+    }
+}

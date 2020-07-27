@@ -137,7 +137,7 @@ class UIPagination extends nodom.DefineElement{
         if(this.showTotal){
             let totalDom:nodom.Element = new nodom.Element('div');
             let txt:nodom.Element = new nodom.Element();
-            txt.textContent = TipWords.total;
+            txt.textContent = NUITipWords.total;
             totalDom.add(txt);
             let span:nodom.Element = new nodom.Element('span');
             span.addClass('nd-pagination-total');
@@ -146,7 +146,7 @@ class UIPagination extends nodom.DefineElement{
             span.add(txt);
             totalDom.add(span);
             txt = new nodom.Element();
-            txt.textContent = TipWords.record;
+            txt.textContent = NUITipWords.record;
             totalDom.add(txt);
             rootDom.add(totalDom);
         }
@@ -157,7 +157,7 @@ class UIPagination extends nodom.DefineElement{
             for(let d of this.pageSizeData){
                 datas.push({
                     value:d,
-                    text:d + TipWords.record + '/' + TipWords.page
+                    text:d + NUITipWords.record + '/' + NUITipWords.page
                 });
             }
             
@@ -254,7 +254,7 @@ class UIPagination extends nodom.DefineElement{
             let goDom:nodom.Element = new nodom.Element('div');
             goDom.addClass('nd-pagination-go');
             let txt:nodom.Element = new nodom.Element();
-            txt.textContent = TipWords.NO;
+            txt.textContent = NUITipWords.NO;
             goDom.add(txt);
             let input:nodom.Element = new nodom.Element('input');
             input.setProp('type','number');
@@ -262,7 +262,7 @@ class UIPagination extends nodom.DefineElement{
             input.setProp('value',new nodom.Expression(this.currentName),true);
             goDom.add(input);
             txt = new nodom.Element();
-            txt.textContent = TipWords.page;
+            txt.textContent = NUITipWords.page;
             goDom.add(txt);
             rootDom.add(goDom);
         }
