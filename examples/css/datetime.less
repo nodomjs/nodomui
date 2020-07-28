@@ -4,41 +4,45 @@
 
 /*datetime css*/
 
-
-
 /*弹出选择框*/
 .nd-datetime{
     position:relative;
     .nd-datetime-field{
         .nd-input-icon;
         .nd-datetime-date{
-            .nd-icon-search;
+            .nd-icon-calendar;
+        }
+        .nd-datetime-time{
+            .nd-icon-time;
         }
     }
     .nd-datetime-picker{
-        // display:none;
         position:absolute;
-        width:245px;
+        z-index:@nd-combo-index;
+        margin-top:1px;
         padding:@nd-padding;
         .nd-border;
-        .nd-color6;
+        .nd-color4;
 
-        .nd-datetime-inputct{
-            display:flex;
-            justify-content: space-around;
-            > input{
-                .nd-input;
-                width:90px;
-                flex:1;
-            }
-            .nd-datetime-date{
-            
-            }
-            .nd-datetime-time{
-                .nd-input;
+        /*底行*/
+        .nd-datetime-btnct{
+            padding:@nd-padding*2 @nd-padding*2 0 0;
+            text-align:right;
+            >button{
+                .nd-btn;
+                .nd-btn-small;
+                margin-right:@nd-padding;
             }
         }
 
+        .nd-datetime-tbl{
+            display:flex;
+        }
+    }
+
+    /*日历表*/
+    .nd-datetime-datetbl{
+        width:245px;
         /*显示年月和箭头*/
         .nd-datetime-ymct{
             line-height:30px;
@@ -81,11 +85,12 @@
         .nd-datetime-weekdays,.nd-datetime-dates{
             >span{
                 font-size:@nd-fontnormal;
+                margin:@nd-padding;
                 display:inline-block;
-                height:35px;
-                width:35px;
+                height:25px;
+                width:25px;
                 text-align:center;
-                line-height: 35px;
+                line-height: 25px;
             }
         }
 
@@ -113,22 +118,36 @@
             }
         }
 
-        /*底行*/
-        .nd-datetime-btnct{
-            padding:@nd-padding*2 @nd-padding*2 0 0;
-            text-align:right;
-            >button{
-                .nd-btn;
-                .nd-btn-small;
-            }
-            :first-child{
-                margin-right:@nd-padding;
-            }
-            .nd-datetime-current{
-                margin-right:@nd-padding;
-            }
-            .nd-datetime-close{
-                .nd-btn;
+        
+    }
+
+    /*时间picker*/
+    .nd-datetime-timetbl{
+        width:210px;
+        height:220px;
+        overflow:hidden;
+        padding:@nd-padding;
+        
+        >input{
+            .nd-input;
+            width:100%;
+            font-size:@nd-fontlarge;
+            text-align:center;
+        }
+        .nd-datetime-timect{
+            font-size:@nd-fontnormal;
+            display:flex;
+            >div{
+                overflow:auto;
+                height:100%;
+                flex:1;
+                >div{
+                    line-height:30px;
+                    text-align:center;
+                }
+                .nd-dateitem-select{
+                    .nd-color5;
+                }
             }
         }
     }

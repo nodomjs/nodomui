@@ -23,7 +23,7 @@ const NUITipWords = {
         yes: '是',
         no: '否',
         today: '今天',
-        current: '此时'
+        now: '此时'
     }
 };
 //# sourceMappingURL=msg_zh.js.map

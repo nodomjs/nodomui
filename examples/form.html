@@ -47,8 +47,11 @@
 </head>
 <body>
     <div>
+        <div>
+            <div>出生日期：<span>{{birth}}</span></div>
+        </div>
         <form class='form'>
-            <!-- <div class='nd-form-item'>
+            <div class='nd-form-item'>
                 <label>姓名:</label>
                 <input  class='nd-form-input' type='text' x-field='userName' value='{{userName}}'>
             </div>
@@ -58,10 +61,14 @@
                     <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span value='F'>女</span>
                 </ui-radio>
-            </div> -->
+            </div>
             <div class='nd-form-item'>
                 <label>出生日期:</label>
-                <ui-datetime x-field='birth' type='date'/>
+                <ui-datetime class='nd-form-input' x-field='birth' type='date'/>
+            </div>
+            <div class='nd-form-item'>
+                <label>计划时间:</label>
+                <ui-datetime class='nd-form-input' x-field='plantime' type='datetime'/>
             </div>
             <!-- <div class='nd-form-item'>
                 <label>学历:</label>
@@ -89,7 +96,7 @@
             <div class='nd-form-item'>
                 <label>同意条款:</label>
                 <ui-checkbox  class='nd-form-input' yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
-            </div> -->
+            </div>-->
         </form>
     </div>
 </body>
@@ -103,6 +110,7 @@
                 agree:'Y',
                 education:'2,3',
                 birth:'1980-1-2',
+                plantime:'2020-8-5 8:45:00',
                 hobby:2,
                 photos:[],
                 edus:[

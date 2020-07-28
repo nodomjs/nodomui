@@ -145,9 +145,11 @@ class UIEventRegister{
                 
                 let evts:IEventObj[] = this.listeners.get(eventName);
                 for(let evt of evts){
-                    
                     let module:nodom.Module = nodom.ModuleFactory.get(evt.module);
                     let dom:nodom.Element = module.renderTree.query(evt.dom);
+                    if(!dom){
+                        continue;
+                    }
                     //事件target在dom内则为true，否则为false
                     let inOrOut:boolean = dom.key===key || dom.query(key)?true:false;
                     if(typeof evt.handler === 'function'){

@@ -11,7 +11,7 @@
 //current color
 @nd-forecolor2:white;
 
-@nd-activecolor:rgb(26, 78, 202);
+@nd-activecolor:#a00;
 @nd-emphasiscolor:rgb(169,110,87);
 @nd-warncolor:rgb(149,127,79);
 @nd-errorcolor:#900;
@@ -106,16 +106,16 @@
 
 
 /*生成 .nd-color1 - 6 */
-.genback(@counter,@i:0) when (@i < @counter){
+.nd-genback(@counter,@i:0) when (@i < @counter){
     @index:@i + 1;
     .nd-color@{index}{
         @nc:'nd-color@{index}';
         background-color:@@nc;
         color:@nd-forecolor1;
     }
-    .genback(@counter,@index);
+    .nd-genback(@counter,@index);
 }
-.genback(7);
+.nd-genback(7);
 
 
 /*global*/
@@ -201,6 +201,7 @@ a:visited{
     cursor:pointer;
 }
 
+/*输入框*/
 .nd-input{
     padding:@nd-padding;
     .nd-color4;
@@ -213,13 +214,16 @@ a:visited{
 /*带图标输入框*/
 .nd-input-icon{
     .nd-input;
-    :first-child{
-        margin-right:@nd-padding;
+    display:flex;
+    
+    :last-child{
+        flex:0;
     }
     input{
-        .nd-color4;
-        border:0;
+        margin:0;
         padding:0;
+        .nd-color4;
+        flex:1;
     }
 }
 /**滚动条**/

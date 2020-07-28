@@ -1,18 +1,13 @@
 @import "base.less";
 @import "icon.less";
-/*表格css*/
-.nd-form{
-    
-}
-
+/*form css*/
 form{
     label{
         display:inline-block;
     }
+
     input{
-        .nd-border;
-        padding:@nd-padding;
-        border-radius:@nd-padding;
+        .nd-input;
     }
 
     .nd-form-item{
@@ -26,6 +21,11 @@ form{
         }
     }
 
+    .nd-radio-active{
+        .nd-icon-radio-active;
+        color:@nd-activecolor;
+    }
+
     .nd-uncheck{
         margin-right:@nd-padding;
         .nd-icon-checkbox;
@@ -33,6 +33,7 @@ form{
     .nd-checked{
         margin-right:@nd-padding;
         .nd-icon-checked;
+        color:@nd-activecolor;
     }
 }
 
@@ -71,7 +72,7 @@ form{
         }
     
         .nd-select-list{
-            .nd-color1;
+            .nd-color4;
             z-index:@nd-combo-index;
             padding:@nd-padding * 2;
             position:absolute;
