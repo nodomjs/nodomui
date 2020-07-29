@@ -152,6 +152,7 @@ class UIDatetime extends nodom.DefineElement{
         
         if(!this.initFlag){
             this.initFlag = true;
+            this.key = uidom.key;
             //设置附加数据项
             model.set(this.extraDataName,{
                 show:false,
@@ -161,10 +162,17 @@ class UIDatetime extends nodom.DefineElement{
                 hour:0,
                 minute:0,
                 second:0,
+                time:'00:00:00',
                 days:[]
             });
 
             this.pickerModelId = model.query(this.extraDataName).$modelId;
+
+            // let pickerModel:nodom.Model = module.modelFactory.get(this.pickerModelId);
+            // //添加hour,minute,second监听
+            // pickerModel.watch('hour',(module,field,value)=>{
+
+            // });
 
             if(this.type === 'date'){
                 this.genDates(module);
@@ -174,8 +182,6 @@ class UIDatetime extends nodom.DefineElement{
                 this.genDates(module);
                 this.genTimes(module);
             }
-            
-
             
             //增加外部点击隐藏
             UIEventRegister.addEvent('click',module.name,uidom.children[1].key,(module,dom,inOrOut,e)=>{
@@ -274,15 +280,15 @@ class UIDatetime extends nodom.DefineElement{
 
     /**
      * 生成timepicker
-     * @param picker 
      */
     genTimePicker():nodom.Element{
+        let me = this;
         let pickerDom:nodom.Element = new nodom.Element('div');
         pickerDom.addClass('nd-datetime-timetbl');
 
         let showDom:nodom.Element = new nodom.Element('input');
         showDom.addClass('nd-datetime-timeinput');
-        showDom.addDirective(new nodom.Directive('field','time'));
+        showDom.setProp('value',new nodom.Expression('time'),true);
         
         pickerDom.add(showDom);
 
@@ -296,13 +302,22 @@ class UIDatetime extends nodom.DefineElement{
         item.addDirective(new nodom.Directive('class',"{'nd-datetime-itemselect':'selected'}"));
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('v')];
+        item.setProp('role','hour');
         item.add(txt);
         hourDom.add(item);
         
+        item.addEvent(new nodom.NodomEvent('click',':delg',
+            (dom,model,module,e,el)=>{
+                me.selectTime(module,dom,model);
+            }
+        ));
+
         let minuteDom:nodom.Element = hourDom.clone(true);
         let secondDom:nodom.Element = hourDom.clone(true);
         minuteDom.children[0].getDirective('repeat').value = 'minutes';
+        minuteDom.children[0].setProp('role','minute');
         secondDom.children[0].getDirective('repeat').value = 'seconds';
+        secondDom.children[0].setProp('role','second');
         itemCt.children = [hourDom,minuteDom,secondDom];
         return pickerDom;
     }
@@ -477,6 +492,7 @@ class UIDatetime extends nodom.DefineElement{
                         this.minute = date.getMinutes();
                         this.second = date.getSeconds();
                         model1.set('time',this.genValueStr('time'));
+                        this.setTimeSelect(module);
                     }
                 }else{ //日期格式不对，则直接设置插件当前日期时间值
                     model.set(this.fieldName,this.genValueStr());
@@ -488,6 +504,7 @@ class UIDatetime extends nodom.DefineElement{
                     this.minute = parseInt(sa[1]);
                     this.second = sa.length>2?parseInt(sa[2]):0;
                     model1.set('time',this.genValueStr('time'));
+                    this.setTimeSelect(module);
                 }
             }
         }
@@ -518,6 +535,38 @@ class UIDatetime extends nodom.DefineElement{
     }
 
     /**
+     * 选中日期
+     * @param module 
+     * @param dom       dom 节点
+     * @param model     被点击dom绑定的model
+     
+     */
+    selectTime(module:nodom.Module,dom:nodom.Element,model?:any){
+        //把selected的项置false
+        let pmodel = module.modelFactory.get(this.pickerModelId);
+        let role = dom.getProp('role');
+        if(pmodel){
+            let datas = pmodel.query(role+'s');
+            for(let d of datas){
+                if(d.selected){
+                    d.selected = false;
+                    break;
+                }
+            }
+        }
+        if(!model){
+            model = module.modelFactory.get(dom.modelId);
+        }
+        if(model){
+            model.set('selected',true);
+        }
+        //设置值
+        this[role] = parseInt(model.query('v'));
+        //设置time显示值
+        pmodel.set('time',this.genValueStr('time'));
+    }
+
+    /**
      * 初始化并显示picker
      * @param dom       input或inputct       
      * @param model     数据模型
@@ -526,7 +575,6 @@ class UIDatetime extends nodom.DefineElement{
      */
     showPicker(dom,model,module,el){
         let data = model.query(this.extraDataName);
-        console.log(data);
         if(data){
             if(data.show){
                 return;
@@ -537,6 +585,44 @@ class UIDatetime extends nodom.DefineElement{
         let pDom:nodom.Element = dom.tagName === 'input'?dom.getParent(module):dom;
         this.setValue(module,model.query(this.fieldName));
         pDom.children[0].assets.set('style','left:0px;' + 'top:' + (el.offsetHeight+3) + 'px');
+    }
+
+    /**
+     * 设置时间选中
+     */
+    setTimeSelect(module:nodom.Module){
+        let model:nodom.Model = module.modelFactory.get(this.pickerModelId);
+        let data = [this.hour,this.minute,this.second];
+        ['hours','minutes','seconds'].forEach((item,i)=>{
+            let datas = model.query(item);
+            //清除之前选中
+            for(let d of datas){
+                if(d.selected){
+                    d.selected = false;
+                    break;
+                }
+            }
+            datas[data[i]].selected = true;
+        });
+        setTimeout(()=>{
+            let uidom:nodom.Element = module.renderTree.query(this.key);
+            let timeCt:nodom.Element;
+            //尚未打开picker
+            if(uidom.children.length === 1){
+                return;
+            }
+            if(this.type === 'datetime'){
+                timeCt = uidom.children[1].children[0].children[1].children[1];
+            }else if(this.type === 'time'){
+                timeCt = uidom.children[1].children[0].children[0].children[1];
+            }
+
+            data.forEach((item,i)=>{
+                let el:HTMLElement = module.container.querySelector("[key='"+ timeCt.children[i].key +"']");
+                el.scrollTo(0,data[i]*30);
+            });
+        },100);
+        
     }
 
     /**

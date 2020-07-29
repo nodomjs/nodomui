@@ -133,11 +133,11 @@ var nodom;
         }).catch((re) => {
             switch (re.type) {
                 case "error":
-                    console.log(new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url).message);
+                    throw new nodom.NodomError("notexist1", nodom.TipWords.resource, re.url);
                 case "timeout":
-                    console.log(new nodom.NodomError("timeout").message);
+                    throw new nodom.NodomError("timeout");
                 case "jsonparse":
-                    console.log(new nodom.NodomError("jsonparse").message);
+                    throw new nodom.NodomError("jsonparse");
             }
         });
     }
@@ -1075,7 +1075,7 @@ var nodom;
             let dst = new Element();
             if (changeKey) {
                 dst.key = nodom.Util.genId() + '';
-                let notCopyProps = ['parent', 'children'];
+                let notCopyProps = ['key','parent', 'children'];
                 nodom.Util.getOwnProps(this).forEach((p) => {
                     if (notCopyProps.includes(p)) {
                         return;
@@ -1724,11 +1724,9 @@ var nodom;
                 let module = nodom.ModuleFactory.get(model.moduleName);
                 let fieldObj = model.data;
                 let valueArr = [];
-                
                 this.fields.forEach((field) => {
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
-                
                 valueArr.unshift(module);
                 return this.execFunc.apply(null, valueArr);
                 function getFieldValue(module, dataObj, field) {
@@ -2803,7 +2801,7 @@ var nodom;
                     if (arr.length > 0) {
                         for (let i = 0; i < arr.length; i++) {
                             let sdom = dom.query(arr[i].domKey);
-                            if(!sdom){
+                            if (!sdom) {
                                 continue;
                             }
                             if (eKey === sdom.key || sdom.query(eKey)) {

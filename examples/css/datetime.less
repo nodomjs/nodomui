@@ -124,11 +124,11 @@
     /*时间picker*/
     .nd-datetime-timetbl{
         width:210px;
-        height:220px;
         overflow:hidden;
         padding:@nd-padding;
         
         >input{
+            margin-bottom:@nd-padding;
             .nd-input;
             width:100%;
             font-size:@nd-fontlarge;
@@ -136,6 +136,7 @@
         }
         .nd-datetime-timect{
             font-size:@nd-fontnormal;
+            height:150px;
             display:flex;
             >div{
                 overflow:auto;
@@ -145,8 +146,8 @@
                     line-height:30px;
                     text-align:center;
                 }
-                .nd-dateitem-select{
-                    .nd-color5;
+                .nd-datetime-itemselect{
+                    .nd-color6;
                 }
             }
         }
