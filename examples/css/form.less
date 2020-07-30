@@ -43,48 +43,48 @@ form{
     }
 }
 
+/*select 框*/
 .nd-select{
     display:inline-block;
-    /*值框*/
-    .nd-select-value{
-        display:none;
-        position:relative;
-    }
+    position:relative;
     .nd-select-content{
-        border:1px solid @nd-color3;
-        border-radius:@nd-padding;
-        position: relative;
-        
         /*输入框，下箭头容器*/
         .nd-select-firstct{
-            // padding:0 0px 0 @nd-padding;
+            .nd-input-icon;
             > b{
-                right:0;
-                top:5px;
-                position:absolute;
+                .nd-icon-arrow-down;
             }
-            /*显示框*/
-            .nd-select-show{
-                width:100%;
-                box-sizing: border-box;
-                border:0;
-            }
-        }
-    
-        .nd-select-list{
-            .nd-color4;
-            z-index:@nd-combo-index;
-            padding:@nd-padding * 2;
-            position:absolute;
-            width:100%;
-            box-sizing: border-box;
-            border-bottom-left-radius: @nd-padding;
-            border-bottom-right-radius: @nd-padding;
-            .nd-border;
         }
     }
-    >*{
-        display:block;
+    .nd-select-list{
+        .nd-color4;
+        max-height:300px;
+        overflow:auto;
+        z-index:@nd-combo-index;
+        padding:@nd-padding * 2;
+        position:absolute;
+        width:100%;
+        box-sizing: border-box;
+        border-bottom-left-radius: @nd-padding;
+        border-bottom-right-radius: @nd-padding;
+        .nd-border;
+
+        .nd-select-item{
+            display:flex;
+            line-height:30px;
+            .nd-select-itemicon{
+                flex:0;
+                .nd-icon-select;
+            }
+
+            .nd-select-itemcontent{
+                flex:1;
+            }
+        }
+
+        .nd-select-selected{
+            color:@nd-activecolor;
+        }
     }
 }
 

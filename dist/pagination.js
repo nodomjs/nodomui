@@ -27,11 +27,9 @@ class UIPagination extends nodom.DefineElement {
         UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName'], ['total', 10, 1, null, null, 10, [], 5, '', []]);
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
-        this.pageDataName = '$ui_pagination_' + nodom.Util.genId();
-        this.pageSizeName = '$ui_pagination_' + nodom.Util.genId();
-        this.currentName = '$ui_pagination_' + nodom.Util.genId();
-        this.pageSizeDataName = '$ui_pagination_' + nodom.Util.genId();
-        this.btnAllowName = '$ui_pagination_' + nodom.Util.genId();
+        this.extraDataName = '$ui_pagination_' + nodom.Util.genId();
+        //增加附加数据模型
+        rootDom.addDirective(new nodom.Directive('model', this.extraDataName));
         //显示共x条
         if (this.showTotal) {
             let totalDom = new nodom.Element('div');
@@ -41,7 +39,7 @@ class UIPagination extends nodom.DefineElement {
             let span = new nodom.Element('span');
             span.addClass('nd-pagination-total');
             txt = new nodom.Element();
-            txt.expressions = [new nodom.Expression(this.totalName)];
+            txt.expressions = [new nodom.Expression('total')];
             span.add(txt);
             totalDom.add(span);
             txt = new nodom.Element();
@@ -60,9 +58,9 @@ class UIPagination extends nodom.DefineElement {
             }
             this.pageSizeDatas = datas;
             let sizeDom = new nodom.Element('select');
-            sizeDom.addDirective(new nodom.Directive('field', this.pageSizeName));
+            sizeDom.addDirective(new nodom.Directive('field', 'pageSize'));
             let optDom = new nodom.Element('option');
-            optDom.addDirective(new nodom.Directive('repeat', this.pageSizeDataName));
+            optDom.addDirective(new nodom.Directive('repeat', 'sizeData'));
             optDom.setProp('value', new nodom.Expression('value'), true);
             let txt = new nodom.Element();
             txt.expressions = [new nodom.Expression('text')];
@@ -76,17 +74,17 @@ class UIPagination extends nodom.DefineElement {
         //左双箭头
         let left1 = new nodom.Element('b');
         left1.addClass('nd-pagination-leftarrow1');
-        left1.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes(" + this.btnAllowName + ")'}"));
+        left1.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes(btnAllow)'}"));
         pageCt.add(left1);
         //左箭头
         let left = new nodom.Element('b');
         left.addClass('nd-pagination-leftarrow');
-        left.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes(" + this.btnAllowName + ")'}"));
+        left.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes(btnAllow)'}"));
         pageCt.add(left);
         //页面数字
         let page = new nodom.Element('span');
         page.addClass('nd-pagination-page');
-        page.addDirective(new nodom.Directive('repeat', this.pageDataName));
+        page.addDirective(new nodom.Directive('repeat', 'pages'));
         page.addDirective(new nodom.Directive('class', "{'nd-pagination-active':'active'}"), true);
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression('no')];
@@ -95,12 +93,12 @@ class UIPagination extends nodom.DefineElement {
         //右箭头
         let right = new nodom.Element('b');
         right.addClass('nd-pagination-rightarrow');
-        right.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes(" + this.btnAllowName + ")'}"));
+        right.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes(btnAllow)'}"));
         pageCt.add(right);
         //右双箭头
         let right1 = new nodom.Element('b');
         right1.addClass('nd-pagination-rightarrow1');
-        right1.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes(" + this.btnAllowName + ")'}"));
+        right1.addDirective(new nodom.Directive('class', "{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes(btnAllow)'}"));
         pageCt.add(right1);
         rootDom.add(pageCt);
         //点击事件
@@ -140,8 +138,8 @@ class UIPagination extends nodom.DefineElement {
             goDom.add(txt);
             let input = new nodom.Element('input');
             input.setProp('type', 'number');
-            input.addDirective(new nodom.Directive('field', this.currentName));
-            input.setProp('value', new nodom.Expression(this.currentName), true);
+            input.addDirective(new nodom.Directive('field', 'pageNo'));
+            input.setProp('value', new nodom.Expression('pageNo'), true);
             goDom.add(input);
             txt = new nodom.Element();
             txt.textContent = NUITipWords.page;
@@ -166,7 +164,6 @@ class UIPagination extends nodom.DefineElement {
      * @param isStep    如果true current为位移量
      */
     update(module, current, isStep) {
-        console.log(module, current, isStep);
         this.changeParams(module, current, isStep);
         //onchange 事件执行
         if (this.onChange && this.onChange !== '') {
@@ -189,11 +186,13 @@ class UIPagination extends nodom.DefineElement {
      * @param isStep    如果true current为位移量
      */
     changeParams(module, current, isStep) {
-        let model = module.modelFactory.get(this.modelId);
+        let model1 = module.modelFactory.get(this.modelId);
+        let model = module.modelFactory.get(this.extraModelId);
+        let data1 = model1.data;
         let data = model.data;
         //获取total
-        if (data && data[this.totalName]) {
-            this.total = data[this.totalName];
+        if (data1 && data1[this.totalName]) {
+            this.total = data1[this.totalName];
         }
         //表示是步数
         if (isStep) {
@@ -202,14 +201,15 @@ class UIPagination extends nodom.DefineElement {
         if (!this.total) {
             return;
         }
+        model.set('total', this.total);
         //页面大小
-        let pageSize = data[this.pageSizeName];
+        let pageSize = data['pageSize'];
         if (typeof pageSize === 'string') {
             pageSize = parseInt(pageSize);
         }
         //设置pagesize，切换到第一页
         if (!current) {
-            let d = model.query(this.currentName);
+            let d = model.query('pageNo');
             if (typeof d === 'string' && d !== '') {
                 //转换为数值
                 d = parseInt(d);
@@ -277,11 +277,11 @@ class UIPagination extends nodom.DefineElement {
         this.currentPage = current;
         this.minPage = min;
         this.maxPage = max;
-        model.set(this.pageDataName, pageArr);
+        model.set('pages', pageArr);
         //设置当前页
-        model.set(this.currentName, current);
+        model.set('pageNo', current);
         //设置箭头状态值
-        model.set(this.btnAllowName, btnAllow);
+        model.set('btnAllow', btnAllow);
     }
     /**
      * 只执行一次的初始化
@@ -295,20 +295,35 @@ class UIPagination extends nodom.DefineElement {
         }
         let model = module.modelFactory.get(dom.modelId);
         this.modelId = model.id;
-        if (this.pageSize) {
-            model.set(this.pageSizeName, this.pageSize);
-        }
-        if (this.currentPage) {
-            model.set(this.currentName, this.currentPage);
-        }
-        model.set(this.pageSizeDataName, this.pageSizeDatas);
+        model.set(this.extraDataName, {
+            //总条数
+            total: 0,
+            //页面数
+            pageNum: 0,
+            //页号
+            pageNo: this.currentPage || 1,
+            //页面大小
+            pageSize: this.pageSize || 10,
+            /**
+             * 按钮允许使用name(自动创建)
+             * 包括左双箭头、左箭头、右箭头、右双箭头
+             * 对应数据 1左双箭头禁用 2左箭头禁用 4右箭头禁用 8右双箭头禁用,组合值则禁用多个:如6禁用左箭头和右箭头
+             */
+            btnAllow: 0,
+            //显示页号数组，如 [11,12,13,14,15]
+            pages: [],
+            //页面数数组
+            sizeData: this.pageSizeDatas || [10, 20, 30, 50]
+        });
+        //附加数据模型
+        this.extraModelId = model.query(this.extraDataName).$modelId;
+        let model1 = module.modelFactory.get(this.extraModelId);
         //增加观察方法
         let watchFunc = function (model, key, value) {
-            me.changeParams(module);
-            me.changeParams(module);
+            me.update(module);
         };
-        model.watch(this.pageSizeName, watchFunc);
-        model.watch(this.currentName, watchFunc);
+        model1.watch('pageSize', watchFunc);
+        model1.watch('pageNo', watchFunc);
         this.update(module, 1);
         this.initFlag = true;
     }

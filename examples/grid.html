@@ -67,8 +67,8 @@
                 <div><label>原价：</label><span>{{oprice}}</span></div>
                 <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div> -->
             </sub>
-            <!-- requestName='pageno,pagesize' -->
-            <ui-pagination totalName='total'  pageSize='10' sizeChange='10,20,30,50' showGo showTotal onChange='changeData'></ui-pagination>
+            <!-- requestName='pageno,pagesize'   -->
+            <ui-pagination totalName='total' onChange='changeData' pageSize='10' sizeChange='10,20,30,50' showGo showTotal></ui-pagination>
         </ui-grid>
         
         
@@ -80,6 +80,7 @@
         module:{
             el:'div',
             data:"data/grid1.json",
+            // data:'http://localhost:3000/commodity/getinfo',
             methods:{
                 cacDis:(data)=>{
                     return data * 10;

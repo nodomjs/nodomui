@@ -587,11 +587,25 @@
       "unicode_decimal": 59354
     },
     {
+      "icon_id": "15838444",
+      "name": "close",
+      "font_class": "close",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
       "icon_id": "15838446",
       "name": "calendar",
       "font_class": "calendar",
       "unicode": "e667",
       "unicode_decimal": 58983
+    },
+    {
+      "icon_id": "15838530",
+      "name": "select",
+      "font_class": "select",
+      "unicode": "e67e",
+      "unicode_decimal": 59006
     },
     {
       "icon_id": "15838540",

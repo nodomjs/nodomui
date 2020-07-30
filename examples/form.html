@@ -43,12 +43,26 @@
             width:300px;
             height:100px;
         }
+
+        .hobitem{
+            display:flex;
+            
+        }
+
+        .hobitem:first-child{
+            flex:1;
+        }
+
+        .hobitem:first-child{
+            flex:1;
+        }
     </style>
 </head>
 <body>
     <div>
         <div>
             <div>出生日期：<span>{{birth}}</span></div>
+            <div>学历：<span>{{education}}</span></div>
         </div>
         <form class='form'>
             <div class='nd-form-item'>
@@ -74,10 +88,28 @@
                 <label>开始时间:</label>
                 <ui-datetime class='nd-form-input' x-field='starttime' type='time'/>
             </div>
-            <!-- <div class='nd-form-item'>
+            <div class='nd-form-item'>
                 <label>学历:</label>
-                <ui-select class='nd-form-input' name='education' valueField='id' displayField='title' listField='edus'>
-                    <div x-repeat='edus' value='{{id}}' show='{{title}}'>{{id}}-{{title}}</div>
+                <!--
+                    x-field 绑定字段
+                    valueField 对应数组中对象的值字段名
+                    displayField 对应数组中对象的显示字段名
+                    listField  下拉列表对应数据
+                -->
+                <ui-select class='nd-form-input' x-field='education' valueField='id' displayField='title' listField='edus'>
+                </ui-select>
+            </div>
+
+            <div class='nd-form-item'>
+                <label>爱好:</label>
+                <!--
+                    x-field 绑定字段
+                    valueField 对应数组中对象的值字段名
+                    displayField 对应数组中对象的显示字段名
+                    listField  下拉列表对应数据
+                -->
+                <ui-select class='nd-form-input' x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' multiselect>
+                    <div>{{hid}} - {{htitle}} - {{desc}}</div>
                 </ui-select>
             </div>
 
@@ -86,7 +118,6 @@
                 <ui-file field='photos' multiple='multi' valueField='imgId' displayField="fileName" 
                  returnFields='id,url,result.rows' uploadMethod='uploadFile' delMethod='delFile'
                  type='' maxCount='5'></ui-file>
-                
             </div>
             
             <div class='nd-form-item'>
@@ -100,7 +131,7 @@
             <div class='nd-form-item'>
                 <label>同意条款:</label>
                 <ui-checkbox  class='nd-form-input' yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
-            </div>-->
+            </div>
         </form>
     </div>
 </body>
@@ -112,14 +143,14 @@
                 userName:'yang',
                 sexy:'F',
                 agree:'Y',
-                education:'2,3',
+                education:'3',
                 birth:'1980-1-2',
                 plantime:'2020-8-5 8:45:00',
                 starttime:'10:00',
                 hobby:2,
                 photos:[],
                 edus:[
-                    {id:1,title:'高中'},
+                    {id:1,title:'高中',},
                     {id:2,title:'专科'},
                     {id:3,title:'本科'},
                     {id:4,title:'硕士'},

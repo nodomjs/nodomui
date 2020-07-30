@@ -491,7 +491,6 @@ class UIDatetime extends nodom.DefineElement {
         this[role] = parseInt(model.query('v'));
         //设置time显示值
         pmodel.set('time', this.genValueStr('time'));
-        console.log(pmodel.data);
     }
     /**
      * 初始化并显示picker
@@ -502,7 +501,6 @@ class UIDatetime extends nodom.DefineElement {
      */
     showPicker(dom, model, module, el) {
         let data = model.query(this.extraDataName);
-        console.log(data);
         if (data) {
             if (data.show) {
                 return;

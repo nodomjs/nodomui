@@ -1,26 +1,18 @@
 ///<reference types='nodom'/>
 /**
  * panel 插件
+ * 
  */
 class UISelect extends nodom.DefineElement{
     tagName:string = 'UI-SELECT';
     /**
-     * 显示数据name(在model中新增)
+     * 附加数据项名
      */
-    displayName:string;
-    /**
-     * 显示开关数据name(在model中新增)
-     */
-    switchName:string;
+    extraDataName:string;
     /**
      * select绑定的数据字段名
      */
     dataName:string;
-
-    /**
-     * 初始化数据标志
-     */
-    initDataFlag:boolean;
 
     /**
      * 列表数据名
@@ -33,19 +25,18 @@ class UISelect extends nodom.DefineElement{
     valueName:string;
 
     /**
-     * 列表项显示字段名（显示在content输入框）
+     * 显示内容
      */
-    showName:string;
-    /**
-     * 选中的数据name(在model中新增)
-     */
-    checkName:string;
-
+    displayName:string;
     /**
      * select 对象的modelId
      */
     modelId:number;
 
+    /**
+     * select 附加数据项modelId
+     */
+    extraModelId:number;
     /**
      * 多选
      */
@@ -56,80 +47,99 @@ class UISelect extends nodom.DefineElement{
     init(el:HTMLElement):nodom.Element{
         let me = this;
         //生成id
-        let gid:number = nodom.Util.genId();
-        this.switchName = '$nui_switch_' + gid;
-        this.displayName = '$nui_display_' + gid;
-        this.checkName = '$nui_checked_' + gid;
-
-        let selectDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(selectDom,el);
-        nodom.Compiler.handleChildren(selectDom,el);
-        selectDom.tagName = 'div';
-        selectDom.addClass('nd-select');
-        this.dataName = selectDom.getProp('name');
-        this.valueName = selectDom.getProp('valuefield');
-        this.showName = selectDom.getProp('displayfield');
-        this.multi = selectDom.hasProp('multiselect');
+        this.extraDataName = '$ui_select_' + nodom.Util.genId();
         
-        selectDom.delProp(['name','valuefield','multiselect']);
+        let rootDom:nodom.Element = new nodom.Element();
+        nodom.Compiler.handleAttributes(rootDom,el);
+        nodom.Compiler.handleChildren(rootDom,el);
+
+        UITool.handleUIParam(rootDom,this,
+            ['valuefield','displayfield','multiselect|bool','listfield'],
+            ['valueName','displayName','multi','listName']
+        );
+
+        rootDom.tagName = 'div';
+        rootDom.addClass('nd-select');
+
+        let field = rootDom.getDirective('field');
+        this.dataName = field.value;
+        
         //显示框
         let showDom:nodom.Element = new nodom.Element('div');
         showDom.addClass('nd-select-content');
-
+            
         //下拉框
         let listDom:nodom.Element = new nodom.Element('div');
         listDom.addClass('nd-select-list');
-        listDom.addDirective(new nodom.Directive('show',me.switchName));    
+        listDom.addDirective(new nodom.Directive('show','show'));
 
         //显示框
         let firstDom:nodom.Element = new nodom.Element('div');
         firstDom.addClass('nd-select-firstct');
         let input:nodom.Element = new nodom.Element('input');
         input.addClass('nd-select-show');
+        
         //多选择，不允许输入
         if(this.multi){
             input.setProp('readonly',true);
         }
-        input.setProp('value', new nodom.Expression(me.displayName),true);
+        input.setProp('value', new nodom.Expression('display'),true);
         firstDom.add(input);
         let icon:nodom.Element = new nodom.Element('b');
-        icon.addClass('nd-icon-arrow-down');
         //点击展开或收拢
         firstDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                model.set(me.switchName,!model.data[me.switchName]);
+                model.set('show',!model.data['show']);
             }
         ));
         firstDom.add(icon);
         showDom.add(firstDom);
-        // 下拉孩子节点
-        for(let c of selectDom.children){
+        
+        let itemDom:nodom.Element;
+        // 如果有，则表示自定义
+        for(let c of rootDom.children){
             if(!c.tagName){
                 continue;
             }
-            //保存list数据名
-            if(c.hasDirective('model')){
-                let d:nodom.Directive = c.getDirective('model');
-                this.listName = d.value[0];
-            }
-            let icon:nodom.Element = new nodom.Element('b');
-            icon.addClass('nd-uncheck');
-            icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.checkName + "'}"));    
-            c.children.unshift(icon);
-            //点击事件
-            c.addEvent(new nodom.NodomEvent('click',
-                (dom,model,module)=>{
-                    me.switchValue(module,model,dom.getProp('show'));
-                }
-            ));
-            listDom.add(c);
+            itemDom = c;
+            break;
         }
+
         
+        //非自定义，则新建默认对象
+        if(!itemDom){
+            itemDom = new nodom.Element('div');
+            let txt:nodom.Element = new nodom.Element();
+            txt.expressions = [new nodom.Expression(this.displayName)];
+            itemDom.add(txt);
+        }
+        itemDom.addClass('nd-select-itemcontent');
+        
+        //item容器包裹
+        let itemCt:nodom.Element = new nodom.Element('div');
+        itemCt.add(itemDom);
+
+        itemCt.addClass('nd-select-item');
+        itemCt.addDirective(new nodom.Directive('repeat','datas'));
+        itemCt.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}"));
+
+        icon = new nodom.Element('b');
+        icon.addClass('nd-select-itemicon');
+        icon.addDirective(new nodom.Directive('show','selected'));    
+        itemCt.add(icon);
+        //点击事件
+        itemCt.addEvent(new nodom.NodomEvent('click',
+            (dom,model,module)=>{
+                me.setValue(module,model);
+            }
+        ));
+        listDom.children = [itemCt];
         showDom.add(listDom);
-        selectDom.children = [showDom];
-        selectDom.delProp('field');
-        selectDom.defineElement = this;
-        return selectDom;
+        //修改model
+        showDom.addDirective(new nodom.Directive('model',this.extraDataName));
+        rootDom.children = [showDom];
+        rootDom.defineElement = this;
+        return rootDom;
     }
     /**
      * 后置渲染
@@ -138,148 +148,120 @@ class UISelect extends nodom.DefineElement{
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
         let me = this;
-        this.modelId = dom.modelId;
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
-        let value = pmodel.query(this.dataName);
-        let valueArr:string[];
+        let pmodel:nodom.Model;
+        if(!this.modelId){
+            this.modelId = dom.modelId;
+            pmodel = module.modelFactory.get(this.modelId);
+            pmodel.set(this.extraDataName,{
+                show:false,
+                display:'',
+                datas:[]
+            });
+
+            let data = pmodel.query(this.extraDataName);
+            this.extraModelId = data.$modelId;
         
-        if(!this.initDataFlag && this.listName){
+            //注册click事件到全局事件管理器
+            UIEventRegister.addEvent('click',module.name,dom.key,
+                (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
+                    let model:nodom.Model = module.modelFactory.get(me.extraModelId);
+                    //外部点击则关闭
+                    if(!inOrout && model.data.show){
+                        model.set('show',false);
+                    }
+                }
+            );
+        }
+
+        pmodel = module.modelFactory.get(this.modelId);
+        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let data = model.data;
+        //下拉值初始化
+        if(this.listName && data.datas.length === 0 && pmodel.data[this.listName]){
+
+            let value = pmodel.query(this.dataName);
+            let valueArr:string[];
             if(value && value!==''){
                 valueArr = value.toString().split(',');
             }
             let txtArr:string[] = [];
             let rows = pmodel.query(this.listName);
-            for(let d of rows){
-                if(valueArr && valueArr.includes(d[this.valueName]+'')){
-                    d[this.checkName] = true;
-                    txtArr.push(d[this.showName]);
-                }else{
-                    d[this.checkName] = false;
-                }
-            }
+            //复制新数据
+            if(rows && Array.isArray(rows)){
+                rows = nodom.Util.clone(rows);
             
-            if(txtArr.length>0){
-                pmodel.set(this.displayName,txtArr.join(','));
-            }
-
-            //注册click事件到全局事件管理器
-            UIEventRegister.addEvent('click',module.name,dom.key,
-                (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
-                    let model:nodom.Model = module.modelFactory.get(dom.modelId);
-                    //外部点击则关闭
-                    if(!inOrout && model.data[me.switchName]){
-                        pmodel.set(me.switchName,false);
+                //初始化选中状态
+                for(let d of rows){
+                    if(valueArr && valueArr.includes(d[this.valueName]+'')){
+                        d.selected = true;
+                        txtArr.push(d[this.displayName]);
+                    }else{
+                        d.selected = false;
                     }
                 }
-            );
-            this.initDataFlag = true;
-        }
-    }
-    /**
-     * 全部反选
-     * @param module    module 
-     */
-    unseleceAll(module:nodom.Module){
-        if(!this.modelId || !this.listName){
-            return;
-        }
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
-        let rows = pmodel.query(this.listName);
-        for(let d of rows){
-            d[this.checkName] = false;    
-        }
-    }
-
-    /**
-     * 添加数据
-     * @param module    模块
-     * @param model     数据model
-     * @param txt       显示文本
-     */
-    switchValue(module:nodom.Module,model:nodom.Model,txt:string){
-        let checked:boolean = model.query(this.checkName);
-        if(checked){
-            this.removeValue(module,model);
-            model.set(this.checkName,false);
-        }else{
-            this.addValue(module,model,txt);
-            model.set(this.checkName,true);
-        }
-    }
-    /**
-     * 添加数据
-     * @param module    模块
-     * @param model     数据model
-     * @param txt       显示文本
-     */
-    addValue(module:nodom.Module,model:nodom.Model,txt:string){
-        let pmodel = module.modelFactory.get(this.modelId);
-        //值串
-        let value:string = pmodel.query(this.dataName);
-        //显示串
-        let display:string = pmodel.query(this.displayName);
-        let v = model.query(this.valueName);
-        
-        //多选
-        if(this.multi){
-            if(value){
-                let a = value.toString().split(',');
-                if(a.includes(v)){
-                    return;
-                }
-
-                a.push(v);
-                pmodel.set(this.dataName,a.join(','));
-                pmodel.set(this.displayName,display+',' + txt);
-            }else{
-                pmodel.set(this.dataName,v);
-                pmodel.set(this.displayName,txt);
+                
+                //设置下拉数据
+                model.set('datas',rows);
+                this.setValue(module);
             }
-        }else{
-            this.unseleceAll(module);
-            pmodel.set(this.valueName,v);
-            pmodel.set(this.displayName,txt);
-            pmodel.set(this.switchName,false);
         }
     }
-
+    
     /**
-     * 添加数据
+     * 设置数据
      * @param module    模块
-     * @param model     数据项
+     * @param value     值
      */
-    removeValue(module:nodom.Module,model:nodom.Model){
+    setValue(module:nodom.Module,model?:nodom.Model){
+        //原model
         let pmodel = module.modelFactory.get(this.modelId);
-        //值串
-        let value:string = pmodel.query(this.dataName);
-        //显示串
-        let display:string = pmodel.query(this.displayName);
-        let v = model.query(this.valueName);
-        model.set(this.checkName,false);
-        if(!value || value === ''){
-            return;
-        }
-        //多选
+        //附加数据model
+        let model1:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let rows  = model1.data['datas'];
+        //显示数组
+        let txtArr:string[] = [];
+        //值数组
+        let valArr:string[] = [];
         if(this.multi){
-            let a = value.toString().split(',');
-            v = v.toString();
-            if(!a.includes(v)){
-                return;
+            //反选
+            if(model){
+                model.set('selected',!model.data.selected);
             }
-            let ind = a.indexOf(v);
             
-            a.splice(ind,1);
-            let a1 = display.split(',');
-            a1.splice(ind,1);
-            pmodel.set(this.dataName,a.join(','));
-            pmodel.set(this.displayName,a1.join(','));
+            for(let d of rows){
+                if(d.selected){
+                    valArr.push(d[this.valueName]);
+                    txtArr.push(d[this.displayName]);
+                }
+            }
+            pmodel.set(this.dataName,valArr.join(','));
+            model1.set('display',txtArr.join(','));
         }else{
-            pmodel.set(this.dataName,'');
-            pmodel.set(this.displayName,'');
-            pmodel.set(this.switchName,false);
+            //如果model不存在，则直接取选中值
+            if(model){
+                //取消选择
+                for(let d of rows){
+                    if(d.selected){
+                        d.selected = false;
+                        break;
+                    }
+                }
+                //设置选择
+                model.set('selected',!model.data.selected);
+            }
+
+            //设置选中
+            for(let d of rows){
+                if(d.selected){
+                    pmodel.set(this.dataName,d[this.valueName]);
+                    model1.set('display',d[this.displayName]);
+                    model1.set('show',false);        
+                    break;
+                }
+            }
+            
         }
     }
-
 }
 
 nodom.DefineElementManager.add('UI-SELECT',UISelect);
