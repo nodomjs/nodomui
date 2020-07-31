@@ -45,16 +45,21 @@
         }
 
         .hobitem{
-            display:flex;
-            
+            overflow:visible;
         }
 
-        .hobitem:first-child{
-            flex:1;
+        .hobitem span{
+            display:inline-block;
+        }
+        .hobitem .id{
+            width:30px;
         }
 
-        .hobitem:first-child{
-            flex:1;
+        .hobitem .title{
+            width:80px;
+        }
+        .hobitem .desc{
+            width:200px;
         }
     </style>
 </head>
@@ -67,7 +72,7 @@
         <form class='form'>
             <div class='nd-form-item'>
                 <label>姓名:</label>
-                <input  class='nd-form-input' type='text' x-field='userName' value='{{userName}}'>
+                <input  class='nd-form-input' x-field='userName' value='{{userName}}'>
             </div>
             <div class='nd-form-item'>
                 <label>性别:</label>
@@ -95,8 +100,9 @@
                     valueField 对应数组中对象的值字段名
                     displayField 对应数组中对象的显示字段名
                     listField  下拉列表对应数据
+                    allowFilter 允许过滤器
                 -->
-                <ui-select class='nd-form-input' x-field='education' valueField='id' displayField='title' listField='edus'>
+                <ui-select class='nd-form-input' x-field='education' valueField='id' displayField='title' allowFilter listField='edus'>
                 </ui-select>
             </div>
 
@@ -107,9 +113,11 @@
                     valueField 对应数组中对象的值字段名
                     displayField 对应数组中对象的显示字段名
                     listField  下拉列表对应数据
+                    allowFilter 允许过滤
+                    listWidth   下拉列表宽度，默认与输入框相同
                 -->
-                <ui-select class='nd-form-input' x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' multiselect>
-                    <div>{{hid}} - {{htitle}} - {{desc}}</div>
+                <ui-select class='nd-form-input' x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' multiselect listWidth='500'>
+                    <div class='hobitem'><span class='id'>{{hid}}</span> <span class='title'>{{htitle}} </span> <span class='desc'>{{desc}}</span></div>
                 </ui-select>
             </div>
 
@@ -117,7 +125,7 @@
                 <label>生活照:</label>
                 <ui-file field='photos' multiple='multi' valueField='imgId' displayField="fileName" 
                  returnFields='id,url,result.rows' uploadMethod='uploadFile' delMethod='delFile'
-                 type='' maxCount='5'></ui-file>
+                 maxCount='5'></ui-file>
             </div>
             
             <div class='nd-form-item'>

@@ -1075,7 +1075,7 @@ var nodom;
             let dst = new Element();
             if (changeKey) {
                 dst.key = nodom.Util.genId() + '';
-                let notCopyProps = ['key','parent', 'children'];
+                let notCopyProps = ['key', 'parent', 'children'];
                 nodom.Util.getOwnProps(this).forEach((p) => {
                     if (notCopyProps.includes(p)) {
                         return;
@@ -3928,7 +3928,8 @@ var nodom;
             if (!directive.extra) {
                 directive.extra = 1;
                 dom.setProp('name', directive.value);
-                let eventName = dom.getProp('tagName') === 'input' && ['text', 'checkbox', 'radio'].includes(dom.getProp('type')) ? 'input' : 'change';
+                let type = dom.getProp('type') || 'text';
+                let eventName = dom.tagName === 'input' && ['text', 'checkbox', 'radio'].includes(type) ? 'input' : 'change';
                 dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
                     if (!el) {
                         return;

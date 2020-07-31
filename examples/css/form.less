@@ -47,43 +47,64 @@ form{
 .nd-select{
     display:inline-block;
     position:relative;
-    .nd-select-content{
-        /*输入框，下箭头容器*/
-        .nd-select-firstct{
-            .nd-input-icon;
-            > b{
-                .nd-icon-arrow-down;
-            }
+    /*输入框，下箭头容器*/
+    .nd-select-inputct{
+        overflow:hidden;
+        .nd-input-icon;
+        > b{
+            .nd-icon-arrow-down;
+            padding:0;
+        }
+        /*搜索框*/
+        .nd-select-search{
+            position:absolute;
+            width:90%;
+            opacity:0.5;
+        }
+
+        .nd-select-search-active{
+            opacity:1;
         }
     }
+    /*下拉框*/
     .nd-select-list{
         .nd-color4;
+        .nd-border;
+        position:absolute;
         max-height:300px;
+        margin-top:@nd-dropdown-margin;
         overflow:auto;
         z-index:@nd-combo-index;
         padding:@nd-padding * 2;
-        position:absolute;
         width:100%;
         box-sizing: border-box;
         border-bottom-left-radius: @nd-padding;
         border-bottom-right-radius: @nd-padding;
-        .nd-border;
-
+        
         .nd-select-item{
             display:flex;
             line-height:30px;
             .nd-select-itemicon{
                 flex:0;
-                .nd-icon-select;
+                padding:0;
+                width:15px;
+                display:inline-block;                
             }
 
             .nd-select-itemcontent{
                 flex:1;
             }
+
+            &:hover{
+                .nd-color6;
+            }
         }
 
         .nd-select-selected{
             color:@nd-activecolor;
+            .nd-select-itemicon{
+                .nd-icon-select;
+            }
         }
     }
 }

@@ -16,22 +16,25 @@
             .nd-icon-time;
         }
     }
+    /*下拉面板*/
     .nd-datetime-picker{
         position:absolute;
         z-index:@nd-combo-index;
-        margin-top:1px;
+        margin-top:@nd-dropdown-margin;
         padding:@nd-padding;
         .nd-border;
         .nd-color4;
 
-        /*底行*/
+        /*按钮*/
         .nd-datetime-btnct{
-            padding:@nd-padding*2 @nd-padding*2 0 0;
-            text-align:right;
+            padding:@nd-padding*2 0;
+            text-align:center;
             >button{
                 .nd-btn;
                 .nd-btn-small;
-                margin-right:@nd-padding;
+            }
+            & :first-child{
+                margin-right:@nd-padding*2;
             }
         }
 
@@ -40,7 +43,7 @@
         }
     }
 
-    /*日历表*/
+    /*日期面板*/
     .nd-datetime-datetbl{
         width:245px;
         /*显示年月和箭头*/
@@ -121,7 +124,7 @@
         
     }
 
-    /*时间picker*/
+    /*时间面板*/
     .nd-datetime-timetbl{
         width:210px;
         overflow:hidden;

@@ -20,6 +20,11 @@ class UISelect extends nodom.DefineElement{
     listName:string;
 
     /**
+     * 下拉框宽度
+     */
+    listWidth:number;
+
+    /**
      * 列表值数据name
      */
     valueName:string;
@@ -28,6 +33,12 @@ class UISelect extends nodom.DefineElement{
      * 显示内容
      */
     displayName:string;
+
+    /**
+     * 允许过滤
+     */
+    allowFilter:boolean;
+
     /**
      * select 对象的modelId
      */
@@ -42,7 +53,11 @@ class UISelect extends nodom.DefineElement{
      */
     multi:boolean;
 
-    //设置显示内容
+    /**
+     * 过滤器方法id
+     */
+    filterMethodId:string;
+    
 
     init(el:HTMLElement):nodom.Element{
         let me = this;
@@ -54,8 +69,9 @@ class UISelect extends nodom.DefineElement{
         nodom.Compiler.handleChildren(rootDom,el);
 
         UITool.handleUIParam(rootDom,this,
-            ['valuefield','displayfield','multiselect|bool','listfield'],
-            ['valueName','displayName','multi','listName']
+            ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool'],
+            ['valueName','displayName','multi','listName','listWidth','allowFilter'],
+            [null,null,null,null,0,null]
         );
 
         rootDom.tagName = 'div';
@@ -64,37 +80,16 @@ class UISelect extends nodom.DefineElement{
         let field = rootDom.getDirective('field');
         this.dataName = field.value;
         
-        //显示框
-        let showDom:nodom.Element = new nodom.Element('div');
-        showDom.addClass('nd-select-content');
+        //修改model
+        rootDom.addDirective(new nodom.Directive('model',this.extraDataName));
             
         //下拉框
         let listDom:nodom.Element = new nodom.Element('div');
         listDom.addClass('nd-select-list');
-        listDom.addDirective(new nodom.Directive('show','show'));
-
-        //显示框
-        let firstDom:nodom.Element = new nodom.Element('div');
-        firstDom.addClass('nd-select-firstct');
-        let input:nodom.Element = new nodom.Element('input');
-        input.addClass('nd-select-show');
-        
-        //多选择，不允许输入
-        if(this.multi){
-            input.setProp('readonly',true);
+        if(this.listWidth){
+            listDom.assets.set('style','width:' + this.listWidth + 'px');
         }
-        input.setProp('value', new nodom.Expression('display'),true);
-        firstDom.add(input);
-        let icon:nodom.Element = new nodom.Element('b');
-        //点击展开或收拢
-        firstDom.addEvent(new nodom.NodomEvent('click',
-            (dom,model,module)=>{
-                model.set('show',!model.data['show']);
-            }
-        ));
-        firstDom.add(icon);
-        showDom.add(firstDom);
-        
+        listDom.addDirective(new nodom.Directive('show','show'));
         let itemDom:nodom.Element;
         // 如果有，则表示自定义
         for(let c of rootDom.children){
@@ -113,31 +108,67 @@ class UISelect extends nodom.DefineElement{
             txt.expressions = [new nodom.Expression(this.displayName)];
             itemDom.add(txt);
         }
-        itemDom.addClass('nd-select-itemcontent');
-        
-        //item容器包裹
-        let itemCt:nodom.Element = new nodom.Element('div');
-        itemCt.add(itemDom);
+        //item文本显示内容
+        let item:nodom.Element = new nodom.Element('div');
+        item.children = itemDom.children;
+        item.addClass('nd-select-itemcontent');
+        itemDom.addClass('nd-select-item');
+        let directive:nodom.Directive = new nodom.Directive('repeat','datas');
+        itemDom.addDirective(directive);
+        itemDom.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}"));
 
-        itemCt.addClass('nd-select-item');
-        itemCt.addDirective(new nodom.Directive('repeat','datas'));
-        itemCt.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}"));
-
-        icon = new nodom.Element('b');
+        let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-select-itemicon');
-        icon.addDirective(new nodom.Directive('show','selected'));    
-        itemCt.add(icon);
+        itemDom.children = [item,icon];
         //点击事件
-        itemCt.addEvent(new nodom.NodomEvent('click',
+        itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
                 me.setValue(module,model);
             }
         ));
-        listDom.children = [itemCt];
-        showDom.add(listDom);
-        //修改model
-        showDom.addDirective(new nodom.Directive('model',this.extraDataName));
-        rootDom.children = [showDom];
+
+        //显示框
+        let showDom:nodom.Element = new nodom.Element('div');
+        showDom.addClass('nd-select-inputct');
+        let input:nodom.Element = new nodom.Element('input');
+        input.addClass('nd-select-show');
+        
+        //多选择，不允许输入
+        if(this.multi){
+            input.setProp('readonly',true);
+        }
+        input.setProp('value', new nodom.Expression('display'),true);
+        showDom.add(input);
+        icon = new nodom.Element('b');
+        //点击展开或收拢
+        showDom.addEvent(new nodom.NodomEvent('click',
+            (dom,model,module)=>{
+                if(model.data.show){
+                    me.hideList(module,model);
+                }else{
+                    model.set('show',true);
+                }
+            }
+        ));
+        
+        if(this.allowFilter){
+            //给repeat增加filter
+            this.filterMethodId = '$$nodom_method_' + nodom.Util.genId();
+            let filter:nodom.Filter = new nodom.Filter(['select','func',this.filterMethodId]);
+            directive.filters = [filter];
+
+            input.assets.set('readonly','true');
+            //input上覆盖一个query input
+            let queryDom:nodom.Element = new nodom.Element('input');
+            queryDom.addClass('nd-select-search');
+            queryDom.addDirective(new nodom.Directive('field','query'));
+            queryDom.addDirective(new nodom.Directive('class',"{'nd-select-search-active':'show'}"));
+            showDom.add(queryDom);
+        }
+        showDom.add(icon);
+
+        listDom.children = [itemDom];
+        rootDom.children = [showDom,listDom];
         rootDom.defineElement = this;
         return rootDom;
     }
@@ -148,33 +179,56 @@ class UISelect extends nodom.DefineElement{
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
         let me = this;
+        //uidom model
         let pmodel:nodom.Model;
+        //附加数据model
+        let model:nodom.Model;
         if(!this.modelId){
             this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
             pmodel.set(this.extraDataName,{
-                show:false,
-                display:'',
-                datas:[]
+                show:false,     //下拉框显示
+                display:'',     //显示内容
+                query:'',       //查询串
+                datas:[]        //下拉框数据
             });
 
             let data = pmodel.query(this.extraDataName);
             this.extraModelId = data.$modelId;
         
+            //增加过滤器方法
+            module.methodFactory.add(this.filterMethodId,function(){
+                let model:nodom.Model = this.modelFactory.get(me.extraModelId);
+                let rows = model.query('datas');
+                if(rows){
+                    return rows.filter( (item)=> {
+                        return model.data.query==='' || item[me.displayName].indexOf(model.data.query) !== -1;
+                    });
+                }
+                return [];
+            });
             //注册click事件到全局事件管理器
             UIEventRegister.addEvent('click',module.name,dom.key,
                 (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
                     let model:nodom.Model = module.modelFactory.get(me.extraModelId);
                     //外部点击则关闭
                     if(!inOrout && model.data.show){
-                        model.set('show',false);
+                        me.hideList(module,model);
                     }
                 }
             );
+
+            model = module.modelFactory.get(this.extraModelId);
         }
 
-        pmodel = module.modelFactory.get(this.modelId);
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        if(!pmodel){
+            pmodel = module.modelFactory.get(this.modelId);
+        }
+        
+        if(!model){
+            model = module.modelFactory.get(this.extraModelId);
+        }
+        
         let data = model.data;
         //下拉值初始化
         if(this.listName && data.datas.length === 0 && pmodel.data[this.listName]){
@@ -255,12 +309,25 @@ class UISelect extends nodom.DefineElement{
                 if(d.selected){
                     pmodel.set(this.dataName,d[this.valueName]);
                     model1.set('display',d[this.displayName]);
-                    model1.set('show',false);        
+                    this.hideList(module,model1);
                     break;
                 }
             }
             
         }
+    }
+
+    /**
+     * 隐藏下拉list
+     * @param module module
+     * @param model  附加model   
+     */
+    hideList(module:nodom.Module,model?:nodom.Model){
+        if(!model){
+            model = module.modelFactory.get(this.extraModelId);
+        }
+        model.set('show',false);
+        model.set('query','');
     }
 }
 
