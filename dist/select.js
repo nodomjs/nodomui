@@ -232,7 +232,7 @@ class UISelect extends nodom.DefineElement {
         }
     }
     /**
-     * 隐藏list
+     * 隐藏下拉list
      * @param module module
      * @param model  附加model
      */

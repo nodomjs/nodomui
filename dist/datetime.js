@@ -516,6 +516,7 @@ class UIDatetime extends nodom.DefineElement {
      * 设置时间选中
      */
     setTimeSelect(module) {
+        let me = this;
         let model = module.modelFactory.get(this.pickerModelId);
         let data = [this.hour, this.minute, this.second];
         ['hours', 'minutes', 'seconds'].forEach((item, i) => {
@@ -529,24 +530,27 @@ class UIDatetime extends nodom.DefineElement {
             }
             datas[data[i]].selected = true;
         });
-        setTimeout(() => {
-            let uidom = module.renderTree.query(this.key);
+        //等待渲染完后执行scroll
+        setTimeout(scroll, 0);
+        function scroll() {
+            let uidom = module.renderTree.query(me.key);
             let timeCt;
             //尚未打开picker
             if (uidom.children.length === 1) {
+                setTimeout(scroll, 0);
                 return;
             }
-            if (this.type === 'datetime') {
+            if (me.type === 'datetime') {
                 timeCt = uidom.children[1].children[0].children[1].children[1];
             }
-            else if (this.type === 'time') {
+            else if (me.type === 'time') {
                 timeCt = uidom.children[1].children[0].children[0].children[1];
             }
             data.forEach((item, i) => {
                 let el = module.container.querySelector("[key='" + timeCt.children[i].key + "']");
                 el.scrollTo(0, data[i] * 30);
             });
-        }, 100);
+        }
     }
     /**
      * 生成日期时间串

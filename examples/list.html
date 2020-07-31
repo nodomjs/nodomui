@@ -24,23 +24,66 @@
     <script src='../dist/list.js'></script>
     
     <style>
-        
+         .list1{
+             width:500px;
+             height:100px;
+         }
+         .item1{
+             width:100px;
+         }
+
+         .item1 img{
+             width:60px;
+         }
+
+         .item1 div{
+             font-size:16px;
+             text-align:center;
+         }
     </style>
 </head>
 <body>
     <div>
+        <p>横向单选list</p>
+        <ui-list x-field='hobby' valueField='hid' displayField='htitle'
+            listField='hobbies' type='col' 
+            itemClick='clickItem'
+            ></ui-list>
 
-        <ui-list 
-            displayField='icon|1|image,title|1'
-            listField='desks' itemClick='clickItem'
-            listType='col'>
+        <p>纵向多选list</p>
+        <ui-list class='list1' x-field='hobby' valueField='hid' displayField='htitle'
+            listField='hobbies' type='row' multiselect 
+            itemClick='clickItem'
+            ></ui-list>
+        <p>带禁用项list</p>
+        <ui-list x-field='hobby' valueField='hid' displayField='htitle' disableField='disable' 
+            listField='hobbies' type='col' 
+            itemClick='clickItem'
+            ></ui-list>
+            
+        <p>自定义list1</p>
+        <ui-list x-field='hobby' class='list1' valueField='hid' displayField='htitle'
+            listField='hobbies' type='row' 
+            itemClick='clickItem'
+            >
+            <div>
+                <b class='{{"nd-icon-" + icon }}'></span>
+                <span>{{htitle}}</span>
+                <span>{{desc}}</span>
+            </div>
         </ui-list>
 
+        <p>自定义list2</p>
         <ui-list 
-            displayField='icon|1|icon,htitle|1,desc|3'
-            listField='hobbies' itemClick='clickItem'
-            listType='row'>
+            listField='desks' type='col' 
+            itemClick='clickItem'
+            >
+            <div class='item1' align='center'>
+                <img src='{{icon}}'>
+                <div>{{title}}</div>
+            </div>
         </ui-list>
+        
 
     </div>
 </body>
@@ -49,6 +92,7 @@
         module:{
             el:'div',
             data:{
+                hobby:2,
                 desks:[
                     {id:1,title:'计算器',icon:'imgs/caculator.png'},
                     {id:2,title:'日历',icon:'imgs/calendar.png'},
@@ -60,10 +104,10 @@
                 hobbies:[
                     {hid:1,htitle:'体育',icon:'prompt',desc:'体育运动很不错'},
                     {hid:2,htitle:'阅读',icon:'search',desc:'阅读让人睿智'},
-                    {hid:3,htitle:'健身',icon:'close',desc:'健身让人上瘾'},
+                    {hid:3,htitle:'健身',icon:'close',disable:true,desc:'健身让人上瘾'},
                     {hid:4,htitle:'电脑游戏',icon:'minus',desc:'好玩可别贪玩'},
                     {hid:5,htitle:'户外运动',icon:'add',desc:'感受大自然，轻呼吸'},
-                    {hid:6,htitle:'旅游',icon:'prompt',desc:'读万卷书，行万里路'},
+                    {hid:6,htitle:'旅游',icon:'prompt',disable:true,desc:'读万卷书，行万里路'},
                     {hid:7,htitle:'吐槽',icon:'prompt',desc:'吐吐更健康'},
                     {hid:8,htitle:'发呆',icon:'prompt',desc:'人生那么长，歇一下又何妨'},
                 ]

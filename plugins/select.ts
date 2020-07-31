@@ -58,7 +58,6 @@ class UISelect extends nodom.DefineElement{
      */
     filterMethodId:string;
     
-
     init(el:HTMLElement):nodom.Element{
         let me = this;
         //生成id
