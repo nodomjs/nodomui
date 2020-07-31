@@ -9,44 +9,59 @@ class UIListTransfer extends nodom.DefineElement {
     }
     init(el) {
         let me = this;
-        //生成check id
-        this.checkName = '$ui_listtransfer_' + nodom.Util.genId();
-        this.selectedName = '$ui_listtransfer_' + nodom.Util.genId();
-        let transferDom = new nodom.Element();
-        nodom.Compiler.handleAttributes(transferDom, el);
-        UITool.handleUIParam(transferDom, this, ['field', 'valuefield', 'displayfield|array', 'data'], ['fieldName', 'valueName', 'displayName', 'listName']);
-        transferDom.tagName = 'div';
-        transferDom.addClass('nd-listtransfer');
+        this.extraDataName = '$ui_listtransfer_' + nodom.Util.genId();
+        let rootDom = new nodom.Element();
+        //更改model
+        rootDom.addDirective(new nodom.Directive('model', this.extraDataName));
+        nodom.Compiler.handleAttributes(rootDom, el);
+        nodom.Compiler.handleChildren(rootDom, el);
+        UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield'], ['valueName', 'displayName', 'listName']);
+        rootDom.tagName = 'div';
+        rootDom.addClass('nd-listtransfer');
+        //从field指令获取dataName
+        let field = rootDom.getDirective('field');
+        if (field) {
+            this.dataName = field.value;
+        }
         //左列表
         let listDom = new nodom.Element('div');
-        listDom.addClass('nd-nd-listtransfer-box');
+        listDom.addClass('nd-list');
         // 列表节点
-        let itemDom = new nodom.Element('div');
-        itemDom.addClass('nd-listtransfer-item');
-        itemDom.addDirective(new nodom.Directive('repeat', this.listName, "select:value:{" + this.selectedName + ":false}"));
-        listDom.add(itemDom);
-        //复选框
-        let icon = new nodom.Element('b');
-        icon.addClass('nd-listtransfer-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-listtransfer-checked':'" + this.checkName + "'}"));
-        itemDom.add(icon);
-        //显示文本
-        for (let f of this.displayName) {
-            let span = new nodom.Element('span');
-            span.addClass('nd-listtransfer-item-col');
-            let txt = new nodom.Element();
-            txt.expressions = [new nodom.Expression(f)];
-            span.add(txt);
-            itemDom.add(span);
+        let itemDom;
+        // 如果有，则表示自定义
+        for (let c of rootDom.children) {
+            if (!c.tagName) {
+                continue;
+            }
+            itemDom = c;
+            break;
         }
+        //非自定义，则新建默认对象
+        if (!itemDom) {
+            itemDom = new nodom.Element('div');
+            let txt = new nodom.Element();
+            txt.expressions = [new nodom.Expression(this.displayName)];
+            itemDom.add(txt);
+        }
+        itemDom.addClass('nd-list-item');
+        itemDom.addDirective(new nodom.Directive('repeat', 'datas', "select:value:{isValue:false}"));
+        itemDom.addDirective(new nodom.Directive('class', "{'nd-list-item-active':'selected'}"));
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            model.set(this.checkName, !model.data[this.checkName]);
+            model.set('selected', !model.data.selected);
         }));
+        //item文本显示内容
+        let item = new nodom.Element('div');
+        item.children = itemDom.children;
+        item.addClass('nd-list-itemcontent');
+        let icon = new nodom.Element('b');
+        icon.addClass('nd-list-icon');
+        itemDom.children = [item, icon];
+        listDom.children = [itemDom];
         //右列表(克隆来)
         let listDom1 = listDom.clone(true);
-        let dir = listDom1.children[0].getDirective('repeat');
-        dir.filters = [new nodom.Filter("select:value:{" + this.selectedName + ":true}")];
+        //更改数据
+        listDom1.children[0].getDirective('repeat').filters = [new nodom.Filter("select:value:{isValue:true}")];
         //按钮>>
         //按钮容器
         let btnGrp = new nodom.Element('div');
@@ -76,10 +91,9 @@ class UIListTransfer extends nodom.DefineElement {
         btn4.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
             me.transfer(module, 2, true);
         }));
-        transferDom.children = [listDom, btnGrp, listDom1];
-        transferDom.delProp(['data', 'field', 'valuefield', 'displayfield']);
-        transferDom.defineElement = this;
-        return transferDom;
+        rootDom.children = [listDom, btnGrp, listDom1];
+        rootDom.defineElement = this;
+        return rootDom;
     }
     /**
      * 后置渲染
@@ -87,27 +101,38 @@ class UIListTransfer extends nodom.DefineElement {
      * @param dom
      */
     beforeRender(module, dom) {
-        this.modelId = dom.modelId;
-        let model = module.modelFactory.get(dom.modelId);
-        //获取绑定字段值
-        let value = model.query(this.fieldName);
-        //获取数据列表值
-        let datas = model.query(this.listName);
-        if (value) {
-            for (let d of datas) {
-                let m = module.modelFactory.get(d.$modelId);
-                let finded = false;
-                for (let v of value) {
-                    if (d[this.valueName] === v) {
-                        m.set(this.selectedName, true);
-                        finded = true;
-                        break;
+        //uidom model
+        let pmodel;
+        //附加数据model
+        let model;
+        if (!this.modelId) {
+            this.modelId = dom.modelId;
+            pmodel = module.modelFactory.get(this.modelId);
+            pmodel.set(this.extraDataName, {
+                //数据
+                datas: []
+            });
+            let data = pmodel.query(this.extraDataName);
+            this.extraModelId = data.$modelId;
+            let value = pmodel.query(this.dataName);
+            let datas = pmodel.query(this.listName);
+            let model = module.modelFactory.get(this.extraModelId);
+            let rows = [];
+            if (Array.isArray(datas)) {
+                let va = [];
+                if (value) {
+                    va = value.split(',');
+                }
+                rows = nodom.Util.clone(datas);
+                for (let d of rows) {
+                    d.selected = false;
+                    d.isValue = false;
+                    if (va && va.includes(d[this.valueName] + '')) {
+                        d.isValue = true;
                     }
                 }
-                if (!finded) {
-                    m.set(this.selectedName, false);
-                }
             }
+            model.set('datas', rows);
         }
     }
     /**
@@ -117,17 +142,17 @@ class UIListTransfer extends nodom.DefineElement {
      * @param all       true 全部移动  false 移动选中的项
      */
     transfer(module, direction, all) {
-        let model = module.modelFactory.get(this.modelId);
-        let datas = model.data[this.listName];
-        let selected = direction === 1 ? true : false;
+        let model = module.modelFactory.get(this.extraModelId);
+        let datas = model.data.datas;
+        let isValue = direction === 1 ? true : false;
         for (let d of datas) {
             if (all) {
-                d[this.selectedName] = selected;
+                d.isValue = isValue;
             }
-            else if (d[this.checkName]) {
-                d[this.selectedName] = selected;
+            else if (d.selected) {
+                d.isValue = isValue;
             }
-            d[this.checkName] = false;
+            d.selected = false;
         }
         this.updateValue(module);
     }
@@ -136,15 +161,15 @@ class UIListTransfer extends nodom.DefineElement {
      * @param module    模块
      */
     updateValue(module) {
-        let model = module.modelFactory.get(this.modelId);
-        let datas = model.data[this.listName];
+        let pmodel = module.modelFactory.get(this.modelId);
+        let model = module.modelFactory.get(this.extraModelId);
         let a = [];
-        for (let d of datas) {
-            if (d[this.selectedName]) {
+        for (let d of model.data.datas) {
+            if (d.isValue) {
                 a.push(d[this.valueName]);
             }
         }
-        model.set(this.fieldName, a);
+        pmodel.set(this.dataName, a.join(','));
     }
 }
 nodom.DefineElementManager.add('UI-LISTTRANSFER', UIListTransfer);

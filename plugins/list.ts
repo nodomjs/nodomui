@@ -156,7 +156,6 @@ class UIList extends nodom.DefineElement{
      * @param dom 
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
-        let me = this;
         //uidom model
         let pmodel:nodom.Model;
         //附加数据model

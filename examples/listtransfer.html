@@ -9,6 +9,7 @@
     <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
     <link rel="stylesheet/less" type="text/css" href="css/button.less" />
     <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/list.less" />
     <link rel="stylesheet/less" type="text/css" href="css/listtransfer.less" />
     <script src='js/nodom.js'></script>
     <script src='js/less.min.js'></script>
@@ -23,7 +24,17 @@
 </head>
 <body>
     <div>
-        <ui-listtransfer class='ct' field='selectedUser'  valueField='uid' displayField='uid,userName,company' data='users'>
+        <p>简单用法</p>
+        <ui-listtransfer class='ct' x-field='selectedUser'  valueField='uid' 
+            displayField='userName' listField='users'>
+        </ui-listtransfer>
+        <p>自定义</p>
+        <ui-listtransfer class='ct' x-field='selectedUser'  valueField='uid' 
+            displayField='userName' listField='users'>
+            <div>
+                <span style='width:100px;display:inline-block;'>{{userName}}</span>
+                <span >{{company}}</span>
+            </div>
         </ui-listtransfer>
     </div>
 </body>
@@ -32,7 +43,7 @@
         module:{
             el:'div',
             data:{
-                selectedUser:[3,4],
+                selectedUser:'3,4',
                 users:[
                     {uid:1,userName:'yang lei','company':'swust'},
                     {uid:2,userName:'张三','company':'阿里'},
