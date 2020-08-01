@@ -21,11 +21,18 @@
 <body>
     
     <div>
+        <p>简单使用</p>
         <ui-tab position='top' allowClose>
-            <tab title='tab1'>this is tab1</tab>
+            <tab title='tab1'><p style='color:red'>this is tab1</p></tab>
             <tab title='tab2'>this is tab2</tab>
             <tab title='tab3'>this is tab3</tab>
         </ui-tab>
+
+        <p>简单使用</p>
+        <ui-tab position='top' allowClose field='datas'>
+            <tab title='tab1'><p style='color:red'>this is tab1</p></tab>
+        </ui-tab>
+    
     </div>
 </body>
 <script>
@@ -33,25 +40,7 @@
         module:{
             el:'div',
             data:{
-                groupUser:[
-                    {gid:1,uid:2},
-                    {gid:1,uid:3},
-                    {gid:3,uid:4},
-                    {gid:2,uid:1}
-                ],
-                groups:[
-                    {gid:1,groupName:'系统管理员'},
-                    {gid:2,groupName:'店铺管理员'},
-                    {gid:3,groupName:'用户管理员'},
-                    {gid:4,groupName:'用户'}
-                ],
-                users:[
-                    {uid:1,userName:'yang'},
-                    {uid:2,userName:'张三'},
-                    {uid:3,userName:'李四'},
-                    {uid:4,userName:'王武'},
-                    {uid:5,userName:'field'}
-                ]
+                
             },
             methods:{
                 clickItem:function(e,module){

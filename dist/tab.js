@@ -64,6 +64,21 @@ class UITab extends nodom.DefineElement {
             if (this.allowClose) {
                 let b = new nodom.Element('b');
                 b.addClass('nd-tab-close');
+                b.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+                    let pmodel = module.modelFactory.get(this.extraModelId);
+                    let datas = pmodel.data.datas;
+                    for (let i = 0; i < datas.length; i++) {
+                        if (datas[i].name === model.data.name) {
+                            //删除tab中的对象
+                            datas.splice(i, 1);
+                            //删除show绑定数据
+                            delete pmodel.data[model.data.name];
+                            //删除body 中的对象
+                            bodyDom.children.splice(i, 1);
+                            break;
+                        }
+                    }
+                }));
                 c.add(b);
             }
             c.addDirective(new nodom.Directive('repeat', 'datas'));

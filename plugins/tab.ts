@@ -78,7 +78,6 @@ class UITab extends nodom.DefineElement{
 
             this.tabs.push({title:title,name:tabName,active:active});
 
-            
             //tab 内容
             let contentDom:nodom.Element = new nodom.Element('div');
             contentDom.children = c.children;
@@ -101,6 +100,26 @@ class UITab extends nodom.DefineElement{
             if(this.allowClose){
                 let b:nodom.Element = new nodom.Element('b');
                 b.addClass('nd-tab-close');
+                b.addEvent(new nodom.NodomEvent('click',(dom,model,module)=>{
+                    let pmodel = module.modelFactory.get(this.extraModelId);
+                    let datas = pmodel.data.datas;
+
+                    for(let i=0;i<datas.length;i++){
+                        if(datas[i].name === model.data.name){
+                            //删除tab中的对象
+                            datas.splice(i,1);
+                            //删除show绑定数据
+                            delete pmodel.data[model.data.name];
+                            //删除body 中的对象
+                            bodyDom.children.splice(i,1);
+                            //设置active
+                            if(i<datas.length){
+
+                            }
+                            break;
+                        }
+                    }    
+                }));
                 c.add(b);
             }
             c.addDirective(new nodom.Directive('repeat','datas'));
