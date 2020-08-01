@@ -1,5 +1,5 @@
 
-@nd-padding:5px;
+@nd-padding:10px;
 @nd-radius:5px;
 @title-padding:15px;
 @nd-gridhead-height:60px;
@@ -19,13 +19,13 @@
 /*背景色*/
 //主背景
 @nd-color1:rgb(23,23,23);  //主背景
-@nd-color2:rgb(27,27,27);  //tree、accordion、form、toolbar、button group
-@nd-color2:rgb(34,34,34);  //tab
-@nd-color3:rgb(39,39,39);  //menu
-@nd-color4:rgb(46,46,46);  //input、panel-title、selected
-@nd-color5:rgb(50,50,50);  //line
-@nd-color6:rgb(63,63,63);  //滚动条 mouseover
-@nd-color7:rgb(85,85,85);  //按钮
+@nd-color2:rgb(27,27,27);  //tree、accordion、form、toolbar、button group、 tab header
+@nd-color3:rgb(34,34,34);  //tab button
+@nd-color4:rgb(39,39,39);  //menu
+@nd-color5:rgb(46,46,46);  //input、panel-title、selected
+@nd-color6:rgb(50,50,50);  //line
+@nd-color7:rgb(63,63,63);  //滚动条 mouseover border
+@nd-color8:rgb(85,85,85);  //按钮
 /*颜色*/
 /*颜色系，根据主color逐次变浅*/
 /**
@@ -116,7 +116,7 @@
     }
     .nd-genback(@counter,@index);
 }
-.nd-genback(7);
+.nd-genback(8);
 
 
 /*global*/
@@ -124,7 +124,7 @@ body{
     padding:0;
     margin:0;
     .nd-color1;
-    font-size:@nd-fontnormal;
+    font-size:@nd-fontlarge;
 }
 
 
@@ -187,6 +187,11 @@ a:visited{
 /*边框*/
 .nd-border{
     border:1px solid @nd-color6;
+}
+
+/*框体padding*/
+.nd-padding{
+    padding:@nd-padding * 2;
 }
 
 /*禁用*/

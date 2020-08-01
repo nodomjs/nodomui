@@ -98,8 +98,6 @@ class UISelect extends nodom.DefineElement{
             itemDom = c;
             break;
         }
-
-        
         //非自定义，则新建默认对象
         if(!itemDom){
             itemDom = new nodom.Element('div');
