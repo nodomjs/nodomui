@@ -84,7 +84,6 @@ class UIListTransfer extends nodom.DefineElement{
             let txt:nodom.Element = new nodom.Element();
             txt.expressions = [new nodom.Expression(this.displayName)];
             itemDom.add(txt);
-        
         }
         itemDom.addClass('nd-list-item');
         
@@ -101,6 +100,7 @@ class UIListTransfer extends nodom.DefineElement{
         item.children = itemDom.children;
         item.addClass('nd-list-itemcontent');
         
+        //选中图标
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-list-icon');
         itemDom.children = [item,icon];

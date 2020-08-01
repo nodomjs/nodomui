@@ -19,8 +19,10 @@
     </style>
 </head>
 <body>
+    
     <div>
-        <ui-relationmap field='groupUser' datas='users,groups'  idFields='uid,gid' showFields='userName,groupName'>
+        <div>{{JSON.stringify(groupUser)}}</div>
+        <ui-relationmap x-field='groupUser' listField='users,groups'  valueField='uid,gid' displayField='userName,groupName'>
         </ui-relationmap>
     </div>
 </body>

@@ -4,20 +4,41 @@
 
 .nd-relationmap{
     border-spacing: 1px;
-    border:1px solid @nd-color10;
-    .nd-color10;
+    .nd-border;
+    .nd-color6;
     .nd-relationmap-head{
-        .nd-color10;
-        padding:@nd-padding;
+        td{
+            .nd-color1;
+            padding:@nd-padding @nd-padding * 2;
+        }
     }
-
+    
     td{
         .nd-color1;
         text-align:center;
     }
 
+    .nd-relationmap-head{
+        td{
+            .nd-disable;
+        }
+    }
+    
+
+    .nd-relationmap-row{
+        td{
+            .nd-canclick;
+        }
+        
+        td:first-child{
+            .nd-disable;
+            padding:@nd-padding @nd-padding*2;
+        }
+    }
+
     .nd-relationmap-active{
-        .nd-icon-selected;
+        .nd-icon-select;
+        color:@nd-activecolor;
     }
 
 }

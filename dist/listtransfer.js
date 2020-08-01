@@ -54,6 +54,7 @@ class UIListTransfer extends nodom.DefineElement {
         let item = new nodom.Element('div');
         item.children = itemDom.children;
         item.addClass('nd-list-itemcontent');
+        //选中图标
         let icon = new nodom.Element('b');
         icon.addClass('nd-list-icon');
         itemDom.children = [item, icon];
