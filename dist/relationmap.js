@@ -34,14 +34,14 @@ class UIRelationMap extends nodom.DefineElement {
         rowHead.add(td);
         //列数td
         td = new nodom.Element('td');
-        td.addDirective(new nodom.Directive('repeat', this.listName[0]));
+        td.addDirective(new nodom.Directive('repeat', this.listName[0], td));
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression(this.displayName[0])];
         td.add(txt);
         rowHead.add(td);
         //行元素
         let tr = new nodom.Element('tr');
-        tr.addDirective(new nodom.Directive('repeat', '$$' + this.mapName));
+        tr.addDirective(new nodom.Directive('repeat', '$$' + this.mapName, tr));
         tr.addClass('nd-relationmap-row');
         td = new nodom.Element('td');
         td.addClass('nd-relationmap-head');
@@ -50,13 +50,13 @@ class UIRelationMap extends nodom.DefineElement {
         td.add(txt);
         tr.add(td);
         td = new nodom.Element('td');
-        td.addDirective(new nodom.Directive('repeat', 'cols'));
+        td.addDirective(new nodom.Directive('repeat', 'cols', td));
         td.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             me.switchValue(module, dom, model);
         }));
         //按钮
         let b = new nodom.Element('b');
-        b.addDirective(new nodom.Directive('class', "{'nd-relationmap-active':'active'}"));
+        b.addDirective(new nodom.Directive('class', "{'nd-relationmap-active':'active'}", b));
         td.add(b);
         tr.add(td);
         rootDom.children = [rowHead, tr];

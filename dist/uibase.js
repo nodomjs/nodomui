@@ -117,7 +117,7 @@ class UITool {
  * window事件注册器
  */
 class UIEventRegister {
-    static addEvent(eventName, moduleName, domKey, handler) {
+    static addEvent(eventName, moduleId, domKey, handler) {
         if (!this.listeners.has(eventName)) {
             this.listeners.set(eventName, []);
             window.addEventListener(eventName, (e) => {
@@ -145,7 +145,7 @@ class UIEventRegister {
             return;
         }
         arr.push({
-            module: moduleName,
+            module: moduleId,
             dom: domKey,
             handler: handler
         });

@@ -18,7 +18,7 @@ class UILoading extends nodom.DefineElement {
             if (c.tagName) {
                 let icon = new nodom.Element('b');
                 icon.addClass('nd-icon-radio');
-                icon.addDirective(new nodom.Directive('class', "{'nd-icon-radio-active':'" + dataName + "==\"" + c.getProp('value') + "\"'}"));
+                icon.addDirective(new nodom.Directive('class', "{'nd-icon-radio-active':'" + dataName + "==\"" + c.getProp('value') + "\"'}", icon));
                 c.children.unshift(icon);
                 //点击事件
                 c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {

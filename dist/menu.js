@@ -83,13 +83,13 @@ class UIMenu extends nodom.DefineElement {
                 }
             }));
             //增加显示指令
-            parentCt.addDirective(new nodom.Directive('show', this.activeName));
+            parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
         }
         //初始化各级
         for (let i = 0; i < this.maxLevels; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
-            itemCt.directives.push(new nodom.Directive('repeat', this.listName));
+            itemCt.directives.push(new nodom.Directive('repeat', this.listName, itemCt));
             itemCt.addClass('nd-menu-nodect');
             let item = menuNode.clone(true);
             itemCt.add(item);
@@ -98,7 +98,7 @@ class UIMenu extends nodom.DefineElement {
             //子菜单箭头图标
             if (this.popupMenu || i > 0) {
                 let icon1 = new nodom.Element('b');
-                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}"));
+                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}", icon1));
                 item.add(icon1);
             }
             //初始化菜单打开关闭
@@ -115,7 +115,7 @@ class UIMenu extends nodom.DefineElement {
                 pmodel.set(me.activeName, false);
             }));
             subCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
-            subCt.addDirective(new nodom.Directive('show', this.activeName));
+            subCt.addDirective(new nodom.Directive('show', this.activeName, subCt));
             itemCt.add(subCt);
             parentCt = subCt;
         }
@@ -131,7 +131,7 @@ class UIMenu extends nodom.DefineElement {
         let me = this;
         //popup menu需要添加右键点击事件
         if (this.popupMenu) {
-            UIEventRegister.addEvent('mousedown', module.name, uidom.key, (module, dom, inOrOut, e) => {
+            UIEventRegister.addEvent('mousedown', module.id, uidom.key, (module, dom, inOrOut, e) => {
                 //非右键不打开
                 if (e.button !== 2) {
                     return;

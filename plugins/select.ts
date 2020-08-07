@@ -80,7 +80,7 @@ class UISelect extends nodom.DefineElement{
         this.dataName = field.value;
         
         //修改model
-        rootDom.addDirective(new nodom.Directive('model',this.extraDataName));
+        rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
             
         //下拉框
         let listDom:nodom.Element = new nodom.Element('div');
@@ -88,7 +88,7 @@ class UISelect extends nodom.DefineElement{
         if(this.listWidth){
             listDom.assets.set('style','width:' + this.listWidth + 'px');
         }
-        listDom.addDirective(new nodom.Directive('show','show'));
+        listDom.addDirective(new nodom.Directive('show','show',listDom));
         let itemDom:nodom.Element;
         // 如果有，则表示自定义
         for(let c of rootDom.children){
@@ -110,9 +110,9 @@ class UISelect extends nodom.DefineElement{
         item.children = itemDom.children;
         item.addClass('nd-select-itemcontent');
         itemDom.addClass('nd-select-item');
-        let directive:nodom.Directive = new nodom.Directive('repeat','datas');
+        let directive:nodom.Directive = new nodom.Directive('repeat','datas',itemDom);
         itemDom.addDirective(directive);
-        itemDom.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}"));
+        itemDom.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}",itemDom));
 
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-select-itemicon');
@@ -158,8 +158,8 @@ class UISelect extends nodom.DefineElement{
             //input上覆盖一个query input
             let queryDom:nodom.Element = new nodom.Element('input');
             queryDom.addClass('nd-select-search');
-            queryDom.addDirective(new nodom.Directive('field','query'));
-            queryDom.addDirective(new nodom.Directive('class',"{'nd-select-search-active':'show'}"));
+            queryDom.addDirective(new nodom.Directive('field','query',queryDom));
+            queryDom.addDirective(new nodom.Directive('class',"{'nd-select-search-active':'show'}",queryDom));
             showDom.add(queryDom);
         }
         showDom.add(icon);
@@ -205,7 +205,7 @@ class UISelect extends nodom.DefineElement{
                 return [];
             });
             //注册click事件到全局事件管理器
-            UIEventRegister.addEvent('click',module.name,dom.key,
+            UIEventRegister.addEvent('click',module.id,dom.key,
                 (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
                     let model:nodom.Model = module.modelFactory.get(me.extraModelId);
                     //外部点击则关闭

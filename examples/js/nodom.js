@@ -11,19 +11,32 @@ var nodom;
 (function (nodom) {
     function newApp(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!config.module) {
+            if (window['NodomConfig']) {
+                config = nodom.Util.merge({}, window['NodomConfig'], config);
+            }
+            if (!config || !config.module) {
                 throw new nodom.NodomError('config', nodom.TipWords.application);
             }
-            if (config.options) {
-                nodom.Application.routerPrePath = config.options['routerPrePath'] || '';
-                nodom.Application.templatePath = config.options['templatePath'] || '';
-                nodom.Application.renderTick = config.options['renderTick'] || 100;
+            nodom.Application.setPath(config.path);
+            if (config.modules) {
+                yield nodom.ModuleFactory.init(config.modules);
             }
             nodom.Scheduler.addTask(nodom.MessageQueue.handleQueue, nodom.MessageQueue);
             nodom.Scheduler.addTask(nodom.Renderer.render, nodom.Renderer);
-            nodom.Scheduler.start();
-            let module = this.createModule(config.module, true);
+            nodom.Scheduler.start(config.scheduleCircle);
+            let module;
+            if (config.module.class) {
+                module = yield nodom.ModuleFactory.getInstance(config.module.class, config.module.name, config.module.data);
+                module.selector = config.module.el;
+            }
+            else {
+                module = new nodom.Module(config.module);
+            }
+            nodom.ModuleFactory.setMain(module);
             yield module.active();
+            if (config.routes) {
+                this.createRoute(config.routes);
+            }
             return module;
         });
     }
@@ -35,7 +48,7 @@ var nodom;
             }
         }
         else {
-            return new nodom.Module(config, main);
+            return new nodom.Module(config);
         }
     }
     nodom.createModule = createModule;
@@ -168,7 +181,7 @@ var nodom;
                         Object.getOwnPropertyNames(src).forEach((prop) => {
                             if (expKey) {
                                 if (expKey.constructor === RegExp && expKey.test(prop)
-                                    || expKey.includes(prop)) {
+                                    || Util.isArray(expKey) && expKey.includes(prop)) {
                                     return;
                                 }
                             }
@@ -210,18 +223,19 @@ var nodom;
                 }
             }
             static merge(o1, o2, o3, o4, o5, o6) {
+                let me = this;
                 for (let i = 0; i < arguments.length; i++) {
                     if (!this.isObject(arguments[i])) {
-                        throw new nodom.NodomError('invoke', 'this.merge', i + '', 'object');
+                        throw new nodom.NodomError('invoke', 'Util.merge', i + '', 'object');
                     }
                 }
                 let retObj = Object.assign.apply(null, arguments);
                 subObj(retObj);
                 return retObj;
-                function subObj(retObj) {
-                    for (let o in retObj) {
-                        if (this.isObject(retObj[o]) || this.isArray(retObj[o])) {
-                            retObj[o] = retObj[o].clone();
+                function subObj(obj) {
+                    for (let o in obj) {
+                        if (me.isObject(obj[o]) || me.isArray(obj[o])) {
+                            retObj[o] = me.clone(retObj[o]);
                         }
                     }
                 }
@@ -620,6 +634,9 @@ var nodom;
                 }
                 return Reflect.apply(foo, obj || null, args);
             }
+            static mergePath(paths) {
+                return paths.join('/').replace(/(\/{2,})|\\\//g, '\/');
+            }
         }
         Util.generatedId = 1;
         return Util;
@@ -629,6 +646,33 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Application {
+        static getPath(type) {
+            if (!this.path) {
+                return '';
+            }
+            let appPath = this.path.app || '';
+            if (type === 'app') {
+                return appPath;
+            }
+            else if (type === 'route') {
+                return this.path.route || '';
+            }
+            else {
+                let p = this.path[type] || '';
+                if (appPath !== '') {
+                    if (p !== '') {
+                        return appPath + '/' + p;
+                    }
+                    else {
+                        return appPath;
+                    }
+                }
+                return p;
+            }
+        }
+        static setPath(pathObj) {
+            this.path = pathObj;
+        }
     }
     nodom.Application = Application;
 })(nodom || (nodom = {}));
@@ -638,7 +682,7 @@ var nodom;
         constructor(module) {
             this.items = new Map();
             if (module !== undefined) {
-                this.moduleName = module.name;
+                this.moduleId = module.id;
             }
         }
         add(name, item) {
@@ -715,7 +759,7 @@ var nodom;
                 let attr = el.attributes[i];
                 let v = attr.value.trim();
                 if (attr.name.startsWith('x-')) {
-                    oe.addDirective(new nodom.Directive(attr.name.substr(2), v), true);
+                    oe.addDirective(new nodom.Directive(attr.name.substr(2), v, oe), true);
                 }
                 else if (attr.name.startsWith('e-')) {
                     let en = attr.name.substr(2);
@@ -773,7 +817,7 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Directive {
-        constructor(type, value, filters) {
+        constructor(type, value, dom, filters) {
             this.id = nodom.Util.genId();
             this.type = type;
             if (nodom.Util.isString(value)) {
@@ -799,14 +843,14 @@ var nodom;
                     }
                 }
             }
-            if (type !== undefined) {
-                nodom.DirectiveManager.init(this);
+            if (type !== undefined && dom) {
+                nodom.DirectiveManager.init(this, dom);
             }
         }
         exec(module, dom, parent) {
             return nodom.DirectiveManager.exec(this, dom, module, parent);
         }
-        clone() {
+        clone(dst) {
             let dir = new Directive(this.type, this.value);
             if (this.filters) {
                 dir.filters = [];
@@ -817,6 +861,7 @@ var nodom;
             if (this.params) {
                 dir.params = nodom.Util.clone(this.params);
             }
+            nodom.DirectiveManager.init(dir, dst);
             return dir;
         }
     }
@@ -854,10 +899,10 @@ var nodom;
             static hasType(name) {
                 return this.directiveTypes.has(name);
             }
-            static init(directive) {
+            static init(directive, dom) {
                 let dt = this.directiveTypes.get(directive.type);
                 if (dt) {
-                    return dt.init(directive);
+                    return dt.init(directive, dom);
                 }
             }
             static exec(directive, dom, module, parent) {
@@ -898,6 +943,7 @@ var nodom;
             this.key = nodom.Util.genId() + '';
         }
         render(module, parent) {
+            let me = this;
             if (this.dontRender) {
                 return;
             }
@@ -906,18 +952,6 @@ var nodom;
                 this.parentKey = parent.key;
                 if (!this.modelId) {
                     this.modelId = parent.modelId;
-                }
-            }
-            if (this.extraData) {
-                let model = module.modelFactory.get(this.modelId);
-                if (!model) {
-                    model = new nodom.Model(this.extraData, module);
-                    this.modelId = model.id;
-                }
-                else {
-                    nodom.Util.getOwnProps(this.extraData).forEach((item) => {
-                        model.set(item, this.extraData[item]);
-                    });
                 }
             }
             if (this.defineElement) {
@@ -933,11 +967,13 @@ var nodom;
             if (this.dontRender) {
                 return;
             }
-            for (let i = 0; i < this.children.length; i++) {
-                let item = this.children[i];
-                item.render(module, this);
-                if (item.dontRender) {
-                    this.children.splice(i--, 1);
+            if (!this.hasDirective('module')) {
+                for (let i = 0; i < this.children.length; i++) {
+                    let item = this.children[i];
+                    item.render(module, this);
+                    if (item.dontRender) {
+                        this.children.splice(i--, 1);
+                    }
                 }
             }
             if (this.defineElement) {
@@ -1073,45 +1109,57 @@ var nodom;
         }
         clone(changeKey) {
             let dst = new Element();
+            let notCopyProps = ['parent', 'directives', 'props', 'exprProps', 'events', 'children'];
+            nodom.Util.getOwnProps(this).forEach((p) => {
+                if (notCopyProps.includes(p)) {
+                    return;
+                }
+                dst[p] = this[p];
+            });
             if (changeKey) {
                 dst.key = nodom.Util.genId() + '';
-                let notCopyProps = ['key', 'parent', 'children'];
-                nodom.Util.getOwnProps(this).forEach((p) => {
-                    if (notCopyProps.includes(p)) {
-                        return;
-                    }
-                    dst[p] = nodom.Util.clone(this[p], null, changeKey);
-                });
             }
-            else {
-                let notCopyProps = ['parent', 'directives', 'props', 'exprProps', 'events', 'children'];
-                nodom.Util.getOwnProps(this).forEach((p) => {
-                    if (notCopyProps.includes(p)) {
-                        return;
-                    }
-                    dst[p] = this[p];
-                });
-                for (let d of this.directives) {
-                    dst.directives.push(d);
+            for (let d of this.directives) {
+                if (changeKey) {
+                    d = d.clone(dst);
                 }
-                nodom.Util.getOwnProps(this.props).forEach((k) => {
-                    dst.props[k] = this.props[k];
-                });
-                nodom.Util.getOwnProps(this.exprProps).forEach((k) => {
-                    dst.exprProps[k] = this.exprProps[k];
-                });
-                for (let key of this.events.keys()) {
-                    let evt = this.events.get(key);
-                    if (nodom.Util.isArray(evt)) {
-                        let a = [];
-                        for (let e of evt) {
-                            a.push(e.clone());
+                dst.directives.push(d);
+            }
+            nodom.Util.getOwnProps(this.props).forEach((k) => {
+                dst.props[k] = this.props[k];
+            });
+            nodom.Util.getOwnProps(this.exprProps).forEach((k) => {
+                if (changeKey) {
+                    let item = this.exprProps[k];
+                    if (Array.isArray(item)) {
+                        let arr = [];
+                        for (let o of item) {
+                            arr.push(o instanceof nodom.Expression ? o.clone() : o);
                         }
-                        dst.events.set(key, a);
+                        dst.exprProps[k] = arr;
+                    }
+                    else if (item instanceof nodom.Expression) {
+                        dst.exprProps[k] = item.clone();
                     }
                     else {
-                        dst.events.set(key, evt.clone());
+                        dst.exprProps[k] = item;
                     }
+                }
+                else {
+                    dst.exprProps[k] = this.exprProps[k];
+                }
+            });
+            for (let key of this.events.keys()) {
+                let evt = this.events.get(key);
+                if (nodom.Util.isArray(evt)) {
+                    let a = [];
+                    for (let e of evt) {
+                        a.push(e.clone());
+                    }
+                    dst.events.set(key, a);
+                }
+                else {
+                    dst.events.set(key, evt.clone());
                 }
             }
             for (let c of this.children) {
@@ -1721,7 +1769,7 @@ var nodom;
                 if (!model || !model.data) {
                     return '';
                 }
-                let module = nodom.ModuleFactory.get(model.moduleName);
+                let module = nodom.ModuleFactory.get(model.moduleId);
                 let fieldObj = model.data;
                 let valueArr = [];
                 this.fields.forEach((field) => {
@@ -1880,47 +1928,76 @@ var nodom;
 (function (nodom) {
     let ResourceManager = (() => {
         class ResourceManager {
-            static getResource(url, type) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    let rObj;
-                    type = type || this.getType(url);
-                    if (this.resources.has(url)) {
-                        rObj = this.resources.get(url);
-                        if (['js', 'css'].includes(type)) {
-                            return;
-                        }
-                    }
-                    else {
-                        rObj = { type: type };
-                        rObj.content = yield nodom.request({ url: url });
-                    }
-                    this.handleOne(url, rObj);
-                    this.resources.set(url, rObj);
-                    return rObj.content;
-                });
-            }
             static getResources(reqs) {
                 return __awaiter(this, void 0, void 0, function* () {
                     let me = this;
-                    let re = this.preHandle(reqs);
-                    let urls = re[1];
-                    let types = re[2];
-                    let rObjs = [];
-                    return Promise.all(re[0]).then(arr => {
-                        for (let i = 0; i < arr.length; i++) {
-                            let rObj;
-                            if (typeof arr[i] === 'string') {
-                                rObj = {
-                                    type: types[i],
-                                    content: arr[i]
-                                };
-                                me.handleOne(urls[i], rObj);
-                                rObjs.push(rObj);
-                            }
+                    this.preHandle(reqs);
+                    let taskId = nodom.Util.genId();
+                    let res = {};
+                    for (let item of reqs) {
+                        res[item.url] = false;
+                    }
+                    this.loadingTasks.set(taskId, res);
+                    for (let item of reqs) {
+                        if (!item.needLoad) {
+                            continue;
                         }
-                        return rObjs;
+                        let url = item.url;
+                        if (this.resources.has(url)) {
+                            res[url].c = item.content;
+                        }
+                        else if (this.waitList.has(url)) {
+                            let arr = this.waitList.get(url);
+                            arr.push(taskId);
+                        }
+                        else {
+                            this.waitList.set(url, [taskId]);
+                            nodom.request({ url: url }).then((content) => {
+                                let rObj = { type: item.type, content: content };
+                                this.handleOne(url, rObj);
+                                this.resources.set(url, rObj);
+                                let arr = this.waitList.get(url);
+                                for (let tid of arr) {
+                                    let tobj = this.loadingTasks.get(tid);
+                                    if (url) {
+                                        tobj[url] = true;
+                                    }
+                                }
+                                this.waitList.delete(item.url);
+                            });
+                        }
+                    }
+                    return new Promise((resolve, reject) => {
+                        check();
+                        function check() {
+                            let r = me.awake(taskId);
+                            if (r) {
+                                resolve(r);
+                                return;
+                            }
+                            setTimeout(check, 0);
+                        }
                     });
                 });
+            }
+            static awake(taskId, url) {
+                if (!this.loadingTasks.has(taskId)) {
+                    return;
+                }
+                let tobj = this.loadingTasks.get(taskId);
+                let finish = true;
+                let contents = [];
+                for (let o in tobj) {
+                    if (tobj[o] === false) {
+                        finish = false;
+                        break;
+                    }
+                    contents.push(this.resources.get(o));
+                }
+                if (finish) {
+                    this.loadingTasks.delete(taskId);
+                    return contents;
+                }
             }
             static getType(url) {
                 let ind = -1;
@@ -1931,7 +2008,7 @@ var nodom;
                         type = 'template';
                     }
                 }
-                return type || 'js';
+                return type || 'text';
             }
             static handleOne(url, rObj) {
                 switch (rObj.type) {
@@ -1960,43 +2037,32 @@ var nodom;
                 this.resources.set(url, rObj);
             }
             static preHandle(reqs) {
-                let promises = [];
                 let types = [];
                 let urls = [];
                 let head = document.querySelector('head');
-                for (let r of reqs) {
-                    let url;
-                    let type;
-                    if (typeof r === 'object') {
-                        url = r.url;
-                        type = r.type || this.getType(url);
+                for (let i = 0; i < reqs.length; i++) {
+                    if (typeof reqs[i] === 'string') {
+                        reqs[i] = {
+                            url: reqs[i]
+                        };
                     }
-                    else {
-                        url = r;
-                        type = this.getType(url);
-                    }
-                    urls.push(url);
-                    types.push(type);
-                    if (type === 'css') {
+                    reqs[i].type = reqs[i].type || this.getType(reqs[i].url);
+                    reqs[i].needLoad = true;
+                    if (reqs[i].type === 'css') {
                         let css = nodom.Util.newEl('link');
                         css.type = 'text/css';
                         css.rel = 'stylesheet';
-                        css.href = url;
+                        css.href = reqs[i].url;
                         head.appendChild(css);
+                        reqs[i].needLoad = false;
                     }
-                    else {
-                        if (this.resources.has(url)) {
-                            promises.push(this.resources.get(url));
-                        }
-                        else {
-                            promises.push(nodom.request(url));
-                        }
-                    }
-                    return [promises, urls, types];
+                    return reqs;
                 }
             }
         }
         ResourceManager.resources = new Map();
+        ResourceManager.loadingTasks = new Map();
+        ResourceManager.waitList = new Map();
         return ResourceManager;
     })();
     nodom.ResourceManager = ResourceManager;
@@ -2021,10 +2087,8 @@ var nodom;
                 for (let i = 0; i < this.messages.length; i++) {
                     let msg = this.messages[i];
                     let module = nodom.ModuleFactory.get(msg.toModule);
-                    if (module && module.state === 2 || module.state === 3) {
-                        module.receive(msg.fromModule, msg.content);
-                    }
                     if (module && module.state >= 2) {
+                        module.receive(msg.fromModule, msg.content);
                         MessageQueue.messages.splice(i--, 1);
                     }
                 }
@@ -2056,7 +2120,7 @@ var nodom;
             this.fields = {};
             this.id = nodom.Util.genId();
             if (module) {
-                this.moduleName = module.name;
+                this.moduleId = module.id;
                 if (module.modelFactory) {
                     module.modelFactory.add(this.id, this);
                 }
@@ -2084,7 +2148,7 @@ var nodom;
                 throw new nodom.NodomError('notexist1', nodom.TipWords.dataItem, key);
             }
             if (data[fn] !== value) {
-                let module = nodom.ModuleFactory.get(this.moduleName);
+                let module = nodom.ModuleFactory.get(this.moduleId);
                 if (nodom.Util.isObject(value) || nodom.Util.isArray(value)) {
                     new Model(value, module);
                 }
@@ -2099,9 +2163,25 @@ var nodom;
                 data[fn] = value;
             }
         }
+        del(key) {
+            let fn, data;
+            let index = key.lastIndexOf('.');
+            if (index !== -1) {
+                fn = key.substr(index + 1);
+                key = key.substr(0, index);
+                data = this.query(key);
+            }
+            else {
+                fn = key;
+                data = this.data;
+            }
+            if (data) {
+                delete data[fn];
+            }
+        }
         update(field, value) {
             let change = false;
-            let module = nodom.ModuleFactory.get(this.moduleName);
+            let module = nodom.ModuleFactory.get(this.moduleId);
             if (nodom.Util.isString(field)) {
                 let fieldObj = this.fields[field];
                 if (!fieldObj) {
@@ -2134,38 +2214,7 @@ var nodom;
             if (dirty) {
                 return this.data;
             }
-            return copy(this.data);
-            function copy(src) {
-                let dst;
-                if (nodom.Util.isObject(src)) {
-                    dst = new Object();
-                    Object.getOwnPropertyNames(src).forEach((prop) => {
-                        if (prop.startsWith('$')) {
-                            return;
-                        }
-                        dst[prop] = copy(src);
-                    });
-                }
-                else if (nodom.Util.isMap(src)) {
-                    dst = new Map();
-                    src.forEach((value, key) => {
-                        if (key.startsWith('$')) {
-                            return;
-                        }
-                        dst.set(key, copy(value));
-                    });
-                }
-                else if (nodom.Util.isArray(src)) {
-                    dst = new Array();
-                    src.forEach(function (item, i) {
-                        dst[i] = copy(item);
-                    });
-                }
-                else {
-                    dst = src;
-                }
-                return dst;
-            }
+            return nodom.Util.clone(this.data, /^\$\S+/);
         }
         watch(key, operate, cancel) {
             let fieldObj = this.fields[key];
@@ -2196,7 +2245,7 @@ var nodom;
                 nodom.Util.getOwnProps(data).forEach((p) => {
                     let v = data[p];
                     if (nodom.Util.isObject(v) || nodom.Util.isArray(v)) {
-                        new Model(v, nodom.ModuleFactory.get(this.moduleName));
+                        new Model(v, nodom.ModuleFactory.get(this.moduleId));
                     }
                     else {
                         this.update(p, v);
@@ -2208,7 +2257,7 @@ var nodom;
             }
             else if (nodom.Util.isArray(data)) {
                 let watcher = ['push', 'unshift', 'splice', 'pop', 'shift', 'reverse', 'sort'];
-                let module = nodom.ModuleFactory.get(this.moduleName);
+                let module = nodom.ModuleFactory.get(this.moduleId);
                 watcher.forEach((item) => {
                     data[item] = function () {
                         let args = [];
@@ -2241,7 +2290,7 @@ var nodom;
                                 new Model(arg, module);
                             }
                         });
-                        nodom.Renderer.add(nodom.ModuleFactory.get(me.moduleName));
+                        nodom.Renderer.add(nodom.ModuleFactory.get(me.moduleId));
                     };
                 });
                 data.forEach((item) => {
@@ -2301,54 +2350,50 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Module {
-        constructor(config, main) {
+        constructor(config) {
             this.firstRender = true;
             this.children = [];
             this.firstRenderOps = [];
             this.beforeFirstRenderOps = [];
+            this.renderOps = [];
+            this.beforeRenderOps = [];
             this.state = 0;
             this.loadNewData = false;
             this.renderDoms = [];
-            if (config.name) {
+            this.container = null;
+            this.moduleMap = new Map();
+            this.id = nodom.Util.genId();
+            if (config && config.name) {
                 this.name = config.name;
             }
             else {
-                this.name = 'Module' + nodom.Util.genId();
+                this.name = 'Module' + this.id;
             }
-            nodom.ModuleFactory.add(this.name, this);
+            nodom.ModuleFactory.add(this);
             this.methodFactory = new nodom.MethodFactory(this);
             this.modelFactory = new nodom.ModelFactory(this);
-            if (config) {
-                this.initConfig = config;
-                if (nodom.Util.isString(config.el)) {
-                    this.containerParam = {
-                        module: config.parentName,
-                        selector: config.el
-                    };
-                }
-                else if (nodom.Util.isEl(config.el)) {
-                    this.container = config.el;
-                }
-                if (nodom.Util.isObject(config.methods)) {
-                    nodom.Util.getOwnProps(config.methods).forEach((item) => {
-                        this.methodFactory.add(item, config.methods[item]);
-                    });
-                }
-                if (this.hasContainer()) {
-                    this.template = this.container.innerHTML.trim();
-                    this.container.innerHTML = '';
-                }
-                if (main) {
-                    this.main = true;
-                    nodom.ModuleFactory.setMain(this);
-                }
+            if (!config) {
+                return;
+            }
+            this.initConfig = config;
+            this.selector = config.el;
+            if (nodom.Util.isObject(config.methods)) {
+                nodom.Util.getOwnProps(config.methods).forEach((item) => {
+                    this.methodFactory.add(item, config.methods[item]);
+                });
+            }
+            if (this.hasContainer()) {
+                this.template = this.container.innerHTML.trim();
+                this.container.innerHTML = '';
             }
         }
         init() {
             return __awaiter(this, void 0, void 0, function* () {
                 let config = this.initConfig;
                 let urlArr = [];
-                let appPath = nodom.Application.templatePath || '';
+                let cssPath = nodom.Application.getPath('css');
+                let templatePath = nodom.Application.getPath('template');
+                let jsPath = nodom.Application.getPath('js');
                 if (config && nodom.Util.isArray(config.requires) && config.requires.length > 0) {
                     config.requires.forEach((item) => {
                         let type;
@@ -2361,7 +2406,8 @@ var nodom;
                             type = 'js';
                             url = item;
                         }
-                        urlArr.push({ url: appPath + url, type: type });
+                        let path = type === 'js' ? jsPath : cssPath;
+                        urlArr.push({ url: nodom.Util.mergePath([path, url]), type: type });
                     });
                 }
                 let templateStr = this.template;
@@ -2372,7 +2418,7 @@ var nodom;
                     }
                     else {
                         urlArr.push({
-                            url: appPath + config.template,
+                            url: nodom.Util.mergePath([templatePath, config.template]),
                             type: config.template.endsWith('.nd') ? 'nd' : 'template'
                         });
                     }
@@ -2404,19 +2450,14 @@ var nodom;
                     }
                 }
                 changeState(this);
-                if (nodom.Util.isArray(this.initConfig.modules)) {
-                    this.initConfig.modules.forEach((item) => {
-                        this.addChild(item);
-                    });
-                }
                 delete this.initConfig;
                 function changeState(mod) {
-                    if (mod.main) {
+                    if (mod.isMain) {
                         mod.state = 3;
                         nodom.Renderer.add(mod);
                     }
-                    else if (mod.parentName) {
-                        mod.state = nodom.ModuleFactory.get(mod.parentName).state;
+                    else if (mod.parentId) {
+                        mod.state = nodom.ModuleFactory.get(mod.parentId).state;
                     }
                     else {
                         mod.state = 1;
@@ -2428,6 +2469,7 @@ var nodom;
             if (this.state !== 3 || !this.virtualDom || !this.hasContainer()) {
                 return false;
             }
+            this.doRenderOp(this.beforeRenderOps);
             let root = this.virtualDom.clone();
             if (this.firstRender) {
                 if (this.loadNewData && this.dataUrl) {
@@ -2437,10 +2479,8 @@ var nodom;
                     }).then((r) => {
                         this.model = new nodom.Model(r, this);
                         this.doFirstRender(root);
-                    }).catch((e) => {
-                        console.log(e);
+                        this.loadNewData = false;
                     });
-                    this.loadNewData = false;
                 }
                 else {
                     this.doFirstRender(root);
@@ -2469,25 +2509,19 @@ var nodom;
                 this.doModuleEvent('onRender');
             }
             this.renderDoms = [];
-            if (nodom.Util.isArray(this.children)) {
-                this.children.forEach(item => {
-                    item.render();
-                });
-            }
+            this.doRenderOp(this.renderOps);
             return true;
         }
         doFirstRender(root) {
             this.doModuleEvent('onBeforeFirstRender');
-            this.beforeFirstRenderOps.forEach((foo) => {
-                nodom.Util.apply(foo, this, []);
-            });
-            this.beforeFirstRenderOps = [];
+            this.doRenderOp(this.beforeFirstRenderOps);
             this.renderTree = root;
             if (this.model) {
                 root.modelId = this.model.id;
             }
             root.render(this, null);
             this.doModuleEvent('onBeforeFirstRenderToHTML');
+            nodom.Util.empty(this.container);
             if (root.children) {
                 root.children.forEach((item) => {
                     item.renderToHtml(this, { type: 'fresh' });
@@ -2495,63 +2529,97 @@ var nodom;
             }
             delete this.firstRender;
             this.doModuleEvent('onFirstRender');
-            this.firstRenderOps.forEach((foo) => {
-                nodom.Util.apply(foo, this, []);
+            this.doRenderOp(this.firstRenderOps);
+        }
+        clone(moduleName) {
+            let me = this;
+            let m = {};
+            let excludes = ['id', 'name', 'model', 'virtualDom', 'container', 'containerKey'];
+            Object.getOwnPropertyNames(this).forEach((item) => {
+                if (excludes.includes(item)) {
+                    return;
+                }
+                m[item] = me[item];
             });
-            this.firstRenderOps = [];
+            m.id = nodom.Util.genId();
+            m.name = moduleName || 'Module' + m.id;
+            m.__proto__ = this.__proto__;
+            nodom.ModuleFactory.add(m);
+            if (this.model) {
+                let d = this.model.getData();
+                m.model = new nodom.Model(nodom.Util.clone(d), m);
+            }
+            m.virtualDom = this.virtualDom.clone(true);
+            console.log(m.virtualDom.key);
+            return m;
         }
         hasContainer() {
-            if (this.container) {
-                return true;
+            if (this.selector) {
+                this.container = document.querySelector(this.selector);
             }
-            else if (this.containerParam !== undefined) {
-                let ct;
-                if (this.containerParam['module'] === undefined) {
-                    ct = document;
-                }
-                else {
-                    let module = nodom.ModuleFactory.get(this.containerParam['module']);
-                    if (module) {
-                        ct = module.container;
-                    }
-                }
-                if (ct) {
-                    this.container = ct.querySelector(this.containerParam['selector']);
-                    return this.container !== null;
-                }
+            else {
+                this.container = document.querySelector("[key='" + this.containerKey + "']");
             }
-            return false;
+            return this.container !== null;
+        }
+        setContainerKey(key) {
+            this.containerKey = key;
+        }
+        getContainerKey() {
+            return (this.containerKey);
         }
         dataChange() {
             nodom.Renderer.add(this);
         }
-        addChild(config) {
-            config.parentName = this.name;
-            let chd = new Module(config);
-            if (this.children === undefined) {
-                this.children = [];
+        addChild(moduleId) {
+            if (!this.children.includes(moduleId)) {
+                this.children.push(moduleId);
+                let m = nodom.ModuleFactory.get(moduleId);
+                if (m) {
+                    m.parentId = this.id;
+                }
+                this.moduleMap.set(m.name, moduleId);
             }
-            this.children.push(chd);
-            return chd;
         }
         send(toName, data) {
-            nodom.MessageQueue.add(this.name, toName, data);
+            if (typeof toName === 'number') {
+                nodom.MessageQueue.add(this.id, toName, data);
+                return;
+            }
+            let toId;
+            let m = this;
+            for (let i = 0; i < 3 && m; i++) {
+                toId = m.moduleMap.get(toName);
+                if (!toId && m.parentId) {
+                    m = nodom.ModuleFactory.get(m.parentId);
+                }
+                else {
+                    break;
+                }
+            }
+            if (toId) {
+                nodom.MessageQueue.add(this.id, toId, data);
+            }
         }
         broadcast(data) {
-            if (this.parentName) {
-                let pmod = nodom.ModuleFactory.get(this.parentName);
-                if (pmod && pmod.children) {
+            if (this.parentId) {
+                let pmod = nodom.ModuleFactory.get(this.parentId);
+                if (pmod) {
                     this.send(pmod.name, data);
-                    pmod.children.forEach((m) => {
-                        if (m === this) {
-                            return;
-                        }
-                        this.send(m.name, data);
-                    });
+                    if (pmod.children) {
+                        pmod.children.forEach((item) => {
+                            if (item === this.id) {
+                                return;
+                            }
+                            let m = nodom.ModuleFactory.get(item);
+                            this.send(m.name, data);
+                        });
+                    }
                 }
             }
             if (this.children !== undefined) {
-                this.children.forEach((m) => {
+                this.children.forEach((item) => {
+                    let m = nodom.ModuleFactory.get(item);
                     this.send(m.name, data);
                 });
             }
@@ -2566,38 +2634,36 @@ var nodom;
                 }
                 if (this.state === 0) {
                     yield this.init();
-                    this.state = 3;
                 }
-                else {
-                    this.state = 3;
-                }
+                this.state = 3;
                 nodom.Renderer.add(this);
-                if (nodom.Util.isArray(this.children)) {
-                    this.children.forEach((m) => __awaiter(this, void 0, void 0, function* () {
-                        yield m.active();
-                    }));
-                }
             });
         }
         unactive() {
-            if (this.main || this.state === 2) {
+            if (this.isMain || this.state === 2) {
                 return;
             }
             this.state = 2;
             this.firstRender = true;
             if (nodom.Util.isArray(this.children)) {
-                this.children.forEach((m) => {
-                    m.unactive();
+                this.children.forEach((item) => {
+                    let m = nodom.ModuleFactory.get(item);
+                    if (m) {
+                        m.unactive();
+                    }
                 });
             }
         }
         destroy() {
             if (nodom.Util.isArray(this.children)) {
-                this.children.forEach((m) => {
-                    m.destroy();
+                this.children.forEach((item) => {
+                    let m = nodom.ModuleFactory.get(item);
+                    if (m) {
+                        m.destroy();
+                    }
                 });
             }
-            nodom.ModuleFactory.remove(this.name);
+            nodom.ModuleFactory.remove(this.id);
         }
         doModuleEvent(eventName, param) {
             const foo = this.methodFactory.get(eventName);
@@ -2621,12 +2687,32 @@ var nodom;
             }
         }
         addBeforeFirstRenderOperation(foo) {
-            let me = this;
             if (!nodom.Util.isFunction(foo)) {
                 return;
             }
-            if (this.beforeFirstRenderOps.indexOf(foo) === -1) {
+            if (!this.beforeFirstRenderOps.includes(foo)) {
                 this.beforeFirstRenderOps.push(foo);
+            }
+        }
+        addRenderOperation(foo) {
+            if (!nodom.Util.isFunction(foo)) {
+                return;
+            }
+            if (!this.renderOps.includes(foo)) {
+                this.renderOps.push(foo);
+            }
+        }
+        addBeforeRenderOperation(foo) {
+            if (!nodom.Util.isFunction(foo)) {
+                return;
+            }
+            if (!this.beforeRenderOps.includes(foo)) {
+                this.beforeRenderOps.push(foo);
+            }
+        }
+        doRenderOp(renderOps) {
+            for (; renderOps.length > 0;) {
+                nodom.Util.apply(renderOps.shift(), this, []);
             }
         }
     }
@@ -2636,23 +2722,106 @@ var nodom;
 (function (nodom) {
     let ModuleFactory = (() => {
         class ModuleFactory {
-            static add(name, item) {
-                this.items.set(name, item);
+            static add(item) {
+                this.modules.set(item.id, item);
             }
-            static get(name) {
-                return this.items.get(name);
+            static get(id) {
+                return this.modules.get(id);
             }
-            static remove(name) {
-                this.items.delete(name);
+            static getInstance(className, moduleName, data) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (!this.classes.has(className)) {
+                        throw new nodom.NodomError('notexist1', nodom.TipWords.moduleClass, className);
+                    }
+                    let cfg = this.classes.get(className);
+                    if (moduleName) {
+                        cfg.name = moduleName;
+                    }
+                    if (!cfg.instance) {
+                        yield this.initModule(cfg);
+                    }
+                    if (cfg.instance) {
+                        if (cfg.singleton) {
+                            return cfg.instance;
+                        }
+                        else {
+                            let mdl = cfg.instance.clone(moduleName);
+                            if (data) {
+                                if (typeof data === 'string') {
+                                    mdl.dataUrl = data;
+                                    mdl.loadNewData = true;
+                                }
+                                else {
+                                    mdl.model = new nodom.Model(data, mdl);
+                                }
+                            }
+                            return mdl;
+                        }
+                    }
+                    return null;
+                });
+            }
+            static remove(id) {
+                this.modules.delete(id);
             }
             static setMain(m) {
                 this.mainModule = m;
+                m.isMain = true;
             }
             static getMain() {
                 return this.mainModule;
             }
+            static init(modules) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    for (let cfg of modules) {
+                        if (!cfg.path) {
+                            throw new nodom.NodomError("paramException", 'modules', 'path');
+                        }
+                        if (!cfg.class) {
+                            throw new nodom.NodomError("paramException", 'modules', 'class');
+                        }
+                        if (cfg.lazy === undefined) {
+                            cfg.lazy = false;
+                        }
+                        if (cfg.singleton === undefined) {
+                            cfg.singleton = true;
+                        }
+                        if (!cfg.lazy) {
+                            yield this.initModule(cfg);
+                        }
+                        this.classes.set(cfg.class, cfg);
+                    }
+                });
+            }
+            static initModule(cfg) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let path = cfg.path;
+                    if (!path.endsWith('.js')) {
+                        path += '.js';
+                    }
+                    let url = nodom.Util.mergePath([nodom.Application.getPath('module'), path]);
+                    yield nodom.ResourceManager.getResources([{ url: url, type: 'js' }]);
+                    let cls = eval(cfg.class);
+                    if (cls) {
+                        let instance = Reflect.construct(cls, [{
+                                name: cfg.name,
+                                data: cfg.data,
+                                lazy: cfg.lazy
+                            }]);
+                        yield instance.init();
+                        cfg.instance = instance;
+                        if (cfg.singleton) {
+                            this.modules.set(instance.id, instance);
+                        }
+                    }
+                    else {
+                        throw new nodom.NodomError('notexist1', nodom.TipWords.moduleClass, cfg.class);
+                    }
+                });
+            }
         }
-        ModuleFactory.items = new Map();
+        ModuleFactory.modules = new Map();
+        ModuleFactory.classes = new Map();
         return ModuleFactory;
     })();
     nodom.ModuleFactory = ModuleFactory;
@@ -2760,7 +2929,7 @@ var nodom;
             }
         }
         fire(e, el) {
-            const module = nodom.ModuleFactory.get(this.moduleName);
+            const module = nodom.ModuleFactory.get(this.moduleId);
             if (!module.hasContainer()) {
                 return;
             }
@@ -2838,7 +3007,7 @@ var nodom;
             }
         }
         bind(module, dom, el) {
-            this.moduleName = module.name;
+            this.moduleId = module.id;
             this.domKey = dom.key;
             if (ExternalEvent.touches[this.name]) {
                 ExternalEvent.regist(this, el);
@@ -2852,7 +3021,7 @@ var nodom;
         }
         delegateTo(module, vdom, el, parent, parentEl) {
             this.domKey = vdom.key;
-            this.moduleName = module.name;
+            this.moduleId = module.id;
             if (!parentEl) {
                 parentEl = document.body;
             }
@@ -2912,7 +3081,7 @@ var nodom;
                     this.unregist(evtObj);
                 }
                 if (!el) {
-                    const module = nodom.ModuleFactory.get(evtObj.moduleName);
+                    const module = nodom.ModuleFactory.get(evtObj.moduleId);
                     el = module.container.querySelector("[key='" + evtObj.domKey + "']");
                 }
                 evtObj.touchListeners = new Map();
@@ -2928,7 +3097,7 @@ var nodom;
             static unregist(evtObj, el) {
                 const evt = ExternalEvent.touches[evtObj.name];
                 if (!el) {
-                    const module = nodom.ModuleFactory.get(evtObj.moduleName);
+                    const module = nodom.ModuleFactory.get(evtObj.moduleId);
                     el = module.container.querySelector("[key='" + evtObj.domKey + "']");
                 }
                 if (evt) {
@@ -3044,24 +3213,27 @@ var nodom;
                 if (module.state !== 3) {
                     return;
                 }
-                if (!this.waitList.includes(module.name)) {
-                    this.waitList.push(module.name);
+                if (!this.waitList.includes(module.id)) {
+                    this.waitList.push(module.id);
                 }
             }
             static remove(module) {
                 let ind;
-                if ((ind = this.waitList.indexOf(module.name)) !== -1) {
+                if ((ind = this.waitList.indexOf(module.id)) !== -1) {
                     this.waitList.splice(ind, 1);
                 }
             }
             static render() {
-                for (let i = 0; i < this.waitList.length; i++) {
-                    let m = nodom.ModuleFactory.get(this.waitList[i]);
-                    if (!m || m.render()) {
-                        this.waitList.shift();
-                        i--;
+                return __awaiter(this, void 0, void 0, function* () {
+                    for (let i = 0; i < this.waitList.length; i++) {
+                        let m = nodom.ModuleFactory.get(this.waitList[i]);
+                        let r;
+                        if (!m || m.render()) {
+                            this.waitList.shift();
+                            i--;
+                        }
                     }
-                }
+                });
             }
         }
         Renderer.waitList = [];
@@ -3103,7 +3275,18 @@ var nodom;
             static start(path) {
                 return __awaiter(this, void 0, void 0, function* () {
                     let diff = this.compare(this.currentPath, path);
-                    let parentModule = diff[0] === null ? nodom.ModuleFactory.getMain() : nodom.ModuleFactory.get(diff[0].module);
+                    let parentModule;
+                    if (diff[0] === null) {
+                        parentModule = nodom.ModuleFactory.getMain();
+                    }
+                    else {
+                        if (typeof diff[0].module === 'string') {
+                            parentModule = yield nodom.ModuleFactory.getInstance(diff[0].module, diff[0].moduleName);
+                        }
+                        else {
+                            parentModule = nodom.ModuleFactory.get(diff[0].module);
+                        }
+                    }
                     for (let i = diff[1].length - 1; i >= 0; i--) {
                         const r = diff[1][i];
                         if (!r.module) {
@@ -3124,12 +3307,15 @@ var nodom;
                         let proute = diff[3];
                         if (route !== null) {
                             showPath = route.useParentPath && proute ? proute.fullPath : route.fullPath;
-                            route.setLinkActive(true);
-                            setRouteParamToModel(route);
+                            let module = nodom.ModuleFactory.get(route.module);
+                            setRouteParamToModel(route, module);
+                            route.setLinkActive();
+                            module.firstRender = true;
+                            module.active();
                         }
                     }
                     else {
-                        for (let i = 0; i < diff[2].length; i++) {
+                        for (let i = 0, index = 0; i < diff[2].length; i++) {
                             let route = diff[2][i];
                             if (!route || !route.module) {
                                 continue;
@@ -3137,24 +3323,35 @@ var nodom;
                             if (!route.useParentPath) {
                                 showPath = route.fullPath;
                             }
-                            if (!parentModule.routerKey) {
-                                throw new nodom.NodomError('notexist', nodom.TipWords.routeView);
+                            let module;
+                            if (typeof route.module === 'string') {
+                                module = yield nodom.ModuleFactory.getInstance(route.module, route.moduleName);
+                                if (!module) {
+                                    throw new nodom.NodomError('notexist1', nodom.TipWords.module, route.module);
+                                }
+                                route.module = module.id;
                             }
-                            let module = nodom.ModuleFactory.get(route.module);
-                            if (!module) {
-                                throw new nodom.NodomError('notexist1', nodom.TipWords.module, route.module);
+                            else {
+                                module = nodom.ModuleFactory.get(route.module);
                             }
-                            module.containerParam = {
-                                module: parentModule.name,
-                                selector: "[key='" + parentModule.routerKey + "']"
-                            };
-                            module.addBeforeFirstRenderOperation(function () {
-                                nodom.Util.empty(module.container);
-                            });
-                            route.setLinkActive(true);
-                            delete module.container;
                             module.firstRender = true;
-                            yield module.active();
+                            parentModule.addChild(module.id);
+                            if (index++ === 0) {
+                                module.setContainerKey(parentModule.routerKey);
+                                yield module.active();
+                                route.setLinkActive();
+                            }
+                            else {
+                                parentModule.addRenderOperation(function () {
+                                    return __awaiter(this, void 0, void 0, function* () {
+                                        if (this.routerKey) {
+                                            module.setContainerKey(this.routerKey);
+                                            yield module.active();
+                                        }
+                                        route.setLinkActive();
+                                    });
+                                });
+                            }
                             setRouteParamToModel(route);
                             if (nodom.Util.isFunction(this.onDefaultEnter)) {
                                 this.onDefaultEnter(module.model);
@@ -3166,21 +3363,24 @@ var nodom;
                         }
                     }
                     if (this.startStyle !== 2 && showPath) {
+                        let p = nodom.Util.mergePath([nodom.Application.getPath('route'), showPath]);
                         if (this.showPath && showPath.indexOf(this.showPath) === 0) {
-                            history.replaceState(path, '', nodom.Application.routerPrePath + showPath);
+                            history.replaceState(path, '', p);
                         }
                         else {
-                            history.pushState(path, '', nodom.Application.routerPrePath + showPath);
+                            history.pushState(path, '', p);
                         }
                         this.showPath = showPath;
                     }
                     this.currentPath = path;
                     this.startStyle = 0;
-                    function setRouteParamToModel(route) {
+                    function setRouteParamToModel(route, module) {
                         if (!route) {
                             return;
                         }
-                        const module = nodom.ModuleFactory.get(route.module);
+                        if (!module) {
+                            module = nodom.ModuleFactory.get(route.module);
+                        }
                         let o = {
                             path: route.path
                         };
@@ -3283,7 +3483,7 @@ var nodom;
                 if (!module || !path || path === '') {
                     return;
                 }
-                let domArr = Router.activeDomMap.get(module.name);
+                let domArr = Router.activeDomMap.get(module.id);
                 if (!domArr) {
                     return;
                 }
@@ -3298,7 +3498,7 @@ var nodom;
                         if (!model) {
                             return;
                         }
-                        let expr = module.expressionFactory.get(dom.getProp('active')[0]);
+                        let expr = dom.getProp('active', true)[0];
                         if (!expr) {
                             return;
                         }
@@ -3327,7 +3527,6 @@ var nodom;
         Router.showPath = '';
         Router.waitList = [];
         Router.currentIndex = 0;
-        Router.moduleRouteMap = new Map();
         Router.startStyle = 0;
         Router.activeDomMap = new Map();
         return Router;
@@ -3338,11 +3537,9 @@ var nodom;
             this.params = [];
             this.data = {};
             this.children = [];
-            this.onEnter = config.onEnter;
-            this.onLeave = config.onLeave;
-            this.useParentPath = config.useParentPath;
-            this.path = config.path;
-            this.module = config.module instanceof nodom.Module ? config.module.name : config.module;
+            for (let o in config) {
+                this[o] = config[o];
+            }
             if (config.path === '') {
                 return;
             }
@@ -3357,18 +3554,17 @@ var nodom;
                 });
             }
         }
-        setLinkActive(ancestor) {
-            let path = this.fullPath;
-            let module = nodom.ModuleFactory.get(this.module);
-            if (module && module.containerParam) {
-                let pm = nodom.ModuleFactory.get(module.containerParam['module']);
+        setLinkActive() {
+            if (this.parent) {
+                let pm = nodom.ModuleFactory.get(this.parent.module);
                 if (pm) {
-                    Router.changeActive(pm, path);
+                    Router.changeActive(pm, this.fullPath);
                 }
             }
-            if (ancestor && this.parent) {
-                this.parent.setLinkActive(true);
-            }
+        }
+        addChild(child) {
+            this.children.push(child);
+            child.parent = this;
         }
     }
     nodom.Route = Route;
@@ -3408,7 +3604,8 @@ var nodom;
                     }
                     if (j === node.children.length) {
                         if (prePath !== '') {
-                            node.children.push(new Route({ path: prePath, notAdd: true }));
+                            let r = new Route({ path: prePath, notAdd: true });
+                            node.addChild(r);
                             node = node.children[node.children.length - 1];
                         }
                         prePath = v;
@@ -3423,7 +3620,7 @@ var nodom;
             }
             if (node !== undefined && node !== route) {
                 route.path = prePath;
-                node.children.push(route);
+                node.addChild(route);
             }
             return true;
         }
@@ -3481,7 +3678,7 @@ var nodom;
         Router.addPath(state);
     });
     nodom.DirectiveManager.addType('route', {
-        init: (directive, dom, module) => {
+        init: (directive, dom) => {
             let value = directive.value;
             if (nodom.Util.isEmpty(value)) {
                 return;
@@ -3499,19 +3696,19 @@ var nodom;
             else {
                 dom.setProp('path', value);
             }
-            dom.addEvent(new nodom.NodomEvent('click', '', (dom, model, module, e) => __awaiter(this, void 0, void 0, function* () {
+            dom.addEvent(new nodom.NodomEvent('click', '', (dom, model, module, e) => {
                 let path = dom.getProp('path');
                 if (nodom.Util.isEmpty(path)) {
                     return;
                 }
                 Router.addPath(path);
-            })));
+            }));
         },
         handle: (directive, dom, module, parent) => {
             if (dom.hasProp('active')) {
-                let domArr = Router.activeDomMap.get(module.name);
+                let domArr = Router.activeDomMap.get(module.id);
                 if (!domArr) {
-                    Router.activeDomMap.set(module.name, [dom.key]);
+                    Router.activeDomMap.set(module.id, [dom.key]);
                 }
                 else {
                     if (!domArr.includes(dom.key)) {
@@ -3529,11 +3726,11 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('router', {
-        init: (directive, dom, module) => {
-            module.routerKey = dom.key;
+        init: (directive, dom) => {
+            dom.setProp('role', 'module');
         },
         handle: (directive, dom, module, parent) => {
-            return;
+            module.routerKey = dom.key;
         }
     });
 })(nodom || (nodom = {}));
@@ -3553,13 +3750,13 @@ var nodom;
                     }
                 });
             }
-            static start() {
+            static start(scheduleTick) {
                 Scheduler.dispatch();
                 if (window.requestAnimationFrame) {
                     window.requestAnimationFrame(Scheduler.start);
                 }
                 else {
-                    window.setTimeout(Scheduler.start, nodom.Application.renderTick);
+                    window.setTimeout(Scheduler.start, scheduleTick || 50);
                 }
             }
             static addTask(foo, thiser) {
@@ -3680,9 +3877,40 @@ var nodom;
 })(nodom || (nodom = {}));
 var nodom;
 (function (nodom) {
+    nodom.DirectiveManager.addType('module', {
+        prio: 0,
+        init: (directive, dom) => {
+            let value = directive.value;
+            let valueArr = value.split('|');
+            directive.value = valueArr[0];
+            directive.extra = {
+                name: valueArr.length > 1 ? valueArr[1] : undefined,
+                init: false
+            };
+            dom.setProp('role', 'module');
+        },
+        handle: (directive, dom, module, parent) => {
+            const ext = directive.extra;
+            let needNew = ext.moduleId === undefined;
+            if (ext.moduleId) {
+                let m = nodom.ModuleFactory.get(ext.moduleId);
+                needNew = m.getContainerKey() !== dom.key;
+            }
+            ext.init = true;
+            nodom.ModuleFactory.getInstance(directive.value, ext.name || dom.getProp('name'), dom.getProp('data'))
+                .then((m) => {
+                if (m) {
+                    m.setContainerKey(dom.key);
+                    ext.moduleId = m.id;
+                    module.addChild(m.id);
+                    m.active();
+                }
+            });
+        }
+    });
     nodom.DirectiveManager.addType('model', {
         prio: 1,
-        init: (directive) => {
+        init: (directive, dom) => {
             let value = directive.value;
             if (nodom.Util.isString(value)) {
                 if (value.startsWith('$$')) {
@@ -3740,7 +3968,7 @@ var nodom;
     });
     nodom.DirectiveManager.addType('repeat', {
         prio: 2,
-        init: (directive) => {
+        init: (directive, dom) => {
             let value = directive.value;
             if (!value) {
                 throw new nodom.NodomError("paramException", "x-repeat");
@@ -3803,7 +4031,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('if', {
-        init: (directive) => {
+        init: (directive, dom) => {
             if (typeof directive.value === 'string') {
                 let value = directive.value;
                 if (!value) {
@@ -3855,7 +4083,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('show', {
-        init: (directive) => {
+        init: (directive, dom) => {
             if (typeof directive.value === 'string') {
                 let value = directive.value;
                 if (!value) {
@@ -3877,7 +4105,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('class', {
-        init: (directive) => {
+        init: (directive, dom) => {
             if (typeof directive.value === 'string') {
                 let obj = eval('(' + directive.value + ')');
                 if (!nodom.Util.isObject(obj)) {
@@ -3922,45 +4150,42 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('field', {
-        init: (directive) => {
+        init: (directive, dom) => {
+            dom.setProp('name', directive.value);
+            let type = dom.getProp('type') || 'text';
+            let eventName = dom.tagName === 'input' && ['text', 'checkbox', 'radio'].includes(type) ? 'input' : 'change';
+            dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
+                if (!el) {
+                    return;
+                }
+                let type = dom.getProp('type');
+                let field = dom.getDirective('field').value;
+                let v = el.value;
+                if (['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
+                    || dom.tagName === 'TEXTAREA') {
+                    dom.setProp('value', new nodom.Expression(field), true);
+                }
+                if (type === 'checkbox') {
+                    if (dom.getProp('yes-value') == v) {
+                        v = dom.getProp('no-value');
+                    }
+                    else {
+                        v = dom.getProp('yes-value');
+                    }
+                }
+                else if (type === 'radio') {
+                    if (!el.checked) {
+                        v = undefined;
+                    }
+                }
+                model.set(field, v);
+                if (type !== 'radio') {
+                    dom.setProp('value', v);
+                    el.value = v;
+                }
+            }));
         },
         handle: (directive, dom, module, parent) => {
-            if (!directive.extra) {
-                directive.extra = 1;
-                dom.setProp('name', directive.value);
-                let type = dom.getProp('type') || 'text';
-                let eventName = dom.tagName === 'input' && ['text', 'checkbox', 'radio'].includes(type) ? 'input' : 'change';
-                dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
-                    if (!el) {
-                        return;
-                    }
-                    let type = dom.getProp('type');
-                    let field = dom.getDirective('field').value;
-                    let v = el.value;
-                    if (['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
-                        || dom.tagName === 'TEXTAREA') {
-                        dom.setProp('value', new nodom.Expression(field), true);
-                    }
-                    if (type === 'checkbox') {
-                        if (dom.getProp('yes-value') == v) {
-                            v = dom.getProp('no-value');
-                        }
-                        else {
-                            v = dom.getProp('yes-value');
-                        }
-                    }
-                    else if (type === 'radio') {
-                        if (!el.checked) {
-                            v = undefined;
-                        }
-                    }
-                    model.set(field, v);
-                    if (type !== 'radio') {
-                        dom.setProp('value', v);
-                        el.value = v;
-                    }
-                }));
-            }
             const type = dom.getProp('type');
             const tgname = dom.tagName.toLowerCase();
             const model = module.modelFactory.get(dom.modelId);
@@ -4005,7 +4230,7 @@ var nodom;
         }
     });
     nodom.DirectiveManager.addType('validity', {
-        init: (directive) => {
+        init: (directive, dom) => {
             let ind, fn, method;
             let value = directive.value;
             if ((ind = value.indexOf('|')) !== -1) {
@@ -4015,7 +4240,7 @@ var nodom;
             else {
                 fn = value;
             }
-            directive.extra = { initChild: false, initEvent: false };
+            directive.extra = { initEvent: false };
             directive.value = fn;
             directive.params = {
                 enabled: false
@@ -4023,25 +4248,22 @@ var nodom;
             if (method) {
                 directive.params.method = method;
             }
+            if (dom.children.length === 0) {
+                let vd1 = new nodom.Element();
+                vd1.textContent = '';
+                dom.add(vd1);
+            }
+            else {
+                dom.children.forEach((item) => {
+                    if (item.children.length === 0) {
+                        let vd1 = new nodom.Element();
+                        vd1.textContent = '   ';
+                        item.add(vd1);
+                    }
+                });
+            }
         },
         handle: (directive, dom, module, parent) => {
-            if (!directive.extra.initChild) {
-                directive.extra.initChild = true;
-                if (dom.children.length === 0) {
-                    let vd1 = new nodom.Element();
-                    vd1.textContent = '';
-                    dom.add(vd1);
-                }
-                else {
-                    dom.children.forEach((item) => {
-                        if (item.children.length === 0) {
-                            let vd1 = new nodom.Element();
-                            vd1.textContent = '   ';
-                            item.add(vd1);
-                        }
-                    });
-                }
-            }
             setTimeout(() => {
                 const el = module.container.querySelector("[name='" + directive.value + "']");
                 if (!directive.extra.initEvent) {

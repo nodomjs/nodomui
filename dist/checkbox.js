@@ -18,7 +18,7 @@ class UICheckbox extends nodom.DefineElement {
         checkDom.delProp(['field', 'yes-value', 'no-value']);
         let icon = new nodom.Element('b');
         icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + dataName + "==\"" + yesValue + "\"'}"));
+        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + dataName + "==\"" + yesValue + "\"'}", icon));
         checkDom.children.unshift(icon);
         //点击事件
         checkDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {

@@ -21,7 +21,7 @@ class UITab extends nodom.DefineElement {
         rootDom.tagName = 'div';
         rootDom.addClass('nd-tab');
         //增加附加model
-        rootDom.addDirective(new nodom.Directive('model', this.extraDataName));
+        rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
         UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool'], ['position', 'allowClose'], ['top', null]);
         let headDom = new nodom.Element('div');
         headDom.addClass('nd-tab-head');
@@ -49,7 +49,7 @@ class UITab extends nodom.DefineElement {
             let contentDom = new nodom.Element('div');
             contentDom.children = c.children;
             //show 指令
-            contentDom.addDirective(new nodom.Directive('show', tabName));
+            contentDom.addDirective(new nodom.Directive('show', tabName, contentDom));
             bodyDom.add(contentDom);
             if (itemDom) {
                 continue;
@@ -64,26 +64,47 @@ class UITab extends nodom.DefineElement {
             if (this.allowClose) {
                 let b = new nodom.Element('b');
                 b.addClass('nd-tab-close');
-                b.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+                //click禁止冒泡
+                b.addEvent(new nodom.NodomEvent('click', ':nopopo', (dom, model, module) => {
                     let pmodel = module.modelFactory.get(this.extraModelId);
                     let datas = pmodel.data.datas;
+                    let activeIndex;
                     for (let i = 0; i < datas.length; i++) {
                         if (datas[i].name === model.data.name) {
+                            //如果当前删除为active，设定active index
+                            //如果不为最后，则取下一个，否则取0 
+                            if (datas[i].active) {
+                                if (i < datas.length - 1) {
+                                    activeIndex = i;
+                                }
+                                else {
+                                    activeIndex = 0;
+                                }
+                            }
                             //删除tab中的对象
                             datas.splice(i, 1);
                             //删除show绑定数据
-                            delete pmodel.data[model.data.name];
+                            pmodel.del(model.data.name);
                             //删除body 中的对象
                             bodyDom.children.splice(i, 1);
                             break;
                         }
                     }
+                    //设置active tab
+                    if (activeIndex !== undefined) {
+                        let d = datas[activeIndex];
+                        //tab active
+                        d.active = true;
+                        //body active
+                        pmodel.data[d.name] = true;
+                    }
                 }));
                 c.add(b);
             }
-            c.addDirective(new nodom.Directive('repeat', 'datas'));
-            c.addDirective(new nodom.Directive('class', "{'nd-tab-item-active':'active'}"));
+            c.addDirective(new nodom.Directive('repeat', 'datas', c));
+            c.addDirective(new nodom.Directive('class', "{'nd-tab-item-active':'active'}", c));
             c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+                console.log(model.data);
                 let pmodel = module.modelFactory.get(this.extraModelId);
                 let datas = pmodel.data.datas;
                 //之前的激活置为不激活

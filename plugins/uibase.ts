@@ -126,7 +126,7 @@ class UITool{
  * 事件对象接口
  */
 interface IEventObj{
-    module:string;
+    module:number;
     dom:string;
     handler:Function;
 }
@@ -136,7 +136,7 @@ interface IEventObj{
  */
 class UIEventRegister{
     static listeners:Map<string,Array<IEventObj>> = new Map();
-    static addEvent(eventName:string,moduleName:string,domKey:string,handler:Function){
+    static addEvent(eventName:string,moduleId:number,domKey:string,handler:Function){
         if(!this.listeners.has(eventName)){
             this.listeners.set(eventName,[]);
             window.addEventListener(eventName,(e)=>{
@@ -165,7 +165,7 @@ class UIEventRegister{
             return;
         }
         arr.push({
-            module:moduleName,
+            module:moduleId,
             dom:domKey,
             handler:handler
         });

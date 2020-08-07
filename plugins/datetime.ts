@@ -78,8 +78,8 @@ class UIDatetime extends nodom.DefineElement{
 
         let pickerDom:nodom.Element = new nodom.Element('div');
         pickerDom.addClass('nd-datetime-picker');
-        pickerDom.addDirective(new nodom.Directive('model',this.extraDataName));
-        pickerDom.addDirective(new nodom.Directive('show','show'));
+        pickerDom.addDirective(new nodom.Directive('model',this.extraDataName,pickerDom));
+        pickerDom.addDirective(new nodom.Directive('show','show',pickerDom));
         
         //日期和时间容器
         let tblCt:nodom.Element = new nodom.Element('div');
@@ -184,7 +184,7 @@ class UIDatetime extends nodom.DefineElement{
             }
             
             //增加外部点击隐藏
-            UIEventRegister.addEvent('click',module.name,uidom.children[1].key,(module,dom,inOrOut,e)=>{
+            UIEventRegister.addEvent('click',module.id,uidom.children[1].key,(module,dom,inOrOut,e)=>{
                 if(!inOrOut){
                     model.query(me.extraDataName).show = false;
                 }
@@ -259,8 +259,8 @@ class UIDatetime extends nodom.DefineElement{
         let dateDom:nodom.Element = new nodom.Element('div');
         dateDom.addClass('nd-datetime-dates');
         let daySpan:nodom.Element = new nodom.Element('span');
-        daySpan.addDirective(new nodom.Directive('repeat','days'));
-        daySpan.addDirective(new nodom.Directive('class',"{'nd-datetime-today':'today','nd-datetime-disable':'disable','nd-datetime-selected':'selected'}"));
+        daySpan.addDirective(new nodom.Directive('repeat','days',daySpan));
+        daySpan.addDirective(new nodom.Directive('class',"{'nd-datetime-today':'today','nd-datetime-disable':'disable','nd-datetime-selected':'selected'}",daySpan));
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('date')];
         daySpan.add(txt);
@@ -298,8 +298,8 @@ class UIDatetime extends nodom.DefineElement{
         let hourDom:nodom.Element = new nodom.Element('div');
         let item:nodom.Element = new nodom.Element('div');
         item.addClass('nd-datetime-timeitem');
-        item.addDirective(new nodom.Directive('repeat','hours'));
-        item.addDirective(new nodom.Directive('class',"{'nd-datetime-itemselect':'selected'}"));
+        item.addDirective(new nodom.Directive('repeat','hours',item));
+        item.addDirective(new nodom.Directive('class',"{'nd-datetime-itemselect':'selected'}",item));
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('v')];
         item.setProp('role','hour');

@@ -73,7 +73,7 @@ class UIList extends nodom.DefineElement{
         nodom.Compiler.handleChildren(rootDom,el);
         rootDom.tagName = 'div';
         //增加附加model
-        rootDom.addDirective(new nodom.Directive('model',this.extraDataName));
+        rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
 
         UITool.handleUIParam(rootDom,this,
             ['valuefield','displayfield','disablefield','listfield','type','itemclick','itemwidth|number','multiselect|bool'],
@@ -112,7 +112,7 @@ class UIList extends nodom.DefineElement{
             }
         }
         itemDom.addClass('nd-list-item');
-        itemDom.addDirective(new nodom.Directive('repeat','datas'));
+        itemDom.addDirective(new nodom.Directive('repeat','datas',itemDom));
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
@@ -135,9 +135,9 @@ class UIList extends nodom.DefineElement{
         }
         
         if(this.disableName !== ''){
-            itemDom.addDirective(new nodom.Directive('class',"{'nd-list-item-active':'selected','nd-list-item-disable':'"+this.disableName+ "'}"));
+            itemDom.addDirective(new nodom.Directive('class',"{'nd-list-item-active':'selected','nd-list-item-disable':'"+this.disableName+ "'}",itemDom));
         }else{
-            itemDom.addDirective(new nodom.Directive('class',"{'nd-list-item-active':'selected'}"));
+            itemDom.addDirective(new nodom.Directive('class',"{'nd-list-item-active':'selected'}",itemDom));
         }
         
         

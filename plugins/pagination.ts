@@ -113,7 +113,7 @@ class UIPagination extends nodom.DefineElement{
         this.extraDataName = '$ui_pagination_' + nodom.Util.genId(); 
         
         //增加附加数据模型
-        rootDom.addDirective(new nodom.Directive('model',this.extraDataName));
+        rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
         //显示共x条
         if(this.showTotal){
             let totalDom:nodom.Element = new nodom.Element('div');
@@ -144,9 +144,9 @@ class UIPagination extends nodom.DefineElement{
             
             this.pageSizeDatas = datas;
             let sizeDom:nodom.Element = new nodom.Element('select');
-            sizeDom.addDirective(new nodom.Directive('field','pageSize'));
+            sizeDom.addDirective(new nodom.Directive('field','pageSize',sizeDom));
             let optDom:nodom.Element = new nodom.Element('option');
-            optDom.addDirective(new nodom.Directive('repeat','sizeData'));
+            optDom.addDirective(new nodom.Directive('repeat','sizeData',optDom));
             optDom.setProp('value',new nodom.Expression('value'),true);
             let txt:nodom.Element = new nodom.Element();
             txt.expressions = [new nodom.Expression('text')];
@@ -161,18 +161,18 @@ class UIPagination extends nodom.DefineElement{
         //左双箭头
         let left1:nodom.Element = new nodom.Element('b');
         left1.addClass('nd-pagination-leftarrow1');
-        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes(btnAllow)'}"));
+        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes(btnAllow)'}",left1));
         pageCt.add(left1);
         //左箭头
         let left:nodom.Element = new nodom.Element('b');
         left.addClass('nd-pagination-leftarrow');
-        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes(btnAllow)'}"));
+        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes(btnAllow)'}",left));
         pageCt.add(left);
         //页面数字
         let page:nodom.Element = new nodom.Element('span');
         page.addClass('nd-pagination-page');
-        page.addDirective(new nodom.Directive('repeat','pages'));
-        page.addDirective(new nodom.Directive('class',"{'nd-pagination-active':'active'}"),true);
+        page.addDirective(new nodom.Directive('repeat','pages',page));
+        page.addDirective(new nodom.Directive('class',"{'nd-pagination-active':'active'}",page),true);
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('no')];
         page.add(txt);
@@ -180,12 +180,12 @@ class UIPagination extends nodom.DefineElement{
         //右箭头
         let right:nodom.Element = new nodom.Element('b');
         right.addClass('nd-pagination-rightarrow');
-        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes(btnAllow)'}"));
+        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes(btnAllow)'}",right));
         pageCt.add(right);
         //右双箭头
         let right1:nodom.Element = new nodom.Element('b');
         right1.addClass('nd-pagination-rightarrow1');
-        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes(btnAllow)'}"));
+        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes(btnAllow)'}",right1));
         pageCt.add(right1);
 
         rootDom.add(pageCt);
@@ -239,7 +239,7 @@ class UIPagination extends nodom.DefineElement{
             goDom.add(txt);
             let input:nodom.Element = new nodom.Element('input');
             input.setProp('type','number');
-            input.addDirective(new nodom.Directive('field','pageNo'));
+            input.addDirective(new nodom.Directive('field','pageNo',input));
             input.setProp('value',new nodom.Expression('pageNo'),true);
             goDom.add(input);
             txt = new nodom.Element();

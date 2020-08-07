@@ -88,8 +88,7 @@ class UIGrid extends nodom.DefineElement {
                 this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
                 filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
             }
-            let directive;
-            directive = new nodom.Directive('repeat', this.dataName);
+            let directive = new nodom.Directive('repeat', this.dataName, rowDom);
             if (filter) {
                 directive.filters = [filter];
             }
@@ -268,7 +267,7 @@ class UIGrid extends nodom.DefineElement {
         rowDom.add(subDom);
         //子panel处理
         //增加显示指令，$showSub作为新增数据项，用于控制显示
-        subDom.addDirective(new nodom.Directive('show', '$showSub'));
+        subDom.addDirective(new nodom.Directive('show', '$showSub', subDom));
         subDom.addClass('nd-grid-sub');
         //自动
         if (subDom.hasProp('auto')) {

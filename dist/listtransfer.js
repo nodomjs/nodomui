@@ -12,7 +12,7 @@ class UIListTransfer extends nodom.DefineElement {
         this.extraDataName = '$ui_listtransfer_' + nodom.Util.genId();
         let rootDom = new nodom.Element();
         //更改model
-        rootDom.addDirective(new nodom.Directive('model', this.extraDataName));
+        rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
         nodom.Compiler.handleAttributes(rootDom, el);
         nodom.Compiler.handleChildren(rootDom, el);
         UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield'], ['valueName', 'displayName', 'listName']);
@@ -44,8 +44,8 @@ class UIListTransfer extends nodom.DefineElement {
             itemDom.add(txt);
         }
         itemDom.addClass('nd-list-item');
-        itemDom.addDirective(new nodom.Directive('repeat', 'datas', "select:value:{isValue:false}"));
-        itemDom.addDirective(new nodom.Directive('class', "{'nd-list-item-active':'selected'}"));
+        itemDom.addDirective(new nodom.Directive('repeat', 'datas', itemDom, "select:value:{isValue:false}"));
+        itemDom.addDirective(new nodom.Directive('class', "{'nd-list-item-active':'selected'}", itemDom));
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             model.set('selected', !model.data.selected);

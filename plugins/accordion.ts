@@ -54,7 +54,7 @@ class UIAccordion extends nodom.DefineElement{
             }
             if(item.hasProp('first')){
                 //添加repeat指令
-                firstDom.addDirective(new nodom.Directive('repeat',item.getProp('data')));
+                firstDom.addDirective(new nodom.Directive('repeat',item.getProp('data'),firstDom));
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
@@ -80,7 +80,7 @@ class UIAccordion extends nodom.DefineElement{
                 //展开图标
                 let icon:nodom.Element = new nodom.Element('b');
                 icon.addClass('nd-accordion-icon nd-icon-right');
-                icon.directives.push(new nodom.Directive('class',"{'nd-accordion-open':'"+ activeName1 + "'}"));
+                icon.directives.push(new nodom.Directive('class',"{'nd-accordion-open':'"+ activeName1 + "'}",icon));
                 item.add(icon);
                 
                 item.delProp(['activename','first']); 
@@ -88,17 +88,17 @@ class UIAccordion extends nodom.DefineElement{
                 activeName2 = item.getProp('activename') || 'active';
                 //存激活field name
                 this.active2 = activeName2;
-                item.directives.push(new nodom.Directive('repeat',item.getProp('data')));
+                item.addDirective(new nodom.Directive('repeat',item.getProp('data'),item));
                 //保存第二级field
                 this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId+':delg'));
-                item.directives.push(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}"));
+                item.addDirective(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}",item));
                 this.method2 = methodId;
                 secondDom.addClass('nd-accordion-secondct');
                 secondDom.add(item);
-                secondDom.directives.push(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}"));
+                secondDom.addDirective(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}",secondDom));
                 if(item.hasProp('icon')){
                     item.addClass('nd-icon-' + item.getProp('icon'));
                 }
