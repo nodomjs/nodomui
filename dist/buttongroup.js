@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIButtonGroup extends nodom.DefineElement {
+class UIButtonGroup extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-BUTTONGROUP';
@@ -16,9 +16,9 @@ class UIButtonGroup extends nodom.DefineElement {
         nodom.Compiler.handleAttributes(oe, el);
         nodom.Compiler.handleChildren(oe, el);
         oe.addClass('nd-buttongroup');
-        oe.defineElement = this;
+        oe.plugin = this;
         return oe;
     }
 }
-nodom.DefineElementManager.add('UI-BUTTONGROUP', UIButtonGroup);
+nodom.PluginManager.add('UI-BUTTONGROUP', UIButtonGroup);
 //# sourceMappingURL=buttongroup.js.map

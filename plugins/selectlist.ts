@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UISelectList extends nodom.DefineElement{
+class UISelectList extends nodom.Plugin{
     tagName:string = 'UI-SELECTLIST';
     /**
      * 显示数据name(在model中新增)
@@ -113,7 +113,7 @@ class UISelectList extends nodom.DefineElement{
         ));
         
         listDom.children = [itemDom];
-        listDom.defineElement = this;
+        listDom.plugin = this;
         return listDom;
     }
     /**
@@ -219,4 +219,4 @@ class UISelectList extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-SELECTLIST',UISelectList);
+nodom.PluginManager.add('UI-SELECTLIST',UISelectList);

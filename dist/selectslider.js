@@ -1,13 +1,13 @@
-class UISelectSlider extends nodom.DefineElement {
+class UISelectSlider extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-SELECTSLIDER';
     }
     init(el) {
         let rootDom = new nodom.Element('div');
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
 }
-nodom.DefineElementManager.add('UI-SELECTSLIDER', UISelectSlider);
+nodom.PluginManager.add('UI-SELECTSLIDER', UISelectSlider);
 //# sourceMappingURL=selectslider.js.map

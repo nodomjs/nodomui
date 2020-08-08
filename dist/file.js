@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UIFile extends nodom.DefineElement {
+class UIFile extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-FILE';
@@ -109,7 +109,7 @@ class UIFile extends nodom.DefineElement {
         uploadDom.add(uploadingDom);
         uploadDom.add(fDom);
         fileDom.children = [ctDom, uploadDom];
-        fileDom.defineElement = this;
+        fileDom.plugin = this;
         return fileDom;
     }
     beforeRender(module, dom) {
@@ -122,5 +122,5 @@ class UIFile extends nodom.DefineElement {
         }
     }
 }
-nodom.DefineElementManager.add('UI-FILE', UIFile);
+nodom.PluginManager.add('UI-FILE', UIFile);
 //# sourceMappingURL=file.js.map

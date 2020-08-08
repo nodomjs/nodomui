@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UILoading extends nodom.DefineElement {
+class UILoading extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-LOADING';
@@ -28,9 +28,9 @@ class UILoading extends nodom.DefineElement {
             }
         }
         radioDom.delProp('field');
-        radioDom.defineElement = this;
+        radioDom.plugin = this;
         return radioDom;
     }
 }
-nodom.DefineElementManager.add('UI-LOADING', UILoading);
+nodom.PluginManager.add('UI-LOADING', UILoading);
 //# sourceMappingURL=loading.js.map

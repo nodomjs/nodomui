@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UITree extends nodom.DefineElement {
+class UITree extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-TREE';
@@ -106,7 +106,7 @@ class UITree extends nodom.DefineElement {
             parentCt = subCt;
         }
         ct.delProp(['data', 'icon', 'checkname', 'dataname', 'activename', 'itemclick', 'maxlevels']);
-        ct.defineElement = this;
+        ct.plugin = this;
         return ct;
         /**
          * 处理子孙节点check状态
@@ -152,5 +152,5 @@ class UITree extends nodom.DefineElement {
         });
     }
 }
-nodom.DefineElementManager.add('UI-TREE', UITree);
+nodom.PluginManager.add('UI-TREE', UITree);
 //# sourceMappingURL=tree.js.map

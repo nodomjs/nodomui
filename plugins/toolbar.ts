@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIToolbar extends nodom.DefineElement{
+class UIToolbar extends nodom.Plugin{
     tagName:string = 'UI-TOOLBAR';
     /**
      * 编译后执行代码
@@ -14,9 +14,9 @@ class UIToolbar extends nodom.DefineElement{
         nodom.Compiler.handleAttributes(oe,el);
         nodom.Compiler.handleChildren(oe,el);
         oe.addClass('nd-toolbar');
-        oe.defineElement=this;
+        oe.plugin=this;
         return oe;
     }
 }
 
-nodom.DefineElementManager.add('UI-TOOLBAR',UIToolbar);
+nodom.PluginManager.add('UI-TOOLBAR',UIToolbar);

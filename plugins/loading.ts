@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UILoading extends nodom.DefineElement{
+class UILoading extends nodom.Plugin{
     tagName:string = 'UI-LOADING';
     init(el:HTMLElement):nodom.Element{
         let radioDom:nodom.Element = new nodom.Element('span');
@@ -29,9 +29,9 @@ class UILoading extends nodom.DefineElement{
         }
         
         radioDom.delProp('field');
-        radioDom.defineElement = this;
+        radioDom.plugin = this;
         return radioDom;
     }
 }
 
-nodom.DefineElementManager.add('UI-LOADING',UILoading);
+nodom.PluginManager.add('UI-LOADING',UILoading);

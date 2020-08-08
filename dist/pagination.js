@@ -2,7 +2,7 @@
 /**
  * 分页插件
  */
-class UIPagination extends nodom.DefineElement {
+class UIPagination extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-PAGINATION';
@@ -146,7 +146,7 @@ class UIPagination extends nodom.DefineElement {
             goDom.add(txt);
             rootDom.add(goDom);
         }
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -295,7 +295,7 @@ class UIPagination extends nodom.DefineElement {
         }
         let model = module.modelFactory.get(dom.modelId);
         this.modelId = model.id;
-        model.set(this.extraDataName, {
+        let model1 = model.set(this.extraDataName, {
             //总条数
             total: 0,
             //页面数
@@ -316,8 +316,7 @@ class UIPagination extends nodom.DefineElement {
             sizeData: this.pageSizeDatas || [10, 20, 30, 50]
         });
         //附加数据模型
-        this.extraModelId = model.query(this.extraDataName).$modelId;
-        let model1 = module.modelFactory.get(this.extraModelId);
+        this.extraModelId = model1.id;
         //增加观察方法
         let watchFunc = function (model, key, value) {
             me.update(module);
@@ -328,5 +327,5 @@ class UIPagination extends nodom.DefineElement {
         this.initFlag = true;
     }
 }
-nodom.DefineElementManager.add('UI-PAGINATION', UIPagination);
+nodom.PluginManager.add('UI-PAGINATION', UIPagination);
 //# sourceMappingURL=pagination.js.map

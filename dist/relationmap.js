@@ -7,7 +7,7 @@
  *  valueName='列数据id名,行数据id名'
  *  showFields='列数据显示数据项名,行数据显示数据项名'
  */
-class UIRelationMap extends nodom.DefineElement {
+class UIRelationMap extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-RELATIONMAP';
@@ -60,7 +60,7 @@ class UIRelationMap extends nodom.DefineElement {
         td.add(b);
         tr.add(td);
         rootDom.children = [rowHead, tr];
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -142,5 +142,5 @@ class UIRelationMap extends nodom.DefineElement {
         model.set('active', !active);
     }
 }
-nodom.DefineElementManager.add('UI-RELATIONMAP', UIRelationMap);
+nodom.PluginManager.add('UI-RELATIONMAP', UIRelationMap);
 //# sourceMappingURL=relationmap.js.map

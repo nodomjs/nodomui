@@ -3,7 +3,7 @@
  * panel 插件
  * 
  */
-class UISelect extends nodom.DefineElement{
+class UISelect extends nodom.Plugin{
     tagName:string = 'UI-SELECT';
     /**
      * 附加数据项名
@@ -166,7 +166,7 @@ class UISelect extends nodom.DefineElement{
 
         listDom.children = [itemDom];
         rootDom.children = [showDom,listDom];
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -183,15 +183,16 @@ class UISelect extends nodom.DefineElement{
         if(!this.modelId){
             this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
-            pmodel.set(this.extraDataName,{
+            let model:nodom.Model = pmodel.set(this.extraDataName,{
                 show:false,     //下拉框显示
                 display:'',     //显示内容
                 query:'',       //查询串
                 datas:[]        //下拉框数据
             });
 
-            let data = pmodel.query(this.extraDataName);
-            this.extraModelId = data.$modelId;
+
+            let data = model.data;
+            this.extraModelId = model.id;
         
             //增加过滤器方法
             module.methodFactory.add(this.filterMethodId,function(){
@@ -328,4 +329,4 @@ class UISelect extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-SELECT',UISelect);
+nodom.PluginManager.add('UI-SELECT',UISelect);

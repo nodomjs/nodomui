@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIList extends nodom.DefineElement {
+class UIList extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-LIST';
@@ -77,7 +77,7 @@ class UIList extends nodom.DefineElement {
             itemDom.addEvent(new nodom.NodomEvent('click', this.clickEvent));
         }
         rootDom.children = [itemDom];
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -93,11 +93,9 @@ class UIList extends nodom.DefineElement {
         if (!this.modelId) {
             this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
-            pmodel.set(this.extraDataName, {
+            this.extraModelId = pmodel.set(this.extraDataName, {
                 datas: [] //下拉框数据
-            });
-            let data = pmodel.query(this.extraDataName);
-            this.extraModelId = data.$modelId;
+            }).id;
         }
         if (!pmodel) {
             pmodel = module.modelFactory.get(this.modelId);
@@ -188,5 +186,5 @@ class UIList extends nodom.DefineElement {
         }
     }
 }
-nodom.DefineElementManager.add('UI-LIST', UIList);
+nodom.PluginManager.add('UI-LIST', UIList);
 //# sourceMappingURL=list.js.map

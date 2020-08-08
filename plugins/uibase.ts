@@ -28,7 +28,7 @@ class UITool{
      */
     static handleUIParam(
         dom:nodom.Element,
-        defDom:nodom.DefineElement,
+        defDom:nodom.Plugin,
         paramArr:string[],
         props:string[],
         defaultValues?:any[]){

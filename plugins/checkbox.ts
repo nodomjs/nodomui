@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UICheckbox extends nodom.DefineElement{
+class UICheckbox extends nodom.Plugin{
     tagName:string = 'UI-CHECKBOX';
     init(el:HTMLElement):nodom.Element{
         let checkDom:nodom.Element = new nodom.Element('span');
@@ -32,9 +32,9 @@ class UICheckbox extends nodom.DefineElement{
                 }
             }
         ));
-        checkDom.defineElement = this;
+        checkDom.plugin = this;
         return checkDom;
     }
 }
 
-nodom.DefineElementManager.add('UI-CHECKBOX',UICheckbox);
+nodom.PluginManager.add('UI-CHECKBOX',UICheckbox);

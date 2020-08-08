@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UITab extends nodom.DefineElement {
+class UITab extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-TAB';
@@ -18,14 +18,16 @@ class UITab extends nodom.DefineElement {
         let rootDom = new nodom.Element();
         nodom.Compiler.handleAttributes(rootDom, el);
         nodom.Compiler.handleChildren(rootDom, el);
+        this.name = rootDom.getProp('name');
         rootDom.tagName = 'div';
         rootDom.addClass('nd-tab');
         //增加附加model
-        rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
-        UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool'], ['position', 'allowClose'], ['top', null]);
+        // rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
+        UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField'], ['position', 'allowClose', 'listName'], ['top', null, '']);
         let headDom = new nodom.Element('div');
         headDom.addClass('nd-tab-head');
         let bodyDom = new nodom.Element('div');
+        this.bodyKey = bodyDom.key;
         bodyDom.addClass('nd-tab-body');
         // 如果有，则表示自定义
         let index = 1;
@@ -49,7 +51,7 @@ class UITab extends nodom.DefineElement {
             let contentDom = new nodom.Element('div');
             contentDom.children = c.children;
             //show 指令
-            contentDom.addDirective(new nodom.Directive('show', tabName, contentDom));
+            contentDom.addDirective(new nodom.Directive('show', this.extraDataName + '.' + tabName, contentDom));
             bodyDom.add(contentDom);
             if (itemDom) {
                 continue;
@@ -66,59 +68,14 @@ class UITab extends nodom.DefineElement {
                 b.addClass('nd-tab-close');
                 //click禁止冒泡
                 b.addEvent(new nodom.NodomEvent('click', ':nopopo', (dom, model, module) => {
-                    let pmodel = module.modelFactory.get(this.extraModelId);
-                    let datas = pmodel.data.datas;
-                    let activeIndex;
-                    for (let i = 0; i < datas.length; i++) {
-                        if (datas[i].name === model.data.name) {
-                            //如果当前删除为active，设定active index
-                            //如果不为最后，则取下一个，否则取0 
-                            if (datas[i].active) {
-                                if (i < datas.length - 1) {
-                                    activeIndex = i;
-                                }
-                                else {
-                                    activeIndex = 0;
-                                }
-                            }
-                            //删除tab中的对象
-                            datas.splice(i, 1);
-                            //删除show绑定数据
-                            pmodel.del(model.data.name);
-                            //删除body 中的对象
-                            bodyDom.children.splice(i, 1);
-                            break;
-                        }
-                    }
-                    //设置active tab
-                    if (activeIndex !== undefined) {
-                        let d = datas[activeIndex];
-                        //tab active
-                        d.active = true;
-                        //body active
-                        pmodel.data[d.name] = true;
-                    }
+                    me.delTab(model.data.name, module);
                 }));
                 c.add(b);
             }
-            c.addDirective(new nodom.Directive('repeat', 'datas', c));
+            c.addDirective(new nodom.Directive('repeat', this.extraDataName + '.datas', c));
             c.addDirective(new nodom.Directive('class', "{'nd-tab-item-active':'active'}", c));
             c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                console.log(model.data);
-                let pmodel = module.modelFactory.get(this.extraModelId);
-                let datas = pmodel.data.datas;
-                //之前的激活置为不激活
-                for (let o of datas) {
-                    if (o.active) {
-                        pmodel.data[o.name] = false;
-                        o.active = false;
-                        break;
-                    }
-                }
-                //tab active
-                model.data.active = true;
-                //body active
-                pmodel.data[model.data.name] = true;
+                me.setActive(model.data.name, module);
             }));
             itemDom = c;
         }
@@ -128,7 +85,7 @@ class UITab extends nodom.DefineElement {
             this.tabs[0].active = true;
         }
         rootDom.children = [headDom, bodyDom];
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -137,11 +94,12 @@ class UITab extends nodom.DefineElement {
      * @param dom
      */
     beforeRender(module, dom) {
+        super.beforeRender(module, dom);
         //uidom model
         let pmodel;
         //附加数据model
-        let model;
-        if (!this.modelId) {
+        if (this.needPreRender) {
+            this.moduleId = module.id;
             this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
             let data = {
@@ -151,10 +109,116 @@ class UITab extends nodom.DefineElement {
             for (let d of this.tabs) {
                 data[d.name] = d.active;
             }
-            pmodel.set(this.extraDataName, data);
-            this.extraModelId = pmodel.query(this.extraDataName).$modelId;
+            this.bodyKey = dom.children[1].key;
+            this.extraModelId = pmodel.set(this.extraDataName, data).id;
         }
     }
+    /**
+     * 添加tab
+     * @param cfg {}
+     *          title:      tab 标题
+     *          name:       tab 名(唯一)
+     *          content:    显示内容(和module二选一)
+     *          module:     模块类名(注册到模块工厂)
+     *          data:       模块数据或url(module定义后可用)
+     *          active:     是否激活
+     *          index:      tab在全局索引的位置，默认添加到最后
+     */
+    addTab(cfg) {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        if (!module) {
+            return;
+        }
+        let model = module.modelFactory.get(this.extraModelId);
+        //设置索引
+        let index = nodom.Util.isNumber(cfg.index) ? cfg.index : model.data.datas.length;
+        model.data.datas.splice(index, 0, {
+            title: cfg.title,
+            name: cfg.name,
+            active: false
+        });
+        model.set(cfg.name, false);
+        if (cfg.content) {
+            let dom = nodom.Compiler.compile(cfg.content);
+            let dom1 = dom.children[0];
+            dom1.addDirective(new nodom.Directive('show', this.extraDataName + '.' + cfg.name, dom1));
+            //需要添加到virtualDom中，否则再次clone会丢失
+            let bodyDom = module.virtualDom.query(this.bodyKey);
+            bodyDom.children.splice(index, 0, dom1);
+        }
+        else if (cfg.module) {
+        }
+        //设置激活
+        if (cfg.active) {
+            this.setActive(cfg.name);
+        }
+    }
+    /**
+     * 删除tab
+     * @param tblName
+     * @param module
+     */
+    delTab(tblName, module) {
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let pmodel = module.modelFactory.get(this.extraModelId);
+        let datas = pmodel.data.datas;
+        let activeIndex;
+        for (let i = 0; i < datas.length; i++) {
+            if (datas[i].name === tblName) {
+                //如果当前删除为active，设定active index
+                //如果不为最后，则取下一个，否则取0 
+                if (datas[i].active) {
+                    if (i < datas.length - 1) {
+                        activeIndex = i;
+                    }
+                    else {
+                        activeIndex = 0;
+                    }
+                }
+                //删除tab中的对象
+                datas.splice(i, 1);
+                //删除show绑定数据
+                pmodel.del(tblName);
+                //删除body 中的对象，需要从原始虚拟dom中删除
+                let bodyDom = module.virtualDom.query(this.bodyKey);
+                bodyDom.children.splice(i, 1);
+                break;
+            }
+        }
+        //设置active tab
+        if (activeIndex !== undefined) {
+            this.setActive(datas[activeIndex].name);
+        }
+    }
+    /**
+     * 设置激活
+     * @param tblName   tab名
+     * @param module    模块
+     */
+    setActive(tblName, module) {
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let pmodel = module.modelFactory.get(this.extraModelId);
+        let datas = pmodel.data.datas;
+        let activeData;
+        //之前的激活置为不激活
+        for (let o of datas) {
+            if (o.active) {
+                pmodel.data[o.name] = false;
+                o.active = false;
+            }
+            if (o.name === tblName) {
+                activeData = o;
+            }
+        }
+        //tab active
+        activeData.active = true;
+        //body active
+        pmodel.data[tblName] = true;
+    }
 }
-nodom.DefineElementManager.add('UI-TAB', UITab);
+nodom.PluginManager.add('UI-TAB', UITab);
 //# sourceMappingURL=tab.js.map

@@ -2,7 +2,7 @@
 /**
  * list元素移动插件
  */
-class UIListTransfer extends nodom.DefineElement{
+class UIListTransfer extends nodom.Plugin{
     tagName:string = 'UI-LISTTRANSFER';
     
     /**
@@ -143,7 +143,7 @@ class UIListTransfer extends nodom.DefineElement{
         }));
 
         rootDom.children = [listDom,btnGrp,listDom1];
-        rootDom.defineElement = this;
+        rootDom.plugin = this;
         return rootDom;
     }
     /**
@@ -159,16 +159,14 @@ class UIListTransfer extends nodom.DefineElement{
         if(!this.modelId){
             this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
-            pmodel.set(this.extraDataName,{
+            let model:nodom.Model = pmodel.set(this.extraDataName,{
                 //数据
                 datas:[]
             });
 
-            let data = pmodel.query(this.extraDataName);
-            this.extraModelId = data.$modelId;
+            this.extraModelId = model.id;
             let value = pmodel.query(this.dataName);
             let datas = pmodel.query(this.listName);
-            let model:nodom.Model = module.modelFactory.get(this.extraModelId);
             
             let rows = [];
             if(Array.isArray(datas)){
@@ -228,4 +226,4 @@ class UIListTransfer extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-LISTTRANSFER',UIListTransfer);
+nodom.PluginManager.add('UI-LISTTRANSFER',UIListTransfer);

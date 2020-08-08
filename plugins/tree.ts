@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UITree extends nodom.DefineElement{
+class UITree extends nodom.Plugin{
     tagName:string = 'UI-TREE';
     /**
      * 左侧箭头点击事件id
@@ -133,7 +133,7 @@ class UITree extends nodom.DefineElement{
         }
         
         ct.delProp(['data','icon','checkname','dataname','activename','itemclick','maxlevels']);
-        ct.defineElement=this;
+        ct.plugin=this;
         return ct;
 
         /**
@@ -183,4 +183,4 @@ class UITree extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-TREE',UITree);
+nodom.PluginManager.add('UI-TREE',UITree);

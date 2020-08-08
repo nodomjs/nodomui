@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIButton extends nodom.DefineElement{
+class UIButton extends nodom.Plugin{
     tagName:string = 'UI-BUTTON';
     /**
      * 编译后执行代码
@@ -99,9 +99,9 @@ class UIButton extends nodom.DefineElement{
                 break;    
         }
         
-        oe.defineElement=this;
+        oe.plugin=this;
         return oe;
     }
 }
 
-nodom.DefineElementManager.add('UI-BUTTON',UIButton);
+nodom.PluginManager.add('UI-BUTTON',UIButton);

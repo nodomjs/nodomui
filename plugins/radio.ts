@@ -2,7 +2,7 @@
 /**
  * checkbox
  */
-class UIRadio extends nodom.DefineElement{
+class UIRadio extends nodom.Plugin{
     tagName:string = 'UI-RADIO';
     init(el:HTMLElement):nodom.Element{
         let radioDom:nodom.Element = new nodom.Element('span');
@@ -29,9 +29,9 @@ class UIRadio extends nodom.DefineElement{
         }
         
         radioDom.delProp('field');
-        radioDom.defineElement = this;
+        radioDom.plugin = this;
         return radioDom;
     }
 }
 
-nodom.DefineElementManager.add('UI-RADIO',UIRadio);
+nodom.PluginManager.add('UI-RADIO',UIRadio);

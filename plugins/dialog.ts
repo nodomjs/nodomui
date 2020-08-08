@@ -33,7 +33,7 @@ class UIDialog extends UIPanel{
         coverDom.addClass('nd-dialog-cover');
         dialogDom.add(coverDom);
         dialogDom.add(dialogBody);
-        dialogDom.defineElement=this;
+        dialogDom.plugin=this;
         return dialogDom;
     }
 
@@ -52,4 +52,4 @@ class UIDialog extends UIPanel{
 }
 
 //添加到元素库
-nodom.DefineElementManager.add('UI-DIALOG',UIDialog);
+nodom.PluginManager.add('UI-DIALOG',UIDialog);

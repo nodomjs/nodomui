@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIAccordion extends nodom.DefineElement {
+class UIAccordion extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-ACCORDION';
@@ -88,7 +88,7 @@ class UIAccordion extends nodom.DefineElement {
         });
         firstDom.add(secondDom);
         ct.children = [firstDom];
-        ct.defineElement = this;
+        ct.plugin = this;
         return ct;
     }
     /**
@@ -129,5 +129,5 @@ class UIAccordion extends nodom.DefineElement {
         });
     }
 }
-nodom.DefineElementManager.add('UI-ACCORDION', UIAccordion);
+nodom.PluginManager.add('UI-ACCORDION', UIAccordion);
 //# sourceMappingURL=accordion.js.map

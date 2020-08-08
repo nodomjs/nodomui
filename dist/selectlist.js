@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UISelectList extends nodom.DefineElement {
+class UISelectList extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-SELECTLIST';
@@ -60,7 +60,7 @@ class UISelectList extends nodom.DefineElement {
             me.switchValue(module, model);
         }));
         listDom.children = [itemDom];
-        listDom.defineElement = this;
+        listDom.plugin = this;
         return listDom;
     }
     /**
@@ -165,5 +165,5 @@ class UISelectList extends nodom.DefineElement {
         pmodel.set(this.fieldName, a.join(','));
     }
 }
-nodom.DefineElementManager.add('UI-SELECTLIST', UISelectList);
+nodom.PluginManager.add('UI-SELECTLIST', UISelectList);
 //# sourceMappingURL=selectlist.js.map

@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIButton extends nodom.DefineElement {
+class UIButton extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-BUTTON';
@@ -92,9 +92,9 @@ class UIButton extends nodom.DefineElement {
                 img.addClass('nd-btn-vert');
                 break;
         }
-        oe.defineElement = this;
+        oe.plugin = this;
         return oe;
     }
 }
-nodom.DefineElementManager.add('UI-BUTTON', UIButton);
+nodom.PluginManager.add('UI-BUTTON', UIButton);
 //# sourceMappingURL=button.js.map

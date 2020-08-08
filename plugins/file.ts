@@ -3,7 +3,7 @@
 /**
  * checkbox
  */
-class UIFile extends nodom.DefineElement{
+class UIFile extends nodom.Plugin{
     tagName:string = 'UI-FILE';
     /**
      * 绑定字段名
@@ -193,7 +193,7 @@ class UIFile extends nodom.DefineElement{
         uploadDom.add(fDom);
 
         fileDom.children = [ctDom,uploadDom];
-        fileDom.defineElement = this;
+        fileDom.plugin = this;
         return fileDom;
     }
 
@@ -208,4 +208,4 @@ class UIFile extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-FILE',UIFile);
+nodom.PluginManager.add('UI-FILE',UIFile);

@@ -11,7 +11,7 @@
  *  只能包括一个子节点(带tagname)
  *  icon:       菜单项图标对应数据字段名
  */
-class UIMenu extends nodom.DefineElement {
+class UIMenu extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-MENU';
@@ -120,7 +120,7 @@ class UIMenu extends nodom.DefineElement {
             parentCt = subCt;
         }
         menuDom.delProp(['listName', 'width', , 'maxlevels']);
-        menuDom.defineElement = this;
+        menuDom.plugin = this;
         return menuDom;
     }
     /**
@@ -261,5 +261,5 @@ class UIMenu extends nodom.DefineElement {
         return [left, top];
     }
 }
-nodom.DefineElementManager.add('UI-MENU', UIMenu);
+nodom.PluginManager.add('UI-MENU', UIMenu);
 //# sourceMappingURL=menu.js.map

@@ -3,7 +3,7 @@
 /**
  * panel 插件
  */
-class UIDatetime extends nodom.DefineElement{
+class UIDatetime extends nodom.Plugin{
     tagName:string = 'UI-DATETIME';
 
     year:number;
@@ -135,7 +135,7 @@ class UIDatetime extends nodom.DefineElement{
         
         pickerDom.add(btnCt);
         rootDom.children = [fieldDom,pickerDom];
-        rootDom.defineElement=this;
+        rootDom.plugin=this;
         return rootDom;
     }
 
@@ -166,14 +166,9 @@ class UIDatetime extends nodom.DefineElement{
                 days:[]
             });
 
-            this.pickerModelId = model.query(this.extraDataName).$modelId;
+            this.pickerModelId = model.get(this.extraDataName).id;
 
-            // let pickerModel:nodom.Model = module.modelFactory.get(this.pickerModelId);
-            // //添加hour,minute,second监听
-            // pickerModel.watch('hour',(module,field,value)=>{
-
-            // });
-
+            
             if(this.type === 'date'){
                 this.genDates(module);
             }else if(this.type === 'time'){
@@ -191,7 +186,7 @@ class UIDatetime extends nodom.DefineElement{
             });
             
         }else{
-            this.pickerModelId = model.query(this.extraDataName).$modelId;
+            this.pickerModelId = model.get(this.extraDataName).id;
         }
     }
 
@@ -665,4 +660,4 @@ class UIDatetime extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-DATETIME',UIDatetime);
+nodom.PluginManager.add('UI-DATETIME',UIDatetime);

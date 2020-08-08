@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UILayout extends nodom.DefineElement {
+class UILayout extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-LAYOUT';
@@ -53,9 +53,9 @@ class UILayout extends nodom.DefineElement {
         if (items['south']) {
             oe.children.push(items['south']);
         }
-        oe.defineElement = this;
+        oe.plugin = this;
         return oe;
     }
 }
-nodom.DefineElementManager.add('UI-LAYOUT', UILayout);
+nodom.PluginManager.add('UI-LAYOUT', UILayout);
 //# sourceMappingURL=layout.js.map

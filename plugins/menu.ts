@@ -12,7 +12,7 @@
  *  只能包括一个子节点(带tagname)
  *  icon:       菜单项图标对应数据字段名
  */
-class UIMenu extends nodom.DefineElement{
+class UIMenu extends nodom.Plugin{
     tagName:string = 'UI-MENU';
     /**
      * 数据项字段名
@@ -164,7 +164,7 @@ class UIMenu extends nodom.DefineElement{
         }
         menuDom.delProp(['listName','width',,'maxlevels']);
             
-        menuDom.defineElement=this;
+        menuDom.plugin=this;
         return menuDom;
     }
     
@@ -314,4 +314,4 @@ class UIMenu extends nodom.DefineElement{
     }
 }
 
-nodom.DefineElementManager.add('UI-MENU',UIMenu);
+nodom.PluginManager.add('UI-MENU',UIMenu);

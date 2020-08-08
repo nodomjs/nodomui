@@ -26,7 +26,7 @@
  *  labelwidth  label宽度，默认100，auto设置时有效
  *
  */
-class UIGrid extends nodom.DefineElement {
+class UIGrid extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-GRID';
@@ -74,7 +74,7 @@ class UIGrid extends nodom.DefineElement {
             else if (c.tagName === 'SUB') {
                 subDom = c;
             }
-            else if (c.defineElement && c.defineElement.tagName === 'UI-PAGINATION') {
+            else if (c.plugin && c.plugin.tagName === 'UI-PAGINATION') {
                 pagination = c;
             }
         }
@@ -156,7 +156,7 @@ class UIGrid extends nodom.DefineElement {
         else {
             grid.children = [tbody];
         }
-        grid.defineElement = this;
+        grid.plugin = this;
         //如果有分页，则需要在外添加容器
         if (pagination) {
             let parentDom = new nodom.Element('div');
@@ -218,18 +218,18 @@ class UIGrid extends nodom.DefineElement {
         down.addClass('nd-grid-sort-down');
         //保存index
         down.tmpData = { index: index };
-        const defineElement = this;
+        const plugin = this;
         /**
          * 升序按钮事件
          */
         up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            defineElement.sort(parseInt(dom.tmpData['index']), 'asc', module);
+            plugin.sort(parseInt(dom.tmpData['index']), 'asc', module);
         }));
         /**
          * 降序按钮事件
          */
         down.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            defineElement.sort(parseInt(dom.tmpData['index']), 'desc', module);
+            plugin.sort(parseInt(dom.tmpData['index']), 'desc', module);
         }));
         updown.add(up);
         updown.add(down);
@@ -377,7 +377,7 @@ class UIGrid extends nodom.DefineElement {
      */
     handlePagination(pagination) {
         let me = this;
-        let df = pagination.defineElement;
+        let df = pagination.plugin;
         if (df.currentPage) {
             this.currentPage = df.currentPage;
         }
@@ -419,5 +419,5 @@ class UIGrid extends nodom.DefineElement {
         }
     }
 }
-nodom.DefineElementManager.add('UI-GRID', UIGrid);
+nodom.PluginManager.add('UI-GRID', UIGrid);
 //# sourceMappingURL=grid.js.map

@@ -2,7 +2,7 @@
 /**
  * panel 插件
  */
-class UIPanel extends nodom.DefineElement {
+class UIPanel extends nodom.Plugin {
     constructor() {
         super(...arguments);
         this.tagName = 'UI-PANEL';
@@ -48,7 +48,7 @@ class UIPanel extends nodom.DefineElement {
         this.handleHead(panelDom, title, showMin, showMax, showClose);
         //处理body
         this.handleBody(panelDom, oe);
-        panelDom.defineElement = this;
+        panelDom.plugin = this;
         return panelDom;
     }
     /**
@@ -115,11 +115,11 @@ class UIPanel extends nodom.DefineElement {
         let btnGrp;
         for (let i = 0; i < oe.children.length; i++) {
             let item = oe.children[i];
-            if (item.defineElement) {
-                if (item.defineElement.tagName === 'UI-TOOLBAR') {
+            if (item.plugin) {
+                if (item.plugin.tagName === 'UI-TOOLBAR') {
                     tbar = item;
                 }
-                else if (item.defineElement.tagName === 'UI-BUTTONGROUP') {
+                else if (item.plugin.tagName === 'UI-BUTTONGROUP') {
                     btnGrp = item;
                 }
             }
@@ -154,5 +154,5 @@ class UIPanel extends nodom.DefineElement {
     setCloseHandler(btn) {
     }
 }
-nodom.DefineElementManager.add('UI-PANEL', UIPanel);
+nodom.PluginManager.add('UI-PANEL', UIPanel);
 //# sourceMappingURL=panel.js.map
