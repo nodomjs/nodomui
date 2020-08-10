@@ -22,13 +22,15 @@ class UITab extends nodom.Plugin {
         rootDom.tagName = 'div';
         rootDom.addClass('nd-tab');
         //增加附加model
-        // rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
-        UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField'], ['position', 'allowClose', 'listName'], ['top', null, '']);
+        UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField', 'height|number'], ['position', 'allowClose', 'listName', 'bodyHeight'], ['top', null, '', 0]);
         let headDom = new nodom.Element('div');
         headDom.addClass('nd-tab-head');
         let bodyDom = new nodom.Element('div');
         this.bodyKey = bodyDom.key;
         bodyDom.addClass('nd-tab-body');
+        if (this.bodyHeight > 0) {
+            bodyDom.assets.set('style', 'height:' + this.bodyHeight + 'px');
+        }
         // 如果有，则表示自定义
         let index = 1;
         let activeIndex = 0;
@@ -57,7 +59,7 @@ class UITab extends nodom.Plugin {
                 continue;
             }
             c.tagName = 'div';
-            c.delProp(['title', 'active']);
+            c.delProp(['title', 'active', 'name']);
             c.addClass('nd-tab-item');
             let txt = new nodom.Element();
             txt.expressions = [new nodom.Expression('title')];
@@ -95,6 +97,7 @@ class UITab extends nodom.Plugin {
      */
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
+        console.log(dom.getProp('name'));
         //uidom model
         let pmodel;
         //附加数据model
@@ -117,9 +120,10 @@ class UITab extends nodom.Plugin {
      * 添加tab
      * @param cfg {}
      *          title:      tab 标题
-     *          name:       tab 名(唯一)
+     *          name:       tab 名(模块内唯一)
      *          content:    显示内容(和module二选一)
-     *          module:     模块类名(注册到模块工厂)
+     *          module:     模块类名
+     *          moduleName: 模块名
      *          data:       模块数据或url(module定义后可用)
      *          active:     是否激活
      *          index:      tab在全局索引的位置，默认添加到最后
@@ -132,22 +136,33 @@ class UITab extends nodom.Plugin {
         let model = module.modelFactory.get(this.extraModelId);
         //设置索引
         let index = nodom.Util.isNumber(cfg.index) ? cfg.index : model.data.datas.length;
+        let tblName = cfg.name || ('Tab' + nodom.Util.genId());
         model.data.datas.splice(index, 0, {
             title: cfg.title,
-            name: cfg.name,
+            name: tblName,
             active: false
         });
-        model.set(cfg.name, false);
+        model.set(tblName, false);
+        //需要添加到virtualDom中，否则再次clone会丢失
+        let bodyDom = module.virtualDom.query(this.bodyKey);
+        let dom;
+        //内容串    
         if (cfg.content) {
-            let dom = nodom.Compiler.compile(cfg.content);
-            let dom1 = dom.children[0];
-            dom1.addDirective(new nodom.Directive('show', this.extraDataName + '.' + cfg.name, dom1));
-            //需要添加到virtualDom中，否则再次clone会丢失
-            let bodyDom = module.virtualDom.query(this.bodyKey);
-            bodyDom.children.splice(index, 0, dom1);
+            dom = nodom.Compiler.compile(cfg.content);
         }
-        else if (cfg.module) {
+        else if (cfg.module) { //引用模块
+            dom = new nodom.Element('div');
+            let mdlStr = cfg.module;
+            if (cfg.moduleName) {
+                mdlStr += '|' + cfg.moduleName;
+            }
+            dom.addDirective(new nodom.Directive('module', mdlStr, dom));
+            if (cfg.data) {
+                dom.setProp('data', cfg.data);
+            }
         }
+        dom.addDirective(new nodom.Directive('show', this.extraDataName + '.' + cfg.name, dom));
+        bodyDom.children.splice(index, 0, dom);
         //设置激活
         if (cfg.active) {
             this.setActive(cfg.name);
@@ -165,6 +180,10 @@ class UITab extends nodom.Plugin {
         let pmodel = module.modelFactory.get(this.extraModelId);
         let datas = pmodel.data.datas;
         let activeIndex;
+        //最后一个不删除
+        if (datas.length === 1) {
+            return;
+        }
         for (let i = 0; i < datas.length; i++) {
             if (datas[i].name === tblName) {
                 //如果当前删除为active，设定active index
