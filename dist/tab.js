@@ -20,9 +20,11 @@ class UITab extends nodom.Plugin {
         nodom.Compiler.handleChildren(rootDom, el);
         this.name = rootDom.getProp('name');
         rootDom.tagName = 'div';
-        rootDom.addClass('nd-tab');
-        //增加附加model
         UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField', 'height|number'], ['position', 'allowClose', 'listName', 'bodyHeight'], ['top', null, '', 0]);
+        rootDom.addClass('nd-tab');
+        if (this.position === 'left' || this.position === 'right') {
+            rootDom.addClass('nd-tab-horizontal');
+        }
         let headDom = new nodom.Element('div');
         headDom.addClass('nd-tab-head');
         let bodyDom = new nodom.Element('div');
@@ -86,7 +88,12 @@ class UITab extends nodom.Plugin {
         if (activeIndex === 0 && this.tabs.length > 0) {
             this.tabs[0].active = true;
         }
-        rootDom.children = [headDom, bodyDom];
+        if (this.position === 'top' || this.position === 'left') {
+            rootDom.children = [headDom, bodyDom];
+        }
+        else {
+            rootDom.children = [bodyDom, headDom];
+        }
         rootDom.plugin = this;
         return rootDom;
     }
@@ -136,13 +143,14 @@ class UITab extends nodom.Plugin {
         let model = module.modelFactory.get(this.extraModelId);
         //设置索引
         let index = nodom.Util.isNumber(cfg.index) ? cfg.index : model.data.datas.length;
-        let tblName = cfg.name || ('Tab' + nodom.Util.genId());
+        //tab名
+        let tabName = cfg.name || ('Tab' + nodom.Util.genId());
         model.data.datas.splice(index, 0, {
             title: cfg.title,
-            name: tblName,
+            name: tabName,
             active: false
         });
-        model.set(tblName, false);
+        model.set(tabName, false);
         //需要添加到virtualDom中，否则再次clone会丢失
         let bodyDom = module.virtualDom.query(this.bodyKey);
         let dom;
@@ -161,19 +169,19 @@ class UITab extends nodom.Plugin {
                 dom.setProp('data', cfg.data);
             }
         }
-        dom.addDirective(new nodom.Directive('show', this.extraDataName + '.' + cfg.name, dom));
+        dom.addDirective(new nodom.Directive('show', this.extraDataName + '.' + tabName, dom));
         bodyDom.children.splice(index, 0, dom);
         //设置激活
         if (cfg.active) {
-            this.setActive(cfg.name);
+            this.setActive(tabName, module);
         }
     }
     /**
      * 删除tab
-     * @param tblName
-     * @param module
+     * @param tabName   tab名
+     * @param module    模块
      */
-    delTab(tblName, module) {
+    delTab(tabName, module) {
         if (!module) {
             module = nodom.ModuleFactory.get(this.moduleId);
         }
@@ -185,7 +193,7 @@ class UITab extends nodom.Plugin {
             return;
         }
         for (let i = 0; i < datas.length; i++) {
-            if (datas[i].name === tblName) {
+            if (datas[i].name === tabName) {
                 //如果当前删除为active，设定active index
                 //如果不为最后，则取下一个，否则取0 
                 if (datas[i].active) {
@@ -199,7 +207,7 @@ class UITab extends nodom.Plugin {
                 //删除tab中的对象
                 datas.splice(i, 1);
                 //删除show绑定数据
-                pmodel.del(tblName);
+                pmodel.del(tabName);
                 //删除body 中的对象，需要从原始虚拟dom中删除
                 let bodyDom = module.virtualDom.query(this.bodyKey);
                 bodyDom.children.splice(i, 1);
@@ -208,15 +216,15 @@ class UITab extends nodom.Plugin {
         }
         //设置active tab
         if (activeIndex !== undefined) {
-            this.setActive(datas[activeIndex].name);
+            this.setActive(datas[activeIndex].name, module);
         }
     }
     /**
      * 设置激活
-     * @param tblName   tab名
+     * @param tabName   tab名
      * @param module    模块
      */
-    setActive(tblName, module) {
+    setActive(tabName, module) {
         if (!module) {
             module = nodom.ModuleFactory.get(this.moduleId);
         }
@@ -229,14 +237,14 @@ class UITab extends nodom.Plugin {
                 pmodel.data[o.name] = false;
                 o.active = false;
             }
-            if (o.name === tblName) {
+            if (o.name === tabName) {
                 activeData = o;
             }
         }
         //tab active
         activeData.active = true;
         //body active
-        pmodel.data[tblName] = true;
+        pmodel.data[tabName] = true;
     }
 }
 nodom.PluginManager.add('UI-TAB', UITab);

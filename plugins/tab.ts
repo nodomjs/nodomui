@@ -65,15 +65,17 @@ class UITab extends nodom.Plugin{
         this.name = rootDom.getProp('name');
         
         rootDom.tagName = 'div';
-        rootDom.addClass('nd-tab');
-        //增加附加model
         
         UITool.handleUIParam(rootDom,this,
             ['position','allowclose|bool','listField','height|number'],
             ['position','allowClose','listName','bodyHeight'],
             ['top',null,'',0]);
         
-             
+        rootDom.addClass('nd-tab');    
+        if(this.position === 'left' || this.position === 'right'){
+            rootDom.addClass('nd-tab-horizontal');
+        }
+        
         let headDom:nodom.Element = new nodom.Element('div');
         headDom.addClass('nd-tab-head');
 
@@ -146,8 +148,12 @@ class UITab extends nodom.Plugin{
         if(activeIndex === 0 && this.tabs.length>0){
             this.tabs[0].active = true;
         }
+        if(this.position === 'top' || this.position === 'left'){
+            rootDom.children = [headDom,bodyDom];
+        }else{
+            rootDom.children = [bodyDom,headDom];
+        }
         
-        rootDom.children = [headDom,bodyDom];
         rootDom.plugin = this;
         return rootDom;
     }
@@ -226,11 +232,11 @@ class UITab extends nodom.Plugin{
                 dom.setProp('data',cfg.data);
             }
         }
-        dom.addDirective(new nodom.Directive('show',this.extraDataName + '.' + cfg.name,dom));
+        dom.addDirective(new nodom.Directive('show',this.extraDataName + '.' + tabName,dom));
         bodyDom.children.splice(index,0,dom);
         //设置激活
         if(cfg.active){
-            this.setActive(cfg.name);
+            this.setActive(tabName,module);
         }
     }
 
@@ -274,22 +280,22 @@ class UITab extends nodom.Plugin{
         }  
         //设置active tab
         if(activeIndex !== undefined){
-            this.setActive(datas[activeIndex].name);
+            this.setActive(datas[activeIndex].name,module);
         }
     }
 
     /**
      * 设置激活
-     * @param tblName   tab名
+     * @param tabName   tab名
      * @param module    模块
      */
-    setActive(tblName:string,module?:nodom.Module){
+    setActive(tabName:string,module?:nodom.Module){
         if(!module){
             module = nodom.ModuleFactory.get(this.moduleId);
         }
         let pmodel:nodom.Model = module.modelFactory.get(this.extraModelId);
-        
         let datas  = pmodel.data.datas;
+        
         let activeData;
         //之前的激活置为不激活
         for(let o of datas){
@@ -297,14 +303,14 @@ class UITab extends nodom.Plugin{
                 pmodel.data[o.name] = false;
                 o.active = false;
             }
-            if(o.name === tblName){
+            if(o.name === tabName){
                 activeData = o;
             }
         }
         //tab active
         activeData.active = true;
         //body active
-        pmodel.data[tblName] = true;
+        pmodel.data[tabName] = true;
     }
 }
 
