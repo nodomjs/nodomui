@@ -8,42 +8,34 @@
     <script src='js/less.min.js'></script>
     <title>Document</title>
     <style>
-        a{
-            width: 50px;
-            height:50px;
-            border:1px solid;
-            display:inline-block;
-            overflow:hidden;
+        @keyframes sizeme{
+            from {height:30px;}
+            to {height:0px;}
         }
-        input{
-            opacity:0;
-            position:absolute;
-            left:0px;
-            top:0px;
-            width:100%;
-            height:100%;
+        div{
+            background-color:red;
+            padding:30px;
+            transition:transform 1s ease;
         }
     </style>
-    <script>
-        // class TreeElement extends HTMLElement{
-        //     constructor(){
-        //         super();
-        //         let shadow = this.attachShadow({mode:'open'});
-        //         // this.innerHTML = "<div style='color:red'>hello world</div>"
-        //         let root = this.shadowRoot;
-        //         root.innerHTML = "<div style='color:red'>hello world</div>";
-        //     }
-        // }
-        // customElements.define('ui-tree',TreeElement);
-    </script>
+    
 </head>
 
 <body>
-    <ui-tree></ui-tree>
+    <button onclick='hide()'>hide</button>
+    <button onclick='show()'>show</button>
+    <div>hello world!</div>
+    <div>this is next</div>
 </body>
 <script>
-    let tree = document.querySelector('ui-tree');
-    let root = tree.shadowRoot;
-    // tree.innerHTML = "<div style='color:red'>hello world</div>"
+    function hide(){
+        let div = document.querySelector('div');
+        console.log(div.offsetHeight,div.offsetWidth);
+        div.style.transform = ' translate(-50%,-50%) scale(0,0)'
+    }
+    function show(){
+        let div = document.querySelector('div');
+        div.style.transform = ' translate(0,0) scale(1,1)'
+    }
 </script>
 </html>

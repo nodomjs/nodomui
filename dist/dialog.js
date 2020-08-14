@@ -19,7 +19,8 @@ class UIDialog extends UIPanel {
         // title = title!==''?title:'Dialog';
         let dialogDom = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
-        dialogDom.addDirective(new nodom.Directive('class', "{'nd-dialog-hide':'!showdlg'}", dialogDom));
+        // dialogDom.addDirective(new nodom.Directive('class',"{'nd-dialog-hide':'!showdlg'}",dialogDom));
+        dialogDom.addDirective(new nodom.Directive('show', 'showdlg', dialogDom));
         //body
         let dialogBody = new nodom.Element('div');
         dialogBody.addClass('nd-dialog-body');

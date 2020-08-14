@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodomui example - panel usage</title>
+    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet/less" type="text/css" href="css/tip.less" />
+    <script src='js/nodom.js'></script>
+    <script src='js/less.min.js'></script>
+    <script src='config/module.js'></script>
+    
+    <script src='../dist/uibase.js'></script>
+    <script src='../dist/tip.js'></script>
+
+    <style>
+        .tip{
+            height:200px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button e-click='showtip1'>tip1</button>
+        <button e-click='showtip2'>tip2</button>
+        <button e-click='showtip3'>tip3</button>
+        <button e-click='showtip4'>tip4</button>
+        <p>hello 测试</p>
+        <ui-tip></ui-tip>
+    </div>
+</body>
+<script>
+    let index = 1;
+    nodom.newApp({
+        module:{
+            el:'div',
+            data:{
+                tabIndex:4
+            },
+            methods:{
+                showtip1:function(){
+                    nodom.tip({content:'hello top' + index++});
+                },
+                showtip2:function(){
+                    nodom.tip({
+                        content:'hello right' + index++,
+                        loc:'right',
+                        allowClose:true,
+                        icon:'close'
+                    });
+                },
+                showtip3:function(){
+                    nodom.tip({
+                        content:'hello bottom <br/> 换一行' + index++,
+                        loc:'bottom',
+                        allowClose:true,
+                        icon:'select'
+                    });
+                },
+                showtip4:function(){
+                    nodom.tip({
+                        content:'hello left' + index++,
+                        loc:'left',
+                        allowClose:true,
+                        icon:'insurance',
+                        theme:'active'
+                    });
+                }
+            }
+        }
+    });
+</script>
+</html>

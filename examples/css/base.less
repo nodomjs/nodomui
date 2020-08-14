@@ -100,9 +100,10 @@
 @nd-btn-corner:6px; 
 
 /*zindex*/
-@nd-dialog-index:1000;
-@nd-menu-index:999;
-@nd-combo-index:998;
+@nd-tip-index:1000;
+@nd-dialog-index:999;
+@nd-menu-index:998;
+@nd-combo-index:997;
 
 /*下拉框离显示框距离*/
 @nd-dropdown-margin:3px;
@@ -189,6 +190,11 @@ a:visited{
     border:1px solid @nd-color6;
 }
 
+.nd-border-shader{
+    border:1px solid @nd-color6;
+    box-shadow: #000 3px 3px 5px;
+}
+
 /*框体padding*/
 .nd-padding{
     padding:@nd-padding * 2;
@@ -207,6 +213,9 @@ a:visited{
 /*可以click*/
 .nd-canclick{
     cursor:pointer;
+    &:hover{
+        color:@nd-forecolor2;
+    }
 }
 
 /*输入框*/
@@ -235,6 +244,17 @@ a:visited{
         flex:1;
     }
 }
+
+/*不同颜色框*/
+
+.nd-box-active{
+    background-color:lighten(@nd-activecolor,30%) !important;
+    border:1px solid @nd-activecolor !important;
+}
+
+
+
+
 /**滚动条**/
 ::-webkit-scrollbar{
     width:10px;

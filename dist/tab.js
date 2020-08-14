@@ -104,7 +104,6 @@ class UITab extends nodom.Plugin {
      */
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
-        console.log(dom.getProp('name'));
         //uidom model
         let pmodel;
         //附加数据model

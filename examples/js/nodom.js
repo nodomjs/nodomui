@@ -1602,7 +1602,6 @@ var nodom;
                 let d = this.getDirective('module');
                 if (d.extra && d.extra.moduleId) {
                     let mdl = nodom.ModuleFactory.get(d.extra.moduleId);
-                    
                     if (mdl) {
                         mdl.unactive();
                     }
@@ -2223,7 +2222,12 @@ var nodom;
                 let arr = key.split('.');
                 let mdl = this;
                 for (let i = 0; i < arr.length && mdl; i++) {
-                    mdl = mdl.children[arr[i]];
+                    if (mdl.children) {
+                        mdl = mdl.children[arr[i]];
+                    }
+                    else {
+                        return;
+                    }
                 }
                 return mdl;
             }
@@ -2512,6 +2516,9 @@ var nodom;
                         this.dataUrl = config.data;
                     }
                 }
+                else {
+                    this.model = new nodom.Model({}, this);
+                }
                 if (urlArr.length > 0) {
                     let rets = yield nodom.ResourceManager.getResources(urlArr);
                     for (let r of rets) {
@@ -2716,6 +2723,14 @@ var nodom;
                 }
                 this.state = 3;
                 nodom.Renderer.add(this);
+                if (nodom.Util.isArray(this.children)) {
+                    this.children.forEach((item) => {
+                        let m = nodom.ModuleFactory.get(item);
+                        if (m) {
+                            m.unactive();
+                        }
+                    });
+                }
             });
         }
         unactive() {
@@ -2795,7 +2810,7 @@ var nodom;
             }
         }
         addPlugin(name, ele) {
-            if (ele.name) {
+            if (name) {
                 this.plugins.set(name, ele);
             }
         }
@@ -4705,15 +4720,16 @@ var nodom;
         beforeRender(module, uidom) {
             if (uidom.key !== this.key) {
                 this.key = uidom.key;
+                this.needPreRender = true;
                 if (uidom.hasProp('name')) {
                     module.addPlugin(uidom.getProp('name'), this);
                 }
-                this.needPreRender = true;
             }
             else {
                 this.needPreRender = false;
             }
         }
+
         afterRender(module, uidom) { }
         clone() {
             let ele = Reflect.construct(this.constructor, []);

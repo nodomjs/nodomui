@@ -1,0 +1,52 @@
+@import "base.less";
+@import "icon.less";
+
+.nd-tip{
+    position:fixed;
+    z-index:@nd-tip-index;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width:100%;
+    .nd-tip-item{
+        .nd-border-shader;
+        .nd-color1;
+        width:300px;
+        box-sizing: border-box;
+        padding:@nd-padding * 2;
+        margin:@nd-padding/2 0;
+        border-radius:@nd-radius;
+        > b{
+            margin-right:5px;
+        }
+        .nd-tip-close{
+            float:right;
+            .nd-icon-cross;
+            .nd-canclick;
+        }
+    }
+}
+
+.nd-tip-top{
+    top:30px;
+}
+.nd-tip-bottom{
+    bottom:30px;
+}
+
+.nd-tip-left{
+    left:0px;
+    top:@nd-padding;
+    width:300px;
+    align-items: center;
+}
+
+.nd-tip-right{
+    right:@nd-padding;
+    top:@nd-padding;
+    width:300px;
+    align-items: center;
+}
+
+

@@ -14,15 +14,10 @@ class UIDialog extends UIPanel{
         
         this.dataName = panelDom.getProp('data') || '$showDialog';
         
-        //设置默认title
-        // title = title?title.trim():'';
-        // title = title!==''?title:'Dialog';
-        
-        
         let dialogDom:nodom.Element = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
-        dialogDom.addDirective(new nodom.Directive('class',"{'nd-dialog-hide':'!showdlg'}",dialogDom));
-
+        // dialogDom.addDirective(new nodom.Directive('class',"{'nd-dialog-hide':'!showdlg'}",dialogDom));
+        dialogDom.addDirective(new nodom.Directive('show','showdlg',dialogDom));
         //body
         let dialogBody:nodom.Element = new nodom.Element('div');
         dialogBody.addClass('nd-dialog-body');
