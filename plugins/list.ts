@@ -140,8 +140,6 @@ class UIList extends nodom.Plugin{
             itemDom.addDirective(new nodom.Directive('class',"{'nd-list-item-active':'selected'}",itemDom));
         }
         
-        
-        
         //点击事件
         if(this.clickEvent){
             itemDom.addEvent(new nodom.NodomEvent('click',this.clickEvent));
@@ -216,9 +214,10 @@ class UIList extends nodom.Plugin{
      * @param value     值
      */
     setValue(module:nodom.Module,model?:nodom.Model){
-        if(!this.dataName || this.valueName !== ''){
+        if(!this.dataName || this.valueName === ''){
             return;
         }
+        
         //原model
         let pmodel = module.modelFactory.get(this.modelId);
         //附加数据model
@@ -252,6 +251,7 @@ class UIList extends nodom.Plugin{
                 //设置选择
                 model.set('selected',!model.data.selected);
             }
+
 
             //设置选中
             for(let d of rows){

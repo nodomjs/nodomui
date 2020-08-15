@@ -4,6 +4,7 @@
  */
 class UIDialog extends UIPanel{
     tagName:string = 'UI-DIALOG';
+    modelId:number;
     dataName:string;
     /**
      * 编译后执行代码
@@ -12,12 +13,17 @@ class UIDialog extends UIPanel{
         el.setAttribute('buttons','close');
         let panelDom:nodom.Element = super.init(el);
         
-        this.dataName = panelDom.getProp('data') || '$showDialog';
+        this.dataName = '$ui_dialog_' + nodom.Util.genId();
+        
+        //设置默认title
+        // title = title?title.trim():'';
+        // title = title!==''?title:'Dialog';
+        
         
         let dialogDom:nodom.Element = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
-        // dialogDom.addDirective(new nodom.Directive('class',"{'nd-dialog-hide':'!showdlg'}",dialogDom));
-        dialogDom.addDirective(new nodom.Directive('show','showdlg',dialogDom));
+        dialogDom.addDirective(new nodom.Directive('show',this.dataName,dialogDom));
+
         //body
         let dialogBody:nodom.Element = new nodom.Element('div');
         dialogBody.addClass('nd-dialog-body');
@@ -43,6 +49,34 @@ class UIDialog extends UIPanel{
                 model.set(me.dataName,false);
             }
         ))
+    }
+
+    /**
+     * 打开dialog
+     * @param module 
+     */
+    public open(module:nodom.Module){
+        if(!module){
+            throw new nodom.NodomError('invoke1','dialog.open','0','Module');
+        }
+        let model:nodom.Model = module.modelFactory.get(this.modelId);
+        if(model){
+            model.set(this.dataName,true);
+        }
+    }
+
+    /**
+     * 关闭dialog
+     * @param module 
+     */
+    public close(module:nodom.Module){
+        if(!module){
+            throw new nodom.NodomError('invoke1','dialog.open','0','Module');
+        }
+        let model:nodom.Model = module.modelFactory.get(this.modelId);
+        if(model){
+            model.set(this.dataName,false);
+        }
     }
 }
 

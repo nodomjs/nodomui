@@ -1,0 +1,26 @@
+// @import "base.scss";
+/******* layout *******/
+.nd-layout{
+    display:flex;
+    flex-direction: column;
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+
+    .nd-layout-north,.nd-layout-south,.nd-layout-west,.nd-layout-east{
+        overflow:auto;
+    }
+    
+    .nd-layout-middle{
+        display:flex;
+        flex:1;
+        overflow:hidden;
+        
+        .nd-layout-center{
+            flex:1;
+            overflow:auto;
+        }
+    }
+}

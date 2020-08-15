@@ -5,15 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
-    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/dialog.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
     
     <script src='js/nodom.js'></script>
-    <script src='js/less.min.js'></script>
     <script src='../dist/panel.js'></script>
     <script src='../dist/button.js'></script>
     <script src='../dist/toolbar.js'></script>
@@ -48,11 +42,10 @@
             <div>hello world!</div>
         </ui-panel>
 
-        <ui-dialog class='dialog' title='测试Dialog' data='showdlg'>
+        <ui-dialog name='dlg' class='dialog' title='测试Dialog'>
             <div>this is a dialog</div>
             <ui-buttongroup>
-                <ui-button active small icon='close' e-click='hideDlg'>关闭</ui-button>
-                
+                <ui-button active small icon='close' e-click='closeDlg'>关闭</ui-button>
             </ui-buttongroup>
         </ui-dialog>
     </div>
@@ -66,10 +59,10 @@
             },
             methods:{
                 showDlg:function(dom,model,module,e){
-                    model.set('showdlg', true);
+                    module.getPlugin('dlg').open(module);
                 },
-                hideDlg:function(dom,model,module,e){
-                    model.set('showdlg', false);
+                closeDlg:function(dom,model,module,e){
+                    module.getPlugin('dlg').close(module);
                 }
             }
         }

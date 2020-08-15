@@ -118,14 +118,17 @@ class UITip extends nodom.Plugin{
             //检查
             me.check(true);
         }));
+
+        let contentDom:nodom.Element = new nodom.Element('div');
+        contentDom.addClass('nd-tip-content');
         let icon:nodom.Element = new nodom.Element('b');
         icon.setProp('class',new nodom.Expression("'nd-icon-' + icon"),true);
         icon.addDirective(new nodom.Directive('show','icon',icon));
 
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('content')];
-        
-        dom.children = [icon,txt,close];
+        contentDom.children = [icon,txt];
+        dom.children = [contentDom,close];
         return dom;
     }
 
@@ -192,7 +195,7 @@ class UITip extends nodom.Plugin{
             start:new Date().getTime(),
             allowClose:allowClose,
             icon:config.icon,
-            theme:config.theme
+            theme:config.theme||'default'
         }
         if(config.exclusive){
             datas = [data]

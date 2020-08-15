@@ -1,0 +1,68 @@
+// @import "base.scss";
+/* panel */
+
+.nd-panel{
+    border-radius:$nd-radius;
+    @include nd-color(1);
+    box-sizing: border-box;
+    width:100%;
+    height:100%;
+    display: flex;
+    flex-direction:column;
+
+    > div{
+        width:inherit;
+        box-sizing: border-box;
+    }
+    /* 头部 */
+    .nd-panel-header{
+        @include nd-color(6);
+        height: 40px;
+        line-height:40px;
+        padding:$nd-padding;
+        border-radius:$nd-radius $nd-radius 0 0;
+        display:inline-flex;
+        justify-content: space-between;
+        /* 标题 */
+        .nd-panel-title{
+            font-size:$nd-fontnormal;
+        }
+
+        /*头部工具栏*/
+        .nd-panel-header-bar{
+            .nd-btn{
+                font-size:$nd-fontlarger;
+            }
+        }
+    }
+
+    .nd-panel-body{
+        padding:$nd-padding;
+        font-size:$nd-fontnormal;
+        flex:1;
+        overflow:auto;
+        border:1px solid $nd-color6;
+        @include nd-color(1);
+    }
+
+    /* toolbar */
+
+    .nd-toolbar{
+        @include nd-color(2);
+        display:inline-flex;
+        .nd-btn{
+            padding:$nd-btn-padding-top;
+        }
+    }
+
+    /* button group*/
+    .nd-buttongroup{
+        padding:$nd-padding;
+        @include nd-color(2);
+        display:inline-flex;
+        justify-content: flex-end;
+        .nd-btn{
+            margin-right:10px;
+        }
+    }
+}

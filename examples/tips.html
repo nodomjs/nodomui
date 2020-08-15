@@ -5,15 +5,9 @@
     <meta title="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
-    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/tip.less" />
+    <link rel="stylesheet" type="text/css" href="sass/tip.css" />
     <script src='js/nodom.js'></script>
-    <script src='js/less.min.js'></script>
     <script src='config/module.js'></script>
-    
     <script src='../dist/uibase.js'></script>
     <script src='../dist/tip.js'></script>
 
@@ -50,24 +44,27 @@
                         content:'hello right' + index++,
                         loc:'right',
                         allowClose:true,
-                        icon:'close'
+                        icon:'close',
+                        theme:'warn'
                     });
                 },
                 showtip3:function(){
                     nodom.tip({
-                        content:'hello bottom <br/> 换一行' + index++,
+                        content:'hello bottom 内容有点多，要不要自动换行' + index++,
                         loc:'bottom',
                         allowClose:true,
-                        icon:'select'
+                        icon:'select',
+                        theme:'success'
                     });
                 },
                 showtip4:function(){
+                    let themes = ['active','success','warn','error'];
                     nodom.tip({
                         content:'hello left' + index++,
                         loc:'left',
                         allowClose:true,
                         icon:'insurance',
-                        theme:'active'
+                        theme:themes[index%4]
                     });
                 }
             }

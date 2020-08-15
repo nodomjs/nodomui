@@ -140,7 +140,7 @@ class UIList extends nodom.Plugin {
      * @param value     值
      */
     setValue(module, model) {
-        if (!this.dataName || this.valueName !== '') {
+        if (!this.dataName || this.valueName === '') {
             return;
         }
         //原model

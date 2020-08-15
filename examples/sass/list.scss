@@ -1,0 +1,67 @@
+// @import "base","icon";
+/*list box*/
+.nd-list{
+    overflow:auto;
+    padding:$nd-padding;
+    @extend .nd-border;
+    padding:$nd-padding;
+    border-radius:$nd-padding;
+    
+    .nd-list-item{
+        display:flex;
+        line-height:30px;
+        @extend .nd-canclick;
+        .nd-list-icon{
+            flex:0;
+            padding:0;
+            width:15px;
+            display:inline-block;                
+        }
+
+        .nd-list-itemcontent{
+            flex:1;
+        }
+
+        &:hover{
+            @include nd-color(6);
+        }
+    }
+
+    .nd-list-item-active{
+        color:$nd-activecolor;
+        .nd-list-icon{
+            @extend .nd-icon-select;
+        }
+    }
+
+    .nd-list-item-disable{
+        @extend .nd-disable;
+    }
+
+}
+
+
+/*横向*/
+.nd-list-horizontal{
+    border-radius:$nd-padding;
+    overflow:auto;
+    .nd-list-item{
+        @extend .nd-canclick;
+        display:inline-block;
+        padding:$nd-padding * 2;
+        border-radius:$nd-padding;
+        margin:$nd-padding;
+
+        &:hover{
+            @extend .nd-menu-active;
+        }
+    }
+
+    .nd-list-item-active{
+        @extend .nd-item-active;
+    }
+
+    .nd-list-item-disable{
+        @extend .nd-disable;
+    }
+}

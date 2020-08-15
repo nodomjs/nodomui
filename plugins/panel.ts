@@ -54,6 +54,10 @@ class UIPanel extends nodom.Plugin{
         return panelDom;
     }
 
+    beforeRender(module:nodom.Module,dom:nodom.Element){
+        super.beforeRender(module,dom);
+    }
+
     /**
      * 处理头部
      * @param panelDom  panel dom

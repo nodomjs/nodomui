@@ -1,0 +1,57 @@
+// @import "base","icon";
+/*relation map*/
+
+.nd-tab{
+    @extend .nd-border;
+    @include nd-color(1);
+    flex-direction: column;
+    /*头部 tab区域*/
+    .nd-tab-head{
+        @include nd-color(2);
+        overflow:hidden;
+        display:flex;
+        flex-direction: row;
+        .nd-tab-item{
+            display:inline-block;
+            @extend .nd-canclick;
+            @include nd-color(3);
+            padding:$nd-padding $nd-padding*2;
+            border-bottom:1px solid $nd-color6;
+
+            .nd-tab-close{
+                margin-left:$nd-padding;
+                font-size:$nd-fontsmall;
+                @extend .nd-icon-cross;
+                @extend .nd-canclick;
+                border-radius:10px;
+            }
+        }
+
+        .nd-tab-item-active{
+            @include nd-color(1);
+            color:$nd-forecolor2;
+            border-bottom:0;
+        }
+    }
+
+    /*内容区域*/
+    .nd-tab-body{
+        @extend .nd-padding;
+        overflow:auto;
+    }
+}
+
+/*横向*/
+
+.nd-tab-horizontal{
+    display:flex;
+    flex-direction: row;
+    
+    .nd-tab-head{
+        @include nd-color(2);
+        flex-direction: column;
+    }
+    .nd-tab-body{
+        flex:1;
+    }
+}

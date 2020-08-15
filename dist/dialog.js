@@ -13,14 +13,13 @@ class UIDialog extends UIPanel {
     init(el) {
         el.setAttribute('buttons', 'close');
         let panelDom = super.init(el);
-        this.dataName = panelDom.getProp('data') || '$showDialog';
+        this.dataName = '$ui_dialog_' + nodom.Util.genId();
         //设置默认title
         // title = title?title.trim():'';
         // title = title!==''?title:'Dialog';
         let dialogDom = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
-        // dialogDom.addDirective(new nodom.Directive('class',"{'nd-dialog-hide':'!showdlg'}",dialogDom));
-        dialogDom.addDirective(new nodom.Directive('show', 'showdlg', dialogDom));
+        dialogDom.addDirective(new nodom.Directive('show', this.dataName, dialogDom));
         //body
         let dialogBody = new nodom.Element('div');
         dialogBody.addClass('nd-dialog-body');
@@ -42,6 +41,32 @@ class UIDialog extends UIPanel {
         btn.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
             model.set(me.dataName, false);
         }));
+    }
+    /**
+     * 打开dialog
+     * @param module
+     */
+    open(module) {
+        if (!module) {
+            throw new nodom.NodomError('invoke1', 'dialog.open', '0', 'Module');
+        }
+        let model = module.modelFactory.get(this.modelId);
+        if (model) {
+            model.set(this.dataName, true);
+        }
+    }
+    /**
+     * 关闭dialog
+     * @param module
+     */
+    close(module) {
+        if (!module) {
+            throw new nodom.NodomError('invoke1', 'dialog.open', '0', 'Module');
+        }
+        let model = module.modelFactory.get(this.modelId);
+        if (model) {
+            model.set(this.dataName, false);
+        }
     }
 }
 //添加到元素库

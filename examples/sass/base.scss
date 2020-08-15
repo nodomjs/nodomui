@@ -1,0 +1,250 @@
+/**
+ * 基础文件
+ * 包含所有变量定义
+ */
+
+/*颜色定义*/
+/*前景色，深色和浅色*/
+//normal color
+$nd-forecolor1: rgb(193,193,193);
+/*current color*/
+$nd-forecolor2: white;
+/*浅色框字体颜色*/
+$nd-forecolor3: #333;
+
+$nd-activecolor: rgb(132,207,252);
+$nd-successcolor: rgb(81,127,60);
+$nd-warncolor: gold;
+$nd-errorcolor: #900;
+$nd-shadecolor: #000;
+
+/*背景色*/
+//主背景
+$nd-color1: rgb(23,23,23);  //主背景
+$nd-color2: rgb(27,27,27);  //tree、accordion、form、toolbar、button group、 tab header
+$nd-color3: rgb(34,34,34);  //tab button
+$nd-color4: rgb(39,39,39);  //menu
+$nd-color5: rgb(46,46,46);  //input、panel-title、selected
+$nd-color6: rgb(50,50,50);  //line
+$nd-color7: rgb(63,63,63);  //滚动条 mouseover border
+$nd-color8: rgb(85,85,85);  //按钮
+
+/*超链接颜色*/
+$nd-linkcolor: #669933;
+$nd-linkcolorvisted: #99CC99;
+//颜色序列
+$nd-listcolor: $nd-color1 $nd-color2 $nd-color3 $nd-color4 $nd-color5 $nd-color6 $nd-color7 $nd-color8;  
+/*颜色 混合*/
+@mixin nd-color($index){
+    background-color: nth($nd-listcolor,$index);
+    color:$nd-forecolor1;
+}
+
+
+ /*size定义*/
+/*全局padding*/
+$nd-padding: 10px;
+/*全局圆角*/
+$nd-radius: 5px;
+/*标题 padding*/
+$nd-title-padding: 15px;
+/*表格高度*/
+$nd-gridhead-height: 60px;
+/*下拉框离显示框距离*/
+$nd-dropdown-margin: 3px;
+/*按钮padding*/
+$nd-btn-padding-left: 15px;
+$nd-btn-padding-top: 8px;
+/*字体大小*/
+$nd-fonttiny: 10px;
+$nd-fontsmall: 12px;
+$nd-fontnormal: 14px;
+$nd-fontlarge: 16px;
+$nd-fontlarger: 18px;
+$nd-fontlargest: 20px;
+
+
+/*zindex*/
+$nd-tip-index: 1000;
+$nd-dialog-index: 999;
+$nd-menu-index: 998;
+$nd-combo-index: 997;
+
+
+/*global*/
+body{
+    padding:0;
+    margin:0;
+    @include nd-color(1);
+    font-size: $nd-fontnormal;
+}
+
+
+button,input{
+    outline:none;
+}
+
+
+/*item active*/
+.nd-item-active{
+    background-color:$nd-activecolor;
+    color:$nd-forecolor2;
+}
+/*menu active*/
+.nd-menu-active{
+    background-color: $nd-color6;
+    color:$nd-forecolor2;
+}
+
+/*link*/
+a:link{
+    color:$nd-linkcolor;
+    text-decoration: none;
+}
+
+a:hover{
+    color:$nd-linkcolorvisted;
+}
+
+a:visited{
+    color:$nd-linkcolorvisted;
+}
+
+
+/*激活背景色*/
+
+.nd-active{
+    background-color:$nd-activecolor;
+    &:hover{
+        background-color:multiply($nd-activecolor,#eeeeee);
+    }
+}
+
+/*强调背景色*/
+.nd-success{
+    background-color:$nd-successcolor;
+    &:hover{
+        background-color:multiply($nd-successcolor,#eeeeee);
+    }
+}
+
+/*警告背景色*/
+.nd-warn{
+    background-color:$nd-warncolor;
+    &:hover{
+        background-color:multiply($nd-warncolor,#eeeeee);
+    }
+}
+
+/*框*/
+@mixin nd-box-bg($color){
+    background-color:mix(#fff,$color,10%);
+    border:1px solid $color;
+    color:mix(#000,$color,50%);
+}
+
+
+.nd-box-default{
+    @include nd-box-bg(nd-clolor(6));
+}
+
+/*active颜色框*/
+.nd-box-active{
+    @include nd-box-bg($nd-activecolor);
+}
+/*success 颜色框*/
+.nd-box-success{
+    @include nd-box-bg($nd-successcolor);
+}
+
+/*warn颜色框*/
+.nd-box-warn{
+    @include nd-box-bg($nd-warncolor);
+}
+
+
+/*error颜色框*/
+.nd-box-error{
+    @include nd-box-bg($nd-errorcolor);
+}
+
+
+/*边框*/
+.nd-border{
+    border:1px solid $nd-color6;
+}
+
+.nd-border-shader{
+    // border:1px solid $nd-color6;
+    box-shadow: $nd-shadecolor 3px 3px 5px;
+}
+
+/*框体padding*/
+.nd-padding{
+    padding:$nd-padding * 2;
+}
+
+/*禁用*/
+.nd-disable{
+    color:grey;
+    cursor:not-allowed;
+    &:hover{
+        color:grey;
+        background-color:transparent;
+    }
+}
+
+/*可以click*/
+.nd-canclick{
+    cursor:pointer;
+    &:hover{
+        color:$nd-forecolor2;
+    }
+}
+
+/*输入框*/
+.nd-input{
+    padding:$nd-padding;
+    @include nd-color(1);
+    border-radius:$nd-radius;
+    border:1px solid $nd-color5;
+    &:hover{
+        border-color:$nd-color3;
+    }
+}
+/*带图标输入框*/
+.nd-input-icon{
+    @extend .nd-input; 
+    display:flex;
+    :last-child{
+        flex:0;
+        padding:0;
+    }
+    input{
+        margin:0;
+        padding:0;
+        border:0;
+        // @include nd-color(4);
+        flex:1;
+    }
+}
+
+/**滚动条**/
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-track
+{
+    @include nd-color(1);
+    // border-left:1px solid $nd-color5;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb{
+    border-radius: $nd-padding;
+    @include nd-color(5);
+    &:hover{
+        @include nd-color(6);
+    }
+}

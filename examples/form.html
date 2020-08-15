@@ -5,23 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>nodomui example - panel usage</title>
-    <link rel="stylesheet/less" type="text/css" href="css/base.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/panel.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/dialog.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/button.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/form.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/font.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/icon.less" />
-    <link rel="stylesheet/less" type="text/css" href="css/datetime.less" />
+    <link rel="stylesheet" type="text/css" href="sass/form.css" />
+    <link rel="stylesheet" type="text/css" href="sass/datetime.css" />
     <script src='js/nodom.js'></script>
-    <script src='js/less.min.js'></script>
     <script src='../dist/msg_zh.js'></script>
     <script src='../dist/uibase.js'></script>
-    <script src='../dist/panel.js'></script>
-    <script src='../dist/button.js'></script>
-    <script src='../dist/toolbar.js'></script>
-    <script src='../dist/buttongroup.js'></script>
-    <script src='../dist/dialog.js'></script>
+    <script src='../dist/form.js'></script>
     <script src='../dist/checkbox.js'></script>
     <script src='../dist/radio.js'></script>
     <script src='../dist/file.js'></script>
@@ -29,38 +18,9 @@
     <script src='../dist/selectlist.js'></script>
     <script src='../dist/datetime.js'></script>
     <style>
-        .form{
-            height:400px;
-            width:400px;
-            padding:10px;
-        }
-        
-        label{
-            width:100px;
-        }
-
-        .hobby{
-            width:300px;
-            height:100px;
-        }
-
-        .hobitem{
-            overflow:visible;
-        }
-
-        .hobitem span{
-            display:inline-block;
-        }
-        .hobitem .id{
-            width:30px;
-        }
-
-        .hobitem .title{
-            width:80px;
-        }
-        .hobitem .desc{
-            width:200px;
-        }
+       form{
+           width:500px;
+       }
     </style>
 </head>
 <body>
@@ -69,30 +29,30 @@
             <div>出生日期：<span>{{birth}}</span></div>
             <div>学历：<span>{{education}}</span></div>
         </div>
-        <form class='form'>
-            <div class='nd-form-item'>
+        <ui-form class='form' labelWidth='80'>
+            <div>
                 <label>姓名:</label>
-                <input  class='nd-form-input' x-field='userName' value='{{userName}}'>
+                <input x-field='userName' value='{{userName}}'>
             </div>
-            <div class='nd-form-item'>
+            <div>
                 <label>性别:</label>
                 <ui-radio  class='nd-form-input' field='sexy'>
                     <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span value='F'>女</span>
                 </ui-radio>
             </div>
-            <div class='nd-form-item'>
+            <div>
                 <label>出生日期:</label>
                 <ui-datetime class='nd-form-input' x-field='birth' type='date'/>
             </div>
-            <div class='nd-form-item'>
+            <div>
                 <label>计划时间:</label>
                 <ui-datetime class='nd-form-input' x-field='plantime' type='datetime'/>
             </div>
-            <div class='nd-form-item'>
+            <div>
                 <label>开始时间:</label>
                 <ui-datetime class='nd-form-input' x-field='starttime' type='time'/>
-            </div>
+            <div>
             <div class='nd-form-item'>
                 <label>学历:</label>
                 <!--
@@ -140,7 +100,7 @@
                 <label>同意条款:</label>
                 <ui-checkbox  class='nd-form-input' yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
             </div>
-        </form>
+        </ui-form>
     </div>
 </body>
 <script>
