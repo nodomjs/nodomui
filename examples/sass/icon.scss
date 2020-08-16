@@ -1,4 +1,4 @@
-@import "base";
+// @import "base";
 
 @font-face {font-family: "nd-iconfont";
     src:url('font/iconfont.ttf'),
@@ -173,5 +173,9 @@
     @include nd-genicon('\e668');
 }
 
+/*垃圾桶*/
+.nd-icon-ashbin{
+    @include nd-genicon('\e748');
+}
 
 

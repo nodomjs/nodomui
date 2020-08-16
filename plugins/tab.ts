@@ -219,7 +219,7 @@ class UITab extends nodom.Plugin{
         let dom:nodom.Element;
         //内容串    
         if(cfg.content){
-            dom = nodom.Compiler.compile(cfg.content);
+            dom = nodom.Compiler.compile(cfg.content,true);
         }else if(cfg.module){ //引用模块
             dom = new nodom.Element('div');
             let mdlStr:string = cfg.module;

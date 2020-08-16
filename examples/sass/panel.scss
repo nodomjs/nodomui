@@ -3,6 +3,7 @@
 
 .nd-panel{
     border-radius:$nd-radius;
+    @extend .nd-border;
     @include nd-color(1);
     box-sizing: border-box;
     width:100%;
@@ -19,7 +20,7 @@
         @include nd-color(6);
         height: 40px;
         line-height:40px;
-        padding:$nd-padding;
+        padding:0 $nd-padding;
         border-radius:$nd-radius $nd-radius 0 0;
         display:inline-flex;
         justify-content: space-between;
@@ -41,28 +42,6 @@
         font-size:$nd-fontnormal;
         flex:1;
         overflow:auto;
-        border:1px solid $nd-color6;
         @include nd-color(1);
-    }
-
-    /* toolbar */
-
-    .nd-toolbar{
-        @include nd-color(2);
-        display:inline-flex;
-        .nd-btn{
-            padding:$nd-btn-padding-top;
-        }
-    }
-
-    /* button group*/
-    .nd-buttongroup{
-        padding:$nd-padding;
-        @include nd-color(2);
-        display:inline-flex;
-        justify-content: flex-end;
-        .nd-btn{
-            margin-right:10px;
-        }
     }
 }

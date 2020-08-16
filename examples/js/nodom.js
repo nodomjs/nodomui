@@ -703,12 +703,12 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Compiler {
-        static compile(elementStr) {
+        static compile(elementStr, needNotRoot) {
             const div = nodom.Util.newEl('div');
             div.innerHTML = elementStr;
             let oe = new nodom.Element();
             this.handleChildren(oe, div);
-            if (oe.children.length === 1) {
+            if (needNotRoot) {
                 return oe.children[0];
             }
             return oe;
@@ -1001,11 +1001,15 @@ var nodom;
             else {
                 if (type === 'fresh' || type === 'add' || type === 'text') {
                     el = module.container.querySelector("[key='" + parent.key + "']");
+                    if(!el){
+                        el = module.container;
+                    }
                 }
                 else if (this.tagName !== undefined) {
                     el = module.container.querySelector("[key='" + this.key + "']");
                 }
             }
+            
             if (!el) {
                 return;
             }
@@ -2603,16 +2607,9 @@ var nodom;
             root.render(this, null);
             this.doModuleEvent('onBeforeFirstRenderToHTML');
             nodom.Util.empty(this.container);
-            if (root.tagName) {
-                root.renderToHtml(this, { type: 'fresh' });
-            }
-            else {
-                if (root.children) {
-                    root.children.forEach((item) => {
-                        item.renderToHtml(this, { type: 'fresh' });
-                    });
-                }
-            }
+            root.children.forEach((item) => {
+                item.renderToHtml(this, { type: 'fresh' });
+            });
             delete this.firstRender;
             this.doModuleEvent('onFirstRender');
             this.doRenderOp(this.firstRenderOps);
@@ -4720,16 +4717,15 @@ var nodom;
         beforeRender(module, uidom) {
             if (uidom.key !== this.key) {
                 this.key = uidom.key;
-                this.needPreRender = true;
                 if (uidom.hasProp('name')) {
                     module.addPlugin(uidom.getProp('name'), this);
                 }
+                this.needPreRender = true;
             }
             else {
                 this.needPreRender = false;
             }
         }
-
         afterRender(module, uidom) { }
         clone() {
             let ele = Reflect.construct(this.constructor, []);

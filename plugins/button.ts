@@ -16,7 +16,7 @@ class UIButton extends nodom.Plugin{
         let icon:string;
         if(oe.hasProp('icon')){
             icon = oe.getProp('icon');
-        } 
+        }
         
         //图标大小
         let arr = ['small','normal','big'];
@@ -57,22 +57,19 @@ class UIButton extends nodom.Plugin{
             oe.delProp('nobg');
         }else{
             //背景色
-            arr = ['warn','active','emphasis'];
+            arr = ['warn','active','success','error'];
             for(let l of arr){
                 if(oe.hasProp(l)){
-                    bg = 'nd-' + l;
+                    bg = 'nd-btn-' + l;
                     oe.delProp(l);
                     break;
                 }
-            }
-            //默认灰色
-            if(!bg){
-                bg = 'nd-bg-grey';    
             }
         }
         //是否无文本
         let notext:string = icon && el.innerHTML.trim() === ''?'nd-btn-notext':'';
 
+        //btn class
         let cls:string = 'nd-btn ' + notext + ' nd-btn-' + size + ' ' + bg;
         
         //把btn类加入到class
@@ -98,7 +95,6 @@ class UIButton extends nodom.Plugin{
                 img.addClass('nd-btn-vert');
                 break;    
         }
-        
         oe.plugin=this;
         return oe;
     }

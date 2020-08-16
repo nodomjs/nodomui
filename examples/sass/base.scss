@@ -4,22 +4,39 @@
  */
 
 /*颜色定义*/
+$nd-whitecolor:#fff;
+$nd-blackcolor:#000;
 /*前景色，深色和浅色*/
-//normal color
-$nd-forecolor1: rgb(193,193,193);
-/*current color*/
-$nd-forecolor2: white;
-/*浅色框字体颜色*/
-$nd-forecolor3: #333;
+/*normal color*/
 
-$nd-activecolor: rgb(132,207,252);
-$nd-successcolor: rgb(81,127,60);
+
+//特殊色
+$nd-activecolor: rgb(40,100,200);
+$nd-successcolor: rgb(41,192,75);
 $nd-warncolor: gold;
-$nd-errorcolor: #900;
-$nd-shadecolor: #000;
+$nd-errorcolor: #f00;
 
-/*背景色*/
+
+/*超链接颜色*/
+$nd-linkcolor:rgb(38,117,246);
+$nd-linkcolorvisted:rgb(30,100,200);
+
+//黑色主题
+/*
+//阴影色
+$nd-shadecolor: #000;
+//前景色
+//通用色
+$nd-forecolor1: rgb(193,193,193);
+//重点色1
+$nd-forecolor2: rgb(225,225,225);
+//重点色2
+$nd-forecolor3: rgb(255,255,255);
+//特殊色背景下的前景色
+$nd-forecolor4: #fff;
+//背景色
 //主背景
+
 $nd-color1: rgb(23,23,23);  //主背景
 $nd-color2: rgb(27,27,27);  //tree、accordion、form、toolbar、button group、 tab header
 $nd-color3: rgb(34,34,34);  //tab button
@@ -28,18 +45,47 @@ $nd-color5: rgb(46,46,46);  //input、panel-title、selected
 $nd-color6: rgb(50,50,50);  //line
 $nd-color7: rgb(63,63,63);  //滚动条 mouseover border
 $nd-color8: rgb(85,85,85);  //按钮
+$nd-color9: rgb(100,100,100); //tip
+*/
+//白色主题
+//阴影色
+$nd-shadecolor: #777;
+//前景色
+//通用色
+$nd-forecolor1:#666;
+//重点色1
+$nd-forecolor2: #333;
+//重点色2
+$nd-forecolor3: #111;
+//特殊色背景下的前景色
+$nd-forecolor4: #fff;
+//背景色
+//主背景
 
-/*超链接颜色*/
-$nd-linkcolor: #669933;
-$nd-linkcolorvisted: #99CC99;
+$nd-color1:#fff;  //主背景
+$nd-color2: #f1f1f1;  //tree、accordion、form、toolbar、button group、 tab header
+$nd-color3: #e1e1e1;  //tab button
+$nd-color4: #d1d1d1;  //menu
+$nd-color5: #e1e1e1;  //input、panel-title、selected
+$nd-color6: #c1c1c1;  //line
+$nd-color7: #a1a1a1;  //滚动条 mouseover border
+$nd-color8: #a1a1a1;  //按钮
+$nd-color9: #333;  //按钮
+
+$nd-forecolor: $nd-blackcolor;
+@function nd-genforecolor($color) {
+    $lg:lightness($nd-color1);
+    $nd-forecolor: mix($nd-whitecolor,$nd-blackcolor,100%-$lg);
+} 
+
+
 //颜色序列
-$nd-listcolor: $nd-color1 $nd-color2 $nd-color3 $nd-color4 $nd-color5 $nd-color6 $nd-color7 $nd-color8;  
+$nd-listcolor: $nd-color1 $nd-color2 $nd-color3 $nd-color4 $nd-color5 $nd-color6 $nd-color7 $nd-color8 $nd-color9;  
 /*颜色 混合*/
 @mixin nd-color($index){
     background-color: nth($nd-listcolor,$index);
     color:$nd-forecolor1;
 }
-
 
  /*size定义*/
 /*全局padding*/
@@ -71,20 +117,6 @@ $nd-menu-index: 998;
 $nd-combo-index: 997;
 
 
-/*global*/
-body{
-    padding:0;
-    margin:0;
-    @include nd-color(1);
-    font-size: $nd-fontnormal;
-}
-
-
-button,input{
-    outline:none;
-}
-
-
 /*item active*/
 .nd-item-active{
     background-color:$nd-activecolor;
@@ -96,56 +128,24 @@ button,input{
     color:$nd-forecolor2;
 }
 
-/*link*/
-a:link{
-    color:$nd-linkcolor;
-    text-decoration: none;
-}
-
-a:hover{
-    color:$nd-linkcolorvisted;
-}
-
-a:visited{
-    color:$nd-linkcolorvisted;
-}
-
-
-/*激活背景色*/
-
-.nd-active{
-    background-color:$nd-activecolor;
-    &:hover{
-        background-color:multiply($nd-activecolor,#eeeeee);
-    }
-}
-
-/*强调背景色*/
-.nd-success{
-    background-color:$nd-successcolor;
-    &:hover{
-        background-color:multiply($nd-successcolor,#eeeeee);
-    }
-}
-
-/*警告背景色*/
-.nd-warn{
-    background-color:$nd-warncolor;
-    &:hover{
-        background-color:multiply($nd-warncolor,#eeeeee);
-    }
-}
 
 /*框*/
 @mixin nd-box-bg($color){
-    background-color:mix(#fff,$color,10%);
-    border:1px solid $color;
-    color:mix(#000,$color,50%);
+    $bg:mix(#fff,$color,90%);
+    background-color:$bg;
+    // border:1px solid $color;
+    @if lightness($bg) > 70% {
+        color:mix(#000,$color,20%);
+    } @else {
+        color:#fff;
+    }
 }
 
 
 .nd-box-default{
-    @include nd-box-bg(nd-clolor(6));
+    background-color:$nd-color9;
+    border:1px solid $nd-color9;
+    color:$nd-forecolor4;
 }
 
 /*active颜色框*/
@@ -166,6 +166,20 @@ a:visited{
 /*error颜色框*/
 .nd-box-error{
     @include nd-box-bg($nd-errorcolor);
+}
+
+/*link*/
+a:link{
+    color:$nd-linkcolor;
+    text-decoration: none;
+}
+
+a:hover{
+    color:$nd-linkcolorvisted;
+}
+
+a:visited{
+    color:$nd-linkcolorvisted;
 }
 
 
@@ -197,9 +211,9 @@ a:visited{
 /*可以click*/
 .nd-canclick{
     cursor:pointer;
-    &:hover{
-        color:$nd-forecolor2;
-    }
+    // &:hover{
+    //     color:$nd-forecolor2;
+    // }
 }
 
 /*输入框*/
@@ -227,6 +241,20 @@ a:visited{
         // @include nd-color(4);
         flex:1;
     }
+}
+
+
+/*global*/
+body{
+    padding:0;
+    margin:0;
+    @include nd-color(1);
+    font-size: $nd-fontnormal;
+}
+
+
+button,input{
+    outline:none;
 }
 
 /**滚动条**/

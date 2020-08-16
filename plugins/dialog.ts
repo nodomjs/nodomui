@@ -4,24 +4,43 @@
  */
 class UIDialog extends UIPanel{
     tagName:string = 'UI-DIALOG';
-    modelId:number;
+
+    /**
+     * 数据项名
+     */
     dataName:string;
+    /**
+     * 模块id
+     */
+    moduleId:number;
+
+    /**
+     * 模型Id
+     */
+    modelId:number;
+    
+    /**
+     * 自动打开
+     */
+    autoOpen:boolean;
     /**
      * 编译后执行代码
      */
     init(el:HTMLElement):nodom.Element{
         el.setAttribute('buttons','close');
         let panelDom:nodom.Element = super.init(el);
-        
+        //删除 panelDom的plugin
+        delete panelDom.plugin;
+
         this.dataName = '$ui_dialog_' + nodom.Util.genId();
-        
-        //设置默认title
-        // title = title?title.trim():'';
-        // title = title!==''?title:'Dialog';
-        
-        
         let dialogDom:nodom.Element = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
+        dialogDom.setProp('name',panelDom.getProp('name'));
+        //autoopen
+        this.autoOpen = panelDom.hasProp('autoopen');
+        
+        panelDom.delProp(['name','autoopen']);
+        
         dialogDom.addDirective(new nodom.Directive('show',this.dataName,dialogDom));
 
         //body
@@ -39,6 +58,21 @@ class UIDialog extends UIPanel{
     }
 
     /**
+     * 渲染前事件
+     * @param module 
+     * @param dom 
+     */
+    beforeRender(module:nodom.Module,dom:nodom.Element){
+        super.beforeRender(module,dom);
+        if(this.needPreRender){
+            this.modelId = dom.modelId;
+            this.moduleId = module.id;
+            if(this.autoOpen){
+                this.open();
+            }
+        }
+    }
+    /**
      * 设置关闭事件
      * @param foo 
      */
@@ -55,27 +89,30 @@ class UIDialog extends UIPanel{
      * 打开dialog
      * @param module 
      */
-    public open(module:nodom.Module){
-        if(!module){
-            throw new nodom.NodomError('invoke1','dialog.open','0','Module');
+    public open(){
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        if(module){
+            let model:nodom.Model = module.modelFactory.get(this.modelId);
+            if(model){
+                model.set(this.dataName,true);
+                console.log(model.data);
+            }
         }
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
-        if(model){
-            model.set(this.dataName,true);
-        }
+        
     }
 
     /**
      * 关闭dialog
      * @param module 
      */
-    public close(module:nodom.Module){
-        if(!module){
-            throw new nodom.NodomError('invoke1','dialog.open','0','Module');
-        }
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
-        if(model){
-            model.set(this.dataName,false);
+    public close(){
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        if(module){
+            let model:nodom.Model = module.modelFactory.get(this.modelId);
+            if(model){
+                model.set(this.dataName,false);
+                console.log(model.data);
+            }
         }
     }
 }

@@ -19,26 +19,44 @@
 /*按钮padding*/
 /*字体大小*/
 /*zindex*/
-/*global*/
-body {
-  padding: 0;
-  margin: 0;
-  background-color: #171717;
-  color: #c1c1c1;
-  font-size: 14px; }
-
-button, input {
-  outline: none; }
-
 /*item active*/
 .nd-item-active {
-  background-color: #84cffc;
+  background-color: #ae163d;
   color: white; }
 
 /*menu active*/
 .nd-menu-active {
   background-color: #323232;
   color: white; }
+
+/*框*/
+.nd-box-default {
+  background-color: #323232;
+  color: #c1c1c1; }
+
+/*active颜色框*/
+.nd-box-active {
+  background-color: #ae163d;
+  border: 1px solid #ae163d;
+  color: #fff; }
+
+/*success 颜色框*/
+.nd-box-success {
+  background-color: #29c04b;
+  border: 1px solid #29c04b;
+  color: #fff; }
+
+/*warn颜色框*/
+.nd-box-warn {
+  background-color: gold;
+  border: 1px solid gold;
+  color: #fff; }
+
+/*error颜色框*/
+.nd-box-error {
+  background-color: #f00;
+  border: 1px solid #f00;
+  color: #fff; }
 
 /*link*/
 a:link {
@@ -51,58 +69,11 @@ a:hover {
 a:visited {
   color: #99CC99; }
 
-/*激活背景色*/
-.nd-active {
-  background-color: #84cffc; }
-  .nd-active:hover {
-    background-color: multiply(#84cffc, #eeeeee); }
-
-/*强调背景色*/
-.nd-success {
-  background-color: #517f3c; }
-  .nd-success:hover {
-    background-color: multiply(#517f3c, #eeeeee); }
-
-/*警告背景色*/
-.nd-warn {
-  background-color: gold; }
-  .nd-warn:hover {
-    background-color: multiply(gold, #eeeeee); }
-
-/*框*/
-.nd-box-default {
-  background-color: #323232;
-  color: #c1c1c1; }
-
-.nd-box-active {
-  background-color: #9dd9fd;
-  border: 1px solid #84cffc;
-  color: #333; }
-
-/*不同颜色框*/
-.nd-box-success {
-  background-color: #9fc88c;
-  border: 1px solid #517f3c;
-  color: #333; }
-
-/*不同颜色框*/
-.nd-box-warn {
-  background-color: #ffef99;
-  border: 1px solid gold;
-  color: #333; }
-
-/*不同颜色框*/
-.nd-box-error {
-  background-color: #ff3333;
-  border: 1px solid #900;
-  color: #333; }
-
 /*边框*/
 .nd-border {
   border: 1px solid #323232; }
 
 .nd-border-shader {
-  border: 1px solid #323232;
   box-shadow: #000 3px 3px 5px; }
 
 /*框体padding*/
@@ -144,6 +115,17 @@ a:visited {
     padding: 0;
     border: 0;
     flex: 1; }
+
+/*global*/
+body {
+  padding: 0;
+  margin: 0;
+  background-color: #171717;
+  color: #c1c1c1;
+  font-size: 14px; }
+
+button, input {
+  outline: none; }
 
 /**滚动条**/
 ::-webkit-scrollbar {
@@ -195,5 +177,30 @@ a:visited {
 /*图标纵向*/
 .nd-btn-vert {
   display: block; }
+
+/*不同色按钮*/
+/*active背景色*/
+.nd-btn-active {
+  background-color: #ae163d; }
+  .nd-btn-active:hover {
+    color: mit(#ae163d, #eeeeee); }
+
+/*success 背景色*/
+.nd-btn-success {
+  background-color: #29c04b; }
+  .nd-btn-success:hover {
+    color: mit(#ae163d, #eeeeee); }
+
+/*warn背景色*/
+.nd-btn-warn {
+  background-color: gold; }
+  .nd-btn-warn:hover {
+    color: mit(#ae163d, #eeeeee); }
+
+/*warn背景色*/
+.nd-btn-error {
+  background-color: #f00; }
+  .nd-btn-error:hover {
+    color: mit(#ae163d, #eeeeee); }
 
 /*# sourceMappingURL=button.css.map */

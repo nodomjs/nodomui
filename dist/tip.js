@@ -90,8 +90,8 @@ class UITip extends nodom.Plugin {
         icon.addDirective(new nodom.Directive('show', 'icon', icon));
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression('content')];
-        contentDom.children = [icon, txt];
-        dom.children = [contentDom, close];
+        contentDom.children = [txt];
+        dom.children = [icon, contentDom, close];
         return dom;
     }
     /**

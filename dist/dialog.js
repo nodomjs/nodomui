@@ -13,12 +13,15 @@ class UIDialog extends UIPanel {
     init(el) {
         el.setAttribute('buttons', 'close');
         let panelDom = super.init(el);
+        //删除 panelDom的plugin
+        delete panelDom.plugin;
         this.dataName = '$ui_dialog_' + nodom.Util.genId();
-        //设置默认title
-        // title = title?title.trim():'';
-        // title = title!==''?title:'Dialog';
         let dialogDom = new nodom.Element('div');
         dialogDom.addClass('nd-dialog');
+        dialogDom.setProp('name', panelDom.getProp('name'));
+        //autoopen
+        this.autoOpen = panelDom.hasProp('autoopen');
+        panelDom.delProp(['name', 'autoopen']);
         dialogDom.addDirective(new nodom.Directive('show', this.dataName, dialogDom));
         //body
         let dialogBody = new nodom.Element('div');
@@ -31,6 +34,21 @@ class UIDialog extends UIPanel {
         dialogDom.add(dialogBody);
         dialogDom.plugin = this;
         return dialogDom;
+    }
+    /**
+     * 渲染前事件
+     * @param module
+     * @param dom
+     */
+    beforeRender(module, dom) {
+        super.beforeRender(module, dom);
+        if (this.needPreRender) {
+            this.modelId = dom.modelId;
+            this.moduleId = module.id;
+            if (this.autoOpen) {
+                this.open();
+            }
+        }
     }
     /**
      * 设置关闭事件
@@ -46,26 +64,28 @@ class UIDialog extends UIPanel {
      * 打开dialog
      * @param module
      */
-    open(module) {
-        if (!module) {
-            throw new nodom.NodomError('invoke1', 'dialog.open', '0', 'Module');
-        }
-        let model = module.modelFactory.get(this.modelId);
-        if (model) {
-            model.set(this.dataName, true);
+    open() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        if (module) {
+            let model = module.modelFactory.get(this.modelId);
+            if (model) {
+                model.set(this.dataName, true);
+                console.log(model.data);
+            }
         }
     }
     /**
      * 关闭dialog
      * @param module
      */
-    close(module) {
-        if (!module) {
-            throw new nodom.NodomError('invoke1', 'dialog.open', '0', 'Module');
-        }
-        let model = module.modelFactory.get(this.modelId);
-        if (model) {
-            model.set(this.dataName, false);
+    close() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        if (module) {
+            let model = module.modelFactory.get(this.modelId);
+            if (model) {
+                model.set(this.dataName, false);
+                console.log(model.data);
+            }
         }
     }
 }

@@ -11,69 +11,52 @@ class UIPanel extends nodom.Plugin {
      * 编译后执行代码
      */
     init(el) {
-        let oe = new nodom.Element();
-        nodom.Compiler.handleAttributes(oe, el);
-        nodom.Compiler.handleChildren(oe, el);
-        let title = oe.getProp('title');
-        //设置默认title
-        title = title ? title.trim() : '';
-        title = title !== '' ? title : 'Panel';
+        let rootDom = new nodom.Element();
+        nodom.Compiler.handleAttributes(rootDom, el);
+        nodom.Compiler.handleChildren(rootDom, el);
+        rootDom.tagName = 'div';
+        UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', ['close']]);
+        rootDom.addClass('nd-panel');
         let showMin = false;
         let showMax = false;
         let showClose = false;
-        if (oe.hasProp('buttons')) {
-            let buttons = oe.getProp('buttons').split(',');
-            if (buttons.includes('min')) {
+        if (this.buttons) {
+            if (this.buttons.includes('min')) {
                 showMin = true;
             }
-            if (buttons.includes('max')) {
+            if (this.buttons.includes('max')) {
                 showMax = true;
             }
-            if (buttons.includes('close')) {
+            if (this.buttons.includes('close')) {
                 showClose = true;
             }
         }
-        oe.delProp(['title', 'buttons']);
-        //panel dom
-        let panelDom = new nodom.Element('div');
-        //拷贝属性
-        Object.getOwnPropertyNames(oe.props).forEach((p) => {
-            panelDom.setProp(p, oe.getProp(p));
-        });
-        Object.getOwnPropertyNames(oe.exprProps).forEach((p) => {
-            panelDom.setProp(p, oe.getProp(p, true), true);
-        });
-        panelDom.addClass('nd-panel');
-        //处理头部
-        this.handleHead(panelDom, title, showMin, showMax, showClose);
         //处理body
-        this.handleBody(panelDom, oe);
-        panelDom.plugin = this;
-        return panelDom;
-    }
-    beforeRender(module, dom) {
-        super.beforeRender(module, dom);
+        this.handleBody(rootDom);
+        //处理头部
+        this.handleHead(rootDom, showMin, showMax, showClose);
+        rootDom.plugin = this;
+        return rootDom;
     }
     /**
      * 处理头部
      * @param panelDom  panel dom
-     * @param title     标题
      * @param showMin   显示最小化按钮
      * @param showMax   显示最大化按钮
      * @param showClose 显示关闭按钮
      */
-    handleHead(panelDom, title, showMin, showMax, showClose) {
-        if ((!title || title === '') && !showMin && !showMax && !showClose) {
+    handleHead(panelDom, showMin, showMax, showClose) {
+        if (!showMin && !showMax && !showClose) {
             return;
         }
         //header
         let headerDom = new nodom.Element('div');
         headerDom.addClass('nd-panel-header');
-        if (title && title !== '') {
+        if (this.title) {
             //title
             let titleCt = new nodom.Element('span');
             titleCt.addClass('nd-panel-title');
-            titleCt.assets.set('innerHTML', title);
+            titleCt.assets.set('innerHTML', this.title);
             headerDom.add(titleCt);
         }
         //title bar
@@ -101,14 +84,14 @@ class UIPanel extends nodom.Plugin {
             }
             headerDom.add(headbarDom);
         }
-        panelDom.add(headerDom);
+        panelDom.children.unshift(headerDom);
     }
     /**
      * 处理body
      * @param panelDom  panel dom
      * @param oe        原始dom
      */
-    handleBody(panelDom, oe) {
+    handleBody(panelDom) {
         //panel body
         let bodyDom = new nodom.Element('div');
         bodyDom.addClass('nd-panel-body');
@@ -116,8 +99,8 @@ class UIPanel extends nodom.Plugin {
         let tbar;
         //button group，，放在panel body后
         let btnGrp;
-        for (let i = 0; i < oe.children.length; i++) {
-            let item = oe.children[i];
+        for (let i = 0; i < panelDom.children.length; i++) {
+            let item = panelDom.children[i];
             if (item.plugin) {
                 if (item.plugin.tagName === 'UI-TOOLBAR') {
                     tbar = item;
@@ -130,6 +113,7 @@ class UIPanel extends nodom.Plugin {
                 bodyDom.add(item);
             }
         }
+        panelDom.children = [];
         if (tbar) {
             panelDom.add(tbar);
         }

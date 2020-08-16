@@ -54,21 +54,18 @@ class UIButton extends nodom.Plugin {
         }
         else {
             //背景色
-            arr = ['warn', 'active', 'emphasis'];
+            arr = ['warn', 'active', 'success', 'error'];
             for (let l of arr) {
                 if (oe.hasProp(l)) {
-                    bg = 'nd-' + l;
+                    bg = 'nd-btn-' + l;
                     oe.delProp(l);
                     break;
                 }
             }
-            //默认灰色
-            if (!bg) {
-                bg = 'nd-bg-grey';
-            }
         }
         //是否无文本
         let notext = icon && el.innerHTML.trim() === '' ? 'nd-btn-notext' : '';
+        //btn class
         let cls = 'nd-btn ' + notext + ' nd-btn-' + size + ' ' + bg;
         //把btn类加入到class
         oe.addClass(cls);

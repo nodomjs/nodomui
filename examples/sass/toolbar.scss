@@ -1,0 +1,9 @@
+// @import "base.scss";
+/* toolbar */
+.nd-toolbar{
+    @include nd-color(2);
+    display:inline-flex;
+    .nd-btn{
+        padding:$nd-btn-padding-top;
+    }
+}

@@ -1,4 +1,4 @@
-@import "base","icon";
+// @import "base","icon";
 
 .nd-tip{
     position:fixed;
@@ -16,12 +16,14 @@
         margin:$nd-padding/2 0;
         border-radius:$nd-radius;
         display:flex;
+        align-items: center;
+
+        > b{
+            margin-right:5px;
+        }
         
         .nd-tip-content{
             display:inline-block;
-            > b{
-                margin-right:5px;
-            }
             flex:1;
         }
         

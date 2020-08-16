@@ -127,8 +127,8 @@ class UITip extends nodom.Plugin{
 
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression('content')];
-        contentDom.children = [icon,txt];
-        dom.children = [contentDom,close];
+        contentDom.children = [txt];
+        dom.children = [icon,contentDom,close];
         return dom;
     }
 

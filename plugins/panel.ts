@@ -5,79 +5,73 @@
 class UIPanel extends nodom.Plugin{
     tagName:string = 'UI-PANEL';
     /**
+     * panel 标题
+     */
+    title:string;
+    /**
+     * button 串
+     */
+    buttons:string[];
+
+    /**
      * 编译后执行代码
      */
     init(el:HTMLElement):nodom.Element{
-        let oe:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(oe,el);
-        nodom.Compiler.handleChildren(oe,el);
+        let rootDom:nodom.Element = new nodom.Element();
+        nodom.Compiler.handleAttributes(rootDom,el);
+        nodom.Compiler.handleChildren(rootDom,el);
+        rootDom.tagName = 'div';
 
-        let title:string = oe.getProp('title');
-        //设置默认title
-        title = title?title.trim():'';
-        title = title!==''?title:'Panel';
+        UITool.handleUIParam(rootDom,this,
+            ['title','buttons|array'],
+            ['title','buttons'],
+            ['Panel',['close']]);
 
+        rootDom.addClass('nd-panel');
+        
         let showMin:boolean = false;
         let showMax:boolean = false;
         let showClose:boolean = false;
         
-        if(oe.hasProp('buttons')){
-            let buttons = oe.getProp('buttons').split(',');
-            if(buttons.includes('min')){
+        if(this.buttons){
+            if(this.buttons.includes('min')){
                 showMin = true;    
             }
-            if(buttons.includes('max')){
+            if(this.buttons.includes('max')){
                 showMax = true;    
             }
-            if(buttons.includes('close')){
+            if(this.buttons.includes('close')){
                 showClose = true;    
             }
         }
-        
-        oe.delProp(['title','buttons']);
-
-        //panel dom
-        let panelDom:nodom.Element = new nodom.Element('div');
-        //拷贝属性
-        Object.getOwnPropertyNames(oe.props).forEach((p)=>{
-            panelDom.setProp(p,oe.getProp(p));
-        });
-        Object.getOwnPropertyNames(oe.exprProps).forEach((p)=>{
-            panelDom.setProp(p, oe.getProp(p,true),true);
-        });
-        panelDom.addClass('nd-panel');
-        //处理头部
-        this.handleHead(panelDom,title,showMin,showMax,showClose);
         //处理body
-        this.handleBody(panelDom,oe);
-        panelDom.plugin=this;
-        return panelDom;
-    }
-
-    beforeRender(module:nodom.Module,dom:nodom.Element){
-        super.beforeRender(module,dom);
+        this.handleBody(rootDom);
+        //处理头部
+        this.handleHead(rootDom,showMin,showMax,showClose);
+        
+        rootDom.plugin=this;
+        return rootDom;
     }
 
     /**
      * 处理头部
      * @param panelDom  panel dom
-     * @param title     标题
      * @param showMin   显示最小化按钮
      * @param showMax   显示最大化按钮
      * @param showClose 显示关闭按钮
      */
-    handleHead(panelDom:nodom.Element,title:string,showMin:boolean,showMax:boolean,showClose:boolean){
-        if((!title||title==='') && !showMin && !showMax && !showClose){
+    handleHead(panelDom:nodom.Element,showMin:boolean,showMax:boolean,showClose:boolean){
+        if(!showMin && !showMax && !showClose){
             return;
         }
         //header
         let headerDom:nodom.Element = new nodom.Element('div');
         headerDom.addClass('nd-panel-header');
-        if(title && title !== ''){
+        if(this.title){
             //title
             let titleCt:nodom.Element = new nodom.Element('span');
             titleCt.addClass('nd-panel-title');
-            titleCt.assets.set('innerHTML',title);
+            titleCt.assets.set('innerHTML',this.title);
             headerDom.add(titleCt);
         }
         
@@ -109,7 +103,7 @@ class UIPanel extends nodom.Plugin{
             }
             headerDom.add(headbarDom);
         }
-        panelDom.add(headerDom);
+        panelDom.children.unshift(headerDom);
     }
 
     /**
@@ -117,7 +111,7 @@ class UIPanel extends nodom.Plugin{
      * @param panelDom  panel dom
      * @param oe        原始dom
      */
-    handleBody(panelDom:nodom.Element,oe:nodom.Element){
+    handleBody(panelDom:nodom.Element){
         //panel body
         let bodyDom:nodom.Element = new nodom.Element('div');
         bodyDom.addClass('nd-panel-body');
@@ -127,8 +121,8 @@ class UIPanel extends nodom.Plugin{
         //button group，，放在panel body后
         let btnGrp:nodom.Element;
         
-        for(let i=0;i<oe.children.length;i++){
-            let item = oe.children[i];
+        for(let i=0;i<panelDom.children.length;i++){
+            let item = panelDom.children[i];
             if(item.plugin){
                 if(item.plugin.tagName ==='UI-TOOLBAR'){
                     tbar = item;
@@ -140,7 +134,7 @@ class UIPanel extends nodom.Plugin{
             }
         }
 
-        
+        panelDom.children = [];
         if(tbar){
             panelDom.add(tbar);
         }
