@@ -65,20 +65,20 @@ class UIPanel extends nodom.Plugin {
             headbarDom.addClass('nd-panel-header-bar');
             //min max close按钮
             if (showMin) {
-                let btn = new nodom.Element('BUTTON');
-                btn.addClass('nd-btn nd-icon-minus nd-btn-nobg nd-btn-notext');
+                let btn = new nodom.Element('B');
+                btn.addClass('nd-panel-min');
                 headbarDom.add(btn);
                 this.setMinHandler(btn);
             }
             if (showMax) {
-                let btn = new nodom.Element('BUTTON');
-                btn.addClass('nd-btn nd-icon-add nd-btn-nobg nd-btn-notext');
+                let btn = new nodom.Element('B');
+                btn.addClass('nd-panel-max');
                 headbarDom.add(btn);
                 this.setMaxHandler(btn);
             }
             if (showClose) {
-                let btn = new nodom.Element('BUTTON');
-                btn.addClass('nd-btn nd-icon-close nd-btn-nobg nd-btn-notext');
+                let btn = new nodom.Element('B');
+                btn.addClass('nd-panel-close');
                 headbarDom.add(btn);
                 this.setCloseHandler(btn);
             }

@@ -21,8 +21,7 @@
             .nd-tab-close{
                 margin-left:$nd-padding;
                 font-size:$nd-fontsmall;
-                @extend .nd-icon-cross;
-                @extend .nd-canclick;
+                @include nd-clickicon('cross');
                 border-radius:10px;
             }
         }

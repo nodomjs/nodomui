@@ -2,10 +2,8 @@
 /*list box*/
 .nd-list{
     overflow:auto;
-    padding:$nd-padding;
-    @extend .nd-border;
-    padding:$nd-padding;
-    border-radius:$nd-padding;
+    
+    @extend .nd-commonbox;
     
     .nd-list-item{
         display:flex;
@@ -37,13 +35,12 @@
     .nd-list-item-disable{
         @extend .nd-disable;
     }
-
 }
 
 
 /*横向*/
 .nd-list-horizontal{
-    border-radius:$nd-padding;
+    // border-radius:$nd-padding;
     overflow:auto;
     .nd-list-item{
         @extend .nd-canclick;
@@ -53,12 +50,12 @@
         margin:$nd-padding;
 
         &:hover{
-            @extend .nd-menu-active;
+            @extend .nd-item-hovercolor;
         }
     }
 
     .nd-list-item-active{
-        @extend .nd-item-active;
+        @extend .nd-item-selectcolor;
     }
 
     .nd-list-item-disable{

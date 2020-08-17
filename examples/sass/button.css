@@ -20,12 +20,12 @@
 /*字体大小*/
 /*zindex*/
 /*item active*/
-.nd-item-active {
+.nd-item-selectcolor {
   background-color: #ae163d;
   color: white; }
 
 /*menu active*/
-.nd-menu-active {
+.nd-item-hovercolor {
   background-color: #323232;
   color: white; }
 
@@ -72,9 +72,6 @@ a:visited {
 /*边框*/
 .nd-border {
   border: 1px solid #323232; }
-
-.nd-border-shader {
-  box-shadow: #000 3px 3px 5px; }
 
 /*框体padding*/
 .nd-padding {

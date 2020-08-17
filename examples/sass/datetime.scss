@@ -9,9 +9,13 @@
         @extend .nd-input-icon;
         .nd-datetime-date{
             @extend .nd-icon-calendar;
+            background-color:inherit;
         }
         .nd-datetime-time{
             @extend .nd-icon-time;
+        }
+        input{
+            background-color:transparent;
         }
     }
     /*下拉面板*/
@@ -21,14 +25,12 @@
         margin-top:$nd-dropdown-margin;
         padding:$nd-padding;
         @extend .nd-border;
-        @include nd-color(4);
-
+        @extend .nd-box-default;
         /*按钮*/
         .nd-datetime-btnct{
             padding:$nd-padding 0;
             text-align:center;
             >button{
-                @extend .nd-btn;
                 @extend .nd-btn-small;
             }
             & :first-child{
@@ -110,7 +112,7 @@
             }
 
             .nd-datetime-selected{
-                @extend .nd-item-active;
+                @extend .nd-item-selectcolor;
                 border-radius:35px;
             }
 
@@ -130,6 +132,7 @@
             margin-bottom:$nd-padding;
             @extend .nd-input;
             width:100%;
+            box-sizing: border-box;
             font-size:$nd-fontlarge;
             text-align:center;
         }
@@ -146,7 +149,7 @@
                     text-align:center;
                 }
                 .nd-datetime-itemselect{
-                    @extend .nd-item-active;
+                    @extend .nd-item-selectcolor;
                 }
             }
         }

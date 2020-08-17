@@ -10,7 +10,8 @@
         display:block;
         position:absolute;
         top:0px;
-        @include nd-color(3);
+        @extend .nd-box-default;
+        // @include nd-color(3);
         .nd-menu-nodect{
             position:relative;
             line-height:30px;
@@ -31,15 +32,15 @@
                     display:inline-block;
                 }
                 &:hover{
-                    @extend .nd-menu-active;
+                    @extend .nd-item-hovercolor;
                 }
             }
             &:hover{
-                @extend .nd-menu-active;
+                @extend .nd-item-hovercolor;
             }
         }
     }
-    
+
     /*第一级菜单*/
     .nd-menu-first{
         display:inline-block;
@@ -49,6 +50,7 @@
     .nd-menu-first-nopop{
         display:inline-block;
         position:relative;
+        box-shadow: none !important;
         > .nd-menu-nodect{
             display:inline-block;
             width:auto;

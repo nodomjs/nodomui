@@ -80,6 +80,7 @@ class UIDatetime extends nodom.Plugin {
             btnCt.add(btn);
         }
         let btnOk = new nodom.Element('button');
+        btnOk.addClass('nd-btn-active');
         btnOk.assets.set('innerHTML', NUITipWords.buttons.ok);
         btnCt.add(btnOk);
         //确定按钮

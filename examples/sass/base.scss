@@ -49,7 +49,7 @@ $nd-color9: rgb(100,100,100); //tip
 */
 //白色主题
 //阴影色
-$nd-shadecolor: #777;
+$nd-shadecolor: #999;
 //前景色
 //通用色
 $nd-forecolor1:#666;
@@ -59,24 +59,19 @@ $nd-forecolor2: #333;
 $nd-forecolor3: #111;
 //特殊色背景下的前景色
 $nd-forecolor4: #fff;
+
 //背景色
 //主背景
 
-$nd-color1:#fff;  //主背景
-$nd-color2: #f1f1f1;  //tree、accordion、form、toolbar、button group、 tab header
-$nd-color3: #e1e1e1;  //tab button
-$nd-color4: #d1d1d1;  //menu
-$nd-color5: #e1e1e1;  //input、panel-title、selected
+$nd-color1:#fff;  //主背景 tree、accordion、form
+$nd-color2: #f1f1f1;  //toolbar、button group、tab header
+$nd-color3: #e6e6e6;  //tab、 button、 item hover
+$nd-color4: #e1e1e1;  //menu
+$nd-color5: #e1e1e1;  //panel-title
 $nd-color6: #c1c1c1;  //line
 $nd-color7: #a1a1a1;  //滚动条 mouseover border
 $nd-color8: #a1a1a1;  //按钮
 $nd-color9: #333;  //按钮
-
-$nd-forecolor: $nd-blackcolor;
-@function nd-genforecolor($color) {
-    $lg:lightness($nd-color1);
-    $nd-forecolor: mix($nd-whitecolor,$nd-blackcolor,100%-$lg);
-} 
 
 
 //颜色序列
@@ -117,15 +112,25 @@ $nd-menu-index: 998;
 $nd-combo-index: 997;
 
 
-/*item active*/
-.nd-item-active{
-    background-color:$nd-activecolor;
-    color:$nd-forecolor2;
+@mixin nd-clickicon($icon){
+    @extend #{'.nd-icon-' + $icon};
+    @extend .nd-canclick;
+    &:hover{
+        color:$nd-activecolor;
+    }
 }
-/*menu active*/
-.nd-menu-active{
-    background-color: $nd-color6;
-    color:$nd-forecolor2;
+
+//生成颜色
+//item hover
+.nd-item-hovercolor{
+    background-color:lighten($nd-activecolor,50%);
+    color:$nd-forecolor1;
+}
+
+/*item active*/
+.nd-item-selectcolor{
+    background-color:lighten($nd-activecolor,20%);
+    color:$nd-forecolor4;
 }
 
 
@@ -133,7 +138,8 @@ $nd-combo-index: 997;
 @mixin nd-box-bg($color){
     $bg:mix(#fff,$color,90%);
     background-color:$bg;
-    // border:1px solid $color;
+    border-radius:$nd-radius;
+    box-shadow: 0px 0px 8px 1px $nd-shadecolor;
     @if lightness($bg) > 70% {
         color:mix(#000,$color,20%);
     } @else {
@@ -142,12 +148,38 @@ $nd-combo-index: 997;
 }
 
 
-.nd-box-default{
-    background-color:$nd-color9;
-    border:1px solid $nd-color9;
-    color:$nd-forecolor4;
+/*边框*/
+.nd-border{
+    border:1px solid $nd-color6;
 }
 
+/*框体padding*/
+.nd-padding{
+    padding:$nd-padding * 2;
+}
+
+/*通用框*/
+//用于 tree、accordion、list等
+.nd-commonbox{
+    @include nd-color(1);
+    border:1px solid $nd-color6;
+    padding:$nd-padding;
+}
+
+/*黑色背景*/
+.nd-box-black{
+    background-color:black;
+    color:white;
+    border-radius:$nd-radius;
+    box-shadow: 0px 0px 8px 1px $nd-shadecolor;
+}
+
+/*默认色背景box*/
+.nd-box-default{
+    @include nd-color(1);
+    border-radius:$nd-radius;
+    box-shadow: 0px 0px 8px 1px $nd-shadecolor;
+}
 /*active颜色框*/
 .nd-box-active{
     @include nd-box-bg($nd-activecolor);
@@ -182,26 +214,10 @@ a:visited{
     color:$nd-linkcolorvisted;
 }
 
-
-/*边框*/
-.nd-border{
-    border:1px solid $nd-color6;
-}
-
-.nd-border-shader{
-    // border:1px solid $nd-color6;
-    box-shadow: $nd-shadecolor 3px 3px 5px;
-}
-
-/*框体padding*/
-.nd-padding{
-    padding:$nd-padding * 2;
-}
-
 /*禁用*/
 .nd-disable{
     color:grey;
-    cursor:not-allowed;
+    cursor:not-allowed !important;
     &:hover{
         color:grey;
         background-color:transparent;
@@ -211,21 +227,20 @@ a:visited{
 /*可以click*/
 .nd-canclick{
     cursor:pointer;
-    // &:hover{
-    //     color:$nd-forecolor2;
-    // }
 }
 
 /*输入框*/
-.nd-input{
+input,.nd-input{
     padding:$nd-padding;
     @include nd-color(1);
     border-radius:$nd-radius;
     border:1px solid $nd-color5;
-    &:hover{
-        border-color:$nd-color3;
+    &:hover, &:focus{
+        @extend .nd-item-hovercolor;
+        border-color:lighten($nd-activecolor,20%);
     }
 }
+
 /*带图标输入框*/
 .nd-input-icon{
     @extend .nd-input; 
@@ -256,6 +271,7 @@ body{
 button,input{
     outline:none;
 }
+
 
 /**滚动条**/
 ::-webkit-scrollbar{

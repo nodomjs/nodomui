@@ -79,7 +79,7 @@
         @include nd-color(1);
         .nd-grid-row{
             &:hover{
-                @extend .nd-menu-active;
+                @extend .nd-item-hovercolor;
             }
         }
     }

@@ -1,32 +1,37 @@
 // @import "base";
 /********** tree ***********/
 .nd-tree{
-    font-size:$nd-fontnormal;
-    @include nd-color(5);
+    @extend .nd-commonbox;
     .nd-tree-nodect{
-        // padding:5px;
+        
         .nd-tree-node{
             display:inline-block;
             padding:$nd-padding;
+            &:hover{
+                @extend .nd-item-hovercolor;
+            }
         }
-        .nd-tree-checkbox{
-            border:1px solid;
-            width:1em;
-        }
-
+        
         .nd-tree-icon{
             display:inline-block;
-            margin-right:$nd-padding;
-            width:1em;
+            margin-right:$nd-padding/2;
+            // width:1em;
         }        
         
         .nd-tree-node-open{
-            transform:ro state(90deg);
+            transform:rotate(90deg);
+        }
+
+        //checkbox
+        .nd-tree-uncheck{
+            @include nd-clickicon('checkbox');
+        }
+
+        .nd-tree-checked{
+            @include nd-clickicon('checked');
         }
     }
-    .nd-tree-node:hover{
-        @include nd-color(6);
-    }
+    
 
     .nd-tree-subct{
         display:none;

@@ -154,7 +154,7 @@ class UITip extends nodom.Plugin {
             start: new Date().getTime(),
             allowClose: allowClose,
             icon: config.icon,
-            theme: config.theme || 'default'
+            theme: config.theme || 'black'
         };
         if (config.exclusive) {
             datas = [data];

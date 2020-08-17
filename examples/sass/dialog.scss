@@ -7,7 +7,7 @@
     left:0;
     right:0;
     z-index: 1000000;
-    @extend .nd-border-shader;
+    @extend .nd-box-default;
     /*蒙版*/
     .nd-dialog-cover{
         @include nd-color(1);

@@ -11,8 +11,8 @@
     display: flex;
     flex-direction:column;
 
-    > div{
-        width:inherit;
+    > *{
+        width:100%;
         box-sizing: border-box;
     }
     /* 头部 */
@@ -31,9 +31,22 @@
 
         /*头部工具栏*/
         .nd-panel-header-bar{
-            .nd-btn{
-                font-size:$nd-fontlarger;
+            font-size:$nd-fontlarge;
+            margin-right:-$nd-padding;
+            > *{
+                margin-right:$nd-padding/2;
             }
+            
+            .nd-panel-min{
+                @include nd-clickicon('minus');
+            }
+            .nd-panel-max{
+                @include nd-clickicon('add');
+            }
+            .nd-panel-close{
+                @include nd-clickicon('close');
+            }
+            
         }
     }
 

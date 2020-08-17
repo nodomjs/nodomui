@@ -122,6 +122,7 @@ class UIDatetime extends nodom.Plugin{
         }
         
         let btnOk:nodom.Element = new nodom.Element('button');
+        btnOk.addClass('nd-btn-active');
         btnOk.assets.set('innerHTML',NUITipWords.buttons.ok);
         btnCt.add(btnOk);
         

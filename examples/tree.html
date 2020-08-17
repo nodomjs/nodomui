@@ -7,6 +7,7 @@
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script src='js/nodom.js'></script>
+    <script src='../dist/uibase.js'></script>
     <script src='../dist/tree.js'></script>
     <style>
         .ct{
@@ -17,10 +18,19 @@
 </head>
 <body>
     <div>
-        <ui-tree class='ct' x-model='data1' data='rows' 
-            icon='minus,add' showName='title' itemClick='clickItem' 
-            checkName='checked' activeName='active'
-            maxLevels='4'
+        <!--
+            listField       显示的数据行
+            valueField      值字段名
+            displayField    显示字段名
+            itemClick       item点击事件
+            checkName       选择字段名，如果没有此项，则不显示选择框
+            maxLevel        最大级数，默认3
+            icons           两个，以“,”分割，第一个为非叶子节点图标，第二个为叶子节点图标
+        -->
+        <ui-tree class='ct' x-model='data1' listField='rows'
+            icons='minus,add' valueField='id' displayField='title' itemClick='clickItem' 
+            checkName='checked' 
+            maxLevel='4'
             >
         </ui-tree>
     </div>
@@ -31,11 +41,11 @@
             el:'div',
             data:{
                 rows:[
-                    {title:'商品管理',active:true,checked:true,rows:[
+                    {title:'商品管理',checked:true,rows:[
                         {title:'商品上架'},
                         {title:'商品下架'},
                         {title:'商品编辑'},
-                        {title:'商品统计',active:true,checked:true,rows:[
+                        {title:'商品统计',checked:true,rows:[
                             {title:'上架统计'},
                             {title:'下架统计'},
                             {title:'销售统计',rows:[

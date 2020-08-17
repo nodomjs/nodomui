@@ -61,9 +61,9 @@ class UIMenu extends nodom.Plugin{
         nodom.Compiler.handleChildren(menuDom,el);
         menuDom.tagName = ('div');
         UITool.handleUIParam(menuDom,this,
-            ['pop','listfield','maxlevels|number','menuwidth|number'],
+            ['popup|bool','listfield','maxlevels|number','menuwidth|number'],
             ['popupMenu','listName','maxLevels','menuWidth'],
-            [false,null,3,150]);
+            [null,null,3,150]);
             
         //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
@@ -278,7 +278,7 @@ class UIMenu extends nodom.Plugin{
         let widthOut:boolean = x + w > window.innerWidth;
         let heightOut:boolean = y + h > window.innerHeight;
         let top:number=dom?0:y;
-        let left:number=dom?0:x+2;
+        let left:number=dom?0:x;
         // 第一级非pop的子菜单是否需要左移动
         
         if(firstNopop){
@@ -303,14 +303,14 @@ class UIMenu extends nodom.Plugin{
             }else if(dom){ //第二级菜单的子菜单
                 left -= w;
             }else if(widthOut){  //pop第一级右侧不够放
-                left -= w+2;
+                left -= w + 2;
             } 
         }else{
             if(dom && !firstNopop){
                 left = w;
             }
         }
-        return[left,top];
+        return[left,top+1];
     }
 }
 

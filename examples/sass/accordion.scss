@@ -1,9 +1,9 @@
 // @import "base";
 /********** accordion ***********/
 .nd-accordion{
+    @extend .nd-commonbox;
     .nd-accordion-item{
         border-bottom:1px solid $nd-color5;
-        
         .nd-accordion-first{
             @include nd-color(2);
             padding:$nd-padding*2;
@@ -33,12 +33,12 @@
             }
          
             .nd-accordion-selected{
-                @extend .nd-item-active;
+                @extend .nd-item-selectcolor;
                 @include nd-color(2)
             }
     
             .nd-accordion-second:hover{
-                @extend .nd-menu-active;
+                @extend .nd-item-hovercolor;
             }
         }
         .nd-accordion-hide{

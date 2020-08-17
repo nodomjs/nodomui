@@ -1,27 +1,28 @@
 // @import "base";
 
 /**按钮**/
-.nd-btn{
+button,.nd-btn{
     display:inline-block;
     @extend .nd-canclick;
-    @include nd-color(8);
+    @include nd-color(3);
+    
     border-radius: $nd-radius;
     border:0px;
-    padding:$nd-btn-padding-top $nd-btn-padding-left;
+    padding:$nd-padding $nd-btn-padding-left;
+
     > b{
         margin-right:$nd-padding/2;
     }
     &:hover{
-        background-color:lighten($nd-color8,10%);
+        background-color:lighten($nd-color3,5%);
         color:$nd-forecolor2;
     }
 }
 
+/*无背景色*/
 .nd-btn-nobg{
     background-color:transparent;
 }
-
-/*无图标*/
 
 /*有图标*/
 .nd-btn-small{

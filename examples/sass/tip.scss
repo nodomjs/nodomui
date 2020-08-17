@@ -9,7 +9,6 @@
     align-items: center;
     width:100%;
     .nd-tip-item{
-        @extend .nd-border-shader;
         width:300px;
         box-sizing: border-box;
         padding:$nd-padding * 2;
@@ -29,8 +28,7 @@
         
         .nd-tip-close{
             margin-right:-$nd-padding;
-            @extend .nd-icon-cross;
-            @extend .nd-canclick;
+            @include nd-clickicon('cross');
         }
     }
 }

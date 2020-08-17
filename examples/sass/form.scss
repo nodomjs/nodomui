@@ -1,10 +1,6 @@
 // @import "base","icon";
 /*form css*/
 .nd-form{
-    input{
-        @extend .nd-input;
-    }
-
     .nd-form-item{
         padding:$nd-padding;
         display:flex;

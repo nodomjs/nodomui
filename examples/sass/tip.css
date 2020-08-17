@@ -20,12 +20,12 @@
 /*字体大小*/
 /*zindex*/
 /*item active*/
-.nd-item-active {
+.nd-item-selectcolor {
   background-color: #ae163d;
   color: white; }
 
 /*menu active*/
-.nd-menu-active {
+.nd-item-hovercolor {
   background-color: #323232;
   color: white; }
 
@@ -165,12 +165,12 @@ button, input {
 /*字体大小*/
 /*zindex*/
 /*item active*/
-.nd-item-active {
+.nd-item-selectcolor {
   background-color: #ae163d;
   color: white; }
 
 /*menu active*/
-.nd-menu-active {
+.nd-item-hovercolor {
   background-color: #323232;
   color: white; }
 

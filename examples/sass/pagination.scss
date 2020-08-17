@@ -31,18 +31,18 @@
             padding:0 $nd-padding;
         }
         .nd-pagination-leftarrow{
-            @extend .nd-icon-arrow-left;
+            @include nd-clickicon('arrow-left');
         }
         .nd-pagination-leftarrow1{
-            @extend .nd-icon-double-arrow-left;
+            @include nd-clickicon('double-arrow-left');
         }
 
         .nd-pagination-rightarrow{
-            @extend .nd-icon-arrow-right;
+            @include nd-clickicon('arrow-right');
         }
 
         .nd-pagination-rightarrow1{
-            @extend .nd-icon-double-arrow-right;
+            @include nd-clickicon('double-arrow-right');
         }
     }
 
