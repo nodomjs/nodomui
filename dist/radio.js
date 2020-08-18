@@ -3,33 +3,51 @@
  * checkbox
  */
 class UIRadio extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-RADIO';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'span';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
-    init(el) {
-        let radioDom = new nodom.Element('span');
-        nodom.Compiler.handleAttributes(radioDom, el);
-        nodom.Compiler.handleChildren(radioDom, el);
-        radioDom.addClass('nd-radio');
-        let dataName = radioDom.getProp('field');
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
+        rootDom.addClass('nd-radio');
+        let field = rootDom.getDirective('field');
+        if (field) {
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
         // 新的孩子节点
-        for (let c of radioDom.children) {
+        for (let c of rootDom.children) {
             if (c.tagName) {
                 let icon = new nodom.Element('b');
                 icon.addClass('nd-icon-radio');
-                icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + dataName + "==\"" + c.getProp('value') + "\"'}", icon));
+                icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + this.dataName + "==\"" + c.getProp('value') + "\"'}", icon));
                 c.children.unshift(icon);
                 //点击事件
                 c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                    let v = model.data[dataName];
-                    model.set(dataName, dom.getProp('value'));
+                    let v = model.data[this.dataName];
+                    model.set(this.dataName, dom.getProp('value'));
                 }));
             }
         }
-        radioDom.delProp('field');
-        radioDom.plugin = this;
-        return radioDom;
     }
 }
 nodom.PluginManager.add('UI-RADIO', UIRadio);

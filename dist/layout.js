@@ -3,19 +3,32 @@
  * panel 插件
  */
 class UILayout extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-LAYOUT';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
-        let oe = new nodom.Element();
-        oe.tagName = 'DIV';
-        nodom.Compiler.handleAttributes(oe, el);
-        nodom.Compiler.handleChildren(oe, el);
-        oe.addClass('nd-layout');
+    generate(rootDom) {
+        rootDom.addClass('nd-layout');
         //增加middle 容器
         let middleCt = new nodom.Element();
         middleCt.addClass('nd-layout-middle');
@@ -23,8 +36,8 @@ class UILayout extends nodom.Plugin {
         let items = {};
         //位置
         let locs = ['north', 'west', 'center', 'east', 'south'];
-        for (let i = 0; i < oe.children.length; i++) {
-            let item = oe.children[i];
+        for (let i = 0; i < rootDom.children.length; i++) {
+            let item = rootDom.children[i];
             if (!item.tagName) {
                 continue;
             }
@@ -36,9 +49,9 @@ class UILayout extends nodom.Plugin {
                 }
             }
         }
-        oe.children = [];
+        rootDom.children = [];
         if (items['north']) {
-            oe.children.push(items['north']);
+            rootDom.children.push(items['north']);
         }
         if (items['west']) {
             middleCt.children.push(items['west']);
@@ -49,12 +62,10 @@ class UILayout extends nodom.Plugin {
         if (items['east']) {
             middleCt.children.push(items['east']);
         }
-        oe.children.push(middleCt);
+        rootDom.children.push(middleCt);
         if (items['south']) {
-            oe.children.push(items['south']);
+            rootDom.children.push(items['south']);
         }
-        oe.plugin = this;
-        return oe;
     }
 }
 nodom.PluginManager.add('UI-LAYOUT', UILayout);

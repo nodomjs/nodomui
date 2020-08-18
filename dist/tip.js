@@ -8,8 +8,8 @@
  *
  */
 class UITip extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-TIP';
         /**
          * 是否需要检查tip列表
@@ -24,10 +24,27 @@ class UITip extends nodom.Plugin {
             bottom: undefined,
             left: undefined
         };
-    }
-    init(el) {
         let rootDom = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom, el);
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
         rootDom.tagName = 'div';
         this.extraDataName = '$ui_tip_manager';
         rootDom.setProp('name', this.extraDataName);
@@ -41,8 +58,6 @@ class UITip extends nodom.Plugin {
             ct.add(this.createTipDom(loc));
             rootDom.add(ct);
         }
-        rootDom.plugin = this;
-        return rootDom;
     }
     /**
      * 后置渲染
@@ -51,7 +66,7 @@ class UITip extends nodom.Plugin {
      */
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
-        if (!this.modelId) {
+        if (this.needPreRender) {
             let model = module.model;
             //构建tip数据模型
             if (!model.get(this.extraDataName)) {

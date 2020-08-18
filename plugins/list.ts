@@ -16,12 +16,12 @@ class UIList extends nodom.Plugin{
     /**
      * 显示数据项名
      */
-    displayName:string;
+    displayField:string;
     
     /**
      * 值数据项名
      */
-    valueName:string;
+    valueField:string;
 
     /**
      * disable数据项名
@@ -30,7 +30,7 @@ class UIList extends nodom.Plugin{
     /**
      * 列表数据名
      */
-    listName:string;
+    listField:string;
 
     /**
      * 类型
@@ -50,7 +50,7 @@ class UIList extends nodom.Plugin{
     /**
      * 是否多选
      */
-    multi:boolean;
+    multiSelect:boolean;
 
     /**
      * 对象的modelId
@@ -62,23 +62,41 @@ class UIList extends nodom.Plugin{
      */
     extraModelId:number;
 
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['valuefield','displayfield','disablefield','listfield','type','itemclick','itemwidth|number','multiselect|bool'],
+                    ['valueField','displayField','disableName','listField','type','clickEvent','itemWidth','multiSelect'],
+                    ['','','',null,'row','',0,null]);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
-    init(el:HTMLElement):nodom.Element{
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
         let me = this;
         //生成id
         this.extraDataName = '$ui_list_' + nodom.Util.genId();
         
-        let rootDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom,el);
-        nodom.Compiler.handleChildren(rootDom,el);
-        rootDom.tagName = 'div';
         //增加附加model
         rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
 
-        UITool.handleUIParam(rootDom,this,
-            ['valuefield','displayfield','disablefield','listfield','type','itemclick','itemwidth|number','multiselect|bool'],
-            ['valueName','displayName','disableName','listName','type','clickEvent','itemWidth','multi'],
-            ['','','',null,'row','',0,null]);
 
         if(this.type === 'row'){
             rootDom.addClass('nd-list');
@@ -105,9 +123,9 @@ class UIList extends nodom.Plugin{
         //非自定义，则新建默认对象
         if(!itemDom){
             itemDom = new nodom.Element('div');
-            if(this.displayName !== ''){
+            if(this.displayField !== ''){
                 let txt:nodom.Element = new nodom.Element();
-                txt.expressions = [new nodom.Expression(this.displayName)];
+                txt.expressions = [new nodom.Expression(this.displayField)];
                 itemDom.add(txt);
             }
         }
@@ -146,8 +164,6 @@ class UIList extends nodom.Plugin{
             itemDom.addEvent(new nodom.NodomEvent('click',this.clickEvent));
         }
         rootDom.children = [itemDom];
-        rootDom.plugin = this;
-        return rootDom;
     }
     /**
      * 后置渲染
@@ -155,12 +171,12 @@ class UIList extends nodom.Plugin{
      * @param dom 
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
+        super.beforeRender(module,dom);
         //uidom model
         let pmodel:nodom.Model;
         //附加数据model
         let model:nodom.Model;
-        if(!this.modelId){
-            this.modelId = dom.modelId;
+        if(this.needPreRender){
             pmodel = module.modelFactory.get(this.modelId);
             this.extraModelId = pmodel.set(this.extraDataName,{
                 datas:[]        //下拉框数据
@@ -177,7 +193,7 @@ class UIList extends nodom.Plugin{
         
         let data = model.data;
         //下拉值初始化
-        if(this.listName && data.datas.length === 0 && pmodel.data[this.listName]){
+        if(this.listField && data.datas.length === 0 && pmodel.data[this.listField]){
             let valueArr:string[];
             if(this.dataName){
                 let value = pmodel.query(this.dataName);
@@ -186,15 +202,15 @@ class UIList extends nodom.Plugin{
                 }
             }
             
-            let rows = pmodel.query(this.listName);
+            let rows = pmodel.query(this.listField);
             //复制新数据
             if(rows && Array.isArray(rows)){
                 rows = nodom.Util.clone(rows);
             
                 //初始化选中状态
-                if(this.valueName !== ''){
+                if(this.valueField !== ''){
                     for(let d of rows){
-                        if(valueArr && valueArr.includes(d[this.valueName]+'')){
+                        if(valueArr && valueArr.includes(d[this.valueField]+'')){
                             d.selected = true;
                         }else{
                             d.selected = false;
@@ -215,10 +231,6 @@ class UIList extends nodom.Plugin{
      * @param value     值
      */
     setValue(module:nodom.Module,model?:nodom.Model){
-        if(!this.dataName || this.valueName === ''){
-            return;
-        }
-        
         //原model
         let pmodel = module.modelFactory.get(this.modelId);
         //附加数据model
@@ -227,19 +239,20 @@ class UIList extends nodom.Plugin{
         //显示数组
         //值数组
         let valArr:string[] = [];
-        if(this.multi){
+        if(this.multiSelect){
             //反选
             if(model){
                 model.set('selected',!model.data.selected);
             }
             
-            for(let d of rows){
-                if(d.selected){
-                    valArr.push(d[this.valueName]);
+            if(this.valueField!=='' && this.dataName){
+                for(let d of rows){
+                    if(d.selected){
+                        valArr.push(d[this.valueField]);
+                    }
                 }
+                pmodel.set(this.dataName,valArr.join(','));
             }
-            pmodel.set(this.dataName,valArr.join(','));
-            console.log(2);
         }else{
             //如果model不存在，则直接取选中值
             if(model){
@@ -258,7 +271,9 @@ class UIList extends nodom.Plugin{
             //设置选中
             for(let d of rows){
                 if(d.selected){
-                    pmodel.set(this.dataName,d[this.valueName]);
+                    if(this.valueField!=='' && this.dataName){
+                        pmodel.set(this.dataName,d[this.valueField]);
+                    }
                     break;
                 }
             }

@@ -17,7 +17,7 @@ class UISelect extends nodom.Plugin{
     /**
      * 列表数据名
      */
-    listName:string;
+    listField:string;
 
     /**
      * 下拉框宽度
@@ -27,22 +27,17 @@ class UISelect extends nodom.Plugin{
     /**
      * 列表值数据name
      */
-    valueName:string;
+    valueField:string;
 
     /**
      * 显示内容
      */
-    displayName:string;
+    displayField:string;
 
     /**
      * 允许过滤
      */
     allowFilter:boolean;
-
-    /**
-     * select 对象的modelId
-     */
-    modelId:number;
 
     /**
      * select 附加数据项modelId
@@ -51,33 +46,56 @@ class UISelect extends nodom.Plugin{
     /**
      * 多选
      */
-    multi:boolean;
+    multiSelect:boolean;
 
+    /**
+     * 下拉框key
+     */
+    listKey:string;
     /**
      * 过滤器方法id
      */
     filterMethodId:string;
-    
-    init(el:HTMLElement):nodom.Element{
+
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool'],
+                    ['valueField','displayField','multiSelect','listField','listWidth','allowFilter'],
+                    [null,null,null,null,0,null]
+                );
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
         let me = this;
         //生成id
         this.extraDataName = '$ui_select_' + nodom.Util.genId();
-        
-        let rootDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom,el);
-        nodom.Compiler.handleChildren(rootDom,el);
-
-        UITool.handleUIParam(rootDom,this,
-            ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool'],
-            ['valueName','displayName','multi','listName','listWidth','allowFilter'],
-            [null,null,null,null,0,null]
-        );
-
-        rootDom.tagName = 'div';
         rootDom.addClass('nd-select');
 
         let field = rootDom.getDirective('field');
-        this.dataName = field.value;
+        if(field){
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
         
         //修改model
         rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
@@ -102,7 +120,7 @@ class UISelect extends nodom.Plugin{
         if(!itemDom){
             itemDom = new nodom.Element('div');
             let txt:nodom.Element = new nodom.Element();
-            txt.expressions = [new nodom.Expression(this.displayName)];
+            txt.expressions = [new nodom.Expression(this.displayField)];
             itemDom.add(txt);
         }
         //item文本显示内容
@@ -131,7 +149,7 @@ class UISelect extends nodom.Plugin{
         input.addClass('nd-select-show');
         
         //多选择，不允许输入
-        if(this.multi){
+        if(this.multiSelect){
             input.setProp('readonly',true);
         }
         input.setProp('value', new nodom.Expression('display'),true);
@@ -139,11 +157,14 @@ class UISelect extends nodom.Plugin{
         icon = new nodom.Element('b');
         //点击展开或收拢
         showDom.addEvent(new nodom.NodomEvent('click',
-            (dom,model,module)=>{
+            (dom,model,module,e,el)=>{
                 if(model.data.show){
                     me.hideList(module,model);
                 }else{
                     model.set('show',true);
+                    let height = el.offsetHeight;
+                    let y = e.clientY + el.offsetHeight - e.offsetY;
+                    UITool.adjustPosAndSize(module,this.listKey,e.clientX,y,height,null,true);
                 }
             }
         ));
@@ -166,8 +187,6 @@ class UISelect extends nodom.Plugin{
 
         listDom.children = [itemDom];
         rootDom.children = [showDom,listDom];
-        rootDom.plugin = this;
-        return rootDom;
     }
     /**
      * 后置渲染
@@ -176,12 +195,13 @@ class UISelect extends nodom.Plugin{
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
         let me = this;
+        super.beforeRender(module,dom);
+        this.listKey = dom.children[1].key;
         //uidom model
         let pmodel:nodom.Model;
         //附加数据model
         let model:nodom.Model;
-        if(!this.modelId){
-            this.modelId = dom.modelId;
+        if(this.needPreRender){
             pmodel = module.modelFactory.get(this.modelId);
             let model:nodom.Model = pmodel.set(this.extraDataName,{
                 show:false,     //下拉框显示
@@ -198,7 +218,7 @@ class UISelect extends nodom.Plugin{
                 let rows = model.query('datas');
                 if(rows){
                     return rows.filter( (item)=> {
-                        return model.data.query==='' || item[me.displayName].indexOf(model.data.query) !== -1;
+                        return model.data.query==='' || item[me.displayField].indexOf(model.data.query) !== -1;
                     });
                 }
                 return [];
@@ -227,7 +247,7 @@ class UISelect extends nodom.Plugin{
         
         let data = model.data;
         //下拉值初始化
-        if(this.listName && data.datas.length === 0 && pmodel.data[this.listName]){
+        if(this.listField && data.datas.length === 0 && pmodel.data[this.listField]){
 
             let value = pmodel.query(this.dataName);
             let valueArr:string[];
@@ -235,16 +255,16 @@ class UISelect extends nodom.Plugin{
                 valueArr = value.toString().split(',');
             }
             let txtArr:string[] = [];
-            let rows = pmodel.query(this.listName);
+            let rows = pmodel.query(this.listField);
             //复制新数据
             if(rows && Array.isArray(rows)){
                 rows = nodom.Util.clone(rows);
             
                 //初始化选中状态
                 for(let d of rows){
-                    if(valueArr && valueArr.includes(d[this.valueName]+'')){
+                    if(valueArr && valueArr.includes(d[this.valueField]+'')){
                         d.selected = true;
-                        txtArr.push(d[this.displayName]);
+                        txtArr.push(d[this.displayField]);
                     }else{
                         d.selected = false;
                     }
@@ -272,7 +292,7 @@ class UISelect extends nodom.Plugin{
         let txtArr:string[] = [];
         //值数组
         let valArr:string[] = [];
-        if(this.multi){
+        if(this.multiSelect){
             //反选
             if(model){
                 model.set('selected',!model.data.selected);
@@ -280,8 +300,8 @@ class UISelect extends nodom.Plugin{
             
             for(let d of rows){
                 if(d.selected){
-                    valArr.push(d[this.valueName]);
-                    txtArr.push(d[this.displayName]);
+                    valArr.push(d[this.valueField]);
+                    txtArr.push(d[this.displayField]);
                 }
             }
             pmodel.set(this.dataName,valArr.join(','));
@@ -303,8 +323,8 @@ class UISelect extends nodom.Plugin{
             //设置选中
             for(let d of rows){
                 if(d.selected){
-                    pmodel.set(this.dataName,d[this.valueName]);
-                    model1.set('display',d[this.displayName]);
+                    pmodel.set(this.dataName,d[this.valueField]);
+                    model1.set('display',d[this.displayField]);
                     this.hideList(module,model1);
                     break;
                 }

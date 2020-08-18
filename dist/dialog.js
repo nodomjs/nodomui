@@ -2,27 +2,42 @@
 /**
  * panel 插件
  */
-class UIDialog extends UIPanel {
-    constructor() {
-        super(...arguments);
+class UIDialog extends nodom.Plugin {
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-DIALOG';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                params.setAttribute('buttons', 'close');
+            }
+            let panel = new UIPanel(params);
+            this.generate(rootDom, panel);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
-        el.setAttribute('buttons', 'close');
-        let panelDom = super.init(el);
-        //删除 panelDom的plugin
-        delete panelDom.plugin;
+    generate(rootDom, panel) {
+        const me = this;
         this.dataName = '$ui_dialog_' + nodom.Util.genId();
-        let dialogDom = new nodom.Element('div');
-        dialogDom.addClass('nd-dialog');
-        dialogDom.setProp('name', panelDom.getProp('name'));
+        rootDom.addClass('nd-dialog');
+        let panelDom = panel.element;
+        //删除panel plugin
+        // delete panelDom.plugin;
+        //获取插件名
+        rootDom.setProp('name', panelDom.getProp('name'));
         //autoopen
         this.autoOpen = panelDom.hasProp('autoopen');
         panelDom.delProp(['name', 'autoopen']);
-        dialogDom.addDirective(new nodom.Directive('show', this.dataName, dialogDom));
+        panel.setCloseHandler(() => {
+            me.close();
+        });
+        rootDom.addDirective(new nodom.Directive('show', this.dataName, rootDom));
         //body
         let dialogBody = new nodom.Element('div');
         dialogBody.addClass('nd-dialog-body');
@@ -30,10 +45,8 @@ class UIDialog extends UIPanel {
         //蒙版
         let coverDom = new nodom.Element('div');
         coverDom.addClass('nd-dialog-cover');
-        dialogDom.add(coverDom);
-        dialogDom.add(dialogBody);
-        dialogDom.plugin = this;
-        return dialogDom;
+        rootDom.add(coverDom);
+        rootDom.add(dialogBody);
     }
     /**
      * 渲染前事件
@@ -43,8 +56,6 @@ class UIDialog extends UIPanel {
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
-            this.modelId = dom.modelId;
-            this.moduleId = module.id;
             if (this.autoOpen) {
                 this.open();
             }
@@ -70,7 +81,6 @@ class UIDialog extends UIPanel {
             let model = module.modelFactory.get(this.modelId);
             if (model) {
                 model.set(this.dataName, true);
-                console.log(model.data);
             }
         }
     }
@@ -84,7 +94,6 @@ class UIDialog extends UIPanel {
             let model = module.modelFactory.get(this.modelId);
             if (model) {
                 model.set(this.dataName, false);
-                console.log(model.data);
             }
         }
     }

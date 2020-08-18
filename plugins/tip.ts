@@ -32,11 +32,7 @@ interface ITip{
  */
 class UITip extends nodom.Plugin{
     tagName:string = 'UI-TIP';
-    /**
-     * model id
-     */
-    modelId:number;
-
+    
     /**
      * 附加数据项名
      */
@@ -56,11 +52,32 @@ class UITip extends nodom.Plugin{
         left:undefined
     }
 
-    init(el:HTMLElement){
+    constructor(params:HTMLElement|object){
+        super(params);
         let rootDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom,el);
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
         rootDom.tagName = 'div';
         this.extraDataName = '$ui_tip_manager';
+        
         rootDom.setProp('name',this.extraDataName);
         
         //绑定model
@@ -73,8 +90,6 @@ class UITip extends nodom.Plugin{
             ct.add(this.createTipDom(loc));
             rootDom.add(ct);
         }
-        rootDom.plugin = this;
-        return rootDom;
     }
 
     /**
@@ -84,7 +99,7 @@ class UITip extends nodom.Plugin{
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
-        if(!this.modelId){
+        if(this.needPreRender){
             let model:nodom.Model = module.model;
             //构建tip数据模型
             if(!model.get(this.extraDataName)){

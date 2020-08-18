@@ -16,6 +16,45 @@ class UITool {
         }
     }
     /**
+     * 调整移动块位置
+     * @param module        模块
+     * @param key           待调整dom key
+     * @param x             目标x
+     * @param y             目标y
+     * @param distance      偏移量
+     * @param bodyHeight    当前document 高度
+     * @param changeSize    是否修改框size
+     */
+    static adjustPosAndSize(module, key, x, y, distance, bodyHeight, changeSize) {
+        let el = module.container.querySelector("[key='" + key + "']");
+        //el可能还未出现，延迟处理
+        if (!el) {
+            setTimeout(() => {
+                UITool.adjustPosAndSize(module, key, x, y, distance, document.body.scrollHeight, changeSize);
+            }, 0);
+        }
+        else {
+            let scTop = document.documentElement.scrollTop || document.body.scrollTop;
+            y += scTop;
+            let height = bodyHeight > window.innerHeight ? bodyHeight : window.innerHeight;
+            //设置最大高度
+            if (changeSize) {
+                el.style.maxHeight = (window.innerHeight - 50) + 'px';
+            }
+            if (y + el.offsetHeight > height) {
+                if (y < el.offsetHeight + distance) { //上方不够放
+                    el.style.transform = 'translate(0,' + -(y + el.offsetHeight - height) + 'px)';
+                }
+                else {
+                    el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)';
+                }
+            }
+            else {
+                el.style.transform = 'translate(0,0)';
+            }
+        }
+    }
+    /**
      * 处理ui参数
      * @param dom           待处理dom
      * @param defDom        自定义dom对象

@@ -26,26 +26,39 @@
  *  labelwidth  label宽度，默认100，auto设置时有效
  */
 class UIGrid extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-GRID';
         /**
          * 字段对象数组，{title:标题,field:字段,expressions:表达式}
          */
         this.fields = [];
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead'], ['rows', null, null, '', null, null, null]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            rootDom.tagName = 'div';
+            rootDom = this.generate(rootDom);
+        }
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
-        let grid = new nodom.Element('div');
-        nodom.Compiler.handleAttributes(grid, el);
-        nodom.Compiler.handleChildren(grid, el);
-        grid.addClass('nd-grid');
-        // rowalt sortable gridline='both' sizeName='pageSize'
-        UITool.handleUIParam(grid, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead'], ['rows', null, null, '', null, null, null]);
+    generate(rootDom) {
+        rootDom.addClass('nd-grid');
         if (this.fixHead) {
-            grid.addClass('nd-grid-fixed');
+            rootDom.addClass('nd-grid-fixed');
         }
         //头部，如果隐藏则不显示
         let thead;
@@ -66,7 +79,7 @@ class UIGrid extends nodom.Plugin {
         //分页dom
         let pagination;
         //第一个tr
-        for (let c of grid.children) {
+        for (let c of rootDom.children) {
             if (c.tagName === 'COLS') {
                 rowDom = c;
             }
@@ -150,21 +163,20 @@ class UIGrid extends nodom.Plugin {
             tbody.add(rowDom);
         }
         if (thead) {
-            grid.children = [thead, tbody];
+            rootDom.children = [thead, tbody];
         }
         else {
-            grid.children = [tbody];
+            rootDom.children = [tbody];
         }
-        grid.plugin = this;
         //如果有分页，则需要在外添加容器
         if (pagination) {
             let parentDom = new nodom.Element('div');
-            parentDom.children = [grid, pagination];
+            parentDom.children = [rootDom, pagination];
             pagination.addClass('nd-grid-pager');
             this.handlePagination(pagination);
             return parentDom;
         }
-        return grid;
+        return rootDom;
     }
     /**
      * 添加到头部
@@ -340,7 +352,10 @@ class UIGrid extends nodom.Plugin {
             return;
         }
         let arr = ['orderby', f['field'], asc];
-        if (directive.filters.length === 1) {
+        if (!directive.filters) {
+            directive.filters = [];
+        }
+        if (directive.filters.length <= 1) {
             directive.filters.push(new nodom.Filter(arr));
         }
         else {
@@ -356,9 +371,8 @@ class UIGrid extends nodom.Plugin {
      */
     beforeRender(module, uidom) {
         let me = this;
-        this.modelId = uidom.modelId;
-        if (!this.initFlag) {
-            this.initFlag = true;
+        super.beforeRender(module, uidom);
+        if (this.needPreRender) {
             //增加过滤器方法
             if (this.selectPageMethodId) {
                 module.methodFactory.add(this.selectPageMethodId, (arr) => {

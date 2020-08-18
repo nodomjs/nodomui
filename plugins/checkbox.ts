@@ -4,36 +4,74 @@
  */
 class UICheckbox extends nodom.Plugin{
     tagName:string = 'UI-CHECKBOX';
-    init(el:HTMLElement):nodom.Element{
-        let checkDom:nodom.Element = new nodom.Element('span');
-        nodom.Compiler.handleAttributes(checkDom,el);
-        nodom.Compiler.handleChildren(checkDom,el);
-        checkDom.addClass('nd-combo');
 
-        let dataName:string = checkDom.getProp('field');
-        let yesValue:string = checkDom.getProp('yes-value');
-        let noValue:string = checkDom.getProp('no-value');
+    /**
+     * 数据项字段名
+     */
+    dataName:string;
+
+    /**
+     * checkbox 选中值
+     */
+    yesValue:string;
+
+    /**
+     * checkbox 未选中值
+     */
+    noValue:string;
+
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['yesvalue','novalue'],
+                    ['yesValue','noValue'],
+                    ['true','false']
+                );
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'span';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
+        const me = this;
+        let field = rootDom.getDirective('field');
+        if(field){
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
         
-        checkDom.delProp(['field','yes-value','no-value']);
-
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + dataName + "==\""+ yesValue +"\"'}",icon));
-        checkDom.children.unshift(icon);
+        icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.dataName + "==\""+ this.yesValue +"\"'}",icon));
+        rootDom.children.unshift(icon);
 
         //点击事件
-        checkDom.addEvent(new nodom.NodomEvent('click',
+        rootDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                let v = model.data[dataName];
-                if(v == yesValue){
-                    model.set(dataName,noValue);
+                let v = model.data[me.dataName];
+                if(v == me.yesValue){
+                    model.set(me.dataName,me.noValue);
                 }else{
-                    model.set(dataName,yesValue);
+                    model.set(me.dataName,me.yesValue);
                 }
             }
         ));
-        checkDom.plugin = this;
-        return checkDom;
     }
 }
 

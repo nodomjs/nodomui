@@ -5,17 +5,23 @@
  */
 class UIToolbar extends nodom.Plugin{
     tagName:string = 'UI-TOOLBAR';
-    /**
-     * 编译后执行代码
-     */
-    init(el:HTMLElement):nodom.Element{
-        let oe:nodom.Element = new nodom.Element();
-        oe.tagName = 'DIV';
-        nodom.Compiler.handleAttributes(oe,el);
-        nodom.Compiler.handleChildren(oe,el);
-        oe.addClass('nd-toolbar');
-        oe.plugin=this;
-        return oe;
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+        }
+        rootDom.tagName = 'div';
+        rootDom.addClass('nd-toolbar');
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
 }
 

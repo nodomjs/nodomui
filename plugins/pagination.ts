@@ -63,11 +63,6 @@ class UIPagination extends nodom.Plugin{
     steps:number;
 
     /**
-     * 初始化标志
-     */
-    initFlag:boolean;
-
-    /**
      * 显示的最小页号
      */
     minPage:number=1;
@@ -76,10 +71,6 @@ class UIPagination extends nodom.Plugin{
      * 显示的最大页号
      */
     maxPage:number=1;
-    /**
-     * 模型id
-     */
-    modelId:number;
 
     /**
      * 附加数据模型id
@@ -94,23 +85,39 @@ class UIPagination extends nodom.Plugin{
      * 请求参数名 [页号,页面大小] 默认为[]
      */
     requestName:string[];
-    /**
-     * 编译后执行代码
-     */
-    init(el:HTMLElement):nodom.Element{
-        let me = this;
+    constructor(params:HTMLElement|object){
+        super(params);
         let rootDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom,el);
-        nodom.Compiler.handleChildren(rootDom,el);
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange','requestname|array|2'],
+                    ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange','requestName'],
+                    ['total',10,1,null,null,10,[],5,'',[]]);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
         rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
-        UITool.handleUIParam(rootDom,this,
-            ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange','requestname|array|2'],
-            ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange','requestName'],
-            ['total',10,1,null,null,10,[],5,'',[]]);
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
+        let me = this;
+        
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
-        this.extraDataName = '$ui_pagination_' + nodom.Util.genId(); 
+        this.extraDataName = '$ui_pagination_' + nodom.Util.genId();
         
         //增加附加数据模型
         rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
@@ -141,18 +148,13 @@ class UIPagination extends nodom.Plugin{
                     text:d + NUITipWords.record + '/' + NUITipWords.page
                 });
             }
-            
             this.pageSizeDatas = datas;
-            let sizeDom:nodom.Element = new nodom.Element('select');
-            sizeDom.addDirective(new nodom.Directive('field','pageSize',sizeDom));
-            let optDom:nodom.Element = new nodom.Element('option');
-            optDom.addDirective(new nodom.Directive('repeat','sizeData',optDom));
-            optDom.setProp('value',new nodom.Expression('value'),true);
-            let txt:nodom.Element = new nodom.Element();
-            txt.expressions = [new nodom.Expression('text')];
-            optDom.add(txt);
-            sizeDom.add(optDom);
-            rootDom.add(sizeDom);
+            rootDom.add(new UISelect({
+                dataName:'pageSize',
+                listField:'sizeData',
+                displayField:'text',
+                valueField:'value'
+            }).element);
         }
 
         //分页内容
@@ -258,6 +260,7 @@ class UIPagination extends nodom.Plugin{
      * @param uidom 
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
+        super.beforeRender(module,uidom);
         this.handleInit(uidom,module);
     }
     
@@ -374,7 +377,7 @@ class UIPagination extends nodom.Plugin{
         }
 
         //参数未改变，则不渲染
-        if(this.initFlag && current === this.currentPage && min === this.minPage && max === this.maxPage){
+        if(this.needPreRender && current === this.currentPage && min === this.minPage && max === this.maxPage){
             return;
         }
         
@@ -404,13 +407,12 @@ class UIPagination extends nodom.Plugin{
      */
     handleInit(dom:nodom.Element,module:nodom.Module){
         let me = this;
-        if(this.initFlag){
+        if(!this.needPreRender){
             return;
         }
         
         let model:nodom.Model = module.modelFactory.get(dom.modelId);
-        this.modelId = model.id;
-
+        
         let model1:nodom.Model = model.set(this.extraDataName,{
             //总条数
             total:0,
@@ -441,7 +443,6 @@ class UIPagination extends nodom.Plugin{
         model1.watch('pageSize',watchFunc);
         model1.watch('pageNo',watchFunc);
         this.update(module,1);
-        this.initFlag = true;
     }
 }
 

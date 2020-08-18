@@ -3,21 +3,33 @@
  * panel 插件
  */
 class UITree extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-TREE';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield', 'itemclick', 'checkname', 'maxlevel|number', 'icons|array|2'], ['valueField', 'displayField', 'listField', 'clickEvent', 'checkName', 'maxLevel', 'iconArr'], ['', null, null, '', '', 3, []]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
+    generate(rootDom) {
         const me = this;
-        let rootDom = new nodom.Element();
-        //增加暂存数据
-        nodom.Compiler.handleAttributes(rootDom, el);
-        UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield', 'itemclick', 'checkname', 'maxlevel|number', 'icons|array|2'], ['valueName', 'displayName', 'listName', 'clickEvent', 'checkName', 'maxLevel', 'iconArr'], ['', null, null, '', '', 3, []]);
         rootDom.addClass('nd-tree');
-        rootDom.tagName = 'div';
         this.activeName = '$ui_tree_' + nodom.Util.genId();
         this.checkedChdNumName = '$ui_tree_' + nodom.Util.genId();
         //展开收拢事件
@@ -34,7 +46,7 @@ class UITree extends nodom.Plugin {
         for (let i = 0; i < this.maxLevel; i++) {
             let itemCt = new nodom.Element();
             itemCt.tagName = 'div';
-            itemCt.directives.push(new nodom.Directive('repeat', this.listName, itemCt));
+            itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
             itemCt.addClass('nd-tree-nodect');
             item = new nodom.Element();
             item.addClass('nd-tree-node');
@@ -49,17 +61,17 @@ class UITree extends nodom.Plugin {
             icon1.tagName = 'SPAN';
             icon1.addClass('nd-tree-icon');
             icon1.addDirective(new nodom.Directive('class', "{'nd-tree-node-open':'" + this.activeName + "'," +
-                "'nd-icon-right':'" + this.listName + "&&" + this.listName + ".length>0'}", icon1));
+                "'nd-icon-right':'" + this.listField + "&&" + this.listField + ".length>0'}", icon1));
             //绑定展开收起事件
             icon1.addEvent(closeOpenEvent);
             itemCt.add(icon1);
             //folder和叶子节点图标
             if (this.iconArr.length > 0) {
                 let a = [];
-                a.push("'nd-icon-" + this.iconArr[0] + "':'" + this.listName + "&&" + this.listName + ".length>0'");
+                a.push("'nd-icon-" + this.iconArr[0] + "':'" + this.listField + "&&" + this.listField + ".length>0'");
                 //叶子节点图标
                 if (this.iconArr.length > 1) {
-                    a.push("'nd-icon-" + this.iconArr[1] + "':'!" + this.listName + "||" + this.listName + ".length===0'");
+                    a.push("'nd-icon-" + this.iconArr[1] + "':'!" + this.listField + "||" + this.listField + ".length===0'");
                 }
                 let icon = new nodom.Element();
                 icon.tagName = 'SPAN';
@@ -80,7 +92,7 @@ class UITree extends nodom.Plugin {
             itemCt.add(item);
             //显示文本
             let txt = new nodom.Element();
-            txt.expressions = [new nodom.Expression(this.displayName)];
+            txt.expressions = [new nodom.Expression(this.displayField)];
             item.add(txt);
             //子节点容器
             let subCt = new nodom.Element();
@@ -105,7 +117,7 @@ class UITree extends nodom.Plugin {
             //展开收拢事件
             module.methodFactory.add(me.arrowClickId, (dom, model, module, e) => {
                 let pmodel = module.modelFactory.get(dom.modelId);
-                let rows = pmodel.data[me.listName];
+                let rows = pmodel.data[me.listField];
                 //叶子节点不处理
                 if (!rows || rows.length === 0) {
                     return;
@@ -134,7 +146,7 @@ class UITree extends nodom.Plugin {
     * @param checked    值
     */
     handleSubCheck(model, module, checked) {
-        let rows = model.data[this.listName];
+        let rows = model.data[this.listField];
         if (!rows) {
             return;
         }
@@ -194,13 +206,13 @@ class UITree extends nodom.Plugin {
      * 获取value
      */
     getValue() {
-        if (this.valueName === '') {
+        if (this.valueField === '') {
             return;
         }
         let va = [];
         let module = nodom.ModuleFactory.get(this.moduleId);
         let model = module.modelFactory.get(this.modelId);
-        getChecked(model.data[this.listName]);
+        getChecked(model.data[this.listField]);
         return va;
         function getChecked(rows) {
             if (Array.isArray(rows)) {
@@ -208,7 +220,7 @@ class UITree extends nodom.Plugin {
                     if (d[this.checkName] === true) {
                         va.push(d);
                     }
-                    getChecked(d[this.listName]);
+                    getChecked(d[this.listField]);
                 }
             }
         }

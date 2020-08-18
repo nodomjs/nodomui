@@ -3,35 +3,52 @@
  * checkbox
  */
 class UICheckbox extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-CHECKBOX';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['yesvalue', 'novalue'], ['yesValue', 'noValue'], ['true', 'false']);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'span';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
-    init(el) {
-        let checkDom = new nodom.Element('span');
-        nodom.Compiler.handleAttributes(checkDom, el);
-        nodom.Compiler.handleChildren(checkDom, el);
-        checkDom.addClass('nd-combo');
-        let dataName = checkDom.getProp('field');
-        let yesValue = checkDom.getProp('yes-value');
-        let noValue = checkDom.getProp('no-value');
-        checkDom.delProp(['field', 'yes-value', 'no-value']);
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
+        const me = this;
+        let field = rootDom.getDirective('field');
+        if (field) {
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
         let icon = new nodom.Element('b');
         icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + dataName + "==\"" + yesValue + "\"'}", icon));
-        checkDom.children.unshift(icon);
+        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.dataName + "==\"" + this.yesValue + "\"'}", icon));
+        rootDom.children.unshift(icon);
         //点击事件
-        checkDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            let v = model.data[dataName];
-            if (v == yesValue) {
-                model.set(dataName, noValue);
+        rootDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+            let v = model.data[me.dataName];
+            if (v == me.yesValue) {
+                model.set(me.dataName, me.noValue);
             }
             else {
-                model.set(dataName, yesValue);
+                model.set(me.dataName, me.yesValue);
             }
         }));
-        checkDom.plugin = this;
-        return checkDom;
     }
 }
 nodom.PluginManager.add('UI-CHECKBOX', UICheckbox);

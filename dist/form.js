@@ -3,16 +3,32 @@
  * form 插件
  */
 class UIForm extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-FORM';
-    }
-    init(el) {
         let rootDom = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom, el);
-        nodom.Compiler.handleChildren(rootDom, el);
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['labelwidth|number'], ['labelWidth'], [100]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
         rootDom.tagName = 'form';
-        UITool.handleUIParam(rootDom, this, ['labelwidth|number'], ['labelWidth'], [100]);
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
         rootDom.addClass('nd-form');
         for (let c of rootDom.children) {
             if (!c.tagName) {
@@ -29,8 +45,6 @@ class UIForm extends nodom.Plugin {
                 }
             }
         }
-        rootDom.plugin = this;
-        return rootDom;
     }
 }
 nodom.PluginManager.add('UI-FORM', UIForm);

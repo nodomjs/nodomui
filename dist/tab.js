@@ -3,24 +3,40 @@
  * panel 插件
  */
 class UITab extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-TAB';
         /**
          * tab对象 [{title:tab1,name:tab1,active:true},...] 用于激活显示tab
          */
         this.tabs = [];
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField', 'height|number'], ['position', 'allowClose', 'listField', 'bodyHeight'], ['top', null, '', 0]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
-    init(el) {
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
         let me = this;
         //生成id
         this.extraDataName = '$ui_tab_' + nodom.Util.genId();
-        let rootDom = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom, el);
-        nodom.Compiler.handleChildren(rootDom, el);
         this.name = rootDom.getProp('name');
-        rootDom.tagName = 'div';
-        UITool.handleUIParam(rootDom, this, ['position', 'allowclose|bool', 'listField', 'height|number'], ['position', 'allowClose', 'listName', 'bodyHeight'], ['top', null, '', 0]);
         rootDom.addClass('nd-tab');
         if (this.position === 'left' || this.position === 'right') {
             rootDom.addClass('nd-tab-horizontal');
@@ -94,8 +110,6 @@ class UITab extends nodom.Plugin {
         else {
             rootDom.children = [bodyDom, headDom];
         }
-        rootDom.plugin = this;
-        return rootDom;
     }
     /**
      * 后置渲染
@@ -108,8 +122,6 @@ class UITab extends nodom.Plugin {
         let pmodel;
         //附加数据model
         if (this.needPreRender) {
-            this.moduleId = module.id;
-            this.modelId = dom.modelId;
             pmodel = module.modelFactory.get(this.modelId);
             let data = {
                 datas: this.tabs

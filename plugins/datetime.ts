@@ -13,7 +13,7 @@ class UIDatetime extends nodom.Plugin{
     minute:number;
     second:number;
 
-    fieldName:string;
+    dataName:string;
     /**
      * 类型 date time datetime
      */
@@ -26,53 +26,71 @@ class UIDatetime extends nodom.Plugin{
      * 附加数据项名
      */
     extraDataName:string;
-    /**
-     * modelId
-     */
-    modelId:number;
-
+    
     /**
      * 日期选择器modelId
      */
     pickerModelId:number;
-    /**初始化标志 */
-    initFlag:boolean;
 
     /**
-     * 编译后执行代码
+     * 下拉框key
      */
-    init(el:HTMLElement):nodom.Element{
-        let me = this;
-        let rootDom:nodom.Element = new nodom.Element('div');
-        nodom.Compiler.handleAttributes(rootDom,el);
-        nodom.Compiler.handleChildren(rootDom,el);
-        rootDom.addClass('nd-datetime');
+    listKey:string;
+    
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['type'],
+                    ['type'],
+                    ['date']);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
-        UITool.handleUIParam(rootDom,this,
-            ['type'],
-            ['type'],
-            ['date']);
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
+        let me = this;
+        rootDom.addClass('nd-datetime');
 
         let fieldDom:nodom.Element = new nodom.Element('div');
         fieldDom.addClass('nd-datetime-field');
         let dateIco:nodom.Element = new nodom.Element('b');
         dateIco.addClass(this.type==='time'?'nd-datetime-time':'nd-datetime-date');
-        let input:nodom.Element = new nodom.Element('input');
+        
         let directive:nodom.Directive = rootDom.getDirective('field');
-        input.addDirective(directive);
-        input.setProp('value',new nodom.Expression(directive.value),true);
-        this.fieldName = directive.value;
-        rootDom.removeDirectives(['field']);
+        if(directive){
+            this.dataName = directive.value;
+            rootDom.removeDirectives(['field']);
+        }
+        //给input增加field指令和value 表达式
+        let input:nodom.Element = new nodom.Element('input');
+        if(this.dataName){
+            input.addDirective(new nodom.Directive('field',this.dataName,input));
+            input.setProp('value',new nodom.Expression(this.dataName),true);
+        }
+        
         fieldDom.add(input);
         fieldDom.add(dateIco);
         //点击事件
         fieldDom.addEvent(new nodom.NodomEvent('click',(dom,model,module,e,el)=>{
-            me.showPicker(dom,model,module,el);
+            me.showPicker(dom,model,module,e,el);
         }));
-
-        // input.addEvent(new nodom.NodomEvent('focus',(dom,model,module,e,el)=>{
-        //     me.showPicker(dom,model,module,el);
-        // }));
 
         this.extraDataName = '$ui_datetime_' + nodom.Util.genId();
 
@@ -131,13 +149,11 @@ class UIDatetime extends nodom.Plugin{
             e.preventDefault();
             model.set('show',false);
             let pmodel:nodom.Model = module.modelFactory.get(me.modelId);
-            pmodel.set(this.fieldName,me.genValueStr());
+            pmodel.set(this.dataName,me.genValueStr());
         }));
         
         pickerDom.add(btnCt);
         rootDom.children = [fieldDom,pickerDom];
-        rootDom.plugin=this;
-        return rootDom;
     }
 
     
@@ -148,12 +164,11 @@ class UIDatetime extends nodom.Plugin{
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         let me = this;
-        this.modelId = uidom.modelId;
+        super.beforeRender(module,uidom);
+        this.listKey = uidom.children[1].key;
         let model:nodom.Model = module.modelFactory.get(uidom.modelId);
         
-        if(!this.initFlag){
-            this.initFlag = true;
-            this.key = uidom.key;
+        if(this.needPreRender){
             //设置附加数据项
             model.set(this.extraDataName,{
                 show:false,
@@ -491,7 +506,7 @@ class UIDatetime extends nodom.Plugin{
                         this.setTimeSelect(module);
                     }
                 }else{ //日期格式不对，则直接设置插件当前日期时间值
-                    model.set(this.fieldName,this.genValueStr());
+                    model.set(this.dataName,this.genValueStr());
                 }
             }else if(this.type === 'time'){
                 if(/^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(str)){
@@ -569,7 +584,7 @@ class UIDatetime extends nodom.Plugin{
      * @param module    模块
      * @param el        当前el
      */
-    showPicker(dom,model,module,el){
+    showPicker(dom,model,module,e,el){
         let data = model.query(this.extraDataName);
         if(data){
             if(data.show){
@@ -579,8 +594,11 @@ class UIDatetime extends nodom.Plugin{
         }
         //父dom
         let pDom:nodom.Element = dom.tagName === 'input'?dom.getParent(module):dom;
-        this.setValue(module,model.query(this.fieldName));
-        pDom.children[0].assets.set('style','left:0px;' + 'top:' + (el.offsetHeight+3) + 'px');
+        this.setValue(module,model.query(this.dataName));
+        model.set('show',true);
+        let height = el.offsetHeight;
+        let y = e.clientY + el.offsetHeight - e.offsetY;
+        UITool.adjustPosAndSize(module,this.listKey,e.clientX,y,height,null,false);
     }
 
     /**
@@ -605,7 +623,7 @@ class UIDatetime extends nodom.Plugin{
         setTimeout(scroll,0);
         
         function scroll(){
-            let uidom:nodom.Element = module.renderTree.query(me.key);
+            let uidom:nodom.Element = me.element;
             let timeCt:nodom.Element;
             //尚未打开picker
             if(uidom.children.length === 1){

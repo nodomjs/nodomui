@@ -63,9 +63,9 @@
     .nd-select-list{
         display:block;
         @extend .nd-box-default;
-        
+        text-align: left;
         position:absolute;
-        max-height:300px;
+        max-height:500px;
         margin-top:$nd-dropdown-margin;
         overflow:auto;
         z-index:$nd-combo-index;
@@ -176,7 +176,7 @@
         height:100px;
         overflow:hidden;
         box-sizing: border-box;
-        @include nd-color(6);
+        @include nd-color(2);
         padding:0;
         position:relative;
             
@@ -199,7 +199,7 @@
             line-height:100px;    
             /*加号按钮*/
             .nd-file-add{
-                @extend .nd-icon-add-select;
+                @extend .nd-icon-add;
                 font-size:30pt;
             }
         }

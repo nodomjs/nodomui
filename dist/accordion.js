@@ -3,18 +3,52 @@
  * panel 插件
  */
 class UIAccordion extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-ACCORDION';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    //处理孩子节点
+                    if (o === 'children') {
+                        if (Array.isArray(params[o])) {
+                            for (let c of params[o]) {
+                                if (typeof c !== 'object') {
+                                    continue;
+                                }
+                                let d = new nodom.Element(c.tagName || 'div');
+                                for (let p in c) {
+                                    if (p === 'tagName') {
+                                        continue;
+                                    }
+                                    d.setProp(p, c[p]);
+                                }
+                                rootDom.add(d);
+                            }
+                        }
+                    }
+                    else {
+                        this[o] = params[o];
+                    }
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
-        let ct = new nodom.Element('div');
-        nodom.Compiler.handleAttributes(ct, el);
-        nodom.Compiler.handleChildren(ct, el);
-        ct.addClass('nd-accordion');
+    generate(rootDom) {
+        rootDom.addClass('nd-accordion');
         let firstDom = new nodom.Element();
         let secondDom = new nodom.Element();
         firstDom.tagName = 'DIV';
@@ -24,8 +58,8 @@ class UIAccordion extends nodom.Plugin {
         let activeName1;
         //第二级active field name
         let activeName2;
-        for (let i = 0; i < ct.children.length; i++) {
-            let item = ct.children[i];
+        for (let i = 0; i < rootDom.children.length; i++) {
+            let item = rootDom.children[i];
             if (!item.tagName) {
                 continue;
             }
@@ -87,46 +121,48 @@ class UIAccordion extends nodom.Plugin {
             return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
         });
         firstDom.add(secondDom);
-        ct.children = [firstDom];
-        ct.plugin = this;
-        return ct;
+        rootDom.children = [firstDom];
     }
     /**
      * 渲染前执行
      * @param module
+     * @param uidom
      */
     beforeRender(module, uidom) {
-        let me = this;
+        const me = this;
+        super.beforeRender(module, uidom);
         //添加第一层click事件
-        module.methodFactory.add(this.method1, (dom, model, module, e) => {
-            let pmodel = module.modelFactory.get(uidom.modelId);
-            let data = pmodel.data[me.field1];
-            //选中字段名
-            let f = me.active1;
-            //取消之前选中
-            for (let d of data) {
-                if (d[f] === true) {
-                    d[f] = false;
-                }
-            }
-            model.set(f, true);
-        });
-        //添加第二层click事件
-        module.methodFactory.add(this.method2, (dom, model, module, e) => {
-            let pmodel = module.modelFactory.get(uidom.modelId);
-            let data = pmodel.data[me.field1];
-            //选中字段名
-            let f = me.active2;
-            //取消之前选中
-            for (let d of data) {
-                for (let d1 of d[me.field2]) {
-                    if (d1[f] === true) {
-                        d1[f] = false;
+        if (this.needPreRender) {
+            module.methodFactory.add(this.method1, (dom, model, module, e) => {
+                let pmodel = module.modelFactory.get(uidom.modelId);
+                let data = pmodel.data[me.field1];
+                //选中字段名
+                let f = me.active1;
+                //取消之前选中
+                for (let d of data) {
+                    if (d[f] === true) {
+                        d[f] = false;
                     }
                 }
-            }
-            model.set(f, true);
-        });
+                model.set(f, true);
+            });
+            //添加第二层click事件
+            module.methodFactory.add(this.method2, (dom, model, module, e) => {
+                let pmodel = module.modelFactory.get(uidom.modelId);
+                let data = pmodel.data[me.field1];
+                //选中字段名
+                let f = me.active2;
+                //取消之前选中
+                for (let d of data) {
+                    for (let d1 of d[me.field2]) {
+                        if (d1[f] === true) {
+                            d1[f] = false;
+                        }
+                    }
+                }
+                model.set(f, true);
+            });
+        }
     }
 }
 nodom.PluginManager.add('UI-ACCORDION', UIAccordion);

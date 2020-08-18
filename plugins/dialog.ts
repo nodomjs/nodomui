@@ -2,46 +2,56 @@
 /**
  * panel 插件
  */
-class UIDialog extends UIPanel{
+class UIDialog extends nodom.Plugin{
     tagName:string = 'UI-DIALOG';
 
     /**
      * 数据项名
      */
     dataName:string;
-    /**
-     * 模块id
-     */
-    moduleId:number;
-
-    /**
-     * 模型Id
-     */
-    modelId:number;
     
     /**
      * 自动打开
      */
     autoOpen:boolean;
-    /**
-     * 编译后执行代码
-     */
-    init(el:HTMLElement):nodom.Element{
-        el.setAttribute('buttons','close');
-        let panelDom:nodom.Element = super.init(el);
-        //删除 panelDom的plugin
-        delete panelDom.plugin;
 
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                params.setAttribute('buttons','close');
+            }
+            let panel:UIPanel = new UIPanel(params);
+            this.generate(rootDom,panel);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element,panel:UIPanel){
+        const me = this;
         this.dataName = '$ui_dialog_' + nodom.Util.genId();
-        let dialogDom:nodom.Element = new nodom.Element('div');
-        dialogDom.addClass('nd-dialog');
-        dialogDom.setProp('name',panelDom.getProp('name'));
+        rootDom.addClass('nd-dialog');
+        
+        let panelDom = panel.element;
+        //删除panel plugin
+        // delete panelDom.plugin;
+        //获取插件名
+        rootDom.setProp('name',panelDom.getProp('name'));
         //autoopen
         this.autoOpen = panelDom.hasProp('autoopen');
-        
         panelDom.delProp(['name','autoopen']);
+        panel.setCloseHandler(()=>{
+            me.close();
+        });
         
-        dialogDom.addDirective(new nodom.Directive('show',this.dataName,dialogDom));
+        rootDom.addDirective(new nodom.Directive('show',this.dataName,rootDom));
 
         //body
         let dialogBody:nodom.Element = new nodom.Element('div');
@@ -51,10 +61,8 @@ class UIDialog extends UIPanel{
         //蒙版
         let coverDom:nodom.Element = new nodom.Element('div');
         coverDom.addClass('nd-dialog-cover');
-        dialogDom.add(coverDom);
-        dialogDom.add(dialogBody);
-        dialogDom.plugin=this;
-        return dialogDom;
+        rootDom.add(coverDom);
+        rootDom.add(dialogBody);
     }
 
     /**
@@ -65,8 +73,6 @@ class UIDialog extends UIPanel{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         if(this.needPreRender){
-            this.modelId = dom.modelId;
-            this.moduleId = module.id;
             if(this.autoOpen){
                 this.open();
             }
@@ -95,7 +101,6 @@ class UIDialog extends UIPanel{
             let model:nodom.Model = module.modelFactory.get(this.modelId);
             if(model){
                 model.set(this.dataName,true);
-                console.log(model.data);
             }
         }
         
@@ -111,7 +116,6 @@ class UIDialog extends UIPanel{
             let model:nodom.Model = module.modelFactory.get(this.modelId);
             if(model){
                 model.set(this.dataName,false);
-                console.log(model.data);
             }
         }
     }

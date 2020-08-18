@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     
     <script src='js/nodom.js'></script>
+    <script src='../dist/uibase.js'></script>
     <script src='../dist/button.js'></script>
     <style>
         
@@ -16,29 +17,18 @@
 <body>
     <div class='btnct'>
         
-        <ui-button small>无图小</ui-button>
-        <ui-button normal>无图中</ui-button>
-        <ui-button big>无图大</ui-button>
-
-        <ui-button small icon='close'></ui-button>
-        <ui-button normal icon='close'></ui-button>
-        <ui-button big icon='close'></ui-button>
-
-        <ui-button small icon='close'>小图标</ui-button>
-        <ui-button normal icon='close'>中图标</ui-button>
-        <ui-button big icon='close' success>大图标</ui-button>
-
-        <ui-button small top icon='close'>小图标</ui-button>
-        <ui-button normal top icon='close'>中图标</ui-button>
-        <ui-button big top icon='close' error>大图标</ui-button>
-
-        <ui-button small right icon='checked'>小图标</ui-button>
-        <ui-button normal right icon='uncheck'>中图标</ui-button>
-        <ui-button big right icon='data' active>大图标</ui-button>
-
-        <ui-button small bottom icon='home'>小图标</ui-button>
-        <ui-button normal bottom icon='home'>中图标</ui-button>
-        <ui-button big bottom warn icon='account' >大图标</ui-button>
+        <ui-button size='small'>无图小</ui-button>
+        <ui-button size='normal'>无图中</ui-button>
+        <ui-button size='big'>无图大</ui-button>
+        <br>
+        <ui-button size='normal' icon='close' theme='active'></ui-button>
+        <ui-button size='normal' icon='checked' theme='error'>小图标</ui-button>
+        <ui-button size='normal' iconPos='top' theme='success' icon='close'>图标</ui-button>
+        
+        <ui-button size='normal' iconPos='right' icon='ashbin' theme='error'>小图标</ui-button>
+        
+        <ui-button size='normal' iconPos='bottom' icon='prompt' theme='warn'>小图标</ui-button>
+        <ui-button size='normal' iconPos='left' icon='prompt' theme='warn' nobg>小图标</ui-button>
         
     </div>
 </body>

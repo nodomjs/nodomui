@@ -8,11 +8,7 @@ class UIFile extends nodom.Plugin{
     /**
      * 绑定字段名
      */
-    fieldName:string;
-
-    /**
-     * 
-     */
+    dataName:string;
 
     /**
      * 多选方式
@@ -76,29 +72,52 @@ class UIFile extends nodom.Plugin{
      */
     fileName:string;
 
-    /**
-     * 初始化标志
-     */
-    initFlag:boolean;
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['valuefield','displayfield','multiple|bool','type','maxcount','uploadmethod','delmethod'],
+                    ['valueField','displayField','multiple','fileType','maxCount','uploadMethod','delMethod'],
+                    [null,null,null,'',1,null,null]);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'span';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
-    init(el:HTMLElement):nodom.Element{
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    private generate(rootDom:nodom.Element){
         let me = this;
-        let fileDom:nodom.Element = new nodom.Element('span');
-        nodom.Compiler.handleAttributes(fileDom,el);
-        UITool.handleUIParam(fileDom,this,
-            ['field','valuefield','displayfield','multiple','type','maxcount','uploadmethod','delmethod'],
-            ['fieldName','valueField','displayField','multiple','fileType','maxCount','uploadMethod','delMethod'],
-            [null,null,null,null,'','',1,null,null]);
         
-        fileDom.tagName = 'div';
-        fileDom.addClass('nd-file');
+        rootDom.addClass('nd-file');
+
+        let field = rootDom.getDirective('field');
+        if(field){
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
+
         if(this.multiple === ''){
             this.maxCount = 1;
         }
+
+
         //生成filestate name
-        this.stateName = '$uploadstate_' + this.fieldName;
-        this.uploadingName = '$uploading_' + this.fieldName;
-        this.fileName = '$file_' + this.fieldName;
+        this.stateName = '$uploadstate_' + this.dataName;
+        this.uploadingName = '$uploading_' + this.dataName;
+        this.fileName = '$file_' + this.dataName;
 
         //生成result name
         this.resultName = '$ui_file_' + nodom.Util.genId();
@@ -106,7 +125,7 @@ class UIFile extends nodom.Plugin{
         //文件显示container
         let ctDom:nodom.Element = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
-        ctDom.addDirective(new nodom.Directive('repeat',this.fieldName,ctDom));
+        ctDom.addDirective(new nodom.Directive('repeat',this.dataName,ctDom));
         
         //显示框
         let showDom:nodom.Element = new nodom.Element('a');
@@ -139,7 +158,7 @@ class UIFile extends nodom.Plugin{
         let uploadDom:nodom.Element = new nodom.Element('div');
         uploadDom.addClass('nd-file-uploadct');
         //当文件数量==maxcount时不再显示
-        uploadDom.addDirective(new nodom.Directive('show',this.fieldName + '.length<' + this.maxCount,uploadDom));
+        uploadDom.addDirective(new nodom.Directive('show',this.dataName + '.length<' + this.maxCount,uploadDom));
         
         //文件
         let fDom:nodom.Element = new nodom.Element('input');
@@ -154,7 +173,7 @@ class UIFile extends nodom.Plugin{
             (dom:nodom.Element,model:nodom.Model,module:nodom.Module,e,el)=>{
                 let foo = module.methodFactory.get(me.uploadMethod);
                 //已有数据条数
-                let fieldData = model.data[this.fieldName];
+                let fieldData = model.data[this.dataName];
                 let rowLen = fieldData?fieldData.length:0;
                 rowLen = this.maxCount - rowLen;
 
@@ -192,14 +211,14 @@ class UIFile extends nodom.Plugin{
         
         uploadDom.add(fDom);
 
-        fileDom.children = [ctDom,uploadDom];
-        fileDom.plugin = this;
-        return fileDom;
+        rootDom.children = [ctDom,uploadDom];
+        rootDom.plugin = this;
+        return rootDom;
     }
 
     beforeRender(module:nodom.Module,dom:nodom.Element){
-        if(!this.initFlag){
-            this.initFlag = true;
+        super.beforeRender(module,dom);
+        if(this.needPreRender){
             let model = module.modelFactory.get(dom.modelId);
             if(model){
                 model.set(this.stateName,0);

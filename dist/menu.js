@@ -2,7 +2,7 @@
 /**
  * panel 插件
  * 配置
- *  listName:   菜单数组数据项名，如rows，各级菜单的必须保持一致
+ *  listField:   菜单数组数据项名，如rows，各级菜单的必须保持一致
  *  popup:      是否为popup菜单，不设置值
  *  maxLevels:  菜单最大级数，默认三级
  *  width:      菜单宽度(如果为非popup，则第一级不用这个宽度)
@@ -12,8 +12,8 @@
  *  icon:       菜单项图标对应数据字段名
  */
 class UIMenu extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-MENU';
         /**
          * 菜单项高度
@@ -23,30 +23,42 @@ class UIMenu extends nodom.Plugin {
          * 方向  0:右 1:左
          */
         this.direction = 0;
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevels', 'menuWidth'], [null, null, 3, 150]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
     /**
-     * 编译后执行代码
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    init(el) {
+    generate(rootDom) {
         let me = this;
-        let menuDom = new nodom.Element();
-        //增加暂存数据
-        nodom.Compiler.handleAttributes(menuDom, el);
-        nodom.Compiler.handleChildren(menuDom, el);
-        menuDom.tagName = ('div');
-        UITool.handleUIParam(menuDom, this, ['popup|bool', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listName', 'maxLevels', 'menuWidth'], [null, null, 3, 150]);
         //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
-        menuDom.addClass('nd-menu');
+        rootDom.addClass('nd-menu');
         if (this.popupMenu) {
-            menuDom.addClass('nd-menu-popup');
+            rootDom.addClass('nd-menu-popup');
         }
-        //menu 节点,menuDom 下第一个带tagName的节点
+        //menu 节点,rootDom 下第一个带tagName的节点
         let menuNode;
-        for (let i = 0; i < menuDom.children.length; i++) {
-            if (menuDom.children[i].tagName) {
-                menuNode = menuDom.children[i];
+        for (let i = 0; i < rootDom.children.length; i++) {
+            if (rootDom.children[i].tagName) {
+                menuNode = rootDom.children[i];
                 menuNode.addClass('nd-menu-node');
                 //如果没有图标，也需要占位
                 let b = new nodom.Element('b');
@@ -60,7 +72,7 @@ class UIMenu extends nodom.Plugin {
             }
         }
         //清空孩子节点
-        menuDom.children = [];
+        rootDom.children = [];
         let parentCt = new nodom.Element('div');
         parentCt.addClass('nd-menu-subct');
         if (this.popupMenu) {
@@ -70,7 +82,7 @@ class UIMenu extends nodom.Plugin {
         else {
             parentCt.addClass('nd-menu-first-nopop');
         }
-        menuDom.add(parentCt);
+        rootDom.add(parentCt);
         //popup 菜单，需要非激活状态下隐藏
         if (this.popupMenu) {
             parentCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
@@ -89,7 +101,7 @@ class UIMenu extends nodom.Plugin {
         for (let i = 0; i < this.maxLevels; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
-            itemCt.directives.push(new nodom.Directive('repeat', this.listName, itemCt));
+            itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
             itemCt.addClass('nd-menu-nodect');
             let item = menuNode.clone(true);
             itemCt.add(item);
@@ -98,7 +110,7 @@ class UIMenu extends nodom.Plugin {
             //子菜单箭头图标
             if (this.popupMenu || i > 0) {
                 let icon1 = new nodom.Element('b');
-                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listName + "&&" + this.listName + ".length>0'}", icon1));
+                icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listField + "&&" + this.listField + ".length>0'}", icon1));
                 item.add(icon1);
             }
             //初始化菜单打开关闭
@@ -119,9 +131,7 @@ class UIMenu extends nodom.Plugin {
             itemCt.add(subCt);
             parentCt = subCt;
         }
-        menuDom.delProp(['listName', 'width', , 'maxlevels']);
-        menuDom.plugin = this;
-        return menuDom;
+        rootDom.delProp(['listField', 'width', , 'maxlevels']);
     }
     /**
      * 渲染前执行
@@ -129,6 +139,7 @@ class UIMenu extends nodom.Plugin {
      */
     beforeRender(module, uidom) {
         let me = this;
+        super.beforeRender(module, uidom);
         //popup menu需要添加右键点击事件
         if (this.popupMenu) {
             UIEventRegister.addEvent('mousedown', module.id, uidom.key, (module, dom, inOrOut, e) => {
@@ -139,7 +150,7 @@ class UIMenu extends nodom.Plugin {
                 let x = e.clientX;
                 let w = me.menuWidth;
                 let model = module.modelFactory.get(uidom.modelId);
-                let rows = model.query(me.listName);
+                let rows = model.query(me.listField);
                 if (rows && rows.length > 0) {
                     let h = rows * me.menuHeight;
                     //根据最大级数计算pop方向
@@ -164,7 +175,7 @@ class UIMenu extends nodom.Plugin {
         //菜单展开
         let openEvent = new nodom.NodomEvent('mouseenter', (dom, model, module, e, el) => {
             if (model) {
-                let rows = model.query(this.listName);
+                let rows = model.query(this.listField);
                 if (!rows || rows.length === 0) {
                     return;
                 }
@@ -188,7 +199,7 @@ class UIMenu extends nodom.Plugin {
         //菜单关闭
         let closeEvent = new nodom.NodomEvent('mouseleave', (dom, model, module, e, el) => {
             if (model) {
-                let rows = model.query(this.listName);
+                let rows = model.query(this.listField);
                 if (rows && rows.length > 0) {
                     //设置当前model的显示参数
                     model.set(me.activeName, false);

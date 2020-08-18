@@ -233,9 +233,9 @@ button, input {
     content: ""; }
 
 /*加号*/
-.nd-icon-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
+.nd-icon-add, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
   font-family: nd-iconfont; }
-  .nd-icon-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
+  .nd-icon-add:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
     content: ""; }
 
 /*关闭*/
@@ -245,9 +245,9 @@ button, input {
     content: ""; }
 
 /*加号(不带圆圈)*/
-.nd-icon-add-select, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add {
+.nd-icon-add-select {
   font-family: nd-iconfont; }
-  .nd-icon-add-select:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before {
+  .nd-icon-add-select:before {
     content: ""; }
 
 /*减号(不带圆圈)*/
@@ -407,7 +407,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 .nd-btn-normal {
   font-size: 14px; }
 
-.nd-btn-big {
+.nd-btn-large {
   font-size: 20px; }
 
 /*无文字*/
@@ -455,7 +455,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 .nd-accordion .nd-accordion-item {
   border-bottom: 1px solid #e1e1e1; }
   .nd-accordion .nd-accordion-item .nd-accordion-first {
-    background-color: #f1f1f1;
+    background-color: #e6e6e6;
     color: #666;
     padding: 20px;
     font-size: 14px;
@@ -472,9 +472,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     line-height: 30px;
     text-indent: 2em;
     font-size: 14px;
-    display: block;
-    background-color: #f1f1f1;
-    color: #666; }
+    display: block; }
   .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected {
     background-color: #f1f1f1;
     color: #666; }
@@ -649,8 +647,9 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       opacity: 1; }
   .nd-select .nd-select-list {
     display: block;
+    text-align: left;
     position: absolute;
-    max-height: 300px;
+    max-height: 500px;
     margin-top: 3px;
     overflow: auto;
     z-index: 997;
@@ -731,7 +730,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     height: 100px;
     overflow: hidden;
     box-sizing: border-box;
-    background-color: #c1c1c1;
+    background-color: #f1f1f1;
     color: #666;
     padding: 0;
     position: relative; }

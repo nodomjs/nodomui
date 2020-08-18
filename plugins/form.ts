@@ -13,27 +13,36 @@ class UIForm extends nodom.Plugin{
      * label宽度，默认100
      */
     labelWidth:number;
-    /**
-     * 对象的modelId
-     */
-    modelId:number;
+    
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['labelwidth|number'],
+                    ['labelWidth'],
+                    [100]);
+
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'form';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
     /**
-     * 模块id
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    moduleId:number;
-    init(el:HTMLElement):nodom.Element{
-        
-        let rootDom:nodom.Element = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom,el);
-        nodom.Compiler.handleChildren(rootDom,el);
-        rootDom.tagName = 'form';
-        
-        UITool.handleUIParam(rootDom,this,
-            ['labelwidth|number'],
-            ['labelWidth'],
-            [100]);
-        
+    private generate(rootDom:nodom.Element){
         rootDom.addClass('nd-form');    
         
         for(let c of rootDom.children){
@@ -51,8 +60,6 @@ class UIForm extends nodom.Plugin{
                 }
             }
         }
-        rootDom.plugin = this;
-        return rootDom;
     }
 }
 

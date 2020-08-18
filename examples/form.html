@@ -83,7 +83,7 @@
 
             <div>
                 <label>生活照:</label>
-                <ui-file field='photos' multiple='multi' valueField='imgId' displayField="fileName" 
+                <ui-file x-field='photos' multiple valueField='imgId' displayField="fileName" 
                  returnFields='id,url,result.rows' uploadMethod='uploadFile' delMethod='delFile'
                  maxCount='5'></ui-file>
             </div>

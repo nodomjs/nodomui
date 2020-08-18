@@ -84,32 +84,38 @@ class UIGrid extends nodom.Plugin{
      */
     selectPageMethodId:string;
 
-    /**
-     * 初始化标志
-     */
-    initFlag:boolean;
+    constructor(params:HTMLElement|object){
+        super(params);
+        let rootDom:nodom.Element = new nodom.Element();
+        if(params){
+            if(params instanceof HTMLElement){
+                nodom.Compiler.handleAttributes(rootDom,params);
+                nodom.Compiler.handleChildren(rootDom,params);
+                UITool.handleUIParam(rootDom,this,
+                    ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','hidehead|bool'],
+                    ['dataName','rowAlt','sortable','gridLine','fixHead','hideHead'],
+                    ['rows',null,null,'',null,null,null]);
+            }else if(typeof params === 'object'){
+                for(let o in params){
+                    this[o] = params[o];
+                }
+            }
+            rootDom.tagName = 'div';
+            rootDom = this.generate(rootDom);
+        }
+        
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
 
     /**
-     * modelId
+     * 产生插件内容
+     * @param rootDom 插件对应的element
      */
-    modelId:number;
-
-    /**
-     * 编译后执行代码
-     */
-    init(el:HTMLElement):nodom.Element{
-        let grid:nodom.Element = new nodom.Element('div');
-        nodom.Compiler.handleAttributes(grid,el);
-        nodom.Compiler.handleChildren(grid,el);
-        grid.addClass('nd-grid');
-        // rowalt sortable gridline='both' sizeName='pageSize'
-        UITool.handleUIParam(grid,this,
-            ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','hidehead|bool'],
-            ['dataName','rowAlt','sortable','gridLine','fixHead','hideHead'],
-            ['rows',null,null,'',null,null,null]);
-
+    private generate(rootDom:nodom.Element):nodom.Element{
+        rootDom.addClass('nd-grid');
         if(this.fixHead){
-            grid.addClass('nd-grid-fixed');
+            rootDom.addClass('nd-grid-fixed');
         }
 
         //头部，如果隐藏则不显示
@@ -134,7 +140,7 @@ class UIGrid extends nodom.Plugin{
         //分页dom
         let pagination:nodom.Element;
         //第一个tr
-        for(let c of grid.children){
+        for(let c of rootDom.children){
             if(c.tagName === 'COLS'){
                 rowDom = c;
             }else if(c.tagName === 'SUB'){
@@ -228,21 +234,21 @@ class UIGrid extends nodom.Plugin{
         }
         
         if(thead){
-            grid.children=[thead,tbody];
+            rootDom.children=[thead,tbody];
         }else{
-            grid.children=[tbody];
+            rootDom.children=[tbody];
         }
         
-        grid.plugin = this;
+        
         //如果有分页，则需要在外添加容器
         if(pagination){
             let parentDom:nodom.Element = new nodom.Element('div');
-            parentDom.children = [grid,pagination];
+            parentDom.children = [rootDom,pagination];
             pagination.addClass('nd-grid-pager');
             this.handlePagination(pagination);
             return parentDom;
         }
-        return grid;
+        return rootDom;
     }
 
     /**
@@ -431,11 +437,15 @@ class UIGrid extends nodom.Plugin{
         }
         //找到字段
         let f = this.fields[index];
+        
         if(!f || !f['field']){
             return;
         }
         let arr:string[] = ['orderby',f['field'],asc];
-        if(directive.filters.length === 1){
+        if(!directive.filters){
+            directive.filters = [];
+        }
+        if(directive.filters.length <= 1){
             directive.filters.push(new nodom.Filter(arr));
         }else{
             directive.filters[1] = new nodom.Filter(arr);
@@ -452,10 +462,9 @@ class UIGrid extends nodom.Plugin{
      */
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         let me = this;
-        this.modelId = uidom.modelId;
+        super.beforeRender(module,uidom);
         
-        if(!this.initFlag){
-            this.initFlag = true;
+        if(this.needPreRender){
             //增加过滤器方法
             if(this.selectPageMethodId){
                 module.methodFactory.add(this.selectPageMethodId,

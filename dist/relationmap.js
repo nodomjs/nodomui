@@ -4,26 +4,43 @@
  * 配置
  *  field 绑定数据项名，数据格式为[{列数据id名:值1,行数据id名:值2},...]
  *  datas='列数据名,行数据名'
- *  valueName='列数据id名,行数据id名'
+ *  valueField='列数据id名,行数据id名'
  *  showFields='列数据显示数据项名,行数据显示数据项名'
  */
 class UIRelationMap extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-RELATIONMAP';
-    }
-    init(el) {
-        let me = this;
         let rootDom = new nodom.Element();
-        nodom.Compiler.handleAttributes(rootDom, el);
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                //需要检查参数
+                UITool.handleUIParam(rootDom, this, ['valuefield|array|1', 'displayfield|array|2', 'listfield|array|2'], ['valueField', 'displayField', 'listField'], [null, null, null]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
         rootDom.tagName = 'table';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
+        let me = this;
         rootDom.addClass('nd-relationmap');
-        //需要检查参数
-        UITool.handleUIParam(rootDom, this, ['valuefield|array|1', 'displayfield|array|2', 'listfield|array|2'], ['valueName', 'displayName', 'listName'], [null, null, null]);
         this.mapName = '$ui_relationmap_' + nodom.Util.genId();
         let field = rootDom.getDirective('field');
         if (field) {
             this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
         }
         //横行头
         let rowHead = new nodom.Element('tr');
@@ -34,9 +51,9 @@ class UIRelationMap extends nodom.Plugin {
         rowHead.add(td);
         //列数td
         td = new nodom.Element('td');
-        td.addDirective(new nodom.Directive('repeat', this.listName[0], td));
+        td.addDirective(new nodom.Directive('repeat', this.listField[0], td));
         let txt = new nodom.Element();
-        txt.expressions = [new nodom.Expression(this.displayName[0])];
+        txt.expressions = [new nodom.Expression(this.displayField[0])];
         td.add(txt);
         rowHead.add(td);
         //行元素
@@ -60,29 +77,27 @@ class UIRelationMap extends nodom.Plugin {
         td.add(b);
         tr.add(td);
         rootDom.children = [rowHead, tr];
-        rootDom.plugin = this;
-        return rootDom;
     }
     /**
      * 渲染前执行
      * @param module
      */
     beforeRender(module, uidom) {
+        super.beforeRender(module, uidom);
         //增加列表格渲染数据
         let model = module.modelFactory.get(uidom.modelId);
-        this.modelId = uidom.modelId;
-        let rowData = model.query(this.listName[1]);
-        let colData = model.query(this.listName[0]);
+        let rowData = model.query(this.listField[1]);
+        let colData = model.query(this.listField[0]);
         let data = model.query(this.dataName);
-        let idRow = this.valueName[1];
-        let idCol = this.valueName[0];
+        let idRow = this.valueField[1];
+        let idCol = this.valueField[0];
         if (!module.model.query(this.mapName)) {
             let mapData = [];
             let title;
             for (let d of rowData) {
                 let a1 = [];
                 let id1 = d[idRow];
-                title = d[this.displayName[1]];
+                title = d[this.displayField[1]];
                 for (let d1 of colData) {
                     let active = false;
                     if (data && data.length > 0) {
@@ -117,8 +132,8 @@ class UIRelationMap extends nodom.Plugin {
         let id2 = model.data['id2'];
         let active = model.data['active'];
         let o = {};
-        o[this.valueName[0]] = id2;
-        o[this.valueName[1]] = id1;
+        o[this.valueField[0]] = id2;
+        o[this.valueField[1]] = id1;
         if (!data) {
             if (!active) {
                 pmodel.set(this.dataName, [o]);
@@ -132,7 +147,7 @@ class UIRelationMap extends nodom.Plugin {
             else { //删除
                 for (let i = 0; i < data.length; i++) {
                     let d = data[i];
-                    if (d[this.valueName[0]] === id2 && d[this.valueName[1]] === id1) {
+                    if (d[this.valueField[0]] === id2 && d[this.valueField[1]] === id1) {
                         data.splice(i, 1);
                         break;
                     }

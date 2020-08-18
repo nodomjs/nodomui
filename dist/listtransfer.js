@@ -3,20 +3,36 @@
  * list元素移动插件
  */
 class UIListTransfer extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-LISTTRANSFER';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield'], ['valueField', 'displayField', 'listField']);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
-    init(el) {
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
         let me = this;
         this.extraDataName = '$ui_listtransfer_' + nodom.Util.genId();
-        let rootDom = new nodom.Element();
         //更改model
         rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
-        nodom.Compiler.handleAttributes(rootDom, el);
-        nodom.Compiler.handleChildren(rootDom, el);
-        UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield'], ['valueName', 'displayName', 'listName']);
-        rootDom.tagName = 'div';
         rootDom.addClass('nd-listtransfer');
         //从field指令获取dataName
         let field = rootDom.getDirective('field');
@@ -40,7 +56,7 @@ class UIListTransfer extends nodom.Plugin {
         if (!itemDom) {
             itemDom = new nodom.Element('div');
             let txt = new nodom.Element();
-            txt.expressions = [new nodom.Expression(this.displayName)];
+            txt.expressions = [new nodom.Expression(this.displayField)];
             itemDom.add(txt);
         }
         itemDom.addClass('nd-list-item');
@@ -102,12 +118,10 @@ class UIListTransfer extends nodom.Plugin {
      * @param dom
      */
     beforeRender(module, dom) {
+        super.beforeRender(module, dom);
         //uidom model
         let pmodel;
-        //附加数据model
-        let model;
-        if (!this.modelId) {
-            this.modelId = dom.modelId;
+        if (this.needPreRender) {
             pmodel = module.modelFactory.get(this.modelId);
             let model = pmodel.set(this.extraDataName, {
                 //数据
@@ -115,7 +129,7 @@ class UIListTransfer extends nodom.Plugin {
             });
             this.extraModelId = model.id;
             let value = pmodel.query(this.dataName);
-            let datas = pmodel.query(this.listName);
+            let datas = pmodel.query(this.listField);
             let rows = [];
             if (Array.isArray(datas)) {
                 let va = [];
@@ -126,7 +140,7 @@ class UIListTransfer extends nodom.Plugin {
                 for (let d of rows) {
                     d.selected = false;
                     d.isValue = false;
-                    if (va && va.includes(d[this.valueName] + '')) {
+                    if (va && va.includes(d[this.valueField] + '')) {
                         d.isValue = true;
                     }
                 }
@@ -165,7 +179,7 @@ class UIListTransfer extends nodom.Plugin {
         let a = [];
         for (let d of model.data.datas) {
             if (d.isValue) {
-                a.push(d[this.valueName]);
+                a.push(d[this.valueField]);
             }
         }
         pmodel.set(this.dataName, a.join(','));

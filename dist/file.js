@@ -3,8 +3,8 @@
  * checkbox
  */
 class UIFile extends nodom.Plugin {
-    constructor() {
-        super(...arguments);
+    constructor(params) {
+        super(params);
         this.tagName = 'UI-FILE';
         /**
          * 状态  0初始化 1上传中 2上传结束
@@ -14,27 +14,48 @@ class UIFile extends nodom.Plugin {
          * 可上传文件数量
          */
         this.maxCount = 1;
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'type', 'maxcount', 'uploadmethod', 'delmethod'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadMethod', 'delMethod'], [null, null, null, '', 1, null, null]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'span';
+        rootDom.plugin = this;
+        this.element = rootDom;
     }
-    init(el) {
+    /**
+     * 产生插件内容
+     * @param rootDom 插件对应的element
+     */
+    generate(rootDom) {
         let me = this;
-        let fileDom = new nodom.Element('span');
-        nodom.Compiler.handleAttributes(fileDom, el);
-        UITool.handleUIParam(fileDom, this, ['field', 'valuefield', 'displayfield', 'multiple', 'type', 'maxcount', 'uploadmethod', 'delmethod'], ['fieldName', 'valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadMethod', 'delMethod'], [null, null, null, null, '', '', 1, null, null]);
-        fileDom.tagName = 'div';
-        fileDom.addClass('nd-file');
+        rootDom.addClass('nd-file');
+        let field = rootDom.getDirective('field');
+        if (field) {
+            this.dataName = field.value;
+            rootDom.removeDirectives(['field']);
+        }
         if (this.multiple === '') {
             this.maxCount = 1;
         }
         //生成filestate name
-        this.stateName = '$uploadstate_' + this.fieldName;
-        this.uploadingName = '$uploading_' + this.fieldName;
-        this.fileName = '$file_' + this.fieldName;
+        this.stateName = '$uploadstate_' + this.dataName;
+        this.uploadingName = '$uploading_' + this.dataName;
+        this.fileName = '$file_' + this.dataName;
         //生成result name
         this.resultName = '$ui_file_' + nodom.Util.genId();
         //文件显示container
         let ctDom = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
-        ctDom.addDirective(new nodom.Directive('repeat', this.fieldName, ctDom));
+        ctDom.addDirective(new nodom.Directive('repeat', this.dataName, ctDom));
         //显示框
         let showDom = new nodom.Element('a');
         showDom.addClass('nd-file-content');
@@ -63,7 +84,7 @@ class UIFile extends nodom.Plugin {
         let uploadDom = new nodom.Element('div');
         uploadDom.addClass('nd-file-uploadct');
         //当文件数量==maxcount时不再显示
-        uploadDom.addDirective(new nodom.Directive('show', this.fieldName + '.length<' + this.maxCount, uploadDom));
+        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
         //文件
         let fDom = new nodom.Element('input');
         fDom.setProp('type', 'file');
@@ -75,7 +96,7 @@ class UIFile extends nodom.Plugin {
         fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
             let foo = module.methodFactory.get(me.uploadMethod);
             //已有数据条数
-            let fieldData = model.data[this.fieldName];
+            let fieldData = model.data[this.dataName];
             let rowLen = fieldData ? fieldData.length : 0;
             rowLen = this.maxCount - rowLen;
             if (el.files) {
@@ -108,13 +129,13 @@ class UIFile extends nodom.Plugin {
         uploadingDom.add(span2);
         uploadDom.add(uploadingDom);
         uploadDom.add(fDom);
-        fileDom.children = [ctDom, uploadDom];
-        fileDom.plugin = this;
-        return fileDom;
+        rootDom.children = [ctDom, uploadDom];
+        rootDom.plugin = this;
+        return rootDom;
     }
     beforeRender(module, dom) {
-        if (!this.initFlag) {
-            this.initFlag = true;
+        super.beforeRender(module, dom);
+        if (this.needPreRender) {
             let model = module.modelFactory.get(dom.modelId);
             if (model) {
                 model.set(this.stateName, 0);

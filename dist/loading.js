@@ -1,6 +1,6 @@
 ///<reference types='nodom'/>
 /**
- * checkbox
+ * loading
  */
 class UILoading extends nodom.Plugin {
     constructor() {
