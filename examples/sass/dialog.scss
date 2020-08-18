@@ -7,10 +7,10 @@
     left:0;
     right:0;
     z-index: 1000000;
-    @extend .nd-box-default;
+    
     /*蒙版*/
     .nd-dialog-cover{
-        @include nd-color(1);
+        background-color:$nd-color9;
         opacity:0.4;
         position:inherit;
         left:0;
@@ -30,6 +30,10 @@
         justify-content: center;
         align-items: center;
         z-index:2;
+
+        .nd-panel{
+            @extend .nd-box-default;
+        }
     }
 }
 .nd-dialog-hide{

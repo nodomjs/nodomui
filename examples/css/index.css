@@ -8,29 +8,32 @@
 /*normal color*/
 /*超链接颜色*/
 /*
+//白色主题
 //阴影色
-$nd-shadecolor: #000;
+$nd-shadecolor: #999;
 //前景色
 //通用色
-$nd-forecolor1: rgb(193,193,193);
+$nd-forecolor1:#666;
 //重点色1
-$nd-forecolor2: rgb(225,225,225);
+$nd-forecolor2: #333;
 //重点色2
-$nd-forecolor3: rgb(255,255,255);
+$nd-forecolor3: #111;
 //特殊色背景下的前景色
 $nd-forecolor4: #fff;
+
 //背景色
 //主背景
 
-$nd-color1: rgb(23,23,23);  //主背景
-$nd-color2: rgb(27,27,27);  //tree、accordion、form、toolbar、button group、 tab header
-$nd-color3: rgb(34,34,34);  //tab button
-$nd-color4: rgb(39,39,39);  //menu
-$nd-color5: rgb(46,46,46);  //input、panel-title、selected
-$nd-color6: rgb(50,50,50);  //line
-$nd-color7: rgb(63,63,63);  //滚动条 mouseover border
-$nd-color8: rgb(85,85,85);  //按钮
-$nd-color9: rgb(100,100,100); //tip
+$nd-color1:#fff;      //主背景 tree、accordion、form
+$nd-color2: #f5f5f5;  //toolbar、button group、tab header
+$nd-color3: #efefef;  //tab、 button、 item hover、accordion第一级
+$nd-color4: #e5e5e5;  //menu
+$nd-color5: #dfdfdf;  //panel-title
+$nd-color6: #d5d5d5;  //line
+$nd-color7: #cfcfcf;  //滚动条 mouseover border
+$nd-color8: #c5c5c5;  //按钮
+$nd-color9: #333;     //默认tip框背景色、蒙版背景色
+
 */
 /*颜色 混合*/
 /*size定义*/
@@ -44,7 +47,7 @@ $nd-color9: rgb(100,100,100); //tip
 /*zindex*/
 .nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list .nd-list-item:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
   background-color: #f3f6fd;
-  color: #666; }
+  color: #c1c1c1; }
 
 /*item active*/
 .nd-item-selectcolor, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-selected, .nd-datetime .nd-datetime-timetbl .nd-datetime-timect > div .nd-datetime-itemselect, .nd-list-horizontal .nd-list-item-active {
@@ -54,7 +57,7 @@ $nd-color9: rgb(100,100,100); //tip
 /*框*/
 /*边框*/
 .nd-border, .nd-datetime .nd-datetime-picker, .nd-listtransfer .nd-list, .nd-panel, .nd-tab {
-  border: 1px solid #c1c1c1; }
+  border: 1px solid #323232; }
 
 /*框体padding*/
 .nd-padding, .nd-tab .nd-tab-body {
@@ -62,51 +65,51 @@ $nd-color9: rgb(100,100,100); //tip
 
 /*通用框*/
 .nd-commonbox, .nd-accordion, .nd-list, .nd-tree {
-  background-color: #fff;
-  color: #666;
-  border: 1px solid #c1c1c1;
+  background-color: #171717;
+  color: #c1c1c1;
+  border: 1px solid #323232;
   padding: 10px; }
 
 /*黑色背景*/
 .nd-box-black {
-  background-color: black;
+  background-color: #333;
   color: white;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999; }
+  box-shadow: 0px 0px 8px 1px #000; }
 
 /*默认色背景box*/
-.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog, .nd-select .nd-select-list, .nd-menu .nd-menu-subct {
-  background-color: #fff;
-  color: #666;
+.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog .nd-dialog-body .nd-panel, .nd-select .nd-select-list, .nd-menu .nd-menu-subct {
+  background-color: #171717;
+  color: #c1c1c1;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999; }
+  box-shadow: 0px 0px 8px 1px #000; }
 
 /*active颜色框*/
 .nd-box-active {
   background-color: #eaf0fa;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
+  box-shadow: 0px 0px 8px 1px #000;
   color: #2050a0; }
 
 /*success 颜色框*/
 .nd-box-success {
   background-color: #eaf9ed;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
+  box-shadow: 0px 0px 8px 1px #000;
   color: #219a3c; }
 
 /*warn颜色框*/
 .nd-box-warn {
   background-color: #fffbe6;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
+  box-shadow: 0px 0px 8px 1px #000;
   color: #ccac00; }
 
 /*error颜色框*/
 .nd-box-error {
   background-color: #ffe6e6;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
+  box-shadow: 0px 0px 8px 1px #000;
   color: #cc0000; }
 
 /*link*/
@@ -135,10 +138,10 @@ a:visited {
 /*输入框*/
 input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input {
   padding: 10px;
-  background-color: #fff;
-  color: #666;
+  background-color: #171717;
+  color: #c1c1c1;
   border-radius: 5px;
-  border: 1px solid #e1e1e1; }
+  border: 1px solid #2e2e2e; }
   input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus {
     border-color: #739de3; }
 
@@ -158,8 +161,8 @@ input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .n
 /*global*/
 body {
   margin: 0;
-  background-color: #fff;
-  color: #666;
+  background-color: #171717;
+  color: #c1c1c1;
   font-size: 14px; }
 
 button, input {
@@ -170,17 +173,17 @@ button, input {
   width: 10px; }
 
 ::-webkit-scrollbar-track {
-  background-color: #fff;
-  color: #666; }
+  background-color: #171717;
+  color: #c1c1c1; }
 
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #e1e1e1;
-  color: #666; }
+  background-color: #2e2e2e;
+  color: #c1c1c1; }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #c1c1c1;
-    color: #666; }
+    background-color: #323232;
+    color: #c1c1c1; }
 
 @font-face {
   font-family: "nd-iconfont";
@@ -385,16 +388,16 @@ button, input {
 /**按钮**/
 button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   display: inline-block;
-  background-color: #e6e6e6;
-  color: #666;
+  background-color: #555555;
+  color: #c1c1c1;
   border-radius: 5px;
   border: 0px;
   padding: 10px 15px; }
   button > b, .nd-btn > b, .nd-listtransfer .nd-listtransfer-btngrp > b > b {
     margin-right: 5px; }
   button:hover, .nd-btn:hover, .nd-listtransfer .nd-listtransfer-btngrp > b:hover {
-    background-color: #f3f3f3;
-    color: #333; }
+    background-color: #626262;
+    color: #e1e1e1; }
 
 /*无背景色*/
 .nd-btn-nobg {
@@ -453,10 +456,10 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /********** accordion ***********/
 .nd-accordion .nd-accordion-item {
-  border-bottom: 1px solid #e1e1e1; }
+  border-bottom: 1px solid #2e2e2e; }
   .nd-accordion .nd-accordion-item .nd-accordion-first {
-    background-color: #e6e6e6;
-    color: #666;
+    background-color: #222222;
+    color: #c1c1c1;
     padding: 20px;
     font-size: 14px;
     width: 100%;
@@ -474,8 +477,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     font-size: 14px;
     display: block; }
   .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected {
-    background-color: #f1f1f1;
-    color: #666; }
+    background-color: #1b1b1b;
+    color: #c1c1c1; }
   .nd-accordion .nd-accordion-item .nd-accordion-hide {
     display: none; }
 
@@ -535,8 +538,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       text-align: center;
       line-height: 25px; }
     .nd-datetime .nd-datetime-datetbl .nd-datetime-dates {
-      border-top: 1px solid #e1e1e1;
-      border-bottom: 1px solid #e1e1e1;
+      border-top: 1px solid #272727;
+      border-bottom: 1px solid #272727;
       font-size: 12px; }
       .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-today {
         color: #2864c8; }
@@ -574,8 +577,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   z-index: 1000000;
   /*蒙版*/ }
   .nd-dialog .nd-dialog-cover {
-    background-color: #fff;
-    color: #666;
+    background-color: #333;
     opacity: 0.4;
     position: inherit;
     left: 0;
@@ -676,7 +678,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #222222;
   padding: 10px;
   border-radius: 10px; }
   .nd-selectlist .nd-selectlist-item {
@@ -688,7 +690,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /*横向*/
 .nd-selectlist-horizontal {
-  border: 1px solid #e6e6e6;
+  border: 1px solid #222222;
   padding: 10px;
   border-radius: 10px;
   overflow: auto; }
@@ -706,8 +708,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     height: 100px;
     margin-right: 20px; }
     .nd-file .nd-file-showct a.nd-file-content {
-      background-color: #c1c1c1;
-      color: #666;
+      background-color: #323232;
+      color: #c1c1c1;
       display: inline-block;
       width: 100%;
       height: 100%;
@@ -730,8 +732,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     height: 100px;
     overflow: hidden;
     box-sizing: border-box;
-    background-color: #f1f1f1;
-    color: #666;
+    background-color: #1b1b1b;
+    color: #c1c1c1;
     padding: 0;
     position: relative; }
     .nd-file .nd-file-uploadct .nd-file-input {
@@ -775,8 +777,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         max-width: 100px;
         max-height: 100px; }
   .nd-grid .nd-grid-head {
-    background-color: #fff;
-    color: #666;
+    background-color: #171717;
+    color: #c1c1c1;
     display: flex;
     flex-direction: row;
     text-align: center;
@@ -792,8 +794,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         align-items: center;
         margin-left: 20px;
         line-height: 10px;
-        background-color: #fff;
-        color: #666;
+        background-color: #171717;
+        color: #c1c1c1;
         /*升序箭头*/
         /*降序箭头*/ }
         .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort > b:hover {
@@ -810,22 +812,22 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     justify-content: center;
     align-items: center; }
   .nd-grid .nd-grid-body {
-    background-color: #fff;
-    color: #666; }
+    background-color: #171717;
+    color: #c1c1c1; }
   .nd-grid .nd-grid-showsub {
     transform: rotate(90deg); }
   .nd-grid .nd-grid-row-line {
-    border-top: 1px solid #e1e1e1; }
+    border-top: 1px solid #2e2e2e; }
   .nd-grid .nd-grid-col-line > div {
-    border-right: 1px solid #e1e1e1; }
+    border-right: 1px solid #2e2e2e; }
   .nd-grid .nd-grid-col-line > div:last-child {
-    border-right: 0px solid #e1e1e1; }
+    border-right: 0px solid #2e2e2e; }
   .nd-grid .nd-grid-body-rowalt > div:nth-child(even) {
-    background-color: #f1f1f1;
-    color: #666; }
+    background-color: #1b1b1b;
+    color: #c1c1c1; }
   .nd-grid .nd-grid-sub {
-    background-color: #fff;
-    color: #666;
+    background-color: #171717;
+    color: #c1c1c1;
     display: flex;
     flex-direction: column;
     padding: 10px; }
@@ -913,8 +915,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   flex-direction: row;
   justify-content: space-around; }
   .nd-listtransfer .nd-list {
-    background-color: #fff;
-    color: #666;
+    background-color: #171717;
+    color: #c1c1c1;
     border-radius: 10px;
     overflow: auto;
     padding: 10px;
@@ -935,8 +937,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   z-index: 998;
   font-size: 14px;
   position: relative;
-  background-color: #e6e6e6;
-  color: #666;
+  background-color: #222222;
+  color: #c1c1c1;
   /*第一级菜单*/
   /*第一级非popup菜单*/ }
   .nd-menu .nd-menu-subct {
@@ -950,7 +952,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       height: 30px;
       width: 100%; }
       .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node {
-        color: #666;
+        color: #c1c1c1;
         padding: 0 20px;
         /*子菜单箭头*/ }
         .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node .nd-menu-subicon, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node .nd-menu-subicon {
@@ -978,10 +980,10 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /*pagenation*/
 .nd-pagination {
   padding: 20px 10px;
-  background-color: #fff;
-  color: #666; }
+  background-color: #171717;
+  color: #c1c1c1; }
   .nd-pagination input, .nd-pagination select {
-    border: 1px solid #e6e6e6;
+    border: 1px solid #222222;
     border-radius: 10px;
     padding: 10px; }
   .nd-pagination > * {
@@ -1007,14 +1009,14 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     padding: 0 10px; }
   .nd-pagination .nd-pagination-go input {
     width: 50px;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #272727;
     margin: 0 10px; }
 
 /* panel */
 .nd-panel {
   border-radius: 5px;
-  background-color: #fff;
-  color: #666;
+  background-color: #171717;
+  color: #c1c1c1;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -1025,8 +1027,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     width: 100%;
     box-sizing: border-box; }
   .nd-panel .nd-panel-header {
-    background-color: #c1c1c1;
-    color: #666;
+    background-color: #323232;
+    color: #c1c1c1;
     height: 40px;
     line-height: 40px;
     padding: 0 10px;
@@ -1053,19 +1055,19 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     font-size: 14px;
     flex: 1;
     overflow: auto;
-    background-color: #fff;
-    color: #666; }
+    background-color: #171717;
+    color: #c1c1c1; }
 
 /*relation map*/
 .nd-relationmap {
   border-spacing: 1px;
-  background-color: #c1c1c1;
-  color: #666; }
+  background-color: #323232;
+  color: #c1c1c1; }
   .nd-relationmap .nd-relationmap-head td {
     padding: 10px 20px; }
   .nd-relationmap td {
-    background-color: #fff;
-    color: #666;
+    background-color: #171717;
+    color: #c1c1c1;
     text-align: center; }
   .nd-relationmap .nd-relationmap-row td:first-child {
     padding: 10px 20px; }
@@ -1074,23 +1076,23 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /*relation map*/
 .nd-tab {
-  background-color: #fff;
-  color: #666;
+  background-color: #171717;
+  color: #c1c1c1;
   flex-direction: column;
   /*头部 tab区域*/
   /*内容区域*/ }
   .nd-tab .nd-tab-head {
-    background-color: #f1f1f1;
-    color: #666;
+    background-color: #1b1b1b;
+    color: #c1c1c1;
     overflow: hidden;
     display: flex;
     flex-direction: row; }
     .nd-tab .nd-tab-head .nd-tab-item {
       display: inline-block;
-      background-color: #e6e6e6;
-      color: #666;
+      background-color: #222222;
+      color: #c1c1c1;
       padding: 10px 20px;
-      border-bottom: 1px solid #c1c1c1; }
+      border-bottom: 1px solid #323232; }
       .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close {
         margin-left: 10px;
         font-size: 12px;
@@ -1098,9 +1100,9 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close:hover {
           color: #2864c8; }
     .nd-tab .nd-tab-head .nd-tab-item-active {
-      background-color: #fff;
-      color: #666;
-      color: #333;
+      background-color: #171717;
+      color: #c1c1c1;
+      color: #e1e1e1;
       border-bottom: 0; }
   .nd-tab .nd-tab-body {
     overflow: auto; }
@@ -1110,8 +1112,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   display: flex;
   flex-direction: row; }
   .nd-tab-horizontal .nd-tab-head {
-    background-color: #f1f1f1;
-    color: #666;
+    background-color: #1b1b1b;
+    color: #c1c1c1;
     flex-direction: column; }
   .nd-tab-horizontal .nd-tab-body {
     flex: 1; }
@@ -1183,8 +1185,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /* toolbar */
 .nd-toolbar {
-  background-color: #f1f1f1;
-  color: #666;
+  background-color: #1b1b1b;
+  color: #c1c1c1;
   display: inline-flex; }
   .nd-toolbar .nd-btn, .nd-toolbar .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-listtransfer .nd-toolbar .nd-listtransfer-btngrp > b {
     padding: 8px; }
@@ -1192,8 +1194,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /* button group*/
 .nd-buttongroup {
   padding: 10px;
-  background-color: #f1f1f1;
-  color: #666;
+  background-color: #1b1b1b;
+  color: #c1c1c1;
   display: inline-flex;
   justify-content: flex-end; }
   .nd-buttongroup .nd-btn, .nd-buttongroup .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-listtransfer .nd-buttongroup .nd-listtransfer-btngrp > b {

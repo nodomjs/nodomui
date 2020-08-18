@@ -4,7 +4,7 @@
 button,.nd-btn{
     display:inline-block;
     @extend .nd-canclick;
-    @include nd-color(3);
+    @include nd-color(8);
     
     border-radius: $nd-radius;
     border:0px;
@@ -14,7 +14,7 @@ button,.nd-btn{
         margin-right:$nd-padding/2;
     }
     &:hover{
-        background-color:lighten($nd-color3,5%);
+        background-color:lighten($nd-color8,5%);
         color:$nd-forecolor2;
     }
 }
