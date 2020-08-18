@@ -61,8 +61,9 @@
     }
     /*下拉框*/
     .nd-select-list{
-        @include nd-color(4);
-        @extend .nd-border;
+        display:block;
+        @extend .nd-box-default;
+        
         position:absolute;
         max-height:300px;
         margin-top:$nd-dropdown-margin;
@@ -89,7 +90,7 @@
             }
 
             &:hover{
-                @include nd-color(6);
+                @extend .nd-item-hovercolor;
             }
         }
 

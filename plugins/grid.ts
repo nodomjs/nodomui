@@ -6,7 +6,7 @@
  *  rowalt      行颜色交替标志，不用设置值
  *  sortable    排序标志，不用设置值 
  *  gridline    网格线类型，包括column(列) row(行) both(行列)，不设置则不显示
- * ui-row参数
+ * cols参数(列信息)
  *  data        表格数据数组对应名，如rows等
  *  子元素(列)，用div元素
  *  width       宽度，表示整个列宽度为几份，所有列的宽度合在一起表示总份数，栅格方式，默认1
@@ -15,7 +15,7 @@
  *  editable    是否可编辑
  *  inputtype   输入类型，参考ui-form，默认text
  *
- * ui-sub参数(详细显示框)
+ * sub参数(详细显示框)
  *  auto        自动生成详细显示框标志，设置该标志后，点击左侧箭头，自动生成显示框
  *  cols        一行显示列数，auto设置时有效
  *  labelwidth  label宽度，默认100，auto设置时有效
@@ -25,7 +25,6 @@
  *  auto        自动生成编辑框标志，设置该标志后，点击左侧箭头，自动生成编辑框
  *  cols        一行显示列数，auto设置时有效
  *  labelwidth  label宽度，默认100，auto设置时有效
- *  
  */
 class UIGrid extends nodom.Plugin{
     tagName:string = 'UI-GRID';
@@ -363,9 +362,7 @@ class UIGrid extends nodom.Plugin{
         if(subDom.hasProp('auto')){
             subDom.children = [];
             //label宽度
-            let lw:string = subDom.getProp('labelwidth')||1;
-            //content宽度
-            let cw:string = subDom.getProp('contentwidth')||5;
+            let lw:string = subDom.getProp('labelwidth')||100;
             //每行显示数
             let cols:number = subDom.hasProp('cols')?parseInt(subDom.getProp('cols')):1;
             let cnt = 0;
@@ -381,18 +378,18 @@ class UIGrid extends nodom.Plugin{
                 itemCt.addClass('nd-grid-sub-item');
                 let label:nodom.Element = new nodom.Element('label');
                 label.assets.set('innerHTML',item['title']+':');
-                label.assets.set('style','flex:' + lw);
+                label.assets.set('style','width:' + lw + 'px');
                 itemCt.add(label);
 
                 let span:nodom.Element = new nodom.Element('span');
-                span.assets.set('style','flex:' + cw);
+                span.addClass('nd-grid-sub-content');
                 let txt:nodom.Element = new nodom.Element();
                 txt.expressions = item['expressions'];
                 span.add(txt);
                 itemCt.add(span);
 
                 rowCt.add(itemCt);
-                subDom.delProp(['auto','cols','labelwidth']);
+                subDom.delProp(['auto','labelwidth']);
             });
         }
         

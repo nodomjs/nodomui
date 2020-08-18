@@ -21,7 +21,7 @@
         }
 
         &:hover{
-            @include nd-color(6);
+            @extend .nd-item-hovercolor;
         }
     }
 

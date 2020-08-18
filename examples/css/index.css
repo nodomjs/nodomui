@@ -42,7 +42,7 @@ $nd-color9: rgb(100,100,100); //tip
 /*按钮padding*/
 /*字体大小*/
 /*zindex*/
-.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
+.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list .nd-list-item:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
   background-color: #f3f6fd;
   color: #666; }
 
@@ -53,7 +53,7 @@ $nd-color9: rgb(100,100,100); //tip
 
 /*框*/
 /*边框*/
-.nd-border, .nd-datetime .nd-datetime-picker, .nd-select .nd-select-list, .nd-listtransfer .nd-list, .nd-panel, .nd-relationmap, .nd-tab {
+.nd-border, .nd-datetime .nd-datetime-picker, .nd-listtransfer .nd-list, .nd-panel, .nd-tab {
   border: 1px solid #c1c1c1; }
 
 /*框体padding*/
@@ -75,7 +75,7 @@ $nd-color9: rgb(100,100,100); //tip
   box-shadow: 0px 0px 8px 1px #999; }
 
 /*默认色背景box*/
-.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog, .nd-menu .nd-menu-subct {
+.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog, .nd-select .nd-select-list, .nd-menu .nd-menu-subct {
   background-color: #fff;
   color: #666;
   border-radius: 5px;
@@ -152,11 +152,11 @@ input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .n
     margin: 0;
     padding: 0;
     border: 0;
+    background-color: transparent;
     flex: 1; }
 
 /*global*/
 body {
-  padding: 0;
   margin: 0;
   background-color: #fff;
   color: #666;
@@ -490,8 +490,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   /*时间面板*/ }
   .nd-datetime .nd-datetime-field .nd-datetime-date {
     background-color: inherit; }
-  .nd-datetime .nd-datetime-field input {
-    background-color: transparent; }
   .nd-datetime .nd-datetime-picker {
     position: absolute;
     z-index: 997;
@@ -650,8 +648,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     .nd-select .nd-select-inputct .nd-select-search-active {
       opacity: 1; }
   .nd-select .nd-select-list {
-    background-color: #e1e1e1;
-    color: #666;
+    display: block;
     position: absolute;
     max-height: 300px;
     margin-top: 3px;
@@ -672,9 +669,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         display: inline-block; }
       .nd-select .nd-select-list .nd-select-item .nd-select-itemcontent {
         flex: 1; }
-      .nd-select .nd-select-list .nd-select-item:hover {
-        background-color: #c1c1c1;
-        color: #666; }
     .nd-select .nd-select-list .nd-select-selected {
       color: #2864c8; }
 
@@ -847,10 +841,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         flex: 1;
         display: flex;
         align-items: center; }
-        .nd-grid .nd-grid-sub .nd-grid-sub-row .nd-grid-sub-item label {
+        .nd-grid .nd-grid-sub .nd-grid-sub-row .nd-grid-sub-item .nd-grid-sub-content {
           flex: 1; }
-        .nd-grid .nd-grid-sub .nd-grid-sub-row .nd-grid-sub-item span {
-          flex: 5; }
 
 .nd-grid-fixed {
   position: relative;
@@ -902,9 +894,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       display: inline-block; }
     .nd-list .nd-list-item .nd-list-itemcontent {
       flex: 1; }
-    .nd-list .nd-list-item:hover {
-      background-color: #c1c1c1;
-      color: #666; }
   .nd-list .nd-list-item-active {
     color: #2864c8; }
 
@@ -1068,397 +1057,12 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     background-color: #fff;
     color: #666; }
 
-/**
- * 基础文件
- * 包含所有变量定义
- */
-/*颜色定义*/
-/*前景色，深色和浅色*/
-/*normal color*/
-/*超链接颜色*/
-/*
-//阴影色
-$nd-shadecolor: #000;
-//前景色
-//通用色
-$nd-forecolor1: rgb(193,193,193);
-//重点色1
-$nd-forecolor2: rgb(225,225,225);
-//重点色2
-$nd-forecolor3: rgb(255,255,255);
-//特殊色背景下的前景色
-$nd-forecolor4: #fff;
-//背景色
-//主背景
-
-$nd-color1: rgb(23,23,23);  //主背景
-$nd-color2: rgb(27,27,27);  //tree、accordion、form、toolbar、button group、 tab header
-$nd-color3: rgb(34,34,34);  //tab button
-$nd-color4: rgb(39,39,39);  //menu
-$nd-color5: rgb(46,46,46);  //input、panel-title、selected
-$nd-color6: rgb(50,50,50);  //line
-$nd-color7: rgb(63,63,63);  //滚动条 mouseover border
-$nd-color8: rgb(85,85,85);  //按钮
-$nd-color9: rgb(100,100,100); //tip
-*/
-/*颜色 混合*/
-/*size定义*/
-/*全局padding*/
-/*全局圆角*/
-/*标题 padding*/
-/*表格高度*/
-/*下拉框离显示框距离*/
-/*按钮padding*/
-/*字体大小*/
-/*zindex*/
-.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
-  background-color: #f3f6fd;
-  color: #666; }
-
-/*item active*/
-.nd-item-selectcolor, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-selected, .nd-datetime .nd-datetime-timetbl .nd-datetime-timect > div .nd-datetime-itemselect, .nd-list-horizontal .nd-list-item-active {
-  background-color: #739de3;
-  color: #fff; }
-
-/*框*/
-/*边框*/
-.nd-border, .nd-datetime .nd-datetime-picker, .nd-select .nd-select-list, .nd-listtransfer .nd-list, .nd-panel, .nd-relationmap, .nd-tab {
-  border: 1px solid #c1c1c1; }
-
-/*框体padding*/
-.nd-padding, .nd-tab .nd-tab-body {
-  padding: 20px; }
-
-/*通用框*/
-.nd-commonbox, .nd-accordion, .nd-list, .nd-tree {
-  background-color: #fff;
-  color: #666;
-  border: 1px solid #c1c1c1;
-  padding: 10px; }
-
-/*黑色背景*/
-.nd-box-black {
-  background-color: black;
-  color: white;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999; }
-
-/*默认色背景box*/
-.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog, .nd-menu .nd-menu-subct {
-  background-color: #fff;
-  color: #666;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999; }
-
-/*active颜色框*/
-.nd-box-active {
-  background-color: #eaf0fa;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
-  color: #2050a0; }
-
-/*success 颜色框*/
-.nd-box-success {
-  background-color: #eaf9ed;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
-  color: #219a3c; }
-
-/*warn颜色框*/
-.nd-box-warn {
-  background-color: #fffbe6;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
-  color: #ccac00; }
-
-/*error颜色框*/
-.nd-box-error {
-  background-color: #ffe6e6;
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #999;
-  color: #cc0000; }
-
-/*link*/
-a:link {
-  color: #2675f6;
-  text-decoration: none; }
-
-a:hover {
-  color: #1e64c8; }
-
-a:visited {
-  color: #1e64c8; }
-
-/*禁用*/
-.nd-disable, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-disable, .nd-list .nd-list-item-disable, .nd-list-horizontal .nd-list-item-disable, .nd-pagination .nd-pagination-pagect .nd-pagination-disable, .nd-relationmap .nd-relationmap-head td, .nd-relationmap .nd-relationmap-row td:first-child {
-  color: grey;
-  cursor: not-allowed !important; }
-  .nd-disable:hover, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-disable:hover, .nd-list .nd-list-item-disable:hover, .nd-list-horizontal .nd-list-item-disable:hover, .nd-pagination .nd-pagination-pagect .nd-pagination-disable:hover, .nd-relationmap .nd-relationmap-head td:hover, .nd-relationmap .nd-relationmap-row td:hover:first-child {
-    color: grey;
-    background-color: transparent; }
-
-/*可以click*/
-.nd-canclick, button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates > span, .nd-list .nd-list-item, .nd-list-horizontal .nd-list-item, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close, .nd-relationmap .nd-relationmap-row td, .nd-tab .nd-tab-head .nd-tab-item, .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close, .nd-tip .nd-tip-item .nd-tip-close, .nd-tree .nd-tree-nodect .nd-tree-uncheck, .nd-tree .nd-tree-nodect .nd-tree-checked {
-  cursor: pointer; }
-
-/*输入框*/
-input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input {
-  padding: 10px;
-  background-color: #fff;
-  color: #666;
-  border-radius: 5px;
-  border: 1px solid #e1e1e1; }
-  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus {
-    border-color: #739de3; }
-
-/*带图标输入框*/
-.nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .nd-select-inputct {
-  display: flex; }
-  .nd-input-icon :last-child, .nd-datetime .nd-datetime-field :last-child, .nd-select .nd-select-inputct :last-child {
-    flex: 0;
-    padding: 0; }
-  .nd-input-icon input, .nd-datetime .nd-datetime-field input, .nd-select .nd-select-inputct input {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    flex: 1; }
-
-/*global*/
-body {
-  padding: 0;
-  margin: 0;
-  background-color: #fff;
-  color: #666;
-  font-size: 14px; }
-
-button, input {
-  outline: none; }
-
-/**滚动条**/
-::-webkit-scrollbar {
-  width: 10px; }
-
-::-webkit-scrollbar-track {
-  background-color: #fff;
-  color: #666; }
-
-/*定义滑块 内阴影+圆角*/
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #e1e1e1;
-  color: #666; }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #c1c1c1;
-    color: #666; }
-
-@font-face {
-  font-family: "nd-iconfont";
-  src: url("font/iconfont.ttf"), url("font/iconfont.woff"); }
-/*icon size*/
-.nd-icon-sizesmall {
-  font-size: 12px; }
-
-.nd-icon-sizenormal {
-  font-size: 14px; }
-
-.nd-icon-sizebig {
-  font-size: 20px; }
-
-/*icon class*/
-/*菜单，树右向箭头*/
-.nd-icon-right, .nd-grid .nd-grid-row .nd-grid-sub-btn, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node .nd-menu-subicon, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node .nd-menu-subicon {
-  font-family: nd-iconfont; }
-  .nd-icon-right:before, .nd-grid .nd-grid-row .nd-grid-sub-btn:before, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node .nd-menu-subicon:before {
-    content: ""; }
-
-/*复选框，未选中*/
-.nd-icon-checkbox, .nd-form .nd-uncheck, .nd-tree .nd-tree-nodect .nd-tree-uncheck {
-  font-family: nd-iconfont; }
-  .nd-icon-checkbox:before, .nd-form .nd-uncheck:before, .nd-tree .nd-tree-nodect .nd-tree-uncheck:before {
-    content: ""; }
-
-/*复选框，已选中*/
-.nd-icon-checked, .nd-form .nd-checked, .nd-tree .nd-tree-nodect .nd-tree-checked {
-  font-family: nd-iconfont; }
-  .nd-icon-checked:before, .nd-form .nd-checked:before, .nd-tree .nd-tree-nodect .nd-tree-checked:before {
-    content: ""; }
-
-/*单选框，未选中*/
-.nd-icon-radio {
-  font-family: nd-iconfont; }
-  .nd-icon-radio:before {
-    content: ""; }
-
-/*单选框，已选中*/
-.nd-icon-radio-active, .nd-form .nd-radio-active {
-  font-family: nd-iconfont; }
-  .nd-icon-radio-active:before, .nd-form .nd-radio-active:before {
-    content: ""; }
-
-/*减号*/
-.nd-icon-minus, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min {
-  font-family: nd-iconfont; }
-  .nd-icon-minus:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min:before {
-    content: ""; }
-
-/*加号*/
-.nd-icon-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
-  font-family: nd-iconfont; }
-  .nd-icon-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
-    content: ""; }
-
-/*关闭*/
-.nd-icon-close, .nd-file .nd-file-showct .nd-file-del, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close {
-  font-family: nd-iconfont; }
-  .nd-icon-close:before, .nd-file .nd-file-showct .nd-file-del:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close:before {
-    content: ""; }
-
-/*加号(不带圆圈)*/
-.nd-icon-add-select, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add {
-  font-family: nd-iconfont; }
-  .nd-icon-add-select:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before {
-    content: ""; }
-
-/*减号(不带圆圈)*/
-.nd-icon-sami-select {
-  font-family: nd-iconfont; }
-  .nd-icon-sami-select:before {
-    content: ""; }
-
-/*提示*/
-.nd-icon-prompt {
-  font-family: nd-iconfont; }
-  .nd-icon-prompt:before {
-    content: ""; }
-
-/*查询*/
-.nd-icon-search {
-  font-family: nd-iconfont; }
-  .nd-icon-search:before {
-    content: ""; }
-
-/*上箭头*/
-.nd-icon-arrow-up, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise {
-  font-family: nd-iconfont; }
-  .nd-icon-arrow-up:before, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise:before {
-    content: ""; }
-
-/*下箭头*/
-.nd-icon-arrow-down, .nd-select .nd-select-inputct > b, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down {
-  font-family: nd-iconfont; }
-  .nd-icon-arrow-down:before, .nd-select .nd-select-inputct > b:before, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down:before {
-    content: ""; }
-
-/*右箭头*/
-.nd-icon-arrow-right, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-rightarrow, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-right1, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow {
-  font-family: nd-iconfont; }
-  .nd-icon-arrow-right:before, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-rightarrow:before, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-right1:before, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow:before {
-    content: ""; }
-
-/*双右箭头*/
-.nd-icon-double-arrow-right, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-rightarrow1, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-right2, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1 {
-  font-family: nd-iconfont; }
-  .nd-icon-double-arrow-right:before, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-rightarrow1:before, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-right2:before, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1:before {
-    content: ""; }
-
-/*左箭头*/
-.nd-icon-arrow-left, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-leftarrow, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-left1, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow {
-  font-family: nd-iconfont; }
-  .nd-icon-arrow-left:before, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-leftarrow:before, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-left1:before, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow:before {
-    content: ""; }
-
-/*双左箭头*/
-.nd-icon-double-arrow-left, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-leftarrow1, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-left2, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1 {
-  font-family: nd-iconfont; }
-  .nd-icon-double-arrow-left:before, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct .nd-datetime-leftarrow1:before, .nd-listtransfer .nd-listtransfer-btngrp .nd-listtransfer-left2:before, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1:before {
-    content: ""; }
-
-/*编辑*/
-.nd-icon-edit {
-  font-family: nd-iconfont; }
-  .nd-icon-edit:before {
-    content: ""; }
-
-/*删除*/
-.nd-icon-del {
-  font-family: nd-iconfont; }
-  .nd-icon-del:before {
-    content: ""; }
-
-/*菜单*/
-.nd-icon-menu {
-  font-family: nd-iconfont; }
-  .nd-icon-menu:before {
-    content: ""; }
-
-/*设置*/
-.nd-icon-menu {
-  font-family: nd-iconfont; }
-  .nd-icon-menu:before {
-    content: ""; }
-
-/*购物车*/
-.nd-icon-shopping-cart {
-  font-family: nd-iconfont; }
-  .nd-icon-shopping-cart:before {
-    content: ""; }
-
-/*用户*/
-.nd-icon-user {
-  font-family: nd-iconfont; }
-  .nd-icon-user:before {
-    content: ""; }
-
-/*安全*/
-.nd-icon-insurance {
-  font-family: nd-iconfont; }
-  .nd-icon-insurance:before {
-    content: ""; }
-
-/*勾*/
-.nd-icon-selected {
-  font-family: nd-iconfont; }
-  .nd-icon-selected:before {
-    content: ""; }
-
-/*日期*/
-.nd-icon-calendar, .nd-datetime .nd-datetime-field .nd-datetime-date {
-  font-family: nd-iconfont; }
-  .nd-icon-calendar:before, .nd-datetime .nd-datetime-field .nd-datetime-date:before {
-    content: ""; }
-
-/*时间*/
-.nd-icon-time, .nd-datetime .nd-datetime-field .nd-datetime-time {
-  font-family: nd-iconfont; }
-  .nd-icon-time:before, .nd-datetime .nd-datetime-field .nd-datetime-time:before {
-    content: ""; }
-
-/*勾*/
-.nd-icon-select, .nd-select .nd-select-list .nd-select-selected .nd-select-itemicon, .nd-list .nd-list-item-active .nd-list-icon, .nd-relationmap .nd-relationmap-active {
-  font-family: nd-iconfont; }
-  .nd-icon-select:before, .nd-select .nd-select-list .nd-select-selected .nd-select-itemicon:before, .nd-list .nd-list-item-active .nd-list-icon:before, .nd-relationmap .nd-relationmap-active:before {
-    content: ""; }
-
-/*叉*/
-.nd-icon-cross, .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close, .nd-tip .nd-tip-item .nd-tip-close {
-  font-family: nd-iconfont; }
-  .nd-icon-cross:before, .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close:before, .nd-tip .nd-tip-item .nd-tip-close:before {
-    content: ""; }
-
-/*垃圾桶*/
-.nd-icon-ashbin {
-  font-family: nd-iconfont; }
-  .nd-icon-ashbin:before {
-    content: ""; }
-
 /*relation map*/
 .nd-relationmap {
   border-spacing: 1px;
   background-color: #c1c1c1;
   color: #666; }
   .nd-relationmap .nd-relationmap-head td {
-    background-color: #fff;
-    color: #666;
     padding: 10px 20px; }
   .nd-relationmap td {
     background-color: #fff;

@@ -190,8 +190,6 @@ class UISelect extends nodom.Plugin{
                 datas:[]        //下拉框数据
             });
 
-
-            let data = model.data;
             this.extraModelId = model.id;
         
             //增加过滤器方法

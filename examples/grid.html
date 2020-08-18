@@ -57,7 +57,12 @@
                 <div width='1' title='折扣' field='discount'>{{(discount*10)|number:2}}</div>
                 <div width='1' title='商品描述' hide>{{desc}}</div>
             </cols>
-            <sub class='sub' labelwidth='1' contentwidth='6' cols='1' auto>
+            <!--
+                labelWidth  label宽度
+                auto        是否自动生成详细信息，如果不设置，则需要添加子元素
+                cols        一行显示几列，默认1列
+            -->
+            <sub class='sub' labelWidth='100' cols='2' auto>
                 <!-- <div><label>编号：</label><span>{{id}}</span></div>
                 <div><label>商品名：</label><span>{{name}}</span></div>
                 <div><label>价格：</label><span>{{price}}</span></div>

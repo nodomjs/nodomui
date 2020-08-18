@@ -51,6 +51,7 @@ class UIList extends nodom.Plugin {
         itemDom.addDirective(new nodom.Directive('repeat', 'datas', itemDom));
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+            console.log(1);
             if (me.disableName !== '' && model.query(me.disableName)) {
                 return;
             }
@@ -162,6 +163,7 @@ class UIList extends nodom.Plugin {
                 }
             }
             pmodel.set(this.dataName, valArr.join(','));
+            console.log(2);
         }
         else {
             //如果model不存在，则直接取选中值

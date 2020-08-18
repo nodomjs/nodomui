@@ -253,15 +253,14 @@ input,.nd-input{
         margin:0;
         padding:0;
         border:0;
-        // @include nd-color(4);
+        background-color:transparent;
         flex:1;
     }
 }
 
-
 /*global*/
 body{
-    padding:0;
+    // padding:0;
     margin:0;
     @include nd-color(1);
     font-size: $nd-fontnormal;

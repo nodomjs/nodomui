@@ -1,13 +1,11 @@
-@import "base","icon";
+// @import "base","icon";
 /*relation map*/
 
 .nd-relationmap{
     border-spacing: 1px;
-    @extend .nd-border;
     @include nd-color(6);
     .nd-relationmap-head{
         td{
-            @include nd-color(1);
             padding:$nd-padding $nd-padding * 2;
         }
     }

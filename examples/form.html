@@ -15,6 +15,7 @@
     <script src='../dist/file.js'></script>
     <script src='../dist/select.js'></script>
     <script src='../dist/selectlist.js'></script>
+    <script src='../dist/list.js'></script>
     <script src='../dist/datetime.js'></script>
     <style>
        form{
@@ -35,7 +36,7 @@
             </div>
             <div>
                 <label>性别:</label>
-                <ui-radio  class='nd-form-input' field='sexy'>
+                <ui-radio  field='sexy'>
                     <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span value='F'>女</span>
                 </ui-radio>
@@ -44,15 +45,15 @@
                 <label>出生日期:</label>
                 <ui-datetime class='nd-form-input' x-field='birth' type='date'/>
             </div>
-            <div>
+            <!-- <div>
                 <label>计划时间:</label>
                 <ui-datetime class='nd-form-input' x-field='plantime' type='datetime'/>
             </div>
             <div>
                 <label>开始时间:</label>
                 <ui-datetime class='nd-form-input' x-field='starttime' type='time'/>
+            <div> -->
             <div>
-            <div class='nd-form-item'>
                 <label>学历:</label>
                 <!--
                     x-field 绑定字段
@@ -61,12 +62,12 @@
                     listField  下拉列表对应数据
                     allowFilter 允许过滤器
                 -->
-                <ui-select class='nd-form-input' x-field='education' valueField='id' displayField='title' allowFilter listField='edus'>
+                <ui-select x-field='education' valueField='id' displayField='title' allowFilter listField='edus'>
                 </ui-select>
             </div>
-
-            <div class='nd-form-item'>
-                <label>爱好:</label>
+            <!-- 
+            <div>
+                <label>爱好:</label> -->
                 <!--
                     x-field 绑定字段
                     valueField 对应数组中对象的值字段名
@@ -75,29 +76,34 @@
                     allowFilter 允许过滤
                     listWidth   下拉列表宽度，默认与输入框相同
                 -->
-                <ui-select class='nd-form-input' x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' multiselect allowFilter listWidth='500'>
+                <!-- <ui-select x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' multiselect allowFilter listWidth='500'>
                     <div class='hobitem'><span class='id'>{{hid}}</span> <span class='title'>{{htitle}} </span> <span class='desc'>{{desc}}</span></div>
                 </ui-select>
-            </div>
+            </div> -->
 
-            <div class='nd-form-item'>
+            <div>
                 <label>生活照:</label>
                 <ui-file field='photos' multiple='multi' valueField='imgId' displayField="fileName" 
                  returnFields='id,url,result.rows' uploadMethod='uploadFile' delMethod='delFile'
                  maxCount='5'></ui-file>
             </div>
             
-            <div class='nd-form-item'>
+            <div>
                 <label>爱好</label>
-                <ui-list class='nd-form-input hobby' field='hobby' valueField='hid' 
-                    displayField='icon|1|icon,hid|1,htitle|2,desc|3'
+                <ui-list x-field='hobby' valueField='hid' style='width:400px'
+                    displayField='htitle' multiselect 
                     listField='hobbies' 
                     listType='row'>
+                    <div>
+                        <b class='{{"nd-icon-" + icon }}'></span>
+                        <span style='width:100px;display:inline-block;'>{{htitle}}</span>
+                        <span>{{desc}}</span>
+                    </div>
                 </ui-list>
             </div>
-            <div class='nd-form-item'>
+            <div>
                 <label>同意条款:</label>
-                <ui-checkbox  class='nd-form-input' yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
+                <ui-checkbox  yes-value='Y' no-value='N'  field='agree'>阅读并同意</ui-checkbox>
             </div>
         </ui-form>
     </div>
