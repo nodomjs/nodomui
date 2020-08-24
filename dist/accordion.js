@@ -65,7 +65,7 @@ class UIAccordion extends nodom.Plugin {
             }
             if (item.hasProp('first')) {
                 //添加repeat指令
-                firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom));
+                firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom), true);
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
@@ -100,26 +100,18 @@ class UIAccordion extends nodom.Plugin {
                 //保存第二级field
                 this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
-                let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
+                if (item.hasProp('itemclick')) {
+                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick') + ':delg'));
+                }
+                // let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addDirective(new nodom.Directive('class', "{'nd-accordion-selected':'" + activeName2 + "'}", item));
-                this.method2 = methodId;
+                // this.method2 = methodId;
                 secondDom.addClass('nd-accordion-secondct');
                 secondDom.add(item);
-                secondDom.addDirective(new nodom.Directive('class', "{'nd-accordion-hide':'!" + activeName1 + "'}", secondDom));
-                if (item.hasProp('icon')) {
-                    item.addClass('nd-icon-' + item.getProp('icon'));
-                }
+                secondDom.addDirective(new nodom.Directive('class', "{'nd-accordion-hide':'!" + activeName1 + "'}", secondDom), true);
             }
-            item.delProp(['data', 'icon', 'second']);
+            item.delProp(['data', 'second']);
         }
-        //指令按优先级排序
-        firstDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
-        secondDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
         firstDom.add(secondDom);
         rootDom.children = [firstDom];
     }

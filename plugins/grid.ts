@@ -258,7 +258,7 @@ class UIGrid extends nodom.Plugin{
      * @param thead     thead
      * @param field     绑定字段
      */ 
-    addToHead(col:nodom.Element,index:number,thead:nodom.Element,field?:string){
+    private addToHead(col:nodom.Element,index:number,thead:nodom.Element,field?:string){
         if(!thead){
             return;
         }
@@ -292,7 +292,7 @@ class UIGrid extends nodom.Plugin{
     /**
      * 添加排序按钮
      */
-    addSortBtn(index:number):nodom.Element{
+    private addSortBtn(index:number):nodom.Element{
         let updown:nodom.Element = new nodom.Element('span');
         updown.addClass('nd-grid-sort');
         let up:nodom.Element = new nodom.Element('B');
@@ -333,7 +333,7 @@ class UIGrid extends nodom.Plugin{
      * @param dataDom   数据行dom
      * @param rowDom    数据行dom容器
      */
-    handleSub(subDom:nodom.Element,thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
+    private handleSub(subDom:nodom.Element,thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
         //表头加一列
         let th:nodom.Element = new nodom.Element('div');
         th.addClass('nd-grid-iconcol');
@@ -343,7 +343,6 @@ class UIGrid extends nodom.Plugin{
         if(thead){
             thead.children[0].children.unshift(th);
         }
-        
         
         //行前添加箭头
         let td:nodom.Element = new nodom.Element('div');
@@ -406,7 +405,7 @@ class UIGrid extends nodom.Plugin{
      * @param headDom   表格头
      * @param rowDom    表格体
      */
-    addGridLine(gridLine:string,headDom:nodom.Element,rowDom:nodom.Element){
+    private addGridLine(gridLine:string,headDom:nodom.Element,rowDom:nodom.Element){
         switch(gridLine){
             case 'column':
                 headDom.addClass('nd-grid-col-line');
@@ -429,7 +428,7 @@ class UIGrid extends nodom.Plugin{
      * @param fieldIndex    排序字段名
      * @param asc           desc 降序 asc升序
      */
-    sort(index:number,asc:string,module:nodom.Module){
+    private sort(index:number,asc:string,module:nodom.Module){
         let dom:nodom.Element = module.virtualDom.query(this.rowDomKey);
         let directive:nodom.Directive = dom.getDirective('repeat');
         if(!directive){
@@ -482,7 +481,7 @@ class UIGrid extends nodom.Plugin{
     /**
      * 处理pagination
      */
-    handlePagination(pagination:nodom.Element){
+    private handlePagination(pagination:nodom.Element){
         let me = this;
         let df:UIPagination = <UIPagination>pagination.plugin;
         if(df.currentPage){
@@ -524,7 +523,6 @@ class UIGrid extends nodom.Plugin{
             }
         }
     }
-
 }
 
 nodom.PluginManager.add('UI-GRID',UIGrid);

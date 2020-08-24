@@ -21,7 +21,7 @@ class UIButtonGroup extends nodom.Plugin {
                                 if (typeof c !== 'object') {
                                     continue;
                                 }
-                                rootDom.add(new UIButton(c));
+                                rootDom.add(new UIButton(c).element);
                             }
                         }
                     }

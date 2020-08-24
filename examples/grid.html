@@ -16,7 +16,7 @@
     <style>
         .ct{
             min-width:1000px !important;
-            /* height:300px; */
+            height:500px; 
         }
         .pager{
             text-align:center;
@@ -38,7 +38,7 @@
             fixHead:  固定表头，滚动条拉动时不滚动
             hideHead: 隐藏头部
         -->
-        <ui-grid  dataName='rows' class='ct' rowalt sortable gridline='both' fixHead>
+        <ui-grid  dataName='rows' class='ct' rowalt sortable gridline='both' hideHead>
             <!--列集合-->
             <cols>
                 <!--
@@ -70,7 +70,7 @@
                 <div><label>原价：</label><span>{{oprice}}</span></div>
                 <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div> -->
             </sub>
-            <!-- requestName='pageno,pagesize'   -->
+            <!--分页-->
             <ui-pagination totalName='total' onChange='changeData' pageSize='10' sizeChange='10,20,30,50' showGo showTotal></ui-pagination>
         </ui-grid>
         

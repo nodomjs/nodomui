@@ -26,9 +26,11 @@
 }
 
 /*icon class*/
+/**必要箭头开始*/
+
 /*菜单，树右向箭头*/
 .nd-icon-right{
-    @include nd-genicon('\e61a');
+    @include nd-genicon('\e6cd');
 }
 
 /*复选框，未选中*/
@@ -38,22 +40,22 @@
 
 /*复选框，已选中*/
 .nd-icon-checked{
-    @include nd-genicon('\e7cc');
+    @include nd-genicon('\e6ce');
 }
 
 /*单选框，未选中*/
 .nd-icon-radio{
-    @include nd-genicon('\e6ed');
+    @include nd-genicon('\e8bb');
 }
 /*单选框，已选中*/
 .nd-icon-radio-active{
-    @include nd-genicon('\e75f');
+    @include nd-genicon('\e61a');
 }
 
 
 /*减号*/
 .nd-icon-minus{
-    @include nd-genicon('\e762');
+    @include nd-genicon('\e6a4');
 }
 /*加号*/
 .nd-icon-add{
@@ -62,56 +64,129 @@
 
 /*关闭*/
 .nd-icon-close{
-    @include nd-genicon('\e761');
+    @include nd-genicon('\e68e');
 }
 
 /*加号(不带圆圈)*/
-.nd-icon-add-select{
-    @include nd-genicon('\e7b0');
+.nd-icon-add1{
+    @include nd-genicon('\e664');
 }
 /*减号(不带圆圈)*/
-.nd-icon-sami-select{
-    @include nd-genicon('\e7b1');
+.nd-icon-minus1{
+    @include nd-genicon('\e6ab');
 }
 
-/*提示*/
-.nd-icon-prompt{
-    @include nd-genicon('\e760');
+/*勾*/
+.nd-icon-select{
+    @include nd-genicon('\e6b7');
 }
 
-/*查询*/
-.nd-icon-search{
-    @include nd-genicon('\e7b6');
+/*叉*/
+.nd-icon-cross{
+    @include nd-genicon('\e675');
 }
 
 /*上箭头*/
 .nd-icon-arrow-up{
-    @include nd-genicon('\e746');
+    @include nd-genicon('\e748');
 }
 /*下箭头*/
 .nd-icon-arrow-down{
-    @include nd-genicon('\e7b2');
-}
-
-/*右箭头*/
-.nd-icon-arrow-right{
-    @include nd-genicon('\e743');
-}
-
-/*双右箭头*/
-.nd-icon-double-arrow-right{
-    @include nd-genicon('\e751');
+    @include nd-genicon('\e668');
 }
 
 /*左箭头*/
 .nd-icon-arrow-left{
-    @include nd-genicon('\e744');
+    @include nd-genicon('\e746');
 }
+
+/*右箭头*/
+.nd-icon-arrow-right{
+    @include nd-genicon('\e745');
+}
+
 
 /*双左箭头*/
 .nd-icon-double-arrow-left{
-    @include nd-genicon('\e752');
+    @include nd-genicon('\e75b');
 }
+
+/*双右箭头*/
+.nd-icon-double-arrow-right{
+    @include nd-genicon('\e75a');
+}
+
+/*日期*/
+.nd-icon-calendar{
+    @include nd-genicon('\e74d');
+}
+
+/*时间*/
+.nd-icon-time{
+    @include nd-genicon('\e6be');
+}
+
+/*查询*/
+.nd-icon-search{
+    @include nd-genicon('\e7b7');
+}
+
+/*loading*/
+.nd-icon-loading{
+    @include nd-genicon('\e762');
+}
+
+/**必要图标结束*/
+
+/**编辑器*/
+/*粗体*/
+.nd-icon-bold{
+    @include nd-genicon('\e7cf');
+}
+/*斜体*/
+.nd-icon-italic{
+    @include nd-genicon('\e7d8');
+}
+/*下划线*/
+.nd-icon-underline{
+    @include nd-genicon('\e7da');
+}
+
+/*左对齐*/
+.nd-icon-leftalign{
+    @include nd-genicon('\e7d7');
+}
+
+/*右对齐*/
+.nd-icon-rightalign{
+    @include nd-genicon('\e7d9');
+}
+
+/*居中对齐*/
+.nd-icon-centeralign{
+    @include nd-genicon('\e7d1');
+}
+
+
+
+/*播放器*/
+/*播放*/
+.nd-icon-play{
+    @include nd-genicon('\e6a8');
+}
+
+/*停止*/
+.nd-icon-stop{
+    @include nd-genicon('\e773');
+}
+
+/*提示*/
+.nd-icon-prompt{
+    @include nd-genicon('\e76a');
+}
+
+
+
 
 /*编辑*/
 .nd-icon-edit{
@@ -129,7 +204,7 @@
 }
 
 /*设置*/
-.nd-icon-menu{
+.nd-icon-set{
     @include nd-genicon('\e74a');
 }
 
@@ -148,30 +223,8 @@
     @include nd-genicon('\e772');
 }
 
-/*勾*/
-.nd-icon-selected{
-    @include nd-genicon('\e765');
-}
 
-/*日期*/
-.nd-icon-calendar{
-    @include nd-genicon('\e667');
-}
 
-/*时间*/
-.nd-icon-time{
-    @include nd-genicon('\e680');
-}
-
-/*勾*/
-.nd-icon-select{
-    @include nd-genicon('\e67e');
-}
-
-/*叉*/
-.nd-icon-cross{
-    @include nd-genicon('\e668');
-}
 
 /*垃圾桶*/
 .nd-icon-ashbin{

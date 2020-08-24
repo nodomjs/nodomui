@@ -33,6 +33,9 @@ class UIDialog extends nodom.Plugin {
         rootDom.setProp('name', panelDom.getProp('name'));
         //autoopen
         this.autoOpen = panelDom.hasProp('autoopen');
+        //事件名
+        this.onClose = panelDom.getProp('onclose');
+        this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
         panel.setCloseHandler(() => {
             me.close();
@@ -82,6 +85,13 @@ class UIDialog extends nodom.Plugin {
             if (model) {
                 model.set(this.dataName, true);
             }
+            //onopen事件
+            if (this.onOpen) {
+                let foo = module.methodFactory.get(this.onOpen);
+                if (foo) {
+                    nodom.Util.apply(foo, model, [model, module]);
+                }
+            }
         }
     }
     /**
@@ -94,6 +104,13 @@ class UIDialog extends nodom.Plugin {
             let model = module.modelFactory.get(this.modelId);
             if (model) {
                 model.set(this.dataName, false);
+            }
+            //onClose事件
+            if (this.onClose) {
+                let foo = module.methodFactory.get(this.onClose);
+                if (foo) {
+                    nodom.Util.apply(foo, model, [model, module]);
+                }
             }
         }
     }

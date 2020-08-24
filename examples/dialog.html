@@ -26,17 +26,17 @@
 </head>
 <body>
     <div>
-        <div style='color:red'>测试dialog</div>
         <button e-click='showDlg'>打开</button>
         <!--
             name        如果需要操作dialog，则需要设置
             title       dialog 标题
             autoOpen    是否自动打开，如果设置，则首次渲染时自动打开
+            onOpen      打开时事件
+            onClose     关闭时事件
         -->
-        <ui-dialog name='dlg' class='dialog' title='测试Dialog' autoOpen>
-            <div>this is a dialog</div>
+        <ui-dialog name='dlg' class='dialog' title='测试Dialog' autoOpen onOpen='onOpen' onClose='onClose'>
             <ui-buttongroup>
-                <ui-button active small icon='close' e-click='closeDlg'>关闭</ui-button>
+                <ui-button theme='active' size='small' icon='close' e-click='closeDlg'>关闭</ui-button>
             </ui-buttongroup>
         </ui-dialog>
     </div>
@@ -45,18 +45,21 @@
     nodom.newApp({
         module:{
             el:'div',
-            data:{
-                
-            },
             methods:{
                 showDlg:function(dom,model,module,e){
                     module.getPlugin('dlg').open();
                 },
                 closeDlg:function(dom,model,module,e){
                     module.getPlugin('dlg').close();
+                },
+                onOpen:function(model,module){
+                    console.log('open');
+                },
+                onClose:function(model,module){
+                    console.log('close');
                 }
             }
         }
-    })
+    });
 </script>
 </html>
