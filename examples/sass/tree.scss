@@ -2,6 +2,7 @@
 /********** tree ***********/
 .nd-tree{
     @extend .nd-commonbox;
+    overflow:auto;
     .nd-tree-nodect{
         
         .nd-tree-node{

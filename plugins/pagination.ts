@@ -194,7 +194,8 @@ class UIPagination extends nodom.Plugin{
         //点击事件
         page.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                me.update(module,model.data['no']);
+                me.changeParams(module,model.data['no']);
+                // me.update(module,model.data['no']);
             }
         ));
         left.addEvent(new nodom.NodomEvent('click',
@@ -202,7 +203,8 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.update(module,-1,true);
+                // me.update(module,-1,true);
+                me.changeParams(module,-1,true);
             }
         ));
 
@@ -211,7 +213,8 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.update(module,1,true);
+                // me.update(module,1,true);
+                me.changeParams(module,1,true);
             }
         ));
 
@@ -220,7 +223,8 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.update(module,-me.steps,true);
+                // me.update(module,-me.steps,true);
+                me.changeParams(module,-me.steps,true);
             }
         ));
 
@@ -229,7 +233,8 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.update(module,me.steps,true);
+                // me.update(module,me.steps,true);
+                me.changeParams(module,me.steps,true);
             }
         ));
         //显示第x页及输入框
@@ -270,8 +275,7 @@ class UIPagination extends nodom.Plugin{
      * @param current   当前页或位移量
      * @param isStep    如果true current为位移量
      */
-    update(module:nodom.Module,current?:number,isStep?:boolean){
-        this.changeParams(module,current,isStep);
+    private update(module:nodom.Module,current?:number,isStep?:boolean){
         //onchange 事件执行
         if(this.onChange && this.onChange !== ''){
             let foo:Function;
@@ -405,14 +409,12 @@ class UIPagination extends nodom.Plugin{
      * @param dom 
      * @param module
      */
-    handleInit(dom:nodom.Element,module:nodom.Module){
+    private handleInit(dom:nodom.Element,module:nodom.Module){
         let me = this;
         if(!this.needPreRender){
             return;
         }
-        
         let model:nodom.Model = module.modelFactory.get(dom.modelId);
-        
         let model1:nodom.Model = model.set(this.extraDataName,{
             //总条数
             total:0,
@@ -442,7 +444,7 @@ class UIPagination extends nodom.Plugin{
         }
         model1.watch('pageSize',watchFunc);
         model1.watch('pageNo',watchFunc);
-        this.update(module,1);
+        this.changeParams(module,1);
     }
 }
 

@@ -66,7 +66,7 @@ class UITree extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
                     ['valuefield','displayfield','listfield','itemclick','checkname','maxlevel|number','icons|array|2'],
-                    ['valueField','displayField','listField','clickEvent','checkName','maxLevel','iconArr'],
+                    ['valueField','displayField','listField','itemClick','checkName','maxLevel','iconArr'],
                     ['',null,null,'','',3,[]]);
             }else if(typeof params === 'object'){
                 for(let o in params){
@@ -289,6 +289,7 @@ class UITree extends nodom.Plugin{
      * 获取value
      */
     getValue():any[]{
+        const me = this;
         if(this.valueField === ''){
             return;
         }
@@ -302,10 +303,10 @@ class UITree extends nodom.Plugin{
         function getChecked(rows){
             if(Array.isArray(rows)){
                 for(let d of rows){
-                    if(d[this.checkName] === true){
-                        va.push(d);
+                    if(d[me.checkName] === true){
+                        va.push(d[me.valueField]);
                     }
-                    getChecked(d[this.listField]);
+                    getChecked(d[me.listField]);
                 }
             }
         }

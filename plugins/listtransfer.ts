@@ -213,7 +213,7 @@ class UIListTransfer extends nodom.Plugin{
      * @param direction 移动方向 1右移 2左移
      * @param all       true 全部移动  false 移动选中的项
      */
-    transfer(module:nodom.Module,direction:number,all:boolean){
+    private transfer(module:nodom.Module,direction:number,all:boolean){
         let model:nodom.Model = module.modelFactory.get(this.extraModelId);
         let datas = model.data.datas;
         let isValue:boolean = direction===1?true:false;
@@ -232,7 +232,7 @@ class UIListTransfer extends nodom.Plugin{
      * 更新字段值
      * @param module    模块
      */
-    updateValue(module:nodom.Module){
+    private updateValue(module:nodom.Module){
         let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
         let model:nodom.Model = module.modelFactory.get(this.extraModelId);
         let a = [];

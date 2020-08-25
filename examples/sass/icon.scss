@@ -52,14 +52,13 @@
     @include nd-genicon('\e61a');
 }
 
-
 /*减号*/
 .nd-icon-minus{
     @include nd-genicon('\e6a4');
 }
 /*加号*/
 .nd-icon-add{
-    @include nd-genicon('\e742');
+    @include nd-genicon('\e665');
 }
 
 /*关闭*/
@@ -128,7 +127,7 @@
 
 /*查询*/
 .nd-icon-search{
-    @include nd-genicon('\e7b7');
+    @include nd-genicon('\e6b4');
 }
 
 /*loading*/
@@ -167,6 +166,25 @@
     @include nd-genicon('\e7d1');
 }
 
+/*剪切*/
+.nd-icon-cut{
+    @include nd-genicon('\e758');
+}
+
+/*复制*/
+.nd-icon-copy{
+    @include nd-genicon('\e6f4');
+}
+
+/*背景色*/
+.nd-icon-bgcolor{
+    @include nd-genicon('\e7cd');
+}
+
+/*擦除*/
+.nd-icon-eraser{
+    @include nd-genicon('\e7d0');
+}
 
 
 /*播放器*/
@@ -180,22 +198,19 @@
     @include nd-genicon('\e773');
 }
 
-/*提示*/
-.nd-icon-prompt{
-    @include nd-genicon('\e76a');
-}
-
-
-
-
 /*编辑*/
 .nd-icon-edit{
-    @include nd-genicon('\e753');
+    @include nd-genicon('\e68b');
 }
 
 /*删除*/
 .nd-icon-del{
-    @include nd-genicon('\e747');
+    @include nd-genicon('\e67c');
+}
+
+/*提示*/
+.nd-icon-prompt{
+    @include nd-genicon('\e6ae');
 }
 
 /*菜单*/
@@ -203,32 +218,332 @@
     @include nd-genicon('\e74a');
 }
 
+/*分类*/
+.nd-icon-category{
+    @include nd-genicon('\e74f');
+}
+
 /*设置*/
 .nd-icon-set{
-    @include nd-genicon('\e74a');
+    @include nd-genicon('\e6bb');
 }
 
 /*购物车*/
-.nd-icon-shopping-cart{
-    @include nd-genicon('\e7b4');
+.nd-icon-cart{
+    @include nd-genicon('\e7b5');
 }
 
 /*用户*/
 .nd-icon-user{
-    @include nd-genicon('\e7b7');
+    @include nd-genicon('\e6c5');
 }
+
+/*密码*/
+.nd-icon-password{
+    @include nd-genicon('\e8b2');
+}
+
+/*锁*/
+.nd-icon-lock{
+    @include nd-genicon('\e69d');
+}
+
+/*解锁*/
+.nd-icon-unlock{
+    @include nd-genicon('\e6c4');
+}
+
 
 /*安全*/
 .nd-icon-insurance{
-    @include nd-genicon('\e772');
+    @include nd-genicon('\e77e');
 }
-
-
-
 
 /*垃圾桶*/
 .nd-icon-ashbin{
-    @include nd-genicon('\e748');
+    @include nd-genicon('\e669');
 }
+
+/*消息*/
+.nd-icon-message{
+    @include nd-genicon('\e613');
+}
+
+/*夜晚*/
+.nd-icon-night{
+    @include nd-genicon('\e77f');
+}
+
+/*白天*/
+.nd-icon-daytime{
+    @include nd-genicon('\e77b');
+}
+
+/*关机*/
+.nd-icon-switch{
+    @include nd-genicon('\e775');
+}
+
+/*二维码*/
+.nd-icon-qrcode{
+    @include nd-genicon('\e76b');
+}
+
+/*下载*/
+.nd-icon-download{
+    @include nd-genicon('\e75d');
+}
+
+/*上传*/
+.nd-icon-upload{
+    @include nd-genicon('\e6c6');
+}
+
+/*警告*/
+.nd-icon-warning{
+    @include nd-genicon('\e6c7');
+}
+
+/*点赞*/
+.nd-icon-good{
+    @include nd-genicon('\e8ad');
+}
+
+/*反赞*/
+.nd-icon-bad{
+    @include nd-genicon('\e66d');
+}
+
+/*眼睛*/
+.nd-icon-eye{
+    @include nd-genicon('\e66b');
+}
+
+/*闭眼睛*/
+.nd-icon-eyeclose{
+    @include nd-genicon('\e68c');
+}
+
+/*隐藏*/
+.nd-icon-hide{
+    @include nd-genicon('\e695');
+}
+
+/*主页*/
+.nd-icon-home{
+    @include nd-genicon('\e7a7');
+}
+
+/*喜欢*/
+.nd-icon-favorite{
+    @include nd-genicon('\e7b6');
+}
+
+/*喜欢fill*/
+.nd-icon-favorite-fill{
+    @include nd-genicon('\e721');
+}
+
+/*收藏*/
+.nd-icon-collect{
+    @include nd-genicon('\e8b9');
+}
+
+/*收藏fill*/
+.nd-icon-collect-fill{
+    @include nd-genicon('\e8c6');
+}
+
+/*星星*/
+.nd-icon-collect-fill{
+    @include nd-genicon('\e8c6');
+}
+
+
+
+/*map*/
+.nd-icon-map{
+    @include nd-genicon('\e764');
+}
+
+/*vip*/
+.nd-icon-vip{
+    @include nd-genicon('\e780');
+}
+
+/*to bottom*/
+.nd-icon-bottom{
+    @include nd-genicon('\e66c');
+}
+
+/*to top*/
+.nd-icon-top{
+    @include nd-genicon('\e6c3');
+}
+
+/*picture*/
+.nd-icon-picture{
+    @include nd-genicon('\e6b1');
+}
+
+/*导航*/
+.nd-icon-navigation{
+    @include nd-genicon('\e6ac');
+}
+
+/*电话*/
+.nd-icon-telephone{
+    @include nd-genicon('\e6c2');
+}
+
+/*缩小*/
+.nd-icon-zoomin{
+    @include nd-genicon('\e6c8');
+}
+
+/*放大*/
+.nd-icon-zoomout{
+    @include nd-genicon('\e6c9');
+}
+
+/*保存*/
+.nd-icon-save{
+    @include nd-genicon('\e6b3');
+}
+
+/*扫描*/
+.nd-icon-scan{
+    @include nd-genicon('\e6b5');
+}
+
+/*pdf*/
+.nd-icon-pdf{
+    @include nd-genicon('\e6ad');
+}
+
+/*打印机*/
+.nd-icon-print{
+    @include nd-genicon('\e6a9');
+}
+
+/*help*/
+.nd-icon-help{
+    @include nd-genicon('\e6a3');
+}
+
+/*folder open*/
+.nd-icon-folderopen{
+    @include nd-genicon('\e698');
+}
+
+/*folder close*/
+.nd-icon-folderclose{
+    @include nd-genicon('\e692');
+}
+
+/*file*/
+.nd-icon-file{
+    @include nd-genicon('\e691');
+}
+
+/*email*/
+.nd-icon-email{
+    @include nd-genicon('\e68d');
+}
+
+/*more*/
+.nd-icon-more{
+    @include nd-genicon('\e689');
+}
+
+/*link*/
+.nd-icon-link{
+    @include nd-genicon('\e761');
+}
+
+/*计算器*/
+.nd-icon-caculator{
+    @include nd-genicon('\e74e');
+}
+
+/*声音*/
+.nd-icon-voice{
+    @include nd-genicon('\e8b8');
+}
+
+/*资金*/
+.nd-icon-func{
+    @include nd-genicon('\e7cb');
+}
+
+/*相机*/
+.nd-icon-camera{
+    @include nd-genicon('\e671');
+}
+
+/*code*/
+.nd-icon-code{
+    @include nd-genicon('\e674');
+}
+
+/*评价*/
+.nd-icon-comment{
+    @include nd-genicon('\e678');
+}
+
+/*data view*/
+.nd-icon-dataview{
+    @include nd-genicon('\e680');
+}
+
+/*折扣*/
+.nd-icon-discount{
+    @include nd-genicon('\e684');
+}
+
+/*取消全屏*/
+.nd-icon-fullscreen-shrink{
+    @include nd-genicon('\e684');
+}
+
+/*全屏*/
+.nd-icon-fullscreen{
+    @include nd-genicon('\e69e');
+}
+
+/*all*/
+.nd-icon-all{
+    @include nd-genicon('\e6ef');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

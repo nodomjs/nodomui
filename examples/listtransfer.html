@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta title="viewport" content="width=device-width, initial-scale=1.0">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>nodomui example - panel usage</title>
+    <title>nodomui example - listtransfer usage</title>
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script src='js/nodom.js'></script>
     <script src='../dist/uibase.js'></script>
     <script src='../dist/listtransfer.js'></script>
     <style>
         .ct{
-            height:150px;
+            height:200px;
             width:600px;
         }
     </style>
@@ -19,11 +19,11 @@
 <body>
     <div>
         <p>简单用法</p>
-        <ui-listtransfer class='ct' x-field='selectedUser'  valueField='uid' 
+        <ui-listtransfer style='height:200px;max-width:500px;' x-field='selectedUser'  valueField='uid' 
             displayField='userName' listField='users'>
         </ui-listtransfer>
         <p>自定义</p>
-        <ui-listtransfer class='ct' x-field='selectedUser'  valueField='uid' 
+        <ui-listtransfer style='height:200px;max-width:500px;' x-field='selectedUser'  valueField='uid' 
             displayField='userName' listField='users'>
             <div>
                 <span style='width:100px;display:inline-block;'>{{userName}}</span>
@@ -46,9 +46,6 @@
                     {uid:5,userName:'fieldyang','company':'京东'},
                     {uid:6,userName:'路人甲','company':'google'}
                 ]
-            },
-            methods:{
-                
             }
         }
     })

@@ -7,6 +7,7 @@
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script src='js/nodom.js'></script>
+    <script src='../dist/uibase.js'></script>
     <script src='../dist/panel.js'></script>
     <script src='../dist/button.js'></script>
     <script src='../dist/toolbar.js'></script>
@@ -14,43 +15,17 @@
     <script src='../dist/layout.js'></script>
     <script src='../dist/accordion.js'></script>
     <style>
-        .north{
-            height:50px;
-            line-height:50px;
-            font-size:18px;
-            background-color:#333;
-            color:#fff;
-            text-align:center;
-        }
-
-        .south{
-            height:100px;
-            line-height:25px;
-            box-sizing:border-box;
-            background-color:#333;
-            color:#fff;
-            font-size:14px;
-            padding:20px;
-            text-align:center;
-        }
-
-        .west{
-            width:200px;
-        }
-        .east{
-            width:200px;
-        }
-        .panel{
-            height:100%;
-        }
+        
         
     </style>
 </head>
 <body>
     <div>
         <ui-layout>
-            <div class='north' north>这是一个管理系统</div>
-            <div west class='west'>
+            <div north style='line-height:60px;text-align: center;font-size:20px;background-color:#333;color:#fff'>
+                这是一个管理系统
+            </div>
+            <div west class='west' style='width:300px'>
                 <ui-panel title='功能选择'>
                     <ui-accordion>
                         <div first data='levels' icon='pulldown pullup' activeName='active'>{{title}}</div>
@@ -59,24 +34,28 @@
                 </ui-panel>
             </div>
             <div center>
-                <ui-panel title='测试panel' buttons='min,max,close'>
+                <ui-panel class='panel' title='测试panel' buttons='min,max,close' style='height:100%'>
                     <ui-toolbar>
-                        <ui-button nobg left icon='menu'></ui-button>
-                        <ui-button nobg right icon='pulldown' >颜色</ui-button>
-                        <ui-button  nobg icon='setting'></ui-button>
-                        <ui-button  nobg icon='publish'></ui-button>
+                        <ui-button nobg icon='menu'></ui-button>
+                        <ui-button nobg right icon='arrow-down' >颜色</ui-button>
+                        <ui-button nobg icon='search'></ui-button>
+                        <ui-button nobg icon='ashbin'></ui-button>
                     </ui-toolbar>
-                    <div>hello world!</div>
                     <ui-buttongroup>
-                        <ui-button active small icon='plus'>添加</ui-button>
-                        <ui-button emphasis small icon='close'>删除</ui-button>
-                        <ui-button warn small icon='info'>编辑</ui-button>
-                        <ui-button small icon='search'>查询</ui-button>
+                        <ui-button theme='active' icon='add'>添加</ui-button>
+                        <ui-button theme='error' icon='ashbin'>删除</ui-button>
+                        <ui-button theme='warn' icon='edit'>编辑</ui-button>
+                        <ui-button  icon='search'>查询</ui-button>
                     </ui-buttongroup>
+                    <!--panel body,可以有多个-->
+                    <div>hello world!</div>
+                    <p>
+                        这是一个panel  
+                    </p>
                 </ui-panel>
             </div>
-            <div east class='east'>东边</div>
-            <div south class='south'>
+            <div east style='width:200px'>东边</div>
+            <div south class='south' style='line-height:30px;text-align: center;font-size:16px;background-color:#333;color:#fff'>
                 nodom团队@版权所有<br>
                 邮箱：nodomjs@aliyun.com
             </div>

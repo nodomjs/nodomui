@@ -230,7 +230,7 @@ class UIList extends nodom.Plugin{
      * @param module    模块
      * @param value     值
      */
-    setValue(module:nodom.Module,model?:nodom.Model){
+    private setValue(module:nodom.Module,model?:nodom.Model){
         //原model
         let pmodel = module.modelFactory.get(this.modelId);
         //附加数据model
@@ -279,9 +279,6 @@ class UIList extends nodom.Plugin{
             }
         }
     }
-
-
-    
 }
 
 nodom.PluginManager.add('UI-LIST',UIList);

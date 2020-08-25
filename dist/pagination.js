@@ -112,31 +112,36 @@ class UIPagination extends nodom.Plugin {
         rootDom.add(pageCt);
         //点击事件
         page.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            me.update(module, model.data['no']);
+            me.changeParams(module, model.data['no']);
+            // me.update(module,model.data['no']);
         }));
         left.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, -1, true);
+            // me.update(module,-1,true);
+            me.changeParams(module, -1, true);
         }));
         right.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, 1, true);
+            // me.update(module,1,true);
+            me.changeParams(module, 1, true);
         }));
         left1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, -me.steps, true);
+            // me.update(module,-me.steps,true);
+            me.changeParams(module, -me.steps, true);
         }));
         right1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, me.steps, true);
+            // me.update(module,me.steps,true);
+            me.changeParams(module, me.steps, true);
         }));
         //显示第x页及输入框
         if (this.showGo) {
@@ -174,7 +179,6 @@ class UIPagination extends nodom.Plugin {
      * @param isStep    如果true current为位移量
      */
     update(module, current, isStep) {
-        this.changeParams(module, current, isStep);
         //onchange 事件执行
         if (this.onChange && this.onChange !== '') {
             let foo;
@@ -332,7 +336,7 @@ class UIPagination extends nodom.Plugin {
         };
         model1.watch('pageSize', watchFunc);
         model1.watch('pageNo', watchFunc);
-        this.update(module, 1);
+        this.changeParams(module, 1);
     }
 }
 nodom.PluginManager.add('UI-PAGINATION', UIPagination);

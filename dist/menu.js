@@ -2,9 +2,9 @@
 /**
  * panel 插件
  * 配置
- *  listField:   菜单数组数据项名，如rows，各级菜单的必须保持一致
+ *  listField:  菜单数组数据项名，如rows，各级菜单的必须保持一致
  *  popup:      是否为popup菜单，不设置值
- *  maxLevels:  菜单最大级数，默认三级
+ *  maxLevel:   菜单最大级数，默认三级
  *  width:      菜单宽度(如果为非popup，则第一级不用这个宽度)
  *
  * 子节点
@@ -28,7 +28,7 @@ class UIMenu extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevels', 'menuWidth'], [null, null, 3, 150]);
+                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevel|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevel', 'menuWidth'], [null, null, 3, 150]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -98,7 +98,7 @@ class UIMenu extends nodom.Plugin {
             parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
         }
         //初始化各级
-        for (let i = 0; i < this.maxLevels; i++) {
+        for (let i = 0; i < this.maxLevel; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
@@ -155,7 +155,7 @@ class UIMenu extends nodom.Plugin {
                     let h = rows * me.menuHeight;
                     //根据最大级数计算pop方向
                     if (this.direction === 0) {
-                        if (x + w * this.maxLevels > window.innerWidth - 10) {
+                        if (x + w * this.maxLevel > window.innerWidth - 10) {
                             this.direction = 1;
                         }
                     }
@@ -258,10 +258,10 @@ class UIMenu extends nodom.Plugin {
                 }
             }
             else if (dom) { //第二级菜单的子菜单
-                left -= w;
+                left -= w + 1;
             }
             else if (widthOut) { //pop第一级右侧不够放
-                left -= w + 2;
+                left -= w + 3;
             }
         }
         else {
