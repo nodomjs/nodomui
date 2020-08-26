@@ -1805,6 +1805,7 @@ var nodom;
                 this.fields.forEach((field) => {
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
+                
                 valueArr.unshift(module);
                 return this.execFunc.apply(null, valueArr);
                 function getFieldValue(module, dataObj, field) {

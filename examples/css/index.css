@@ -129,7 +129,7 @@ a:visited {
     background-color: transparent; }
 
 /*可以click*/
-.nd-canclick, button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates > span, .nd-list .nd-list-item, .nd-list-horizontal .nd-list-item, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close, .nd-relationmap .nd-relationmap-row td, .nd-tab .nd-tab-head .nd-tab-item, .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close, .nd-tip .nd-tip-item .nd-tip-close, .nd-tree .nd-tree-nodect .nd-tree-uncheck, .nd-tree .nd-tree-nodect .nd-tree-checked {
+.nd-canclick, button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-ymct > b, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates > span, .nd-layout .nd-layout-middle .nd-layout-header b, .nd-list .nd-list-item, .nd-list-horizontal .nd-list-item, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow, .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close, .nd-relationmap .nd-relationmap-row td, .nd-tab .nd-tab-head .nd-tab-item, .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close, .nd-tip .nd-tip-item .nd-tip-close, .nd-tree .nd-tree-nodect .nd-tree-uncheck, .nd-tree .nd-tree-nodect .nd-tree-checked {
   cursor: pointer; }
 
 /*输入框*/
@@ -1270,14 +1270,30 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   left: 0;
   right: 0; }
   .nd-layout .nd-layout-north, .nd-layout .nd-layout-south, .nd-layout .nd-layout-west, .nd-layout .nd-layout-east {
-    overflow: auto; }
+    overflow: auto;
+    box-sizing: border-box; }
   .nd-layout .nd-layout-middle {
     display: flex;
-    flex: 1;
-    overflow: hidden; }
+    box-sizing: border-box;
+    overflow: hidden;
+    flex: 1; }
     .nd-layout .nd-layout-middle .nd-layout-center {
       flex: 1;
       overflow: auto; }
+    .nd-layout .nd-layout-middle .nd-layout-header {
+      background-color: #d5d5d5;
+      color: #666;
+      height: 40px;
+      line-height: 40px;
+      padding: 0 10px;
+      border-radius: 5px 5px 0 0;
+      display: flex;
+      min-width: 40px; }
+      .nd-layout .nd-layout-middle .nd-layout-header .nd-layout-title {
+        flex: 1;
+        text-align: center; }
+      .nd-layout .nd-layout-middle .nd-layout-header b {
+        width: 30px; }
 
 /*list box*/
 .nd-list {
