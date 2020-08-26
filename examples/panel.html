@@ -13,19 +13,15 @@
     <script src='../dist/toolbar.js'></script>
     <script src='../dist/buttongroup.js'></script>
     <style>
-        .panel{
-            margin:20px;
-            height:300px;
-            width:500px;
-        }
+        
     </style>
 </head>
 <body>
     <div>
-        <ui-panel class='panel' title='测试panel' buttons='min,max,close'>
+        <ui-panel title='测试panel' style='box-sizing:border-box;width:{{width}};height:{{height}}' buttons='minus|recover,add|maximum'>
             <ui-toolbar>
                 <ui-button nobg icon='menu'></ui-button>
-                <ui-button nobg iconPos='right' icon='arrow-down' >颜色</ui-button>
+                <ui-button nobg >颜色</ui-button>
                 <ui-button nobg icon='search'></ui-button>
                 <ui-button nobg icon='ashbin'></ui-button>
             </ui-toolbar>
@@ -38,7 +34,7 @@
             <!--panel body,可以有多个-->
             <div>hello world!</div>
             <p>
-                这是一个panel  
+                这是一个panel
             </p>
         </ui-panel>
     </div>
@@ -46,7 +42,22 @@
 <script>
     nodom.newApp({
         module:{
-            el:'div'
+            el:'div',
+            data:{
+                width:'500px',
+                height:'300px'
+            },
+            methods:{
+                recover:function(dom,model,module){
+
+                    model.set('width','500px');
+                    model.set('height','300px');
+                },
+                maximum:function(dom,model,module){
+                    model.set('width','100%');
+                    model.set('height','100%');
+                }
+            }
         }
     })
 </script>

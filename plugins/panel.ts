@@ -14,6 +14,11 @@ class UIPanel extends nodom.Plugin{
     buttons:string[];
 
     /**
+     * 头部图标按钮dom
+     */
+    headerBtnDom:nodom.Element;
+
+    /**
      * 关闭按钮操作
      */
     closeHandler:Function|string;
@@ -28,7 +33,7 @@ class UIPanel extends nodom.Plugin{
                 UITool.handleUIParam(rootDom,this,
                     ['title','buttons|array'],
                     ['title','buttons'],
-                    ['Panel',['close']]);
+                    ['Panel',[]]);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -49,38 +54,10 @@ class UIPanel extends nodom.Plugin{
         let me = this;
 
         rootDom.addClass('nd-panel');
-        let showMin:boolean = false;
-        let showMax:boolean = false;
-        let showClose:boolean = false;
         
-        if(this.buttons){
-            if(this.buttons.includes('min')){
-                showMin = true;    
-            }
-            if(this.buttons.includes('max')){
-                showMax = true;    
-            }
-            if(this.buttons.includes('close')){
-                showClose = true;    
-            }
-        }
         //处理body
         this.handleBody(rootDom);
         //处理头部
-        this.handleHead(rootDom,showMin,showMax,showClose);
-    }
-
-    /**
-     * 处理头部
-     * @param panelDom  panel dom
-     * @param showMin   显示最小化按钮
-     * @param showMax   显示最大化按钮
-     * @param showClose 显示关闭按钮
-     */
-    handleHead(panelDom:nodom.Element,showMin:boolean,showMax:boolean,showClose:boolean){
-        if(!showMin && !showMax && !showClose){
-            return;
-        }
         //header
         let headerDom:nodom.Element = new nodom.Element('div');
         headerDom.addClass('nd-panel-header');
@@ -92,47 +69,17 @@ class UIPanel extends nodom.Plugin{
             headerDom.add(titleCt);
         }
         
-        //title bar
-        if(showMin || showMax || showClose){
-            let headbarDom:nodom.Element = new nodom.Element('div');
-            headbarDom.addClass('nd-panel-header-bar');
-            
-            //min max close按钮
-            if(showMin){
-                let btn:nodom.Element = new nodom.Element('B');
-                btn.addClass('nd-panel-min');
-                headbarDom.add(btn);
-                
-            }
-        
-            if(showMax){
-                let btn:nodom.Element = new nodom.Element('B');
-                btn.addClass('nd-panel-max');
-                headbarDom.add(btn);
-                this.setMaxHandler(btn);
-            }
+        let headbarDom:nodom.Element = new nodom.Element('div');
+        headbarDom.addClass('nd-panel-header-bar');
+        this.headerBtnDom = headbarDom;
+        headerDom.add(headbarDom);
+        rootDom.children.unshift(headerDom);
 
-            if(showClose){
-                let btn:nodom.Element = new nodom.Element('B');
-                btn.addClass('nd-panel-close');
-                headbarDom.add(btn);
-                btn.addEvent(new nodom.NodomEvent('click',(dom,model,module)=>{
-                    if(this.closeHandler){
-                        let foo:Function;
-                        if(typeof this.closeHandler === 'string'){
-                            foo = module.methodFactory.get(foo);
-                        }else if(nodom.Util.isFunction(this.closeHandler)){
-                            foo = this.closeHandler;
-                        }
-                        if(foo){
-                            foo(dom,model,module);
-                        }
-                    }
-                }));
-            }
-            headerDom.add(headbarDom);
+        //头部按钮
+        for(let btn of this.buttons){
+            let a = btn.split('|');
+            this.addHeadBtn(a[0],a[1]);
         }
-        panelDom.children.unshift(headerDom);
     }
 
     /**
@@ -140,7 +87,7 @@ class UIPanel extends nodom.Plugin{
      * @param panelDom  panel dom
      * @param oe        原始dom
      */
-    handleBody(panelDom:nodom.Element){
+    private handleBody(panelDom:nodom.Element){
         //panel body
         let bodyDom:nodom.Element = new nodom.Element('div');
         bodyDom.addClass('nd-panel-body');
@@ -174,29 +121,19 @@ class UIPanel extends nodom.Plugin{
     }
 
     /**
-     * 设置最小化事件
-     * @param foo 
+     * 添加头部图标
+     * @param icon      icon名 
+     * @param handler   处理函数
      */
-    setMinHandler(btn:nodom.Element){
-
+    addHeadBtn(icon:string,handler:string|Function){
+        let btn:nodom.Element = new nodom.Element('b');
+        btn.addClass('nd-icon-' + icon);
+        btn.addClass('nd-canclick');
+        this.headerBtnDom.add(btn);
+        if(handler){
+            btn.addEvent(new nodom.NodomEvent('click',handler));
+        }
     }
-
-    /**
-     * 设置最大化事件
-     * @param foo 
-     */
-    setMaxHandler(btn:nodom.Element){
-
-    }
-
-    /**
-     * 设置关闭事件
-     * @param foo 
-     */
-    setCloseHandler(handler:Function){
-        this.closeHandler = handler;
-    }
-    
 }
 
 nodom.PluginManager.add('UI-PANEL',UIPanel);

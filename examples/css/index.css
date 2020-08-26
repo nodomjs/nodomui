@@ -237,7 +237,7 @@ button, input {
 .nd-icon-add, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
   font-family: nd-iconfont; }
   .nd-icon-add:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
-    content: ""; }
+    content: ""; }
 
 /*关闭*/
 .nd-icon-close, .nd-file .nd-file-showct .nd-file-del, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close {
@@ -426,7 +426,7 @@ button, input {
 .nd-icon-menu {
   font-family: nd-iconfont; }
   .nd-icon-menu:before {
-    content: ""; }
+    content: ""; }
 
 /*分类*/
 .nd-icon-category {

@@ -11,7 +11,7 @@ class UIPanel extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', ['close']]);
+                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -31,36 +31,9 @@ class UIPanel extends nodom.Plugin {
     generate(rootDom) {
         let me = this;
         rootDom.addClass('nd-panel');
-        let showMin = false;
-        let showMax = false;
-        let showClose = false;
-        if (this.buttons) {
-            if (this.buttons.includes('min')) {
-                showMin = true;
-            }
-            if (this.buttons.includes('max')) {
-                showMax = true;
-            }
-            if (this.buttons.includes('close')) {
-                showClose = true;
-            }
-        }
         //处理body
         this.handleBody(rootDom);
         //处理头部
-        this.handleHead(rootDom, showMin, showMax, showClose);
-    }
-    /**
-     * 处理头部
-     * @param panelDom  panel dom
-     * @param showMin   显示最小化按钮
-     * @param showMax   显示最大化按钮
-     * @param showClose 显示关闭按钮
-     */
-    handleHead(panelDom, showMin, showMax, showClose) {
-        if (!showMin && !showMax && !showClose) {
-            return;
-        }
         //header
         let headerDom = new nodom.Element('div');
         headerDom.addClass('nd-panel-header');
@@ -71,44 +44,16 @@ class UIPanel extends nodom.Plugin {
             titleCt.assets.set('innerHTML', this.title);
             headerDom.add(titleCt);
         }
-        //title bar
-        if (showMin || showMax || showClose) {
-            let headbarDom = new nodom.Element('div');
-            headbarDom.addClass('nd-panel-header-bar');
-            //min max close按钮
-            if (showMin) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-min');
-                headbarDom.add(btn);
-            }
-            if (showMax) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-max');
-                headbarDom.add(btn);
-                this.setMaxHandler(btn);
-            }
-            if (showClose) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-close');
-                headbarDom.add(btn);
-                btn.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                    if (this.closeHandler) {
-                        let foo;
-                        if (typeof this.closeHandler === 'string') {
-                            foo = module.methodFactory.get(foo);
-                        }
-                        else if (nodom.Util.isFunction(this.closeHandler)) {
-                            foo = this.closeHandler;
-                        }
-                        if (foo) {
-                            foo(dom, model, module);
-                        }
-                    }
-                }));
-            }
-            headerDom.add(headbarDom);
+        let headbarDom = new nodom.Element('div');
+        headbarDom.addClass('nd-panel-header-bar');
+        this.headerBtnDom = headbarDom;
+        headerDom.add(headbarDom);
+        rootDom.children.unshift(headerDom);
+        //头部按钮
+        for (let btn of this.buttons) {
+            let a = btn.split('|');
+            this.addHeadBtn(a[0], a[1]);
         }
-        panelDom.children.unshift(headerDom);
     }
     /**
      * 处理body
@@ -147,23 +92,18 @@ class UIPanel extends nodom.Plugin {
         }
     }
     /**
-     * 设置最小化事件
-     * @param foo
+     * 添加头部图标
+     * @param icon      icon名
+     * @param handler   处理函数
      */
-    setMinHandler(btn) {
-    }
-    /**
-     * 设置最大化事件
-     * @param foo
-     */
-    setMaxHandler(btn) {
-    }
-    /**
-     * 设置关闭事件
-     * @param foo
-     */
-    setCloseHandler(handler) {
-        this.closeHandler = handler;
+    addHeadBtn(icon, handler) {
+        let btn = new nodom.Element('b');
+        btn.addClass('nd-icon-' + icon);
+        btn.addClass('nd-canclick');
+        this.headerBtnDom.add(btn);
+        if (handler) {
+            btn.addEvent(new nodom.NodomEvent('click', handler));
+        }
     }
 }
 nodom.PluginManager.add('UI-PANEL', UIPanel);

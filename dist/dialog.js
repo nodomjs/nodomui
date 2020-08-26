@@ -8,9 +8,6 @@ class UIDialog extends nodom.Plugin {
         this.tagName = 'UI-DIALOG';
         let rootDom = new nodom.Element();
         if (params) {
-            if (params instanceof HTMLElement) {
-                params.setAttribute('buttons', 'close');
-            }
             let panel = new UIPanel(params);
             this.generate(rootDom, panel);
         }
@@ -37,7 +34,7 @@ class UIDialog extends nodom.Plugin {
         this.onClose = panelDom.getProp('onclose');
         this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
-        panel.setCloseHandler(() => {
+        panel.addHeadBtn('close', () => {
             me.close();
         });
         rootDom.addDirective(new nodom.Directive('show', this.dataName, rootDom));
@@ -63,16 +60,6 @@ class UIDialog extends nodom.Plugin {
                 this.open();
             }
         }
-    }
-    /**
-     * 设置关闭事件
-     * @param foo
-     */
-    setCloseHandler(btn) {
-        let me = this;
-        btn.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            model.set(me.dataName, false);
-        }));
     }
     /**
      * 打开dialog
@@ -105,6 +92,7 @@ class UIDialog extends nodom.Plugin {
             if (model) {
                 model.set(this.dataName, false);
             }
+            console.log(model.data);
             //onClose事件
             if (this.onClose) {
                 let foo = module.methodFactory.get(this.onClose);
