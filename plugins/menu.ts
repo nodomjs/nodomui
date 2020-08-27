@@ -191,7 +191,7 @@ class UIMenu extends nodom.Plugin{
         super.beforeRender(module,uidom);
         
         //popup menu需要添加右键点击事件
-        if(this.popupMenu){
+        if(this.needPreRender && this.popupMenu){
             UIEventRegister.addEvent('mousedown',module.id,uidom.key,
                 (module,dom,inOrOut,e)=>{
                     //非右键不打开
@@ -203,13 +203,13 @@ class UIMenu extends nodom.Plugin{
                     let model:nodom.Model = module.modelFactory.get(uidom.modelId);
                     let rows = model.query(me.listField);
                     if(rows && rows.length>0){
-                        let h:number = rows * me.menuHeight;
+                        let h:number = rows.length * me.menuHeight;
                         //根据最大级数计算pop方向
-                        if(this.direction === 0){
-                            if(x + w*this.maxLevel > window.innerWidth-10){
-                                this.direction = 1;
-                            }
-                        }
+                        // if(this.direction === 0){
+                        //     if(x + w*this.maxLevel > window.innerWidth-10){
+                        //         this.direction = 1;
+                        //     }
+                        // }
                         let loc = this.cacPos(null,e.clientX,e.clientY,this.menuWidth,h);
                         model.set(me.menuStyleName,'width:' + me.menuWidth + 'px;left:' + loc[0] + 'px;top:' + loc[1] + 'px');
                         model.set(me.activeName,true);
@@ -223,7 +223,7 @@ class UIMenu extends nodom.Plugin{
      * 初始化菜单打开和关闭
      * @returns     [mouseenter(打开子菜单),mouseleave(关闭自己)]  
      */
-    initOpenAndClose():nodom.NodomEvent[]{
+    private initOpenAndClose():nodom.NodomEvent[]{
         let me = this;
         //菜单展开
         let openEvent:nodom.NodomEvent = new nodom.NodomEvent('mouseenter', 
@@ -245,7 +245,6 @@ class UIMenu extends nodom.Plugin{
                         x = e.clientX - e.offsetX + w;
                         y = e.clientY - e.offsetY;
                     }
-                    
                     let loc = this.cacPos(dom,x,y,w,h,el);
                     model.set(this.menuStyleName,'width:' + me.menuWidth + 'px;left:' + loc[0] + 'px;top:' + loc[1] + 'px');
                     model.set(this.activeName,true);
@@ -287,7 +286,7 @@ class UIMenu extends nodom.Plugin{
      * @param h             子菜单高度
      */
      
-    cacPos(dom:nodom.Element,x:number,y:number,w:number,h:number,el?:HTMLElement):number[]{
+    private cacPos(dom:nodom.Element,x:number,y:number,w:number,h:number,el?:HTMLElement):number[]{
         //非pop第一级菜单
         let firstNopop:boolean = dom && !this.popupMenu && dom.tmpData['level'] === 1;
         //超出宽度
@@ -295,8 +294,8 @@ class UIMenu extends nodom.Plugin{
         let heightOut:boolean = y + h > window.innerHeight;
         let top:number=dom?0:y;
         let left:number=dom?0:x;
-        // 第一级非pop的子菜单是否需要左移动
         
+        // 第一级非pop的子菜单是否需要左移动
         if(firstNopop){
             top = this.menuHeight;
         }else if(heightOut){

@@ -34,6 +34,7 @@ class UIDialog extends nodom.Plugin {
         this.onClose = panelDom.getProp('onclose');
         this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
+        //增加关闭按钮
         panel.addHeadBtn('close', () => {
             me.close();
         });
@@ -92,7 +93,6 @@ class UIDialog extends nodom.Plugin {
             if (model) {
                 model.set(this.dataName, false);
             }
-            console.log(model.data);
             //onClose事件
             if (this.onClose) {
                 let foo = module.methodFactory.get(this.onClose);

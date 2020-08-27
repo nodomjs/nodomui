@@ -85,12 +85,6 @@
             data:"data/grid1.json",
             // data:'http://localhost:3000/commodity/getinfo',
             methods:{
-                cacDis:(data)=>{
-                    return data * 10;
-                },
-                clickItem:(dom,model,module,e)=>{
-                    console.log('hello',dom,model,module,e)
-                },
                 changeData:(module,pageno,pagesize)=>{
                     nodom.request({
                         url:'data/grid'+ pageno +'.json',

@@ -900,11 +900,11 @@ var nodom;
             }
             else if (this.tagName !== undefined) {
                 el = module.container.querySelector("[key='" + this.key + "']");
+                this.handleAssets(el);
             }
             if (!el) {
                 return;
             }
-            this.handleAssets(el);
             switch (type) {
                 case 'fresh':
                     if (this.tagName) {

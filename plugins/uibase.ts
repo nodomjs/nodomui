@@ -45,13 +45,8 @@ class UITool{
                 el.style.maxHeight = (window.innerHeight-50) + 'px';
             }
             
-            if(y + el.offsetHeight > height){
-                if(y < el.offsetHeight+distance){ //上方不够放
-                    el.style.transform = 'translate(0,' + -(y+el.offsetHeight - height) + 'px)'; 
-                }else{
-                    el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)'; 
-                }
-                
+            if(y + el.offsetHeight > height && y > el.offsetHeight+distance){
+                el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)'; 
             }else{
                 el.style.transform = 'translate(0,0)';
             }

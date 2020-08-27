@@ -38,6 +38,8 @@ class UISelect extends nodom.Plugin {
         if (field) {
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
+            //移除事件
+            rootDom.events.delete('change');
         }
         //修改model
         rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
@@ -172,10 +174,12 @@ class UISelect extends nodom.Plugin {
         let data = model.data;
         //下拉值初始化
         if (this.listField && data.datas.length === 0 && pmodel.data[this.listField]) {
-            let value = pmodel.query(this.dataName);
             let valueArr;
-            if (value && value !== '') {
-                valueArr = value.toString().split(',');
+            if (this.dataName) {
+                let value = pmodel.query(this.dataName);
+                if (value && value !== '') {
+                    valueArr = value.toString().split(',');
+                }
             }
             let txtArr = [];
             let rows = pmodel.query(this.listField);
@@ -224,7 +228,9 @@ class UISelect extends nodom.Plugin {
                     txtArr.push(d[this.displayField]);
                 }
             }
-            pmodel.set(this.dataName, valArr.join(','));
+            if (this.dataName) {
+                pmodel.set(this.dataName, valArr.join(','));
+            }
             model1.set('display', txtArr.join(','));
         }
         else {
@@ -243,7 +249,9 @@ class UISelect extends nodom.Plugin {
             //设置选中
             for (let d of rows) {
                 if (d.selected) {
-                    pmodel.set(this.dataName, d[this.valueField]);
+                    if (this.dataName) {
+                        pmodel.set(this.dataName, d[this.valueField]);
+                    }
                     model1.set('display', d[this.displayField]);
                     this.hideList(module, model1);
                     break;

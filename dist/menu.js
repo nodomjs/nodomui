@@ -141,7 +141,7 @@ class UIMenu extends nodom.Plugin {
         let me = this;
         super.beforeRender(module, uidom);
         //popup menu需要添加右键点击事件
-        if (this.popupMenu) {
+        if (this.needPreRender && this.popupMenu) {
             UIEventRegister.addEvent('mousedown', module.id, uidom.key, (module, dom, inOrOut, e) => {
                 //非右键不打开
                 if (e.button !== 2) {
@@ -152,13 +152,13 @@ class UIMenu extends nodom.Plugin {
                 let model = module.modelFactory.get(uidom.modelId);
                 let rows = model.query(me.listField);
                 if (rows && rows.length > 0) {
-                    let h = rows * me.menuHeight;
+                    let h = rows.length * me.menuHeight;
                     //根据最大级数计算pop方向
-                    if (this.direction === 0) {
-                        if (x + w * this.maxLevel > window.innerWidth - 10) {
-                            this.direction = 1;
-                        }
-                    }
+                    // if(this.direction === 0){
+                    //     if(x + w*this.maxLevel > window.innerWidth-10){
+                    //         this.direction = 1;
+                    //     }
+                    // }
                     let loc = this.cacPos(null, e.clientX, e.clientY, this.menuWidth, h);
                     model.set(me.menuStyleName, 'width:' + me.menuWidth + 'px;left:' + loc[0] + 'px;top:' + loc[1] + 'px');
                     model.set(me.activeName, true);

@@ -1041,7 +1041,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     .nd-select .nd-select-inputct .nd-select-search {
       position: absolute;
       width: 90%;
-      opacity: 0.5; }
+      opacity: 0.3;
+      background-color: #fff; }
     .nd-select .nd-select-inputct .nd-select-search-active {
       opacity: 1; }
   .nd-select .nd-select-list {
@@ -1071,30 +1072,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       color: #2864c8; }
 
 /*selectlist box*/
-.nd-selectlist {
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #efefef;
-  padding: 10px;
-  border-radius: 10px; }
-  .nd-selectlist .nd-selectlist-item {
-    line-height: 30px;
-    display: flex;
-    flex-direction: row; }
-    .nd-selectlist .nd-selectlist-item .nd-selectlist-item-col {
-      flex: 1; }
-
 /*横向*/
-.nd-selectlist-horizontal {
-  border: 1px solid #efefef;
-  padding: 10px;
-  border-radius: 10px;
-  overflow: auto; }
-  .nd-selectlist-horizontal .nd-selectlist-item {
-    display: inline-block;
-    margin: 30px; }
-
 .nd-file {
   display: flex;
   flex-direction: row; }
