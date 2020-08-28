@@ -106,56 +106,27 @@
     }
 }
 
-/*selectlist box*/
-// .nd-selectlist{
-//     overflow:auto;
-//     display:flex;
-//     flex-direction: column;
-//     border:1px solid $nd-color3;
-//     padding:$nd-padding;
-//     border-radius:$nd-padding;
-//     .nd-selectlist-item{
-//         line-height:30px;
-//         display:flex;
-//         flex-direction: row;
-//         .nd-selectlist-item-col{
-//             flex:1;
-//         }
-//     }
-// }
-/*横向*/
-// .nd-selectlist-horizontal{
-//     border:1px solid $nd-color3;
-//     padding:$nd-padding;
-//     border-radius:$nd-padding;
-//     overflow:auto;
-//     .nd-selectlist-item{
-//         display:inline-block;
-//         margin:$nd-padding*3;
-//     }
-// }
-
 .nd-file{
     display:flex;
     flex-direction: row;
     .nd-file-showct{
         position:relative;
-        flex:1;
+        display:inline-block;
         width:100px;
         height:100px;
-        // line-height:100px;
+        overflow:hidden;
         margin-right:$nd-padding * 2;
-        
         a.nd-file-content{
             @include nd-color(6);
-            display:inline-block;
             width:100%;
             height:100%;
             background-position: 0 0;
             background-size: 100% 100%;
             background-repeat: no-repeat;
-            text-align:center;
             
+            display:flex;
+            align-items: center;
+            justify-content: center;
             img{
                 width:100px;
             }
@@ -165,6 +136,7 @@
             position: absolute;
             @extend .nd-icon-close;
             right:0px;
+            top:0px;
             font-size:$nd-fontlarger;
             cursor: pointer;
             &:hover{
@@ -174,7 +146,6 @@
     }
 
     .nd-file-uploadct{
-        flex:1;
         width:100px;
         height:100px;
         overflow:hidden;
@@ -182,10 +153,11 @@
         @include nd-color(2);
         padding:0;
         position:relative;
-            
+        display:inline-block;
+        
         .nd-file-input{
             opacity:0;
-            display:block;
+            display:inline-block;
             height:100%;
             width:100%;
             padding:0;
@@ -196,13 +168,15 @@
             position: absolute;
             left:0px;
             top:0px;
-            width:100px;
-            height:100px;
+            width:100%;
+            height:100%;
             text-align:center;
-            line-height:100px;    
+            line-height:100px;
+            box-sizing: border-box;
+        
             /*加号按钮*/
             .nd-file-add{
-                @extend .nd-icon-add;
+                @extend .nd-icon-add1;
                 font-size:30pt;
             }
         }

@@ -234,9 +234,9 @@ button, input {
     content: ""; }
 
 /*加号*/
-.nd-icon-add, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
+.nd-icon-add, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max {
   font-family: nd-iconfont; }
-  .nd-icon-add:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
+  .nd-icon-add:before, .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:before {
     content: ""; }
 
 /*关闭*/
@@ -246,9 +246,9 @@ button, input {
     content: ""; }
 
 /*加号(不带圆圈)*/
-.nd-icon-add1 {
+.nd-icon-add1, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add {
   font-family: nd-iconfont; }
-  .nd-icon-add1:before {
+  .nd-icon-add1:before, .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add:before {
     content: ""; }
 
 /*减号(不带圆圈)*/
@@ -1071,38 +1071,38 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     .nd-select .nd-select-list .nd-select-selected {
       color: #2864c8; }
 
-/*selectlist box*/
-/*横向*/
 .nd-file {
   display: flex;
   flex-direction: row; }
   .nd-file .nd-file-showct {
     position: relative;
-    flex: 1;
+    display: inline-block;
     width: 100px;
     height: 100px;
+    overflow: hidden;
     margin-right: 20px; }
     .nd-file .nd-file-showct a.nd-file-content {
       background-color: #d5d5d5;
       color: #666;
-      display: inline-block;
       width: 100%;
       height: 100%;
       background-position: 0 0;
       background-size: 100% 100%;
       background-repeat: no-repeat;
-      text-align: center; }
+      display: flex;
+      align-items: center;
+      justify-content: center; }
       .nd-file .nd-file-showct a.nd-file-content img {
         width: 100px; }
     .nd-file .nd-file-showct .nd-file-del {
       position: absolute;
       right: 0px;
+      top: 0px;
       font-size: 18px;
       cursor: pointer; }
       .nd-file .nd-file-showct .nd-file-del:hover {
         color: #2864c8; }
   .nd-file .nd-file-uploadct {
-    flex: 1;
     width: 100px;
     height: 100px;
     overflow: hidden;
@@ -1110,10 +1110,11 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     background-color: #f5f5f5;
     color: #666;
     padding: 0;
-    position: relative; }
+    position: relative;
+    display: inline-block; }
     .nd-file .nd-file-uploadct .nd-file-input {
       opacity: 0;
-      display: block;
+      display: inline-block;
       height: 100%;
       width: 100%;
       padding: 0;
@@ -1122,10 +1123,11 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       position: absolute;
       left: 0px;
       top: 0px;
-      width: 100px;
-      height: 100px;
+      width: 100%;
+      height: 100%;
       text-align: center;
       line-height: 100px;
+      box-sizing: border-box;
       /*加号按钮*/ }
       .nd-file .nd-file-uploadct .nd-file-uploading .nd-file-add {
         font-size: 30pt; }

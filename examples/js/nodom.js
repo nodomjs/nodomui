@@ -129,13 +129,17 @@ var nodom;
                     }
                     break;
                 case 'POST':
+                if(config.params instanceof FormData){
+                    data = config.params;
+                }else{ 
                     let fd = new FormData();
                     for (let o in config.params) {
                         fd.append(o, config.params[o]);
                     }
                     req.open(method, url, async, config.user, config.pwd);
                     data = fd;
-                    break;
+                }
+                break;
             }
             req.open(method, url, async, config.user, config.pwd);
             if (config.header) {

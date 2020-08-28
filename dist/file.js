@@ -14,11 +14,15 @@ class UIFile extends nodom.Plugin {
          * 可上传文件数量
          */
         this.maxCount = 1;
+        /**
+         * 当前上传数量
+         */
+        this.count = 0;
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'type', 'maxcount', 'uploadmethod', 'delmethod'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadMethod', 'delMethod'], [null, null, null, '', 1, null, null]);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'filetype', 'maxcount|number', 'uploadurl', 'deleteurl', 'uploadname'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadUrl', 'deleteUrl', 'uploadName'], [null, null, null, '', 1, null, '', 'file']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -38,20 +42,101 @@ class UIFile extends nodom.Plugin {
     generate(rootDom) {
         let me = this;
         rootDom.addClass('nd-file');
+        //附加数据项名
+        this.extraDataName = '$ui_file_' + nodom.Util.genId();
         let field = rootDom.getDirective('field');
         if (field) {
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
+            //移除事件
+            rootDom.events.delete('change');
         }
-        if (this.multiple === '') {
+        if (!this.multiple) {
             this.maxCount = 1;
         }
-        //生成filestate name
-        this.stateName = '$uploadstate_' + this.dataName;
-        this.uploadingName = '$uploading_' + this.dataName;
-        this.fileName = '$file_' + this.dataName;
-        //生成result name
-        this.resultName = '$ui_file_' + nodom.Util.genId();
+        rootDom.children = [this.genShowDom(), this.genUploadDom()];
+        rootDom.plugin = this;
+        return rootDom;
+    }
+    /**
+     * 产生上传dom
+     */
+    genUploadDom() {
+        const me = this;
+        //上传容器
+        let uploadDom = new nodom.Element('div');
+        uploadDom.addClass('nd-file-uploadct');
+        //当文件数量==maxcount时不再显示
+        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
+        //文件
+        let fDom = new nodom.Element('input');
+        fDom.setProp('type', 'file');
+        //多文件
+        // if(this.multiple){
+        //     fDom.setProp('multiple','multiple');
+        // }
+        fDom.addClass('nd-file-input');
+        //input file change事件
+        fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
+            if (!el.files) {
+                return;
+            }
+            //上传标志
+            model.set(me.extraDataName + '.state', 1);
+            //上传显示
+            model.set(me.extraDataName + '.uploading', NUITipWords.uploading);
+            let form = new FormData();
+            let cnt = 0;
+            for (let f of el.files) {
+                //超出文件不能上传
+                if (++cnt + me.count > me.maxCount) {
+                    break;
+                }
+                form.append(me.uploadName, f);
+            }
+            //提交请求
+            nodom.request({
+                url: me.uploadUrl,
+                method: 'POST',
+                params: form,
+                header: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                type: 'json'
+            }).then((r) => {
+                console.log(r);
+                //上传显示
+                model.set(me.extraDataName + '.state', 0);
+                //设置显示数据
+                model.query(me.dataName).push(r);
+            });
+        }));
+        //上传框
+        let uploadingDom = new nodom.Element('div');
+        uploadingDom.addClass('nd-file-uploading');
+        //上传(+号)
+        let span1 = new nodom.Element('span');
+        span1.addClass('nd-file-add');
+        span1.addDirective(new nodom.Directive('show', this.extraDataName + '.state==0', span1));
+        uploadingDom.add(span1);
+        //上传中
+        let span2 = new nodom.Element('span');
+        span2.addClass('nd-file-progress');
+        span2.addDirective(new nodom.Directive('show', this.extraDataName + '.state==1', span2));
+        let txt = new nodom.Element();
+        txt.expressions = [new nodom.Expression((this.extraDataName + '.uploading') || NUITipWords.uploading)];
+        span2.add(txt);
+        uploadingDom.add(span2);
+        uploadDom.add(uploadingDom);
+        uploadDom.add(fDom);
+        return uploadDom;
+    }
+    /**
+     * 创建显示dom
+     * @returns     上传后的显示dom
+     */
+    genShowDom() {
+        const me = this;
         //文件显示container
         let ctDom = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
@@ -74,71 +159,59 @@ class UIFile extends nodom.Plugin {
         }
         ctDom.add(showDom);
         //删除按钮
-        if (this.delMethod) {
-            let delDom = new nodom.Element('b');
-            delDom.addClass('nd-file-del');
-            delDom.addEvent(new nodom.NodomEvent('click', this.delMethod));
-            ctDom.add(delDom);
-        }
-        //上传容器
-        let uploadDom = new nodom.Element('div');
-        uploadDom.addClass('nd-file-uploadct');
-        //当文件数量==maxcount时不再显示
-        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
-        //文件
-        let fDom = new nodom.Element('input');
-        fDom.setProp('type', 'file');
-        //多文件
-        if (this.multiple === 'multi') {
-            fDom.setProp('multiple', 'multiple');
-        }
-        fDom.addClass('nd-file-input');
-        fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
-            let foo = module.methodFactory.get(me.uploadMethod);
-            //已有数据条数
-            let fieldData = model.data[this.dataName];
-            let rowLen = fieldData ? fieldData.length : 0;
-            rowLen = this.maxCount - rowLen;
-            if (el.files) {
-                //上传标志
-                model.set(me.stateName, 1);
-                //上传显示
-                model.set(me.uploadingName, NUITipWords.uploading);
-                //设置文件内容
-                model.set(me.fileName, el.files);
-                if (foo) {
-                    foo.apply(module, [dom, model, module, e]);
-                }
+        let delDom = new nodom.Element('b');
+        delDom.addClass('nd-file-del');
+        ctDom.add(delDom);
+        //点击删除
+        delDom.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            let params = {};
+            console.log(model.data);
+            let id = model.query(me.valueField);
+            params[me.valueField] = id;
+            if (this.deleteUrl !== '') { //存在del url，则需要从服务器删除
+                nodom.request({
+                    url: me.deleteUrl,
+                    params: params
+                }).then((r) => {
+                    me.removeFile(module, id);
+                });
+            }
+            else {
+                me.removeFile(module, id);
             }
         }));
-        //上传框
-        let uploadingDom = new nodom.Element('div');
-        uploadingDom.addClass('nd-file-uploading');
-        //上传(+号)
-        let span1 = new nodom.Element('span');
-        span1.addClass('nd-file-add');
-        span1.addDirective(new nodom.Directive('show', this.stateName + '==0', span1));
-        uploadingDom.add(span1);
-        //上传中
-        let span2 = new nodom.Element('span');
-        span2.addClass('nd-file-progress');
-        span2.addDirective(new nodom.Directive('show', this.stateName + '==1', span2));
-        let txt = new nodom.Element();
-        txt.expressions = [new nodom.Expression(this.uploadingName || NUITipWords.uploading)];
-        span2.add(txt);
-        uploadingDom.add(span2);
-        uploadDom.add(uploadingDom);
-        uploadDom.add(fDom);
-        rootDom.children = [ctDom, uploadDom];
-        rootDom.plugin = this;
-        return rootDom;
+        return ctDom;
+    }
+    /**
+     * 删除文件
+     * @param module    模块
+     * @param id        res id
+     */
+    removeFile(module, id) {
+        let pm = module.modelFactory.get(this.modelId);
+        let rows = pm.query(this.dataName);
+        //从上传结果中删除
+        if (Array.isArray(rows)) {
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i][this.valueField] === id) {
+                    console.log(id);
+                    rows.splice(i, 1);
+                    break;
+                }
+            }
+        }
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
             let model = module.modelFactory.get(dom.modelId);
+            //增加附加model
             if (model) {
-                model.set(this.stateName, 0);
+                let model1 = model.set(this.extraDataName, {
+                    state: 0,
+                    uploading: false
+                });
+                this.extraModelId = model1.id;
             }
         }
     }
