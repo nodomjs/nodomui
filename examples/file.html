@@ -15,13 +15,12 @@
     <div>
         <p>单文件</p>
         <!-- deleteUrl='http://localhost:3000/delres' -->
-        <ui-file x-field='files' valueField='id' displayField="url" uploadName='file' 
+        <ui-file x-field='files' valueField='id' displayField="fileName" uploadName='file' 
             uploadUrl='http://localhost:3000/upload'></ui-file>
 
         <p>多文件</p>
         <ui-file x-field='photos' multiple valueField='id' displayField="url"  uploadName='file'
-        uploadUrl='http://localhost:3000/upload' fileType='image'
-        maxCount='5'></ui-file>
+        uploadUrl='http://localhost:3000/upload' fileType='image' maxCount='5'></ui-file>
     </div>
 
 </body>
@@ -32,38 +31,7 @@
             data:{
                 files:[],
                 photos:[]
-            },
-            /*uploadFile:function(dom,model,module,e){
-                let xhr = new XMLHttpRequest();
-                xhr.open('POST','http://localhost:3000/upload');
-                let form = new FormData();
-                let files = model.data['$file_photos'];
-                for(let f of files){
-                    form.append('photo',f);
-                }
-                xhr.setRequestHeader('Content-Type','multipart/form-data');
-                xhr.send(form);
-                xhr.onload = (x)=>{
-                    let r = JSON.parse(xhr.responseText);
-                    for(let r1 of r.rows){
-                        model.data['photos'].push({
-                            imgId:r1.id,
-                            imgUrl:r1.url,
-                            fileName:r1.fileName
-                        });
-                    }
-                    model.set('$uploadstate_photos',0);
-                }
-            },
-            delFile:function(dom,model,module,e){
-                let rows = module.model.data['photos'];
-                for(let i=0;i<rows.length;i++){
-                    if(rows[i].imgId === model.data['imgId']){
-                        rows.splice(i,1);
-                        break;
-                    }
-                }
-            }*/
+            }
         }
     });
 </script>

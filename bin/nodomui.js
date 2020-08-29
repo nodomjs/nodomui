@@ -46,13 +46,8 @@ class UITool {
             if (changeSize) {
                 el.style.maxHeight = (window.innerHeight - 50) + 'px';
             }
-            if (y + el.offsetHeight > height) {
-                if (y < el.offsetHeight + distance) {
-                    el.style.transform = 'translate(0,' + -(y + el.offsetHeight - height) + 'px)';
-                }
-                else {
-                    el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)';
-                }
+            if (y + el.offsetHeight > height && y > el.offsetHeight + distance) {
+                el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)';
             }
             else {
                 el.style.transform = 'translate(0,0)';
@@ -236,7 +231,7 @@ class UIAccordion extends nodom.Plugin {
                 continue;
             }
             if (item.hasProp('first')) {
-                firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom));
+                firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom), true);
                 item.addClass('nd-accordion-first');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
                 item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
@@ -263,25 +258,16 @@ class UIAccordion extends nodom.Plugin {
                 item.addDirective(new nodom.Directive('repeat', item.getProp('data'), item));
                 this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
-                let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
+                if (item.hasProp('itemclick')) {
+                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick') + ':delg'));
+                }
                 item.addDirective(new nodom.Directive('class', "{'nd-accordion-selected':'" + activeName2 + "'}", item));
-                this.method2 = methodId;
                 secondDom.addClass('nd-accordion-secondct');
                 secondDom.add(item);
-                secondDom.addDirective(new nodom.Directive('class', "{'nd-accordion-hide':'!" + activeName1 + "'}", secondDom));
-                if (item.hasProp('icon')) {
-                    item.addClass('nd-icon-' + item.getProp('icon'));
-                }
+                secondDom.addDirective(new nodom.Directive('class', "{'nd-accordion-hide':'!" + activeName1 + "'}", secondDom), true);
             }
-            item.delProp(['data', 'icon', 'second']);
+            item.delProp(['data', 'second']);
         }
-        firstDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
-        secondDom.directives.sort((a, b) => {
-            return nodom.DirectiveManager.getType(a.type).prio - nodom.DirectiveManager.getType(b.type).prio;
-        });
         firstDom.add(secondDom);
         rootDom.children = [firstDom];
     }
@@ -401,7 +387,7 @@ class UIButtonGroup extends nodom.Plugin {
                                 if (typeof c !== 'object') {
                                     continue;
                                 }
-                                rootDom.add(new UIButton(c));
+                                rootDom.add(new UIButton(c).element);
                             }
                         }
                     }
@@ -972,9 +958,6 @@ class UIDialog extends nodom.Plugin {
         this.tagName = 'UI-DIALOG';
         let rootDom = new nodom.Element();
         if (params) {
-            if (params instanceof HTMLElement) {
-                params.setAttribute('buttons', 'close');
-            }
             let panel = new UIPanel(params);
             this.generate(rootDom, panel);
         }
@@ -989,8 +972,10 @@ class UIDialog extends nodom.Plugin {
         let panelDom = panel.element;
         rootDom.setProp('name', panelDom.getProp('name'));
         this.autoOpen = panelDom.hasProp('autoopen');
+        this.onClose = panelDom.getProp('onclose');
+        this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
-        panel.setCloseHandler(() => {
+        panel.addHeadBtn('close', () => {
             me.close();
         });
         rootDom.addDirective(new nodom.Directive('show', this.dataName, rootDom));
@@ -1010,18 +995,18 @@ class UIDialog extends nodom.Plugin {
             }
         }
     }
-    setCloseHandler(btn) {
-        let me = this;
-        btn.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            model.set(me.dataName, false);
-        }));
-    }
     open() {
         let module = nodom.ModuleFactory.get(this.moduleId);
         if (module) {
             let model = module.modelFactory.get(this.modelId);
             if (model) {
                 model.set(this.dataName, true);
+            }
+            if (this.onOpen) {
+                let foo = module.methodFactory.get(this.onOpen);
+                if (foo) {
+                    nodom.Util.apply(foo, model, [model, module]);
+                }
             }
         }
     }
@@ -1031,6 +1016,12 @@ class UIDialog extends nodom.Plugin {
             let model = module.modelFactory.get(this.modelId);
             if (model) {
                 model.set(this.dataName, false);
+            }
+            if (this.onClose) {
+                let foo = module.methodFactory.get(this.onClose);
+                if (foo) {
+                    nodom.Util.apply(foo, model, [model, module]);
+                }
             }
         }
     }
@@ -1042,11 +1033,12 @@ class UIFile extends nodom.Plugin {
         this.tagName = 'UI-FILE';
         this.state = 0;
         this.maxCount = 1;
+        this.count = 0;
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'type', 'maxcount', 'uploadmethod', 'delmethod'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadMethod', 'delMethod'], [null, null, null, '', 1, null, null]);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'filetype', 'maxcount|number', 'uploadurl', 'deleteurl', 'uploadname'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadUrl', 'deleteUrl', 'uploadName'], [null, null, null, '', 1, null, '', 'file']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1060,20 +1052,71 @@ class UIFile extends nodom.Plugin {
         this.element = rootDom;
     }
     generate(rootDom) {
-        let me = this;
         rootDom.addClass('nd-file');
+        this.extraDataName = '$ui_file_' + nodom.Util.genId();
         let field = rootDom.getDirective('field');
         if (field) {
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
+            rootDom.events.delete('change');
         }
-        if (this.multiple === '') {
+        if (!this.multiple) {
             this.maxCount = 1;
         }
-        this.stateName = '$uploadstate_' + this.dataName;
-        this.uploadingName = '$uploading_' + this.dataName;
-        this.fileName = '$file_' + this.dataName;
-        this.resultName = '$ui_file_' + nodom.Util.genId();
+        rootDom.children = [this.genShowDom(), this.genUploadDom()];
+        rootDom.plugin = this;
+        return rootDom;
+    }
+    genUploadDom() {
+        const me = this;
+        let uploadDom = new nodom.Element('div');
+        uploadDom.addClass('nd-file-uploadct');
+        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
+        let fDom = new nodom.Element('input');
+        fDom.setProp('type', 'file');
+        fDom.addClass('nd-file-input');
+        fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
+            if (!el.files) {
+                return;
+            }
+            model.set(me.extraDataName + '.state', 1);
+            model.set(me.extraDataName + '.uploading', NUITipWords.uploading);
+            let form = new FormData();
+            for (let f of el.files) {
+                form.append(me.uploadName, f);
+            }
+            nodom.request({
+                url: me.uploadUrl,
+                method: 'POST',
+                params: form,
+                header: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                type: 'json'
+            }).then((r) => {
+                model.set(me.extraDataName + '.state', 0);
+                model.query(me.dataName).push(r);
+            });
+        }));
+        let uploadingDom = new nodom.Element('div');
+        uploadingDom.addClass('nd-file-uploading');
+        let span1 = new nodom.Element('span');
+        span1.addClass('nd-file-add');
+        span1.addDirective(new nodom.Directive('show', this.extraDataName + '.state==0', span1));
+        uploadingDom.add(span1);
+        let span2 = new nodom.Element('span');
+        span2.addClass('nd-file-progress');
+        span2.addDirective(new nodom.Directive('show', this.extraDataName + '.state==1', span2));
+        let txt = new nodom.Element();
+        txt.expressions = [new nodom.Expression((this.extraDataName + '.uploading') || NUITipWords.uploading)];
+        span2.add(txt);
+        uploadingDom.add(span2);
+        uploadDom.add(uploadingDom);
+        uploadDom.add(fDom);
+        return uploadDom;
+    }
+    genShowDom() {
+        const me = this;
         let ctDom = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
         ctDom.addDirective(new nodom.Directive('repeat', this.dataName, ctDom));
@@ -1093,60 +1136,48 @@ class UIFile extends nodom.Plugin {
             showDom.add(txt);
         }
         ctDom.add(showDom);
-        if (this.delMethod) {
-            let delDom = new nodom.Element('b');
-            delDom.addClass('nd-file-del');
-            delDom.addEvent(new nodom.NodomEvent('click', this.delMethod));
-            ctDom.add(delDom);
-        }
-        let uploadDom = new nodom.Element('div');
-        uploadDom.addClass('nd-file-uploadct');
-        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
-        let fDom = new nodom.Element('input');
-        fDom.setProp('type', 'file');
-        if (this.multiple === 'multi') {
-            fDom.setProp('multiple', 'multiple');
-        }
-        fDom.addClass('nd-file-input');
-        fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
-            let foo = module.methodFactory.get(me.uploadMethod);
-            let fieldData = model.data[this.dataName];
-            let rowLen = fieldData ? fieldData.length : 0;
-            rowLen = this.maxCount - rowLen;
-            if (el.files) {
-                model.set(me.stateName, 1);
-                model.set(me.uploadingName, NUITipWords.uploading);
-                model.set(me.fileName, el.files);
-                if (foo) {
-                    foo.apply(module, [dom, model, module, e]);
-                }
+        let delDom = new nodom.Element('b');
+        delDom.addClass('nd-file-del');
+        ctDom.add(delDom);
+        delDom.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            let params = {};
+            let id = model.query(me.valueField);
+            params[me.valueField] = id;
+            if (this.deleteUrl !== '') {
+                nodom.request({
+                    url: me.deleteUrl,
+                    params: params
+                }).then((r) => {
+                    me.removeFile(module, id);
+                });
+            }
+            else {
+                me.removeFile(module, id);
             }
         }));
-        let uploadingDom = new nodom.Element('div');
-        uploadingDom.addClass('nd-file-uploading');
-        let span1 = new nodom.Element('span');
-        span1.addClass('nd-file-add');
-        span1.addDirective(new nodom.Directive('show', this.stateName + '==0', span1));
-        uploadingDom.add(span1);
-        let span2 = new nodom.Element('span');
-        span2.addClass('nd-file-progress');
-        span2.addDirective(new nodom.Directive('show', this.stateName + '==1', span2));
-        let txt = new nodom.Element();
-        txt.expressions = [new nodom.Expression(this.uploadingName || NUITipWords.uploading)];
-        span2.add(txt);
-        uploadingDom.add(span2);
-        uploadDom.add(uploadingDom);
-        uploadDom.add(fDom);
-        rootDom.children = [ctDom, uploadDom];
-        rootDom.plugin = this;
-        return rootDom;
+        return ctDom;
+    }
+    removeFile(module, id) {
+        let pm = module.modelFactory.get(this.modelId);
+        let rows = pm.query(this.dataName);
+        if (Array.isArray(rows)) {
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i][this.valueField] === id) {
+                    rows.splice(i, 1);
+                    break;
+                }
+            }
+        }
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
             let model = module.modelFactory.get(dom.modelId);
             if (model) {
-                model.set(this.stateName, 0);
+                model.set(this.extraDataName, {
+                    state: 0,
+                    uploading: false
+                });
             }
         }
     }
@@ -1530,6 +1561,7 @@ class UILayout extends nodom.Plugin {
     }
     generate(rootDom) {
         rootDom.addClass('nd-layout');
+        this.extraDataName = '$ui_layout_' + nodom.Util.genId();
         let middleCt = new nodom.Element();
         middleCt.addClass('nd-layout-middle');
         middleCt.tagName = 'DIV';
@@ -1544,6 +1576,12 @@ class UILayout extends nodom.Plugin {
                 if (item.hasProp(l)) {
                     item.addClass('nd-layout-' + l);
                     items[l] = item;
+                    if (l === 'west') {
+                        this.handleEastAndWest(item, 0);
+                    }
+                    else if (l === 'east') {
+                        this.handleEastAndWest(item, 1);
+                    }
                     break;
                 }
             }
@@ -1564,6 +1602,87 @@ class UILayout extends nodom.Plugin {
         rootDom.children.push(middleCt);
         if (items['south']) {
             rootDom.children.push(items['south']);
+        }
+    }
+    beforeRender(module, dom) {
+        super.beforeRender(module, dom);
+        if (this.needPreRender) {
+            let model = module.modelFactory.get(dom.modelId);
+            model.set(this.extraDataName, {
+                openWest: true,
+                openEast: true,
+                westWidth: 0,
+                eastWidth: 0
+            });
+        }
+    }
+    handleEastAndWest(dom, loc) {
+        const me = this;
+        if (dom.hasProp('title') || dom.hasProp('allowmin')) {
+            let header = new nodom.Element('div');
+            header.addClass('nd-layout-header');
+            dom.children.unshift(header);
+            let title;
+            if (dom.hasProp('title')) {
+                title = new nodom.Element('div');
+                title.addClass('nd-layout-title');
+                let txt = new nodom.Element();
+                txt.textContent = dom.getProp('title');
+                title.add(txt);
+                header.add(title);
+            }
+            let icon;
+            if (dom.hasProp('allowmin')) {
+                icon = new nodom.Element('b');
+                if (loc === 1) {
+                    if (title) {
+                        title.addDirective(new nodom.Directive('show', this.extraDataName + '.openEast', title));
+                    }
+                    icon.addDirective(new nodom.Directive('class', "{'nd-icon-arrow-right':'" + this.extraDataName + ".openEast','nd-icon-arrow-left':'!" + this.extraDataName + ".openEast'}", icon));
+                    icon.addEvent(new nodom.NodomEvent('click', (dom, model, module, e, el) => {
+                        let data = model.query(me.extraDataName);
+                        let eastEl = el.parentNode.parentNode;
+                        let compStyle = window.getComputedStyle(eastEl);
+                        let width;
+                        if (data.openEast) {
+                            if (data.eastWidth === 0) {
+                                data.eastWidth = compStyle.width;
+                            }
+                            width = '40px';
+                        }
+                        else {
+                            width = data.eastWidth;
+                        }
+                        eastEl.style.width = width;
+                        data.openEast = !data.openEast;
+                    }));
+                    header.children.unshift(icon);
+                }
+                else {
+                    if (title) {
+                        title.addDirective(new nodom.Directive('show', this.extraDataName + '.openWest', title));
+                    }
+                    icon.addDirective(new nodom.Directive('class', "{'nd-icon-arrow-left':'" + this.extraDataName + ".openWest','nd-icon-arrow-right':'!" + this.extraDataName + ".openWest'}", icon));
+                    icon.addEvent(new nodom.NodomEvent('click', (dom, model, module, e, el) => {
+                        let data = model.query(me.extraDataName);
+                        let westEl = el.parentNode.parentNode;
+                        let compStyle = window.getComputedStyle(westEl);
+                        let width;
+                        if (data.openWest) {
+                            if (data.westWidth === 0) {
+                                data.westWidth = compStyle.width;
+                            }
+                            width = '40px';
+                        }
+                        else {
+                            width = data.westWidth;
+                        }
+                        westEl.style.width = width;
+                        data.openWest = !data.openWest;
+                    }));
+                    header.add(icon);
+                }
+            }
         }
     }
 }
@@ -1888,7 +2007,7 @@ class UIMenu extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevels|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevels', 'menuWidth'], [null, null, 3, 150]);
+                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevel|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevel', 'menuWidth'], [null, null, 3, 150]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1945,7 +2064,7 @@ class UIMenu extends nodom.Plugin {
             }));
             parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
         }
-        for (let i = 0; i < this.maxLevels; i++) {
+        for (let i = 0; i < this.maxLevel; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
@@ -1979,7 +2098,7 @@ class UIMenu extends nodom.Plugin {
     beforeRender(module, uidom) {
         let me = this;
         super.beforeRender(module, uidom);
-        if (this.popupMenu) {
+        if (this.needPreRender && this.popupMenu) {
             UIEventRegister.addEvent('mousedown', module.id, uidom.key, (module, dom, inOrOut, e) => {
                 if (e.button !== 2) {
                     return;
@@ -1989,12 +2108,7 @@ class UIMenu extends nodom.Plugin {
                 let model = module.modelFactory.get(uidom.modelId);
                 let rows = model.query(me.listField);
                 if (rows && rows.length > 0) {
-                    let h = rows * me.menuHeight;
-                    if (this.direction === 0) {
-                        if (x + w * this.maxLevels > window.innerWidth - 10) {
-                            this.direction = 1;
-                        }
-                    }
+                    let h = rows.length * me.menuHeight;
                     let loc = this.cacPos(null, e.clientX, e.clientY, this.menuWidth, h);
                     model.set(me.menuStyleName, 'width:' + me.menuWidth + 'px;left:' + loc[0] + 'px;top:' + loc[1] + 'px');
                     model.set(me.activeName, true);
@@ -2074,10 +2188,10 @@ class UIMenu extends nodom.Plugin {
                 }
             }
             else if (dom) {
-                left -= w;
+                left -= w + 1;
             }
             else if (widthOut) {
-                left -= w + 2;
+                left -= w + 3;
             }
         }
         else {
@@ -2179,31 +2293,31 @@ class UIPagination extends nodom.Plugin {
         pageCt.add(right1);
         rootDom.add(pageCt);
         page.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            me.update(module, model.data['no']);
+            me.changeParams(module, model.data['no']);
         }));
         left.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, -1, true);
+            me.changeParams(module, -1, true);
         }));
         right.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, 1, true);
+            me.changeParams(module, 1, true);
         }));
         left1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, -me.steps, true);
+            me.changeParams(module, -me.steps, true);
         }));
         right1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.update(module, me.steps, true);
+            me.changeParams(module, me.steps, true);
         }));
         if (this.showGo) {
             let goDom = new nodom.Element('div');
@@ -2229,7 +2343,6 @@ class UIPagination extends nodom.Plugin {
         this.handleInit(uidom, module);
     }
     update(module, current, isStep) {
-        this.changeParams(module, current, isStep);
         if (this.onChange && this.onChange !== '') {
             let foo;
             if (typeof this.onChange === 'string') {
@@ -2349,7 +2462,7 @@ class UIPagination extends nodom.Plugin {
         };
         model1.watch('pageSize', watchFunc);
         model1.watch('pageNo', watchFunc);
-        this.update(module, 1);
+        this.changeParams(module, 1);
     }
 }
 nodom.PluginManager.add('UI-PAGINATION', UIPagination);
@@ -2362,7 +2475,7 @@ class UIPanel extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', ['close']]);
+                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2378,27 +2491,7 @@ class UIPanel extends nodom.Plugin {
     generate(rootDom) {
         let me = this;
         rootDom.addClass('nd-panel');
-        let showMin = false;
-        let showMax = false;
-        let showClose = false;
-        if (this.buttons) {
-            if (this.buttons.includes('min')) {
-                showMin = true;
-            }
-            if (this.buttons.includes('max')) {
-                showMax = true;
-            }
-            if (this.buttons.includes('close')) {
-                showClose = true;
-            }
-        }
         this.handleBody(rootDom);
-        this.handleHead(rootDom, showMin, showMax, showClose);
-    }
-    handleHead(panelDom, showMin, showMax, showClose) {
-        if (!showMin && !showMax && !showClose) {
-            return;
-        }
         let headerDom = new nodom.Element('div');
         headerDom.addClass('nd-panel-header');
         if (this.title) {
@@ -2407,42 +2500,15 @@ class UIPanel extends nodom.Plugin {
             titleCt.assets.set('innerHTML', this.title);
             headerDom.add(titleCt);
         }
-        if (showMin || showMax || showClose) {
-            let headbarDom = new nodom.Element('div');
-            headbarDom.addClass('nd-panel-header-bar');
-            if (showMin) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-min');
-                headbarDom.add(btn);
-            }
-            if (showMax) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-max');
-                headbarDom.add(btn);
-                this.setMaxHandler(btn);
-            }
-            if (showClose) {
-                let btn = new nodom.Element('B');
-                btn.addClass('nd-panel-close');
-                headbarDom.add(btn);
-                btn.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                    if (this.closeHandler) {
-                        let foo;
-                        if (typeof this.closeHandler === 'string') {
-                            foo = module.methodFactory.get(foo);
-                        }
-                        else if (nodom.Util.isFunction(this.closeHandler)) {
-                            foo = this.closeHandler;
-                        }
-                        if (foo) {
-                            foo(dom, model, module);
-                        }
-                    }
-                }));
-            }
-            headerDom.add(headbarDom);
+        let headbarDom = new nodom.Element('div');
+        headbarDom.addClass('nd-panel-header-bar');
+        this.headerBtnDom = headbarDom;
+        headerDom.add(headbarDom);
+        rootDom.children.unshift(headerDom);
+        for (let btn of this.buttons) {
+            let a = btn.split('|');
+            this.addHeadBtn(a[0], a[1]);
         }
-        panelDom.children.unshift(headerDom);
     }
     handleBody(panelDom) {
         let bodyDom = new nodom.Element('div');
@@ -2472,12 +2538,14 @@ class UIPanel extends nodom.Plugin {
             panelDom.add(btnGrp);
         }
     }
-    setMinHandler(btn) {
-    }
-    setMaxHandler(btn) {
-    }
-    setCloseHandler(handler) {
-        this.closeHandler = handler;
+    addHeadBtn(icon, handler) {
+        let btn = new nodom.Element('b');
+        btn.addClass('nd-icon-' + icon);
+        btn.addClass('nd-canclick');
+        this.headerBtnDom.add(btn);
+        if (handler) {
+            btn.addEvent(new nodom.NodomEvent('click', handler));
+        }
     }
 }
 nodom.PluginManager.add('UI-PANEL', UIPanel);
@@ -2683,6 +2751,7 @@ class UISelect extends nodom.Plugin {
         if (field) {
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
+            rootDom.events.delete('change');
         }
         rootDom.addDirective(new nodom.Directive('model', this.extraDataName, rootDom));
         let listDom = new nodom.Element('div');
@@ -2795,10 +2864,12 @@ class UISelect extends nodom.Plugin {
         }
         let data = model.data;
         if (this.listField && data.datas.length === 0 && pmodel.data[this.listField]) {
-            let value = pmodel.query(this.dataName);
             let valueArr;
-            if (value && value !== '') {
-                valueArr = value.toString().split(',');
+            if (this.dataName) {
+                let value = pmodel.query(this.dataName);
+                if (value && value !== '') {
+                    valueArr = value.toString().split(',');
+                }
             }
             let txtArr = [];
             let rows = pmodel.query(this.listField);
@@ -2834,7 +2905,9 @@ class UISelect extends nodom.Plugin {
                     txtArr.push(d[this.displayField]);
                 }
             }
-            pmodel.set(this.dataName, valArr.join(','));
+            if (this.dataName) {
+                pmodel.set(this.dataName, valArr.join(','));
+            }
             model1.set('display', txtArr.join(','));
         }
         else {
@@ -2849,7 +2922,9 @@ class UISelect extends nodom.Plugin {
             }
             for (let d of rows) {
                 if (d.selected) {
-                    pmodel.set(this.dataName, d[this.valueField]);
+                    if (this.dataName) {
+                        pmodel.set(this.dataName, d[this.valueField]);
+                    }
                     model1.set('display', d[this.displayField]);
                     this.hideList(module, model1);
                     break;
@@ -3242,7 +3317,7 @@ class UITree extends nodom.Plugin {
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield', 'itemclick', 'checkname', 'maxlevel|number', 'icons|array|2'], ['valueField', 'displayField', 'listField', 'clickEvent', 'checkName', 'maxLevel', 'iconArr'], ['', null, null, '', '', 3, []]);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield', 'itemclick', 'checkname', 'maxlevel|number', 'icons|array|2'], ['valueField', 'displayField', 'listField', 'itemClick', 'checkName', 'maxLevel', 'iconArr'], ['', null, null, '', '', 3, []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -3392,6 +3467,7 @@ class UITree extends nodom.Plugin {
         }
     }
     getValue() {
+        const me = this;
         if (this.valueField === '') {
             return;
         }
@@ -3403,10 +3479,10 @@ class UITree extends nodom.Plugin {
         function getChecked(rows) {
             if (Array.isArray(rows)) {
                 for (let d of rows) {
-                    if (d[this.checkName] === true) {
-                        va.push(d);
+                    if (d[me.checkName] === true) {
+                        va.push(d[me.valueField]);
                     }
-                    getChecked(d[this.listField]);
+                    getChecked(d[me.listField]);
                 }
             }
         }

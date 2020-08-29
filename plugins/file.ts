@@ -97,14 +97,10 @@ class UIFile extends nodom.Plugin{
      * @param rootDom 插件对应的element
      */
     private generate(rootDom:nodom.Element){
-        let me = this;
-        
         rootDom.addClass('nd-file');
         //附加数据项名
         this.extraDataName = '$ui_file_' + nodom.Util.genId();
-
         let field = rootDom.getDirective('field');
-        
         if(field){
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
@@ -115,7 +111,6 @@ class UIFile extends nodom.Plugin{
         if(!this.multiple){
             this.maxCount = 1;
         }
-
         rootDom.children = [this.genShowDom(),this.genUploadDom()];
         rootDom.plugin = this;
         return rootDom;
@@ -123,6 +118,7 @@ class UIFile extends nodom.Plugin{
 
     /**
      * 产生上传dom
+     * @returns     上传后的显示dom
      */
     private genUploadDom():nodom.Element{
         const me = this;
@@ -135,7 +131,6 @@ class UIFile extends nodom.Plugin{
         //文件
         let fDom:nodom.Element = new nodom.Element('input');
         fDom.setProp('type','file');
-        
         fDom.addClass('nd-file-input');
 
         //input file change事件
@@ -144,7 +139,6 @@ class UIFile extends nodom.Plugin{
                 if(!el.files){
                     return;
                 }
-
                 //上传标志
                 model.set(me.extraDataName + '.state',1);
                 //上传显示
@@ -187,10 +181,8 @@ class UIFile extends nodom.Plugin{
         txt.expressions = [new nodom.Expression((this.extraDataName + '.uploading')||NUITipWords.uploading)];
         span2.add(txt);
         uploadingDom.add(span2);
-
         uploadDom.add(uploadingDom);
         uploadDom.add(fDom);
-
         return uploadDom;
     }
 
@@ -200,7 +192,6 @@ class UIFile extends nodom.Plugin{
      */
     private genShowDom():nodom.Element{
         const me = this;
-
         //文件显示container
         let ctDom:nodom.Element = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
@@ -230,7 +221,6 @@ class UIFile extends nodom.Plugin{
         //点击删除
         delDom.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
             let params = {};
-            console.log(model.data);
             let id = model.query(me.valueField);
             params[me.valueField] = id;
             if(this.deleteUrl !== ''){  //存在del url，则需要从服务器删除
@@ -259,7 +249,6 @@ class UIFile extends nodom.Plugin{
         if(Array.isArray(rows)){
             for(let i=0;i<rows.length;i++){
                 if(rows[i][this.valueField] === id){
-                    console.log(id);
                     rows.splice(i,1);
                     break;
                 }
@@ -273,7 +262,7 @@ class UIFile extends nodom.Plugin{
             let model = module.modelFactory.get(dom.modelId);
             //增加附加model
             if(model){
-                let model1:nodom.Model = model.set(this.extraDataName,{
+                model.set(this.extraDataName,{
                     state:0,
                     uploading:false
                 });
