@@ -378,11 +378,13 @@ class UIGrid extends nodom.Plugin {
             //增加附加数据项
             let model = module.modelFactory.get(uidom.modelId);
             model.set(this.extraDataName, {});
-            this.doReq(module, this.pagination);
+            //如果有分页，由分页去请求数据
+            if (!this.pagination) {
+                this.doReq(module, this.pagination);
+            }
             //增加过滤器方法
             if (this.selectPageMethodId) {
                 module.methodFactory.add(this.selectPageMethodId, (arr) => {
-                    console.log(me.pageSize);
                     let start = (me.currentPage - 1) * me.pageSize;
                     let end = start + me.pageSize;
                     return arr.slice(start, end);

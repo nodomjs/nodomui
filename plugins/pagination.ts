@@ -157,6 +157,7 @@ class UIPagination extends nodom.Plugin{
                 valueField:'value',
                 onChange:(model,module,newValue,oldValue)=>{
                     me.changeParams(module);
+                    me.update(module);
                 }
             }).element);
         }
@@ -199,6 +200,7 @@ class UIPagination extends nodom.Plugin{
         page.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
                 me.changeParams(module,model.data['no']);
+                me.update(module);
             }
         ));
         left.addEvent(new nodom.NodomEvent('click',
@@ -207,6 +209,7 @@ class UIPagination extends nodom.Plugin{
                     return;
                 }
                 me.changeParams(module,-1,true);
+                me.update(module);
             }
         ));
 
@@ -216,6 +219,7 @@ class UIPagination extends nodom.Plugin{
                     return;
                 }
                 me.changeParams(module,1,true);
+                me.update(module);
             }
         ));
 
@@ -225,6 +229,7 @@ class UIPagination extends nodom.Plugin{
                     return;
                 }
                 me.changeParams(module,-me.steps,true);
+                me.update(module);
             }
         ));
 
@@ -234,6 +239,7 @@ class UIPagination extends nodom.Plugin{
                     return;
                 }
                 me.changeParams(module,me.steps,true);
+                me.update(module);
             }
         ));
         //显示第x页及输入框
@@ -406,8 +412,6 @@ class UIPagination extends nodom.Plugin{
         model.set('pageNo',current);
         //设置箭头状态值
         model.set('btnAllow',btnAllow);
-        console.log(this.pageSize);
-        this.update(module);
     }
     /**
      * 只执行一次的初始化

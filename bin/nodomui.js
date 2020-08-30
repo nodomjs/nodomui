@@ -1234,7 +1234,7 @@ class UIGrid extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead'], ['rows', null, null, '', null, null, null]);
+                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool', 'dataurl'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead', 'dataUrl'], ['rows', null, null, '', null, null, null, null]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1249,6 +1249,7 @@ class UIGrid extends nodom.Plugin {
     }
     generate(rootDom) {
         rootDom.addClass('nd-grid');
+        this.extraDataName = '$ui_grid_' + nodom.Util.genId();
         if (this.fixHead) {
             rootDom.addClass('nd-grid-fixed');
         }
@@ -1283,7 +1284,7 @@ class UIGrid extends nodom.Plugin {
                 this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
                 filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
             }
-            let directive = new nodom.Directive('repeat', this.dataName, rowDom);
+            let directive = new nodom.Directive('repeat', this.extraDataName + '.' + this.dataName, rowDom);
             if (filter) {
                 directive.filters = [filter];
             }
@@ -1488,6 +1489,11 @@ class UIGrid extends nodom.Plugin {
         let me = this;
         super.beforeRender(module, uidom);
         if (this.needPreRender) {
+            let model = module.modelFactory.get(uidom.modelId);
+            model.set(this.extraDataName, {});
+            if (!this.pagination) {
+                this.doReq(module, this.pagination);
+            }
             if (this.selectPageMethodId) {
                 module.methodFactory.add(this.selectPageMethodId, (arr) => {
                     let start = (me.currentPage - 1) * me.pageSize;
@@ -1500,41 +1506,49 @@ class UIGrid extends nodom.Plugin {
     handlePagination(pagination) {
         let me = this;
         let df = pagination.plugin;
+        this.pagination = df;
+        df.dataUrl = this.dataUrl;
         if (df.currentPage) {
             this.currentPage = df.currentPage;
         }
         if (df.pageSize) {
             this.pageSize = df.pageSize;
         }
-        let reqName = df.requestName;
         if (!df.onChange) {
-            df.onChange = (module, pageNo, pageSize) => {
-                if (reqName.length === 0) {
-                    me.currentPage = pageNo;
-                    me.pageSize = pageSize;
-                    nodom.Renderer.add(module);
-                }
-                else {
-                    let params = {};
-                    params[reqName[0]] = pageNo;
-                    params[reqName[1]] = pageSize;
-                    request({
-                        url: module.dataUrl,
-                        params: params,
-                        type: 'json'
-                    }).then(r => {
-                        if (!r) {
-                            return;
-                        }
-                        if (r[df.totalName]) {
-                            module.model.set(df.totalName, r[df.totalName]);
-                            df.changeParams(module);
-                        }
-                        module.model.set(me.dataName, r[me.dataName]);
-                    });
-                }
+            df.onChange = (module) => {
+                me.doReq(module, df);
             };
         }
+    }
+    doReq(module, pagination) {
+        const me = this;
+        let params = {};
+        if (pagination) {
+            let reqName = pagination.requestName;
+            if (reqName.length === 2) {
+                params[reqName[0]] = pagination.currentPage;
+                params[reqName[1]] = pagination.pageSize;
+            }
+        }
+        nodom.request({
+            url: me.dataUrl,
+            params: params,
+            type: 'json'
+        }).then(r => {
+            if (!r) {
+                return;
+            }
+            console.log(r.rows);
+            let model = module.modelFactory.get(me.modelId);
+            model.set(this.extraDataName, r);
+            if (pagination) {
+                if (pagination.pageSize) {
+                    this.pageSize = pagination.pageSize;
+                }
+                model.set(pagination.extraDataName + '.total', r[pagination.totalName]);
+                pagination.changeParams(module);
+            }
+        });
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
@@ -2214,7 +2228,7 @@ class UIPagination extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName'], ['total', 10, 1, null, null, 10, [], 5, '', []]);
+                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2', 'dataurl'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName', 'dataUrl'], ['total', 10, 1, null, null, 10, [], 5, '', [], '']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2262,7 +2276,11 @@ class UIPagination extends nodom.Plugin {
                 dataName: 'pageSize',
                 listField: 'sizeData',
                 displayField: 'text',
-                valueField: 'value'
+                valueField: 'value',
+                onChange: (model, module, newValue, oldValue) => {
+                    me.changeParams(module);
+                    me.update(module);
+                }
             }).element);
         }
         let pageCt = new nodom.Element('div');
@@ -2294,30 +2312,35 @@ class UIPagination extends nodom.Plugin {
         rootDom.add(pageCt);
         page.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             me.changeParams(module, model.data['no']);
+            me.update(module);
         }));
         left.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
             me.changeParams(module, -1, true);
+            me.update(module);
         }));
         right.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
             me.changeParams(module, 1, true);
+            me.update(module);
         }));
         left1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
             me.changeParams(module, -me.steps, true);
+            me.update(module);
         }));
         right1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
             me.changeParams(module, me.steps, true);
+            me.update(module);
         }));
         if (this.showGo) {
             let goDom = new nodom.Element('div');
@@ -2343,7 +2366,7 @@ class UIPagination extends nodom.Plugin {
         this.handleInit(uidom, module);
     }
     update(module, current, isStep) {
-        if (this.onChange && this.onChange !== '') {
+        if (this.onChange !== '') {
             let foo;
             if (typeof this.onChange === 'string') {
                 foo = module.methodFactory.get(this.onChange);
@@ -2357,24 +2380,26 @@ class UIPagination extends nodom.Plugin {
         }
     }
     changeParams(module, current, isStep) {
-        let model1 = module.modelFactory.get(this.modelId);
-        let model = module.modelFactory.get(this.extraModelId);
-        let data1 = model1.data;
-        let data = model.data;
-        if (data1 && data1[this.totalName]) {
-            this.total = data1[this.totalName];
+        let model = module.modelFactory.get(this.modelId);
+        let data = model.query(this.extraDataName);
+        let total = data.total;
+        if (!total) {
+            let data1 = model.data;
+            if (data1 && data1[this.totalName]) {
+                total = data1[this.totalName];
+            }
+            if (total) {
+                data.total = total;
+            }
         }
         if (isStep) {
             current = this.currentPage + current;
         }
-        if (!this.total) {
+        if (!total) {
             return;
         }
-        model.set('total', this.total);
-        let pageSize = data['pageSize'];
-        if (typeof pageSize === 'string') {
-            pageSize = parseInt(pageSize);
-        }
+        model = model.get(this.extraDataName);
+        let pageSize = model.data['pageSize'];
         if (!current) {
             let d = model.query('pageNo');
             if (typeof d === 'string' && d !== '') {
@@ -2382,7 +2407,7 @@ class UIPagination extends nodom.Plugin {
             }
             current = d || 1;
         }
-        let pageCount = Math.ceil(this.total / pageSize);
+        let pageCount = Math.ceil(total / pageSize);
         if (current > pageCount) {
             current = pageCount;
         }
@@ -2422,7 +2447,7 @@ class UIPagination extends nodom.Plugin {
         if (current === 1) {
             btnAllow += 2;
         }
-        if (this.needPreRender && current === this.currentPage && min === this.minPage && max === this.maxPage) {
+        if (model.query('pageSize') === this.pageSize && current === this.currentPage && min === this.minPage && max === this.maxPage) {
             return;
         }
         let pageArr = [];
@@ -2433,16 +2458,16 @@ class UIPagination extends nodom.Plugin {
                 active: active
             });
         }
-        this.pageSize = pageSize;
         this.currentPage = current;
         this.minPage = min;
         this.maxPage = max;
+        this.pageSize = model.data['pageSize'];
         model.set('pages', pageArr);
+        model.set('pageSize', this.pageSize);
         model.set('pageNo', current);
         model.set('btnAllow', btnAllow);
     }
     handleInit(dom, module) {
-        let me = this;
         if (!this.needPreRender) {
             return;
         }
@@ -2451,17 +2476,12 @@ class UIPagination extends nodom.Plugin {
             total: 0,
             pageNum: 0,
             pageNo: this.currentPage || 1,
-            pageSize: this.pageSize || 10,
+            pageSize: this.pageSize,
             btnAllow: 0,
             pages: [],
             sizeData: this.pageSizeDatas || [10, 20, 30, 50]
         });
         this.extraModelId = model1.id;
-        let watchFunc = function (model, key, value) {
-            me.update(module);
-        };
-        model1.watch('pageSize', watchFunc);
-        model1.watch('pageNo', watchFunc);
         this.changeParams(module, 1);
     }
 }
@@ -2730,7 +2750,7 @@ class UISelect extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiselect|bool', 'listfield', 'listwidth|number', 'allowfilter|bool'], ['valueField', 'displayField', 'multiSelect', 'listField', 'listWidth', 'allowFilter'], [null, null, null, null, 0, null]);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiselect|bool', 'listfield', 'listwidth|number', 'allowfilter|bool', 'onchange'], ['valueField', 'displayField', 'multiSelect', 'listField', 'listWidth', 'allowFilter', 'onChange'], [null, null, null, null, 0, null, '']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2895,6 +2915,7 @@ class UISelect extends nodom.Plugin {
         let rows = model1.data['datas'];
         let txtArr = [];
         let valArr = [];
+        let value;
         if (this.multiSelect) {
             if (model) {
                 model.set('selected', !model.data.selected);
@@ -2906,7 +2927,7 @@ class UISelect extends nodom.Plugin {
                 }
             }
             if (this.dataName) {
-                pmodel.set(this.dataName, valArr.join(','));
+                value = valArr.join(',');
             }
             model1.set('display', txtArr.join(','));
         }
@@ -2923,13 +2944,29 @@ class UISelect extends nodom.Plugin {
             for (let d of rows) {
                 if (d.selected) {
                     if (this.dataName) {
-                        pmodel.set(this.dataName, d[this.valueField]);
+                        value = d[this.valueField];
                     }
                     model1.set('display', d[this.displayField]);
                     this.hideList(module, model1);
                     break;
                 }
             }
+        }
+        if (value !== this.value) {
+            pmodel.set(this.dataName, value);
+            if (this.onChange !== '') {
+                let foo;
+                if (typeof this.onChange === 'string') {
+                    foo = module.methodFactory.get(this.onChange);
+                }
+                else {
+                    foo = this.onChange;
+                }
+                if (nodom.Util.isFunction(foo)) {
+                    foo.apply(null, [model, module, value, this.value]);
+                }
+            }
+            this.value = value;
         }
     }
     hideList(module, model) {
