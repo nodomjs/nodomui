@@ -57,6 +57,16 @@ class UISelect extends nodom.Plugin{
      */
     filterMethodId:string;
 
+    /**
+     * 值
+     */
+    value:string;
+
+    /**
+     * change 事件或事件名
+     */
+    onChange:string|Function;
+
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
@@ -65,9 +75,9 @@ class UISelect extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool'],
-                    ['valueField','displayField','multiSelect','listField','listWidth','allowFilter'],
-                    [null,null,null,null,0,null]
+                    ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool','onchange'],
+                    ['valueField','displayField','multiSelect','listField','listWidth','allowFilter','onChange'],
+                    [null,null,null,null,0,null,'']
                 );
             }else if(typeof params === 'object'){
                 for(let o in params){
@@ -296,6 +306,8 @@ class UISelect extends nodom.Plugin{
         let txtArr:string[] = [];
         //值数组
         let valArr:string[] = [];
+
+        let value:string;
         if(this.multiSelect){
             //反选
             if(model){
@@ -309,7 +321,8 @@ class UISelect extends nodom.Plugin{
                 }
             }
             if(this.dataName){
-                pmodel.set(this.dataName,valArr.join(','));
+                value = valArr.join(',');
+                
             }
             model1.set('display',txtArr.join(','));
         }else{
@@ -329,7 +342,7 @@ class UISelect extends nodom.Plugin{
             for(let d of rows){
                 if(d.selected){
                     if(this.dataName){
-                        pmodel.set(this.dataName,d[this.valueField]);
+                        value = d[this.valueField];
                     }
                     model1.set('display',d[this.displayField]);
                     this.hideList(module,model1);
@@ -337,6 +350,22 @@ class UISelect extends nodom.Plugin{
                 }
             }
         }
+        if(value !== this.value){
+            pmodel.set(this.dataName,value);
+            if(this.onChange !== ''){
+                let foo;
+                if(typeof this.onChange === 'string'){
+                    foo = module.methodFactory.get(this.onChange);
+                }else{
+                    foo = this.onChange;
+                }
+                if(nodom.Util.isFunction(foo)){
+                    foo.apply(null,[model,module,value,this.value]);
+                }
+            }
+            this.value = value;
+        }
+        
     }
 
     /**

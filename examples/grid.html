@@ -16,7 +16,7 @@
     <style>
         .ct{
             min-width:1000px !important;
-            height:500px; 
+            height:400px; 
         }
         .pager{
             text-align:center;
@@ -36,9 +36,10 @@
             sortable: 可排序，如果不设置，则列标题不会显示排序按钮
             gridLine: 网格线，分为 row(行) column(列) both(行列)
             fixHead:  固定表头，滚动条拉动时不滚动
+            dataUrl:  表格数据url
             hideHead: 隐藏头部
         -->
-        <ui-grid  dataName='rows' class='ct' rowalt sortable gridline='both' hideHead>
+        <ui-grid  dataName='rows' class='ct' rowalt sortable gridline='both' hideHead dataUrl='http://localhost:3000/commodity/getinfo'>
             <!--列集合-->
             <cols>
                 <!--
@@ -71,9 +72,8 @@
                 <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div> -->
             </sub>
             <!--分页-->
-            <ui-pagination totalName='total' onChange='changeData' pageSize='10' sizeChange='10,20,30,50' showGo showTotal></ui-pagination>
+            <ui-pagination totalName='total' requestName='pageno,pagesize' pageSize='10' sizeChange='10,20,30,50' showGo showTotal></ui-pagination>
         </ui-grid>
-        
         
     </div>
 </body>
@@ -82,9 +82,9 @@
     nodom.newApp({
         module:{
             el:'div',
-            data:"data/grid1.json",
+            // data:"data/grid1.json",
             // data:'http://localhost:3000/commodity/getinfo',
-            methods:{
+            /*methods:{
                 changeData:(module,pageno,pagesize)=>{
                     nodom.request({
                         url:'data/grid'+ pageno +'.json',
@@ -96,7 +96,7 @@
                         module.model.set('rows',r.rows);
                     })
                 }
-            }
+            }*/
         }
     });
 </script>

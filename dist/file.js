@@ -40,7 +40,6 @@ class UIFile extends nodom.Plugin {
      * @param rootDom 插件对应的element
      */
     generate(rootDom) {
-        let me = this;
         rootDom.addClass('nd-file');
         //附加数据项名
         this.extraDataName = '$ui_file_' + nodom.Util.genId();
@@ -60,6 +59,7 @@ class UIFile extends nodom.Plugin {
     }
     /**
      * 产生上传dom
+     * @returns     上传后的显示dom
      */
     genUploadDom() {
         const me = this;
@@ -71,10 +71,6 @@ class UIFile extends nodom.Plugin {
         //文件
         let fDom = new nodom.Element('input');
         fDom.setProp('type', 'file');
-        //多文件
-        // if(this.multiple){
-        //     fDom.setProp('multiple','multiple');
-        // }
         fDom.addClass('nd-file-input');
         //input file change事件
         fDom.addEvent(new nodom.NodomEvent('change', (dom, model, module, e, el) => {
@@ -86,12 +82,7 @@ class UIFile extends nodom.Plugin {
             //上传显示
             model.set(me.extraDataName + '.uploading', NUITipWords.uploading);
             let form = new FormData();
-            let cnt = 0;
             for (let f of el.files) {
-                //超出文件不能上传
-                if (++cnt + me.count > me.maxCount) {
-                    break;
-                }
                 form.append(me.uploadName, f);
             }
             //提交请求
@@ -104,7 +95,6 @@ class UIFile extends nodom.Plugin {
                 },
                 type: 'json'
             }).then((r) => {
-                console.log(r);
                 //上传显示
                 model.set(me.extraDataName + '.state', 0);
                 //设置显示数据
@@ -165,7 +155,6 @@ class UIFile extends nodom.Plugin {
         //点击删除
         delDom.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
             let params = {};
-            console.log(model.data);
             let id = model.query(me.valueField);
             params[me.valueField] = id;
             if (this.deleteUrl !== '') { //存在del url，则需要从服务器删除
@@ -194,7 +183,6 @@ class UIFile extends nodom.Plugin {
         if (Array.isArray(rows)) {
             for (let i = 0; i < rows.length; i++) {
                 if (rows[i][this.valueField] === id) {
-                    console.log(id);
                     rows.splice(i, 1);
                     break;
                 }
@@ -207,11 +195,10 @@ class UIFile extends nodom.Plugin {
             let model = module.modelFactory.get(dom.modelId);
             //增加附加model
             if (model) {
-                let model1 = model.set(this.extraDataName, {
+                model.set(this.extraDataName, {
                     state: 0,
                     uploading: false
                 });
-                this.extraModelId = model1.id;
             }
         }
     }

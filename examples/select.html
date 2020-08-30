@@ -24,7 +24,7 @@
             allowFilter 允许过滤
             listWidth   下拉列表宽度，默认与输入框相同
         -->
-        <ui-select x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' >
+        <ui-select x-field='hobby' valueField='hid' displayField='htitle' listField='hobbies' onChange='change'>
         </ui-select>
 
         <p>多选方式</p>
@@ -60,6 +60,11 @@
                     {hid:5,htitle:'户外运动',icon:'password',desc:'感受大自然，轻呼吸'},
                     {hid:6,htitle:'旅游',icon:'prompt',disable:true,desc:'读万卷书，行万里路'}
                 ]
+            },
+            methods:{
+                change:function(model,module,newValue,oldValue){
+                    console.log(model,module,newValue,oldValue);
+                }
             }
         }
     })

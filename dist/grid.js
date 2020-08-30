@@ -38,7 +38,7 @@ class UIGrid extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead'], ['rows', null, null, '', null, null, null]);
+                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool', 'dataurl'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead', 'dataUrl'], ['rows', null, null, '', null, null, null, null]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -57,6 +57,8 @@ class UIGrid extends nodom.Plugin {
      */
     generate(rootDom) {
         rootDom.addClass('nd-grid');
+        //生成附加数据名
+        this.extraDataName = '$ui_grid_' + nodom.Util.genId();
         if (this.fixHead) {
             rootDom.addClass('nd-grid-fixed');
         }
@@ -100,7 +102,7 @@ class UIGrid extends nodom.Plugin {
                 this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
                 filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
             }
-            let directive = new nodom.Directive('repeat', this.dataName, rowDom);
+            let directive = new nodom.Directive('repeat', this.extraDataName + '.' + this.dataName, rowDom);
             if (filter) {
                 directive.filters = [filter];
             }
@@ -373,9 +375,14 @@ class UIGrid extends nodom.Plugin {
         let me = this;
         super.beforeRender(module, uidom);
         if (this.needPreRender) {
+            //增加附加数据项
+            let model = module.modelFactory.get(uidom.modelId);
+            model.set(this.extraDataName, {});
+            this.doReq(module, this.pagination);
             //增加过滤器方法
             if (this.selectPageMethodId) {
                 module.methodFactory.add(this.selectPageMethodId, (arr) => {
+                    console.log(me.pageSize);
                     let start = (me.currentPage - 1) * me.pageSize;
                     let end = start + me.pageSize;
                     return arr.slice(start, end);
@@ -385,49 +392,62 @@ class UIGrid extends nodom.Plugin {
     }
     /**
      * 处理pagination
+     * @param pagination    pagination对应dom
      */
     handlePagination(pagination) {
         let me = this;
         let df = pagination.plugin;
+        this.pagination = df;
+        df.dataUrl = this.dataUrl;
         if (df.currentPage) {
             this.currentPage = df.currentPage;
         }
         if (df.pageSize) {
             this.pageSize = df.pageSize;
         }
-        let reqName = df.requestName;
         //如果已经有change事件了，则不再设置
         if (!df.onChange) {
             //增加onchange事件
-            df.onChange = (module, pageNo, pageSize) => {
-                //无请求
-                if (reqName.length === 0) {
-                    me.currentPage = pageNo;
-                    me.pageSize = pageSize;
-                    //渲染模块
-                    nodom.Renderer.add(module);
-                }
-                else {
-                    let params = {};
-                    params[reqName[0]] = pageNo;
-                    params[reqName[1]] = pageSize;
-                    request({
-                        url: module.dataUrl,
-                        params: params,
-                        type: 'json'
-                    }).then(r => {
-                        if (!r) {
-                            return;
-                        }
-                        if (r[df.totalName]) {
-                            module.model.set(df.totalName, r[df.totalName]);
-                            df.changeParams(module);
-                        }
-                        module.model.set(me.dataName, r[me.dataName]);
-                    });
-                }
+            df.onChange = (module) => {
+                me.doReq(module, df);
             };
         }
+    }
+    /**
+     * 请求数据
+     * @param module        模块
+     * @param pagination    分页插件
+     */
+    doReq(module, pagination) {
+        const me = this;
+        let params = {};
+        if (pagination) {
+            let reqName = pagination.requestName;
+            if (reqName.length === 2) {
+                params[reqName[0]] = pagination.currentPage;
+                params[reqName[1]] = pagination.pageSize;
+            }
+        }
+        nodom.request({
+            url: me.dataUrl,
+            params: params,
+            type: 'json'
+        }).then(r => {
+            if (!r) {
+                return;
+            }
+            console.log(r.rows);
+            let model = module.modelFactory.get(me.modelId);
+            model.set(this.extraDataName, r);
+            // 设置pagination total值
+            if (pagination) {
+                if (pagination.pageSize) {
+                    this.pageSize = pagination.pageSize;
+                }
+                model.set(pagination.extraDataName + '.total', r[pagination.totalName]);
+                pagination.changeParams(module);
+            }
+        });
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
