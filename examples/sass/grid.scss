@@ -19,6 +19,12 @@
                 max-height:100px;
             }
         }
+
+        /*左对齐*/
+        .nd-grid-row-item-left{
+            justify-content:flex-start;
+        }
+
         .nd-grid-sub-btn{
             @extend .nd-icon-right;
         }
@@ -90,15 +96,20 @@
     }
 
     .nd-grid-row-line{
-        border-top:1px solid $nd-color5;
+        > * {
+            border-top:1px solid $nd-color5;
+        }
+        > :last-child{
+            border-bottom:1px solid $nd-color5;
+        }
     }
 
     .nd-grid-col-line{
-        >div{
+        > * {
             border-right:1px solid $nd-color5;
         }
 
-        >div:last-child{
+        & :last-child{
             border-right:0px solid $nd-color5;
         }
     }

@@ -82,9 +82,8 @@
 
             <div>
                 <label>生活照:</label>
-                <ui-file x-field='photos' multiple valueField='imgId' displayField="fileName" 
-                 uploadMethod='uploadFile' delMethod='delFile'
-                 maxCount='5'></ui-file>
+                <ui-file x-field='photos' multiple valueField='id' displayField="url"  uploadName='file'
+                uploadUrl='http://localhost:3000/upload' fileType='image' maxCount='5'></ui-file>
             </div>
             
             <div>

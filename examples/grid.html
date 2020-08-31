@@ -39,16 +39,116 @@
             dataUrl:  表格数据url
             hideHead: 隐藏头部
         -->
-        <ui-grid  dataName='rows' class='ct' rowalt sortable gridline='both' hideHead dataUrl='http://localhost:3000/commodity/getinfo'>
-            <!--列集合-->
+
+        <h3>简单使用</h3>
+        <button e-click='getGridData'>获取表格数据</button>
+        <p>表格列元素通过cols元素定义，cols每个子元素都为表格的一列</p>
+        <ui-grid name='grd'  dataName='rows' style='height:300px' dataUrl='http://localhost:3000/commodity/getinfo'>
+            <!--
+                列属性
+                width:显示宽度，所有宽度之和为表格宽度份数，width值表示 width/总份数 * 100%
+                title:表头名
+                field:绑定字段名，如果不绑定，则不能排序
+                notsort: 不显示排序
+                hide: 在表格中隐藏该列
+            -->
             <cols>
-                <!--
-                    width:显示宽度，所有宽度之和为表格宽度份数，width值表示 width/总份数 * 100%
-                    title:表头名
-                    field:绑定字段名，如果不绑定，则不能排序
-                    notsort: 不显示排序
-                    hide: 在表格中隐藏该列
-                -->
+                <div width='1' title='编号' notsort field='id' left>{{id}}</div>
+                <div width='3' title='商品名' field='name' left>{{name}}</div>
+                <div width='1' title='价格' field='price' left>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+        </ui-grid>
+        
+        <h3>增加网格线</h3>
+        <p>通过gridLine设置网格线，包括row(行线),column(列线),both(全部)</p>
+        <ui-grid  dataName='rows' style='height:300px' gridLine='both'
+        dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+        </ui-grid>
+
+        <h3>行底色交替</h3>
+        <p>通过rowalt设置行间隔底色</p>
+        <ui-grid  dataName='rows' class='height:300px' rowalt
+        dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+        </ui-grid>
+
+        <h3>固定表头</h3>
+        <p>通过fixHead设置固定表头，设置后，只有表body设置滚动条</p>
+        <ui-grid  dataName='rows' style='height:300px' rowalt fixHead
+        dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+        </ui-grid>
+
+        <h3>增加排序</h3>
+        <p>通过sortable启用排序，cols子元素可以设置notsort表示该列不排序</p>
+        <ui-grid  dataName='rows' style='height:300px' rowalt fixHead sortable
+        dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <!--该列不排序-->
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+        </ui-grid>
+
+        <h3>增加子表格</h3>
+        <p>通过添加子元素 sub 设置子表格，主要用于显示行详情，有两种方式:</p>
+        <ol>
+            <li>设置auto属性，自动生成行详情</li>
+            <li>在sub中自定义子元素显示</li>
+        </ol>
+        <h4>自动生成</h4>
+        <ui-grid  dataName='rows' style='height:300px' rowalt
+            dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+            <sub auto cols='2'></sub>
+        </ui-grid>
+
+        <h4>自定义子表格</h4>
+        <ui-grid  dataName='rows' class='height:300px' rowalt
+            dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
+                <div width='1' title='编号' notsort field='id'>{{id}}</div>
+                <div width='3' title='商品名' field='name'>{{name}}</div>
+                <div width='1' title='价格' field='price'>{{price|currency}}</div>
+                <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
+            </cols>
+            <sub>
+                <div><label style='color:red;width:150px;'>编号：</label><span>{{id}}</span></div>
+                <div><label style='color:red;width:150px;'>商品名：</label><span>{{name}}</span></div>
+                <div><label style='color:red;width:150px;'>价格：</label><span>{{price}}</span></div>
+                <div><label style='color:red;width:150px;'>原价：</label><span>{{oprice}}</span></div>
+            </sub>
+        </ui-grid>
+
+        <h3>增加分页</h3>
+        <p>通过ui-pagination引入分页插件</p>
+        <ui-grid  dataName='rows' style='height:300px' rowalt sortable fixHead
+            dataUrl='http://localhost:3000/commodity/getinfo'>
+            <cols>
                 <div width='0.6' title='编号' notsort field='id'>{{id}}</div>
                 <div width='2' title='头像' field='head' type='img'>{{head}}</div>
                 <div width='2' title='头像链接' field='head'><a href='{{head}}' target='blank'>{{head}}</a></div>
@@ -59,20 +159,9 @@
                 <div width='1' title='折扣' field='discount'>{{(discount*10)|number:2}}</div>
                 <div width='1' title='商品描述' hide>{{desc}}</div>
             </cols>
-            <!--
-                labelWidth  label宽度
-                auto        是否自动生成详细信息，如果不设置，则需要添加子元素
-                cols        一行显示几列，默认1列
-            -->
-            <sub class='sub' labelWidth='100' cols='2' auto>
-                <!-- <div><label>编号：</label><span>{{id}}</span></div>
-                <div><label>商品名：</label><span>{{name}}</span></div>
-                <div><label>价格：</label><span>{{price}}</span></div>
-                <div><label>原价：</label><span>{{oprice}}</span></div>
-                <div><label>折扣：</label><span>{{(discount*10)|number:2}}</span></div> -->
-            </sub>
+            <sub class='sub' labelWidth='100' cols='2' auto ></sub>
             <!--分页-->
-            <ui-pagination totalName='total' requestName='pageno,pagesize' pageSize='10' sizeChange='10,20,30,50' showGo showTotal></ui-pagination>
+            <ui-pagination totalName='total' requestName='pageno,pagesize' pageSize='10' sizeChange='10,20,30,50' showGo showTotal />
         </ui-grid>
         
     </div>
@@ -82,21 +171,11 @@
     nodom.newApp({
         module:{
             el:'div',
-            // data:"data/grid1.json",
-            // data:'http://localhost:3000/commodity/getinfo',
-            /*methods:{
-                changeData:(module,pageno,pagesize)=>{
-                    nodom.request({
-                        url:'data/grid'+ pageno +'.json',
-                        type:'json'
-                    }).then((r)=>{
-                        if(r.total){
-                            module.model.set('total',r.total);
-                        }
-                        module.model.set('rows',r.rows);
-                    })
+            methods:{
+                getGridData:function(dom,model,module){
+                    console.log(module.getPlugin('grd').getData());
                 }
-            }*/
+            }
         }
     });
 </script>

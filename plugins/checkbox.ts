@@ -57,8 +57,8 @@ class UICheckbox extends nodom.Plugin{
         }
         
         let icon:nodom.Element = new nodom.Element('b');
-        icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class',"{'nd-checked':'" + this.dataName + "==\""+ this.yesValue +"\"'}",icon));
+        icon.addClass('nd-icon-checkbox');
+        icon.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'" + this.dataName + "==\""+ this.yesValue +"\"'}",icon));
         rootDom.children.unshift(icon);
 
         //点击事件

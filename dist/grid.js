@@ -111,6 +111,10 @@ class UIGrid extends nodom.Plugin {
             //第一个孩子
             let dataDom = new nodom.Element('div');
             dataDom.addClass('nd-grid-row');
+            //网格线
+            if (this.gridLine === 'col' || this.gridLine === 'both') {
+                dataDom.addClass('nd-grid-col-line');
+            }
             //处理所有td
             for (let i = 0; i < rowDom.children.length; i++) {
                 let c = rowDom.children[i];
@@ -148,12 +152,16 @@ class UIGrid extends nodom.Plugin {
                 }
                 c.tagName = 'div';
                 c.addClass('nd-grid-row-item');
+                //表格内容左对其
+                if (c.hasProp('left')) {
+                    c.addClass('nd-grid-row-item-left');
+                }
                 //设置自定义flex
                 if (c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))) {
                     c.setProp('style', 'flex:' + c.getProp('width'));
                 }
                 dataDom.add(c);
-                c.delProp(['title', 'type', 'width', 'field', 'notsort']);
+                c.delProp(['title', 'type', 'width', 'field', 'notsort', 'left']);
             }
             //替换孩子节点
             rowDom.children = [dataDom];
@@ -166,9 +174,15 @@ class UIGrid extends nodom.Plugin {
         }
         if (thead) {
             rootDom.children = [thead, tbody];
+            if (this.gridLine === 'row' || this.gridLine === 'both') {
+                thead.addClass('nd-grid-row-line');
+            }
         }
         else {
             rootDom.children = [tbody];
+        }
+        if (this.gridLine === 'row' || this.gridLine === 'both') {
+            tbody.addClass('nd-grid-row-line');
         }
         //如果有分页，则需要在外添加容器
         if (pagination) {
@@ -195,6 +209,10 @@ class UIGrid extends nodom.Plugin {
         if (thead.children.length === 0) {
             let thCt = new nodom.Element('div');
             thCt.addClass('nd-grid-row');
+            //网格线
+            if (this.gridLine === 'col' || this.gridLine === 'both') {
+                thCt.addClass('nd-grid-col-line');
+            }
             thead.add(thCt);
         }
         //隐藏头部不显示
@@ -270,7 +288,7 @@ class UIGrid extends nodom.Plugin {
         td.addClass('nd-grid-iconcol');
         b = new nodom.Element('b');
         b.addClass('nd-grid-sub-btn');
-        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}"));
+        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", b));
         b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
             model.set('$showSub', !model.data['$showSub']);
         }));
@@ -289,6 +307,10 @@ class UIGrid extends nodom.Plugin {
             let lw = subDom.getProp('labelwidth') || 100;
             //每行显示数
             let cols = subDom.hasProp('cols') ? parseInt(subDom.getProp('cols')) : 1;
+            //单行不多于4个数据域
+            if (cols > 4) {
+                cols = 4;
+            }
             let cnt = 0;
             let rowCt;
             this.fields.forEach((item) => {
@@ -312,28 +334,6 @@ class UIGrid extends nodom.Plugin {
                 rowCt.add(itemCt);
                 subDom.delProp(['auto', 'labelwidth']);
             });
-        }
-    }
-    /**
-     * 添加网格线
-     * @param gridLine  网格线类型 column row both
-     * @param headDom   表格头
-     * @param rowDom    表格体
-     */
-    addGridLine(gridLine, headDom, rowDom) {
-        switch (gridLine) {
-            case 'column':
-                headDom.addClass('nd-grid-col-line');
-                rowDom.addClass('nd-grid-col-line');
-                break;
-            case 'row':
-                headDom.addClass('nd-grid-row-line');
-                rowDom.addClass('nd-grid-row-line');
-                break;
-            case 'both':
-                headDom.addClass('nd-grid-row-line nd-grid-col-line');
-                rowDom.addClass('nd-grid-row-line nd-grid-col-line');
-                break;
         }
     }
     /**
@@ -438,7 +438,6 @@ class UIGrid extends nodom.Plugin {
             if (!r) {
                 return;
             }
-            console.log(r.rows);
             let model = module.modelFactory.get(me.modelId);
             model.set(this.extraDataName, r);
             // 设置pagination total值
@@ -450,6 +449,18 @@ class UIGrid extends nodom.Plugin {
                 pagination.changeParams(module);
             }
         });
+    }
+    /**
+     * 获取表格数据
+     */
+    getData() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.modelFactory.get(this.modelId);
+        model = model.get(this.extraDataName);
+        let data = model.getData();
+        if (data) {
+            return data[this.dataName];
+        }
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);

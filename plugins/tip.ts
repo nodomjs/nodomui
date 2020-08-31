@@ -213,7 +213,12 @@ class UITip extends nodom.Plugin{
             theme:config.theme||'black'
         }
         if(config.exclusive){
-            datas = [data]
+            //清空datas
+            for(let d of datas){
+                datas.pop();
+            }
+            //增加data
+            datas.push(data);
         }else{
             datas.push(data);
         }

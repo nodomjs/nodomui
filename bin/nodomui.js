@@ -1292,6 +1292,9 @@ class UIGrid extends nodom.Plugin {
             rowDom.tagName = 'div';
             let dataDom = new nodom.Element('div');
             dataDom.addClass('nd-grid-row');
+            if (this.gridLine === 'col' || this.gridLine === 'both') {
+                dataDom.addClass('nd-grid-col-line');
+            }
             for (let i = 0; i < rowDom.children.length; i++) {
                 let c = rowDom.children[i];
                 if (!c.tagName) {
@@ -1323,11 +1326,14 @@ class UIGrid extends nodom.Plugin {
                 }
                 c.tagName = 'div';
                 c.addClass('nd-grid-row-item');
+                if (c.hasProp('left')) {
+                    c.addClass('nd-grid-row-item-left');
+                }
                 if (c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))) {
                     c.setProp('style', 'flex:' + c.getProp('width'));
                 }
                 dataDom.add(c);
-                c.delProp(['title', 'type', 'width', 'field', 'notsort']);
+                c.delProp(['title', 'type', 'width', 'field', 'notsort', 'left']);
             }
             rowDom.children = [dataDom];
             rowDom.delProp('data');
@@ -1338,9 +1344,15 @@ class UIGrid extends nodom.Plugin {
         }
         if (thead) {
             rootDom.children = [thead, tbody];
+            if (this.gridLine === 'row' || this.gridLine === 'both') {
+                thead.addClass('nd-grid-row-line');
+            }
         }
         else {
             rootDom.children = [tbody];
+        }
+        if (this.gridLine === 'row' || this.gridLine === 'both') {
+            tbody.addClass('nd-grid-row-line');
         }
         if (pagination) {
             let parentDom = new nodom.Element('div');
@@ -1358,6 +1370,9 @@ class UIGrid extends nodom.Plugin {
         if (thead.children.length === 0) {
             let thCt = new nodom.Element('div');
             thCt.addClass('nd-grid-row');
+            if (this.gridLine === 'col' || this.gridLine === 'both') {
+                thCt.addClass('nd-grid-col-line');
+            }
             thead.add(thCt);
         }
         if (thead) {
@@ -1408,7 +1423,7 @@ class UIGrid extends nodom.Plugin {
         td.addClass('nd-grid-iconcol');
         b = new nodom.Element('b');
         b.addClass('nd-grid-sub-btn');
-        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}"));
+        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", b));
         b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
             model.set('$showSub', !model.data['$showSub']);
         }));
@@ -1422,6 +1437,9 @@ class UIGrid extends nodom.Plugin {
             subDom.children = [];
             let lw = subDom.getProp('labelwidth') || 100;
             let cols = subDom.hasProp('cols') ? parseInt(subDom.getProp('cols')) : 1;
+            if (cols > 4) {
+                cols = 4;
+            }
             let cnt = 0;
             let rowCt;
             this.fields.forEach((item) => {
@@ -1445,22 +1463,6 @@ class UIGrid extends nodom.Plugin {
                 rowCt.add(itemCt);
                 subDom.delProp(['auto', 'labelwidth']);
             });
-        }
-    }
-    addGridLine(gridLine, headDom, rowDom) {
-        switch (gridLine) {
-            case 'column':
-                headDom.addClass('nd-grid-col-line');
-                rowDom.addClass('nd-grid-col-line');
-                break;
-            case 'row':
-                headDom.addClass('nd-grid-row-line');
-                rowDom.addClass('nd-grid-row-line');
-                break;
-            case 'both':
-                headDom.addClass('nd-grid-row-line nd-grid-col-line');
-                rowDom.addClass('nd-grid-row-line nd-grid-col-line');
-                break;
         }
     }
     sort(index, asc, module) {
@@ -1538,7 +1540,6 @@ class UIGrid extends nodom.Plugin {
             if (!r) {
                 return;
             }
-            console.log(r.rows);
             let model = module.modelFactory.get(me.modelId);
             model.set(this.extraDataName, r);
             if (pagination) {
@@ -1549,6 +1550,15 @@ class UIGrid extends nodom.Plugin {
                 pagination.changeParams(module);
             }
         });
+    }
+    getData() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.modelFactory.get(this.modelId);
+        model = model.get(this.extraDataName);
+        let data = model.getData();
+        if (data) {
+            return data[this.dataName];
+        }
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
@@ -3298,7 +3308,10 @@ class UITip extends nodom.Plugin {
             theme: config.theme || 'black'
         };
         if (config.exclusive) {
-            datas = [data];
+            for (let d of datas) {
+                datas.pop();
+            }
+            datas.push(data);
         }
         else {
             datas.push(data);

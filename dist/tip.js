@@ -172,7 +172,10 @@ class UITip extends nodom.Plugin {
             theme: config.theme || 'black'
         };
         if (config.exclusive) {
-            datas = [data];
+            for (let d of datas) {
+                datas.pop();
+            }
+            datas.push(data);
         }
         else {
             datas.push(data);
