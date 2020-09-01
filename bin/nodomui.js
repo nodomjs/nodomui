@@ -434,8 +434,8 @@ class UICheckbox extends nodom.Plugin {
             rootDom.removeDirectives(['field']);
         }
         let icon = new nodom.Element('b');
-        icon.addClass('nd-uncheck');
-        icon.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.dataName + "==\"" + this.yesValue + "\"'}", icon));
+        icon.addClass('nd-checkbox-uncheck');
+        icon.addDirective(new nodom.Directive('class', "{'nd-checkbox-checked':'" + this.dataName + "==\"" + this.yesValue + "\"'}", icon));
         rootDom.children.unshift(icon);
         rootDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             let v = model.data[me.dataName];
@@ -1797,7 +1797,7 @@ class UIList extends nodom.Plugin {
         let model;
         if (this.needPreRender) {
             pmodel = module.modelFactory.get(this.modelId);
-            this.extraModelId = pmodel.set(this.extraDataName, {
+            pmodel.set(this.extraDataName, {
                 datas: []
             }).id;
         }
@@ -1805,7 +1805,7 @@ class UIList extends nodom.Plugin {
             pmodel = module.modelFactory.get(this.modelId);
         }
         if (!model) {
-            model = module.modelFactory.get(this.extraModelId);
+            model = pmodel.get(this.extraDataName);
         }
         let data = model.data;
         if (this.listField && data.datas.length === 0 && pmodel.data[this.listField]) {
@@ -1836,7 +1836,7 @@ class UIList extends nodom.Plugin {
     }
     setValue(module, model) {
         let pmodel = module.modelFactory.get(this.modelId);
-        let model1 = module.modelFactory.get(this.extraModelId);
+        let model1 = pmodel.get(this.extraDataName);
         let rows = model1.data['datas'];
         let valArr = [];
         if (this.multiSelect) {
@@ -2610,7 +2610,7 @@ class UIRadio extends nodom.Plugin {
         for (let c of rootDom.children) {
             if (c.tagName) {
                 let icon = new nodom.Element('b');
-                icon.addClass('nd-icon-radio');
+                icon.addClass('nd-radio-unactive');
                 icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + this.dataName + "==\"" + c.getProp('value') + "\"'}", icon));
                 c.children.unshift(icon);
                 c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {

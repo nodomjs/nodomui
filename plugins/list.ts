@@ -52,16 +52,6 @@ class UIList extends nodom.Plugin{
      */
     multiSelect:boolean;
 
-    /**
-     * 对象的modelId
-     */
-    modelId:number;
-
-    /**
-     * 附加数据项modelId
-     */
-    extraModelId:number;
-
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
@@ -96,8 +86,6 @@ class UIList extends nodom.Plugin{
         
         //增加附加model
         rootDom.addDirective(new nodom.Directive('model',this.extraDataName,rootDom));
-
-
         if(this.type === 'row'){
             rootDom.addClass('nd-list');
         }else{
@@ -134,7 +122,6 @@ class UIList extends nodom.Plugin{
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                console.log(1);
                 if(me.disableName !== '' && model.query(me.disableName)){
                     return;
                 }
@@ -178,17 +165,18 @@ class UIList extends nodom.Plugin{
         let model:nodom.Model;
         if(this.needPreRender){
             pmodel = module.modelFactory.get(this.modelId);
-            this.extraModelId = pmodel.set(this.extraDataName,{
+            pmodel.set(this.extraDataName,{
                 datas:[]        //下拉框数据
             }).id;
         }
 
+        
         if(!pmodel){
             pmodel = module.modelFactory.get(this.modelId);
         }
         
         if(!model){
-            model = module.modelFactory.get(this.extraModelId);
+            model = pmodel.get(this.extraDataName);
         }
         
         let data = model.data;
@@ -230,11 +218,11 @@ class UIList extends nodom.Plugin{
      * @param module    模块
      * @param value     值
      */
-    private setValue(module:nodom.Module,model?:nodom.Model){
+    setValue(module:nodom.Module,model?:nodom.Model){
         //原model
         let pmodel = module.modelFactory.get(this.modelId);
         //附加数据model
-        let model1:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let model1:nodom.Model = pmodel.get(this.extraDataName);
         let rows  = model1.data['datas'];
         //显示数组
         //值数组

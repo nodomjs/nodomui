@@ -166,8 +166,12 @@ button, input {
   outline: none; }
 
 /**滚动条**/
-::-webkit-scrollbar {
-  width: 10px; }
+@media screen and (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 1px; } }
+@media screen and (min-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 10px; } }
 
 ::-webkit-scrollbar-track {
   background-color: #fff;
@@ -181,6 +185,27 @@ button, input {
   ::-webkit-scrollbar-thumb:hover {
     background-color: #d5d5d5;
     color: #666; }
+
+/*标题*/
+h1 {
+  font-size: 20px;
+  font-weight: bold !important; }
+
+h2 {
+  font-size: 18px;
+  font-weight: bold !important; }
+
+h3 {
+  font-size: 16px;
+  font-weight: bold !important; }
+
+h4 {
+  font-size: 14px;
+  font-weight: bold !important; }
+
+h5 {
+  font-size: 12px;
+  font-weight: bold !important; }
 
 @font-face {
   font-family: "nd-iconfont";
@@ -204,27 +229,27 @@ button, input {
     content: ""; }
 
 /*复选框，未选中*/
-.nd-icon-checkbox, .nd-form .nd-uncheck, .nd-tree .nd-tree-nodect .nd-tree-uncheck {
+.nd-icon-checkbox, .nd-checkbox-uncheck, .nd-tree .nd-tree-nodect .nd-tree-uncheck {
   font-family: nd-iconfont; }
-  .nd-icon-checkbox:before, .nd-form .nd-uncheck:before, .nd-tree .nd-tree-nodect .nd-tree-uncheck:before {
+  .nd-icon-checkbox:before, .nd-checkbox-uncheck:before, .nd-tree .nd-tree-nodect .nd-tree-uncheck:before {
     content: ""; }
 
 /*复选框，已选中*/
-.nd-icon-checked, .nd-form .nd-checked, .nd-tree .nd-tree-nodect .nd-tree-checked {
+.nd-icon-checked, .nd-checkbox-checked, .nd-tree .nd-tree-nodect .nd-tree-checked {
   font-family: nd-iconfont; }
-  .nd-icon-checked:before, .nd-form .nd-checked:before, .nd-tree .nd-tree-nodect .nd-tree-checked:before {
+  .nd-icon-checked:before, .nd-checkbox-checked:before, .nd-tree .nd-tree-nodect .nd-tree-checked:before {
     content: ""; }
 
 /*单选框，未选中*/
-.nd-icon-radio {
+.nd-icon-radio, .nd-radio-unactive {
   font-family: nd-iconfont; }
-  .nd-icon-radio:before {
+  .nd-icon-radio:before, .nd-radio-unactive:before {
     content: ""; }
 
 /*单选框，已选中*/
-.nd-icon-radio-active, .nd-form .nd-radio-active {
+.nd-icon-radio-active, .nd-radio-active {
   font-family: nd-iconfont; }
-  .nd-icon-radio-active:before, .nd-form .nd-radio-active:before {
+  .nd-icon-radio-active:before, .nd-radio-active:before {
     content: ""; }
 
 /*减号*/
@@ -701,7 +726,7 @@ button, input {
 /**按钮**/
 button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   display: inline-block;
-  background-color: #c5c5c5;
+  background-color: #e5e5e5;
   color: #666;
   border-radius: 5px;
   border: 0px;
@@ -709,7 +734,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   button > b, .nd-btn > b, .nd-listtransfer .nd-listtransfer-btngrp > b > b {
     margin-right: 5px; }
   button:hover, .nd-btn:hover, .nd-listtransfer .nd-listtransfer-btngrp > b:hover {
-    background-color: #d2d2d2;
+    background-color: #f2f2f2;
     color: #333; }
 
 /*无背景色*/
@@ -924,19 +949,22 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       width: 0px; }
 
 /*form css*/
-.nd-form .nd-form-item {
+.nd-form-item {
   padding: 10px;
   display: flex;
   align-items: center; }
-  .nd-form .nd-form-item label {
+  .nd-form-item label {
     margin-right: 10px; }
-  .nd-form .nd-form-item input, .nd-form .nd-form-item textarea, .nd-form .nd-form-item .nd-select, .nd-form .nd-form-item .nd-datetime {
+  .nd-form-item input, .nd-form-item textarea, .nd-form-item .nd-select, .nd-form-item .nd-datetime {
     flex: 1; }
-.nd-form .nd-radio-active {
+
+.nd-radio-active {
   color: #2864c8; }
-.nd-form .nd-uncheck {
+
+.nd-checkbox-uncheck {
   margin-right: 10px; }
-.nd-form .nd-checked {
+
+.nd-checkbox-checked {
   margin-right: 10px;
   color: #2864c8; }
 
