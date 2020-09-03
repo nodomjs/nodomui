@@ -12,8 +12,8 @@
  *  只能包括一个子节点(带tagname)
  *  icon:       菜单项图标对应数据字段名
  */
-class UIMenu extends nodom.Plugin{
-    tagName:string = 'UI-MENU';
+class UISidebar extends nodom.Plugin{
+    tagName:string = 'UI-SIDEBAR';
     /**
      * 数据项字段名
      */
@@ -46,13 +46,14 @@ class UIMenu extends nodom.Plugin{
     direction:number=0;
 
     /**
-     * 位置 top,left,right 默认top，popup时无效
-     */
-    position:string;
-    /**
      * 最大级数
      */
     maxLevel:number;
+
+    /**
+     * 位置，left right ，默认left
+     */
+    position:string;
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -62,9 +63,10 @@ class UIMenu extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['popup|bool','position','listfield','maxlevel|number','menuwidth|number'],
-                    ['popupMenu','position','listField','maxLevel','menuWidth'],
-                    [null,'top',null,3,150]);
+                    ['position','listfield','maxlevel|number','menuwidth|number'],
+                    ['position','listField','maxLevel','menuWidth'],
+                    ['left',null,3,150]);
+                
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -85,97 +87,59 @@ class UIMenu extends nodom.Plugin{
         let me = this;
             
         //激活字段名
+        //激活字段名
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
-        rootDom.addClass('nd-menu');
 
-        /**
-         * popup
-         */
-        if(this.position === 'left' || this.position === 'right'){
-            this.popupMenu = true;
+        rootDom.addClass('nd-sidebar');
+        if(this.position === 'left'){
+            rootDom.addClass('nd-sidebar-left');
+        }else{
+            rootDom.addClass('nd-sidebar-right');
         }
-        
-        //menu 节点,rootDom 下第一个带tagName的节点
-        let menuNode:nodom.Element;
+
+        let node:nodom.Element;
         for(let i=0;i<rootDom.children.length;i++){
             if(rootDom.children[i].tagName){
-                menuNode = rootDom.children[i];
-                menuNode.addClass('nd-menu-node');
+                node = rootDom.children[i];
+                node.addClass('nd-sidebar-node');
                 //如果没有图标，也需要占位
                 let b:nodom.Element = new nodom.Element('b');
-                menuNode.children.unshift(b);
+                node.children.unshift(b);
                 //构建class表达式
-                if(menuNode.hasProp('icon')){
-                    b.setProp('class',['nd-icon-',new nodom.Expression(menuNode.getProp('icon'))],true);
-                    menuNode.delProp('icon');
+                if(node.hasProp('icon')){
+                    b.setProp('class',['nd-icon-',new nodom.Expression(node.getProp('icon'))],true);
+                    node.delProp('icon');
                 }
                 break;
             }
         }
         //清空孩子节点
         rootDom.children = [];
-
         let parentCt:nodom.Element = new nodom.Element('div');
-        parentCt.addClass('nd-menu-subct');
-        if(this.popupMenu){
-            if(this.position === 'left' || this.position === 'right'){
-                rootDom.addClass('nd-menu-left');
-                rootDom.addEvent(new nodom.NodomEvent('mouseleave',
-                    (dom,model,module,e)=>{
-                        dom.assets.set('style','width:30px');
-                    }
-                ));
+        parentCt.addClass('nd-sidebar-subct');
+        parentCt.assets.set('style','width:' + this.menuWidth + 'px');
 
-                //mouse enter 事件
-                parentCt.addEvent(new nodom.NodomEvent('mouseenter',
-                    (dom,model,module,e)=>{
-                        dom.assets.set('style','width:' + me.menuWidth + 'px');
-                    }
-                ));
-            }else{
-                rootDom.addClass('nd-menu-popup');
-                parentCt.addClass('nd-menu-first');
-                parentCt.setProp('style', new nodom.Expression(this.menuStyleName),true);
-                parentCt.addEvent(new nodom.NodomEvent('mouseleave',
-                    (dom,model,module,e)=>{
-                        let parent = dom.getParent(module);
-                        let pmodel = module.modelFactory.get(parent.modelId);
-                        pmodel.set(me.activeName,false);
-                        //第一级需要还原direction
-                        if(dom.hasClass('nd-menu-first')){
-                            this.direction = 0;
-                        }
-                    }
-                ));
-                //增加显示指令
-                parentCt.addDirective(new nodom.Directive('show',this.activeName,parentCt));
-            }
-        }else{
-            parentCt.addClass('nd-menu-first-nopop');
-        }
-        rootDom.add(parentCt);
-        
+
         //初始化各级
         for(let i=0;i<this.maxLevel;i++){
             parentCt.tmpData = {level:i+1};
             let itemCt:nodom.Element = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat',this.listField,itemCt));
-            itemCt.addClass('nd-menu-nodect');
-            let item:nodom.Element = menuNode.clone(true);
+            itemCt.addClass('nd-sidebar-nodect');
+            let item:nodom.Element = node.clone(true);
             itemCt.add(item);
             
             //缓存item级
             itemCt.tmpData = {level:(i+1)};
-            //子菜单箭头图标
-            if(this.popupMenu || i>0){
-                let icon1 = new nodom.Element('b');
-                icon1.addDirective(new nodom.Directive('class',
-                    "{'nd-menu-subicon':'" + this.listField + "&&" + this.listField + ".length>0'}",
-                    icon1
-                ));
-                item.add(icon1);
-            }
+            
+            let icon1 = new nodom.Element('b');
+            icon1.addDirective(new nodom.Directive('class',
+                "{'nd-sidebar-subicon':'" + this.listField + "&&" + this.listField + ".length>0'}",
+                icon1
+            ));
+            item.add(icon1);
+        
             //初始化菜单打开关闭
             let openClose = this.initOpenAndClose();
             //绑定展开收起事件
@@ -185,7 +149,7 @@ class UIMenu extends nodom.Plugin{
             parentCt.add(itemCt);
             
             let subCt:nodom.Element = new nodom.Element('div');
-            subCt.addClass('nd-menu-subct');
+            subCt.addClass('nd-sidebar-subct');
             subCt.addEvent(new nodom.NodomEvent('mouseleave',
                 (dom,model,module,e)=>{
                     let parent = dom.getParent(module);
@@ -196,9 +160,11 @@ class UIMenu extends nodom.Plugin{
             subCt.setProp('style', new nodom.Expression(this.menuStyleName),true);
             subCt.addDirective(new nodom.Directive('show',this.activeName,subCt));
             itemCt.add(subCt);
+            rootDom.add(parentCt);
             parentCt = subCt;
         }
-        rootDom.delProp(['listField','width',,'maxlevels']);
+        console.log(rootDom);
+        rootDom.delProp(['listField','width','maxlevels']);
     }
     
     /**
@@ -210,31 +176,8 @@ class UIMenu extends nodom.Plugin{
         super.beforeRender(module,uidom);
         
         //popup menu需要添加右键点击事件
-        if(this.needPreRender && this.popupMenu && this.position !== 'left' && this.position !== 'right'){
-            UIEventRegister.addEvent('mousedown',module.id,uidom.key,
-                (module,dom,inOrOut,e)=>{
-                    //非右键不打开
-                    if(e.button !== 2){
-                        return;
-                    }
-                    let x = e.clientX;
-                    let w = me.menuWidth;
-                    let model:nodom.Model = module.modelFactory.get(uidom.modelId);
-                    let rows = model.query(me.listField);
-                    if(rows && rows.length>0){
-                        let h:number = rows.length * me.menuHeight;
-                        //根据最大级数计算pop方向
-                        // if(this.direction === 0){
-                        //     if(x + w*this.maxLevel > window.innerWidth-10){
-                        //         this.direction = 1;
-                        //     }
-                        // }
-                        let loc = this.cacPos(null,e.clientX,e.clientY,this.menuWidth,h);
-                        model.set(me.menuStyleName,'width:' + me.menuWidth + 'px;left:' + loc[0] + 'px;top:' + loc[1] + 'px');
-                        model.set(me.activeName,true);
-                    }
-                }
-            );
+        if(this.needPreRender && this.popupMenu){
+            
         }
     }
 
@@ -348,4 +291,4 @@ class UIMenu extends nodom.Plugin{
     }
 }
 
-nodom.PluginManager.add('UI-MENU',UIMenu);
+nodom.PluginManager.add('UI-SIDEBAR',UISidebar);

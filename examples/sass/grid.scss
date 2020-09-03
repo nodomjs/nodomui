@@ -38,7 +38,8 @@
         .nd-grid-row{
             width:100%;
             height:$nd-gridhead-height;
-            line-height:$nd-gridhead-height;
+            padding:$nd-padding;
+            // line-height:$nd-gridhead-height;
             /*排序容器*/
             .nd-grid-sort{
                 display:flex;

@@ -12,6 +12,8 @@
     .nd-layout-north,.nd-layout-south,.nd-layout-west,.nd-layout-east{
         overflow:auto;
         box-sizing: border-box;
+        position:relative;
+        @include nd-color(1);
     }
     
     .nd-layout-middle{

@@ -11,7 +11,7 @@
         position:absolute;
         top:0px;
         @extend .nd-box-default;
-        // @include nd-color(3);
+        @include nd-color(3);
         .nd-menu-nodect{
             position:relative;
             line-height:30px;
@@ -63,4 +63,18 @@
     left:0;
     top:0;
     width:100%;
+}
+
+.nd-menu-left{
+    position:absolute;
+    top:0;
+    bottom:0;
+    min-width: 30px;
+    @include nd-color(3);
+    > .nd-menu-subct{
+        position:relative;
+        box-shadow: none !important;
+        height:100%;
+        width:inherit;
+    }
 }

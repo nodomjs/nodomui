@@ -9,21 +9,17 @@
     
     <script src='js/nodom.js'></script>
     <script src='../dist/uibase.js'></script>
-    <script src='../dist/layout.js'></script>
-    <script src='../dist/menu.js'></script>
+    <script src='../dist/sidebar.js'></script>
 </head>
 <body>
     <div>
-        <ui-menu listField='rows' maxLevel='5' width='150'>
+        <ui-sidebar listField='rows' maxLevel='1' width='150'>
             <a x-route='{{url}}' icon="icon" e-click='clickItem'>{{title}}</a>
-        </ui-menu>
-    
-        <p>
-            右键点击打开弹出菜单
-        </p>
-        <ui-menu listField='rows' popup maxLevel='5' width='150'>
+        </ui-sidebar>
+        
+        <!-- <ui-menu listField='rows' popup maxLevel='5' width='150'>
             <a x-route='{{url}}' icon="icon" e-click='clickItem'>{{title}}</a>
-        </ui-menu>
+        </ui-menu> -->
     </div>
 </body>
 <script>
