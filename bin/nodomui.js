@@ -1766,7 +1766,6 @@ class UIList extends nodom.Plugin {
         itemDom.addClass('nd-list-item');
         itemDom.addDirective(new nodom.Directive('repeat', 'datas', itemDom));
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            console.log(1);
             if (me.disableName !== '' && model.query(me.disableName)) {
                 return;
             }
@@ -2031,7 +2030,7 @@ class UIMenu extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['popup|bool', 'listfield', 'maxlevel|number', 'menuwidth|number'], ['popupMenu', 'listField', 'maxLevel', 'menuWidth'], [null, null, 3, 150]);
+                UITool.handleUIParam(rootDom, this, ['popup|bool', 'position', 'listfield', 'maxlevel|number', 'menuwidth|number'], ['popupMenu', 'position', 'listField', 'maxLevel', 'menuWidth'], [null, 'top', null, 3, 150]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2049,8 +2048,8 @@ class UIMenu extends nodom.Plugin {
         this.activeName = '$nui_menu_' + nodom.Util.genId();
         this.menuStyleName = '$nui_menu_' + nodom.Util.genId();
         rootDom.addClass('nd-menu');
-        if (this.popupMenu) {
-            rootDom.addClass('nd-menu-popup');
+        if (this.position === 'left' || this.position === 'right') {
+            this.popupMenu = true;
         }
         let menuNode;
         for (let i = 0; i < rootDom.children.length; i++) {
@@ -2070,24 +2069,34 @@ class UIMenu extends nodom.Plugin {
         let parentCt = new nodom.Element('div');
         parentCt.addClass('nd-menu-subct');
         if (this.popupMenu) {
-            parentCt.addClass('nd-menu-first');
-            parentCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
+            if (this.position === 'left' || this.position === 'right') {
+                rootDom.addClass('nd-menu-left');
+                rootDom.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
+                    dom.assets.set('style', 'width:30px');
+                }));
+                parentCt.addEvent(new nodom.NodomEvent('mouseenter', (dom, model, module, e) => {
+                    dom.assets.set('style', 'width:' + me.menuWidth + 'px');
+                }));
+            }
+            else {
+                rootDom.addClass('nd-menu-popup');
+                parentCt.addClass('nd-menu-first');
+                parentCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
+                parentCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
+                    let parent = dom.getParent(module);
+                    let pmodel = module.modelFactory.get(parent.modelId);
+                    pmodel.set(me.activeName, false);
+                    if (dom.hasClass('nd-menu-first')) {
+                        this.direction = 0;
+                    }
+                }));
+                parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
+            }
         }
         else {
             parentCt.addClass('nd-menu-first-nopop');
         }
         rootDom.add(parentCt);
-        if (this.popupMenu) {
-            parentCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
-                let parent = dom.getParent(module);
-                let pmodel = module.modelFactory.get(parent.modelId);
-                pmodel.set(me.activeName, false);
-                if (dom.hasClass('nd-menu-first')) {
-                    this.direction = 0;
-                }
-            }));
-            parentCt.addDirective(new nodom.Directive('show', this.activeName, parentCt));
-        }
         for (let i = 0; i < this.maxLevel; i++) {
             parentCt.tmpData = { level: i + 1 };
             let itemCt = new nodom.Element('div');
@@ -2122,7 +2131,7 @@ class UIMenu extends nodom.Plugin {
     beforeRender(module, uidom) {
         let me = this;
         super.beforeRender(module, uidom);
-        if (this.needPreRender && this.popupMenu) {
+        if (this.needPreRender && this.popupMenu && this.position !== 'left' && this.position !== 'right') {
             UIEventRegister.addEvent('mousedown', module.id, uidom.key, (module, dom, inOrOut, e) => {
                 if (e.button !== 2) {
                     return;

@@ -20,7 +20,7 @@ NoDomUI是一套基于NoDom开发的插件。
 2. plugins:插件源代码目录
 3. examples:例子程序目录
 4. examples/sass:插件sass文件目录
-5. examples/css:插件css编译目录，index.css为编译后css文件，index.scss为待编译sass文件
+5. examples/css:插件css编译目录，nodomui.css为编译后css文件，nodomui.min.css为压缩后的css文件，nodomui.scss为待编译sass文件
 6. examples/css/font:iconfont目录，用于文字图标，针对“nd-icon-xxxx”系列css
 7. index.ts:整体编译源文件
 8. Gruntfile.js:grunt文件
