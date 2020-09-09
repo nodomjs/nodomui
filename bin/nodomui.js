@@ -1295,6 +1295,9 @@ class UIGrid extends nodom.Plugin {
             if (this.gridLine === 'col' || this.gridLine === 'both') {
                 dataDom.addClass('nd-grid-col-line');
             }
+            if (this.gridLine === 'row' || this.gridLine === 'both') {
+                dataDom.addClass('nd-grid-row-line');
+            }
             for (let i = 0; i < rowDom.children.length; i++) {
                 let c = rowDom.children[i];
                 if (!c.tagName) {
@@ -1345,14 +1348,17 @@ class UIGrid extends nodom.Plugin {
         if (thead) {
             rootDom.children = [thead, tbody];
             if (this.gridLine === 'row' || this.gridLine === 'both') {
-                thead.addClass('nd-grid-row-line');
+                rootDom.addClass('nd-grid-ct-row-line');
             }
         }
         else {
             rootDom.children = [tbody];
         }
         if (this.gridLine === 'row' || this.gridLine === 'both') {
-            tbody.addClass('nd-grid-row-line');
+            rootDom.addClass('nd-grid-ct-row-line');
+        }
+        if (this.gridLine === 'col' || this.gridLine === 'both') {
+            rootDom.addClass('nd-grid-ct-col-line');
         }
         if (pagination) {
             let parentDom = new nodom.Element('div');
@@ -1372,6 +1378,9 @@ class UIGrid extends nodom.Plugin {
             thCt.addClass('nd-grid-row');
             if (this.gridLine === 'col' || this.gridLine === 'both') {
                 thCt.addClass('nd-grid-col-line');
+            }
+            if (this.gridLine === 'row' || this.gridLine === 'both') {
+                thCt.addClass('nd-grid-row-line');
             }
             thead.add(thCt);
         }

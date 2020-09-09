@@ -26,7 +26,7 @@
  *  cols        一行显示列数，auto设置时有效
  *  labelwidth  label宽度，默认100，auto设置时有效
  */
-class UIGrid extends nodom.Plugin{
+class UIGrid1 extends nodom.Plugin{
     tagName:string = 'UI-GRID';
     /**
      * 字段对象数组，{title:标题,field:字段,expressions:表达式}
@@ -197,11 +197,6 @@ class UIGrid extends nodom.Plugin{
             if(this.gridLine === 'col' || this.gridLine === 'both'){
                 dataDom.addClass('nd-grid-col-line');
             }
-
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                dataDom.addClass('nd-grid-row-line');
-            }
-
             //处理所有td
             for(let i=0;i<rowDom.children.length;i++){
                 let c = rowDom.children[i];
@@ -269,18 +264,14 @@ class UIGrid extends nodom.Plugin{
         if(thead){
             rootDom.children=[thead,tbody];
             if(this.gridLine === 'row' || this.gridLine === 'both'){
-                rootDom.addClass('nd-grid-ct-row-line');
+                thead.addClass('nd-grid-row-line');
             }
         }else{
             rootDom.children=[tbody];
         }
 
         if(this.gridLine === 'row' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-row-line');
-        }
-
-        if(this.gridLine === 'col' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-col-line');
+            tbody.addClass('nd-grid-row-line');
         }
         
         
@@ -314,11 +305,6 @@ class UIGrid extends nodom.Plugin{
             if(this.gridLine === 'col' || this.gridLine === 'both'){
                 thCt.addClass('nd-grid-col-line');
             }
-
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                thCt.addClass('nd-grid-row-line');
-            }
-
             thead.add(thCt);    
         }
         //隐藏头部不显示
@@ -338,6 +324,7 @@ class UIGrid extends nodom.Plugin{
                     th.add(this.addSortBtn(index));
                 }
             }
+        
             thead.children[0].add(th);
         }
     }
@@ -355,7 +342,7 @@ class UIGrid extends nodom.Plugin{
         down.addClass('nd-grid-sort-down');
         //保存index
         down.tmpData = {index:index};
-        const plugin:UIGrid = this;
+        const plugin:UIGrid1 = this;
         /**
          * 升序按钮事件
          */
@@ -597,4 +584,4 @@ class UIGrid extends nodom.Plugin{
     }
 }
 
-nodom.PluginManager.add('UI-GRID',UIGrid);
+nodom.PluginManager.add('UI-GRID1',UIGrid1);

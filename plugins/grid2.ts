@@ -26,7 +26,7 @@
  *  cols        一行显示列数，auto设置时有效
  *  labelwidth  label宽度，默认100，auto设置时有效
  */
-class UIGrid extends nodom.Plugin{
+class UIGrid2 extends nodom.Plugin{
     tagName:string = 'UI-GRID';
     /**
      * 字段对象数组，{title:标题,field:字段,expressions:表达式}
@@ -120,7 +120,7 @@ class UIGrid extends nodom.Plugin{
                     this[o] = params[o];
                 }
             }
-            rootDom.tagName = 'div';
+            rootDom.tagName = 'table';
             rootDom = this.generate(rootDom);
         }
         
@@ -142,14 +142,14 @@ class UIGrid extends nodom.Plugin{
         }
 
         //头部，如果隐藏则不显示
-        let thead:nodom.Element
+        let thead:nodom.Element;
         if(!this.hideHead){
-            thead = new nodom.Element('div');
+            thead = new nodom.Element('thead');
             thead.addClass('nd-grid-head');
         }
         
         //tbody
-        let tbody:nodom.Element = new nodom.Element('div');
+        let tbody:nodom.Element = new nodom.Element('tbody');
         tbody.addClass('nd-grid-body');
         if(this.rowAlt){
             tbody.addClass('nd-grid-body-rowalt');
@@ -171,7 +171,7 @@ class UIGrid extends nodom.Plugin{
                 pagination = c;
             }
         }
-        
+
         if(rowDom){
             this.rowDomKey = rowDom.key;
             //每一行包括行数据和subpanel，所以需要rowDom作为容器，dataDom作为数据行，subDom最为子panel
@@ -191,17 +191,15 @@ class UIGrid extends nodom.Plugin{
             rowDom.tagName = 'div';
 
             //第一个孩子
-            let dataDom:nodom.Element = new nodom.Element('div');
+            let dataDom:nodom.Element = new nodom.Element('tr');
             dataDom.addClass('nd-grid-row');
             //网格线
             if(this.gridLine === 'col' || this.gridLine === 'both'){
                 dataDom.addClass('nd-grid-col-line');
             }
 
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                dataDom.addClass('nd-grid-row-line');
-            }
-
+            //列数
+            let colCnt:number = 0;
             //处理所有td
             for(let i=0;i<rowDom.children.length;i++){
                 let c = rowDom.children[i];
@@ -210,6 +208,8 @@ class UIGrid extends nodom.Plugin{
                     rowDom.children.splice(i--,1);
                     continue;
                 }
+
+                colCnt++;
 
                 //隐藏列不显示
                 if(c.hasProp('hide')){
@@ -241,15 +241,15 @@ class UIGrid extends nodom.Plugin{
                         delete tdIn.expressions;
                         break;
                 }
-                c.tagName='div';
+                c.tagName='td';
                 c.addClass('nd-grid-row-item');
                 //表格内容左对其
                 if(c.hasProp('left')){
                     c.addClass('nd-grid-row-item-left');
                 }
                 //设置自定义flex
-                if(c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))){
-                    c.setProp('style','flex:' + c.getProp('width'));
+                if(c.hasProp('width')){
+                    c.setProp('style','width:' + c.getProp('width'));
                 }
                 
                 dataDom.add(c);
@@ -261,7 +261,7 @@ class UIGrid extends nodom.Plugin{
             rowDom.delProp('data');
             //带子容器
             if(subDom){
-                this.handleSub(subDom,thead,dataDom,rowDom);
+                this.handleSub(subDom,thead,dataDom,rowDom,colCnt);
             }
             tbody.add(rowDom);
         }
@@ -269,18 +269,14 @@ class UIGrid extends nodom.Plugin{
         if(thead){
             rootDom.children=[thead,tbody];
             if(this.gridLine === 'row' || this.gridLine === 'both'){
-                rootDom.addClass('nd-grid-ct-row-line');
+                thead.addClass('nd-grid-row-line');
             }
         }else{
             rootDom.children=[tbody];
         }
 
         if(this.gridLine === 'row' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-row-line');
-        }
-
-        if(this.gridLine === 'col' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-col-line');
+            tbody.addClass('nd-grid-row-line');
         }
         
         
@@ -308,37 +304,33 @@ class UIGrid extends nodom.Plugin{
         }
         //如果没有孩子节点，则创建一个
         if(thead.children.length === 0){
-            let thCt = new nodom.Element('div');
+            let thCt = new nodom.Element('tr');
             thCt.addClass('nd-grid-row');
             //网格线
             if(this.gridLine === 'col' || this.gridLine === 'both'){
                 thCt.addClass('nd-grid-col-line');
             }
-
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                thCt.addClass('nd-grid-row-line');
-            }
-
             thead.add(thCt);    
         }
         //隐藏头部不显示
         if(thead){
             //th
-            let th:nodom.Element = new nodom.Element('div');
-            th.addClass('nd-grid-row-item');
-            th.setProp('style','flex:' + col.getProp('width')||0);
+            let td:nodom.Element = new nodom.Element('td');
+            td.addClass('nd-grid-row-item');
+            td.setProp('style','width:' + col.getProp('width'));
             //表头内容
             let span:nodom.Element = new nodom.Element('span');
             span.assets.set('innerHTML',col.getProp('title'));
-            th.add(span);
+            td.add(span);
             //允许排序
             if(this.sortable){
                 //图片不排序，设置notsort属性，无field属性不排序
                 if(col.getProp('type') !== 'img' && !col.hasProp('notsort') && field){
-                    th.add(this.addSortBtn(index));
+                    td.add(this.addSortBtn(index));
                 }
             }
-            thead.children[0].add(th);
+        
+            thead.children[0].add(td);
         }
     }
     /**
@@ -355,7 +347,7 @@ class UIGrid extends nodom.Plugin{
         down.addClass('nd-grid-sort-down');
         //保存index
         down.tmpData = {index:index};
-        const plugin:UIGrid = this;
+        const plugin:UIGrid2 = this;
         /**
          * 升序按钮事件
          */
@@ -385,9 +377,9 @@ class UIGrid extends nodom.Plugin{
      * @param dataDom   数据行dom
      * @param rowDom    数据行dom容器
      */
-    private handleSub(subDom:nodom.Element,thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
+    private handleSub(subDom:nodom.Element,thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element,colCnt:number){
         //表头加一列
-        let th:nodom.Element = new nodom.Element('div');
+        let th:nodom.Element = new nodom.Element('td');
         th.addClass('nd-grid-iconcol');
         let b:nodom.Element = new nodom.Element('b');
         b.addClass('nd-grid-sub-btn');
@@ -397,7 +389,8 @@ class UIGrid extends nodom.Plugin{
         }
         
         //行前添加箭头
-        let td:nodom.Element = new nodom.Element('div');
+        let td:nodom.Element = new nodom.Element('td');
+
         td.addClass('nd-grid-iconcol');
         b = new nodom.Element('b');
         b.addClass('nd-grid-sub-btn');
@@ -409,16 +402,19 @@ class UIGrid extends nodom.Plugin{
         ));
         td.add(b);
         dataDom.children.unshift(td);
-        subDom.tagName = 'div';
+        subDom.tagName = 'tr';
         rowDom.add(subDom);
 
+        let subTd:nodom.Element = new nodom.Element('td');
+        subTd.assets.set('colspan',colCnt);
         //子panel处理
         //增加显示指令，$showSub作为新增数据项，用于控制显示
         subDom.addDirective(new nodom.Directive('show','$showSub',subDom));
         subDom.addClass('nd-grid-sub');
+        
+        subTd.children = [];
         //自动
         if(subDom.hasProp('auto')){
-            subDom.children = [];
             //label宽度
             let lw:string = subDom.getProp('labelwidth')||100;
             //每行显示数
@@ -433,7 +429,7 @@ class UIGrid extends nodom.Plugin{
                 if(cnt++ % cols === 0){
                     rowCt = new nodom.Element('div');
                     rowCt.addClass('nd-grid-sub-row');
-                    subDom.add(rowCt);
+                    subTd.add(rowCt);
                 }
                 
                 let itemCt:nodom.Element = new nodom.Element('div');
@@ -451,9 +447,14 @@ class UIGrid extends nodom.Plugin{
                 itemCt.add(span);
 
                 rowCt.add(itemCt);
-                subDom.delProp(['auto','labelwidth']);
             });
+            subDom.delProp(['auto','labelwidth']);
+        }else{
+            for(let c of subDom.children){
+                subTd.add(c);
+            }
         }
+        subDom.children = [subTd];
     }
     
     /**
@@ -597,4 +598,4 @@ class UIGrid extends nodom.Plugin{
     }
 }
 
-nodom.PluginManager.add('UI-GRID',UIGrid);
+nodom.PluginManager.add('UI-GRID',UIGrid2);

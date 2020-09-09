@@ -1,8 +1,13 @@
 // @import "base";
 
 @font-face {font-family: "nd-iconfont";
-    src:url('font/iconfont.ttf'),
-    url('font/iconfont.woff')
+    // src:url('font/iconfont.ttf'),
+    // url('font/iconfont.woff')
+    src: url('font/iconfont.eot');
+    src: url('font/iconfont.eot') format('embedded-opentype'),
+        url('font/iconfont.woff') format('woff'),
+        url('font/iconfont.ttf') format('truetype');
+        // url('font/iconfont.svg') format('svg');
 }
 
 /*icon size*/

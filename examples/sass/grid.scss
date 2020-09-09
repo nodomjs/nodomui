@@ -29,6 +29,7 @@
             @extend .nd-icon-right;
         }
     }
+
     .nd-grid-head{
         @include nd-color(1);
         display:flex;
@@ -38,14 +39,12 @@
         .nd-grid-row{
             width:100%;
             height:$nd-gridhead-height;
-            padding:$nd-padding;
-            // line-height:$nd-gridhead-height;
             /*排序容器*/
             .nd-grid-sort{
                 display:flex;
                 flex-direction: column;
                 align-items: center;
-                margin-left:$nd-padding * 2;
+                margin-left:$nd-padding;
                 line-height:10px;
                 @include nd-color(1);
                 /*升序箭头*/
@@ -89,30 +88,15 @@
                 @extend .nd-item-hovercolor;
             }
         }
+
+        .nd-grid-row-line:last-child{
+            border-bottom:1px solid $nd-color5;
+        }
     }
 
     /*显示sub的图标旋转*/
     .nd-grid-showsub{
         transform:rotate(90deg);
-    }
-
-    .nd-grid-row-line{
-        > * {
-            border-top:1px solid $nd-color5;
-        }
-        > :last-child{
-            border-bottom:1px solid $nd-color5;
-        }
-    }
-
-    .nd-grid-col-line{
-        > * {
-            border-right:1px solid $nd-color5;
-        }
-
-        & :last-child{
-            border-right:0px solid $nd-color5;
-        }
     }
 
     /*每行颜色交错*/
@@ -125,7 +109,8 @@
         display:flex;
         flex-direction: column;
         padding:$nd-padding;
-
+        border-bottom:1px solid $nd-color5;
+        border-right:1px solid $nd-color5;
         .nd-grid-sub-row{
             display:flex;
             min-height:30px;
@@ -143,6 +128,20 @@
                 }
             }
         }
+    }
+    /*行网格线*/
+    .nd-grid-row-line{
+        border-bottom:1px solid $nd-color5;
+    }
+
+    /*列网格线*/
+    .nd-grid-col-line{
+        > * {
+            border-right:1px solid $nd-color5;
+        }
+        // & :last-child{
+        //     border-right:0px solid $nd-color5;
+        // }
     }
 }
 
@@ -167,4 +166,16 @@
 .nd-grid-pager{
     padding-top:$nd-padding * 2;
     text-align:right;
+}
+
+/*容器行线*/
+.nd-grid-ct-row-line{
+    border-top:1px solid $nd-color5;
+    border-bottom:1px solid $nd-color5;
+}
+
+/*容器列线*/
+.nd-grid-ct-col-line{
+    border-left:1px solid $nd-color5;
+    border-right:1px solid $nd-color5;
 }

@@ -38,7 +38,7 @@
         <h3>简单使用</h3>
         <button e-click='getGridData'>获取表格数据</button>
         <p>表格列元素通过cols元素定义，cols每个子元素都为表格的一列</p>
-        <ui-grid name='grd'  dataName='rows' style='height:300px' dataUrl='http://localhost:3000/commodity/getinfo'>
+        <ui-grid name='grd'  dataName='rows' style='height:300px' dataUrl='data/grid1.json' gridLine='row'>
             <!--
                 列属性
                 width:显示宽度，所有宽度之和为表格宽度份数，width值表示 width/总份数 * 100%
@@ -58,7 +58,7 @@
         <h3>增加网格线</h3>
         <p>通过gridLine设置网格线，包括row(行线),column(列线),both(全部)</p>
         <ui-grid  dataName='rows' style='height:300px' gridLine='both'
-        dataUrl='http://localhost:3000/commodity/getinfo'>
+        dataUrl='data/grid1.json'>
             <cols>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
@@ -70,7 +70,7 @@
         <h3>行底色交替</h3>
         <p>通过rowalt设置行间隔底色</p>
         <ui-grid  dataName='rows' class='height:300px' rowalt
-        dataUrl='http://localhost:3000/commodity/getinfo'>
+        dataUrl='data/grid1.json'>
             <cols>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
@@ -82,7 +82,7 @@
         <h3>固定表头</h3>
         <p>通过fixHead设置固定表头，设置后，只有表body设置滚动条</p>
         <ui-grid  dataName='rows' style='height:300px' rowalt fixHead
-        dataUrl='http://localhost:3000/commodity/getinfo'>
+        dataUrl='data/grid1.json'>
             <cols>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
@@ -94,7 +94,7 @@
         <h3>增加排序</h3>
         <p>通过sortable启用排序，cols子元素可以设置notsort表示该列不排序</p>
         <ui-grid  dataName='rows' style='height:300px' rowalt fixHead sortable
-        dataUrl='http://localhost:3000/commodity/getinfo'>
+        dataUrl='data/grid1.json'>
             <cols>
                 <!--该列不排序-->
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
@@ -112,7 +112,7 @@
         </ol>
         <h4>自动生成</h4>
         <ui-grid  dataName='rows' style='height:300px' rowalt
-            dataUrl='http://localhost:3000/commodity/getinfo'>
+            dataUrl='data/grid1.json'>
             <cols>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
@@ -124,7 +124,7 @@
 
         <h4>自定义子表格</h4>
         <ui-grid  dataName='rows' class='height:300px' rowalt
-            dataUrl='http://localhost:3000/commodity/getinfo'>
+            dataUrl='data/grid1.json'>
             <cols>
                 <div width='1' title='编号' notsort field='id'>{{id}}</div>
                 <div width='3' title='商品名' field='name'>{{name}}</div>
@@ -142,7 +142,7 @@
         <h3>增加分页</h3>
         <p>通过ui-pagination引入分页插件</p>
         <ui-grid  dataName='rows' style='height:300px' rowalt sortable fixHead
-            dataUrl='http://localhost:3000/commodity/getinfo'>
+            dataUrl='data/grid1.json'>
             <cols>
                 <div width='0.6' title='编号' notsort field='id'>{{id}}</div>
                 <div width='2' title='头像' field='head' type='img'>{{head}}</div>
