@@ -1132,6 +1132,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         display: inline-block; }
         .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sub-btn:before {
           content: ''; }
+    .nd-grid .nd-grid-head .nd-grid-row-line {
+      border-top: 1px solid #dfdfdf; }
   .nd-grid .nd-grid-iconcol {
     width: 25px;
     display: flex;
@@ -1154,7 +1156,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     flex-direction: column;
     padding: 10px;
     border-bottom: 1px solid #dfdfdf;
-    border-right: 1px solid #dfdfdf; }
+    border-right: 1px solid #dfdfdf;
+    border-left: 1px solid #dfdfdf; }
     .nd-grid .nd-grid-sub .nd-grid-sub-row {
       display: flex;
       min-height: 30px;
@@ -1172,6 +1175,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     border-bottom: 1px solid #dfdfdf; }
   .nd-grid .nd-grid-col-line > * {
     border-right: 1px solid #dfdfdf; }
+  .nd-grid .nd-grid-col-line:first-child {
+    border-left: 1px solid #dfdfdf; }
 
 .nd-grid-fixed {
   position: relative;
@@ -1192,15 +1197,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   text-align: right; }
 
 /*容器行线*/
-.nd-grid-ct-row-line {
-  border-top: 1px solid #dfdfdf;
-  border-bottom: 1px solid #dfdfdf; }
-
 /*容器列线*/
-.nd-grid-ct-col-line {
-  border-left: 1px solid #dfdfdf;
-  border-right: 1px solid #dfdfdf; }
-
 /******* layout *******/
 .nd-layout {
   display: flex;

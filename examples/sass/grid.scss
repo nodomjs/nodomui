@@ -70,6 +70,10 @@
                 }
             }
         }
+
+        .nd-grid-row-line{
+            border-top:1px solid $nd-color5;
+        }
     }
 
     /*图标列*/
@@ -88,7 +92,6 @@
                 @extend .nd-item-hovercolor;
             }
         }
-
         .nd-grid-row-line:last-child{
             border-bottom:1px solid $nd-color5;
         }
@@ -111,10 +114,10 @@
         padding:$nd-padding;
         border-bottom:1px solid $nd-color5;
         border-right:1px solid $nd-color5;
+        border-left:1px solid $nd-color5;
         .nd-grid-sub-row{
             display:flex;
             min-height:30px;
-            
             flex-direction: row;
             align-items: center;
             justify-content: space-around;
@@ -139,9 +142,10 @@
         > * {
             border-right:1px solid $nd-color5;
         }
-        // & :last-child{
-        //     border-right:0px solid $nd-color5;
-        // }
+
+        &:first-child{
+            border-left:1px solid $nd-color5;
+        }
     }
 }
 
@@ -157,7 +161,6 @@
         top:0px;
         left:0px;
     }
-
     .nd-grid-body{
         overflow-y:auto;
     }
@@ -169,13 +172,13 @@
 }
 
 /*容器行线*/
-.nd-grid-ct-row-line{
-    border-top:1px solid $nd-color5;
-    border-bottom:1px solid $nd-color5;
-}
+// .nd-grid-ct-row-line{
+//     border-top:1px solid $nd-color5;
+//     border-bottom:1px solid $nd-color5;
+// }
 
 /*容器列线*/
-.nd-grid-ct-col-line{
-    border-left:1px solid $nd-color5;
-    border-right:1px solid $nd-color5;
-}
+// .nd-grid-ct-col-line{
+//     border-left:1px solid $nd-color5;
+//     border-right:1px solid $nd-color5;
+// }
