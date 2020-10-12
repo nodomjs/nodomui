@@ -1,4 +1,4 @@
-///<reference types='nodom'/>
+///<reference types='nodomjs'/>
 
 /**
  * 分页插件

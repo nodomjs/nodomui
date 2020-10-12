@@ -1,4 +1,4 @@
-///<reference types='nodom'/>
+///<reference types='nodomjs'/>
 
 /**
  * panel 插件

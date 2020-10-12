@@ -1,4 +1,4 @@
-///<reference types='nodom'/>
+///<reference types='nodomjs'/>
 /**
  * list元素移动插件
  */

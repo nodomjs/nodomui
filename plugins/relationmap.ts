@@ -1,4 +1,4 @@
-///<reference types='nodom'/>
+///<reference types='nodomjs'/>
 
 /**
  * relation map 插件
