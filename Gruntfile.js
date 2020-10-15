@@ -33,7 +33,8 @@ module.exports = function (grunt) {
             './plugins/tab.ts',
             './plugins/tip.ts',
             './plugins/toolbar.ts',
-            './plugins/tree.ts',
+            './plugins/text.ts',
+            './plugins/tree.ts'
         ],
         out:'bin/nodomui.js',
         options:{

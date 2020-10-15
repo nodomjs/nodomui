@@ -42,7 +42,7 @@ $nd-color9: #333;           //默认tip框背景色、蒙版背景色
 /*按钮padding*/
 /*字体大小*/
 /*zindex*/
-.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list .nd-list-item:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
+.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-grid .nd-grid-body .nd-grid-row:hover, .nd-list .nd-list-item:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
   background-color: #f3f6fd;
   color: #666; }
 
@@ -133,22 +133,24 @@ a:visited {
   cursor: pointer; }
 
 /*输入框*/
-input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input {
+input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input {
   padding: 10px;
   background-color: #fff;
   color: #666;
   border-radius: 5px;
   border: 1px solid #dfdfdf; }
-  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus {
+  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus {
     border-color: #739de3; }
 
 /*带图标输入框*/
-.nd-input-icon, .nd-datetime .nd-datetime-field, .nd-select .nd-select-inputct {
-  display: flex; }
-  .nd-input-icon :last-child, .nd-datetime .nd-datetime-field :last-child, .nd-select .nd-select-inputct :last-child {
+.nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct {
+  display: flex;
+  line-height: 15px; }
+  .nd-input-icon b, .nd-datetime .nd-datetime-field b, .nd-text b, .nd-select .nd-select-inputct b {
     flex: 0;
-    padding: 0; }
-  .nd-input-icon input, .nd-datetime .nd-datetime-field input, .nd-select .nd-select-inputct input {
+    padding: 0;
+    width: 16px; }
+  .nd-input-icon input, .nd-datetime .nd-datetime-field input, .nd-text input, .nd-select .nd-select-inputct input {
     margin: 0;
     padding: 0;
     border: 0;
@@ -956,8 +958,12 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   align-items: center; }
   .nd-form-item label {
     margin-right: 10px; }
-  .nd-form-item input, .nd-form-item textarea, .nd-form-item .nd-select, .nd-form-item .nd-datetime {
+  .nd-form-item input, .nd-form-item textarea, .nd-form-item .nd-select, .nd-form-item .nd-datetime, .nd-form-item .nd-text {
     flex: 1; }
+
+/*文本框*/
+.nd-text .nd-text-iconleft {
+  margin-right: 5px; }
 
 .nd-radio-active {
   color: #2864c8; }
@@ -969,9 +975,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   margin-right: 10px;
   color: #2864c8; }
 
-.nd-combo b, .nd-radio b, .nd-select b {
-  padding-right: 10px; }
-
 /*select 框*/
 .nd-select {
   display: inline-block;
@@ -981,8 +984,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-select .nd-select-inputct {
     overflow: hidden;
     /*搜索框*/ }
-    .nd-select .nd-select-inputct > b {
-      padding: 0; }
     .nd-select .nd-select-inputct .nd-select-search {
       position: absolute;
       width: 90%;
@@ -1009,10 +1010,11 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       .nd-select .nd-select-list .nd-select-item .nd-select-itemicon {
         flex: 0;
         padding: 0;
-        width: 15px;
         display: inline-block; }
       .nd-select .nd-select-list .nd-select-item .nd-select-itemcontent {
         flex: 1; }
+      .nd-select .nd-select-list .nd-select-item b {
+        padding: 5px; }
     .nd-select .nd-select-list .nd-select-selected {
       color: #2864c8; }
 

@@ -13,6 +13,7 @@ class UIList extends nodom.Plugin{
      * 附加数据项名
      */
     extraDataName:string;
+    
     /**
      * 显示数据项名
      */
@@ -24,14 +25,15 @@ class UIList extends nodom.Plugin{
     valueField:string;
 
     /**
-     * disable数据项名
-     */
-    disableName:string;
-    /**
      * 列表数据名
      */
     listField:string;
 
+    /**
+     * disable数据项名
+     */
+    disableName:string;
+    
     /**
      * 类型
      */

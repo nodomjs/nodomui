@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/nodomui.css" />
     <script src='js/nodom.js'></script>
     <script src='../bin/nodomui.js'></script>
+    <script src='../dist/text.js'></script>
     <style>
        form{
            width:500px;
@@ -23,7 +24,8 @@
         <ui-form class='form' labelWidth='80'>
             <div>
                 <label>姓名:</label>
-                <input x-field='userName' value='{{userName}}'>
+                <!-- <span class='nd-input-icon'><b class='nd-icon-search'></b><input x-field='userName' value='{{userName}}'></span> -->
+                <ui-text x-field='userName' value='{{userName}}' icon='search'></ui-text>
             </div>
             <div>
                 <label>性别:</label>

@@ -2606,6 +2606,7 @@ class UIRadio extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'listfield', 'itemmargin|number'], ['valueField', 'displayField', 'listField', 'itemMargin'], ['', '', '', 5]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2625,16 +2626,61 @@ class UIRadio extends nodom.Plugin {
             this.dataName = field.value;
             rootDom.removeDirectives(['field']);
         }
-        for (let c of rootDom.children) {
-            if (c.tagName) {
-                let icon = new nodom.Element('b');
-                icon.addClass('nd-radio-unactive');
-                icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + this.dataName + "==\"" + c.getProp('value') + "\"'}", icon));
-                c.children.unshift(icon);
-                c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                    let v = model.data[this.dataName];
-                    model.set(this.dataName, dom.getProp('value'));
-                }));
+        if (this.valueField !== '' && this.displayField !== '' && this.listField !== '') {
+            this.checkName = '$ui_radio_' + nodom.Util.genId();
+            let item = new nodom.Element('span');
+            item.setProp('value', new nodom.Expression(this.valueField), true);
+            let icon = new nodom.Element('b');
+            icon.addClass('nd-radio-unactive');
+            icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + this.checkName + "'}", icon));
+            item.add(icon);
+            let txt = new nodom.Element();
+            txt.expressions = [new nodom.Expression(this.displayField)];
+            item.add(txt);
+            let directive = new nodom.Directive('repeat', this.listField, item);
+            item.addDirective(directive);
+            item.assets.set('style', 'margin:0 ' + this.itemMargin + 'px;');
+            item.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+                let model1 = module.modelFactory.get(this.modelId);
+                let datas = model1.query(this.listField);
+                if (datas) {
+                    for (let d of datas) {
+                        d[this.checkName] = false;
+                    }
+                }
+                model.set(this.checkName, true);
+                model1.set(this.dataName, dom.getProp('value'));
+            }));
+            rootDom.children = [item];
+        }
+        else {
+            for (let c of rootDom.children) {
+                if (c.tagName) {
+                    let icon = new nodom.Element('b');
+                    icon.addClass('nd-radio-unactive');
+                    icon.addDirective(new nodom.Directive('class', "{'nd-radio-active':'" + this.dataName + "==\"" + c.getProp('value') + "\"'}", icon));
+                    c.children.unshift(icon);
+                    c.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+                        model.set(this.dataName, dom.getProp('value'));
+                    }));
+                }
+            }
+        }
+    }
+    beforeRender(module, dom) {
+        super.beforeRender(module, dom);
+        let model = module.modelFactory.get(this.modelId);
+        if (this.checkName) {
+            let datas = model.query(this.listField);
+            if (datas) {
+                for (let d of datas) {
+                    if (model.data[this.dataName] == d[this.valueField]) {
+                        d[this.checkName] = true;
+                    }
+                    else {
+                        d[this.checkName] = false;
+                    }
+                }
             }
         }
     }
@@ -3377,6 +3423,65 @@ class UIToolbar extends nodom.Plugin {
     }
 }
 nodom.PluginManager.add('UI-TOOLBAR', UIToolbar);
+class UIText extends nodom.Plugin {
+    constructor(params) {
+        super(params);
+        this.tagName = 'UI-TEXT';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['icon', 'iconpos'], ['icon', 'iconPos'], ['', 'left']);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    generate(rootDom) {
+        let me = this;
+        rootDom.addClass('nd-text');
+        let field = rootDom.getDirective('field');
+        let input = new nodom.Element('input');
+        input.setProp('type', 'text');
+        input.addDirective(new nodom.Directive('field', field.value, input));
+        rootDom.add(input);
+        input.events = rootDom.events;
+        let vProp = rootDom.getProp('value');
+        if (!vProp) {
+            vProp = rootDom.getProp('value', true);
+            input.setProp('value', vProp, true);
+        }
+        else {
+            input.setProp('value', vProp);
+        }
+        rootDom.removeDirectives(['field']);
+        rootDom.events.clear();
+        if (this.icon !== '') {
+            let icon = new nodom.Element('b');
+            icon.addClass('nd-icon-' + this.icon);
+            if (this.iconPos === 'left') {
+                icon.addClass('nd-text-iconleft');
+                rootDom.children.unshift(icon);
+            }
+            else {
+                rootDom.add(icon);
+            }
+        }
+    }
+    beforeRender(module, dom) {
+        let me = this;
+        super.beforeRender(module, dom);
+    }
+}
+nodom.PluginManager.add('UI-TEXT', UIText);
 class UITree extends nodom.Plugin {
     constructor(params) {
         super(params);

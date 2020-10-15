@@ -7,10 +7,17 @@
     label{
         margin-right:$nd-padding;
     }
-    input,textarea,.nd-select,.nd-datetime{
+    input,textarea,.nd-select,.nd-datetime,.nd-text{
         flex:1;
     }
-    
+}
+
+/*文本框*/
+.nd-text{
+    @extend .nd-input-icon;
+    .nd-text-iconleft{
+        margin-right:5px;
+    }
 }
 
 .nd-radio-unactive{
@@ -33,12 +40,6 @@
 }
 
 
-.nd-combo,.nd-radio,.nd-select{
-    b{
-        padding-right:$nd-padding;
-    }
-}
-
 /*select 框*/
 .nd-select{
     display:inline-block;
@@ -50,7 +51,6 @@
         @extend .nd-input-icon;
         > b{
             @extend .nd-icon-arrow-down;
-            padding:0;
         }
         
         /*搜索框*/
@@ -87,7 +87,6 @@
             .nd-select-itemicon{
                 flex:0;
                 padding:0;
-                width:15px;
                 display:inline-block;                
             }
 
@@ -97,6 +96,10 @@
 
             &:hover{
                 @extend .nd-item-hovercolor;
+            }
+
+            b{
+                padding:5px;
             }
         }
 
