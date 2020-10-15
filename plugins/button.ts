@@ -6,8 +6,6 @@
 class UIButton extends nodom.Plugin{
     tagName:string = 'UI-BUTTON';
     
-    // size='small' iconPos='top' theme='success' icon='close'
-
     /**
      * 按钮大小 small normal large
      */
