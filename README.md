@@ -32,4 +32,4 @@ NoDomUI是一套基于NoDom开发的插件。
 ### css编译
 1. npm安装sass；
 2. 切换到examples/css目录；
-3. 运行“sass index.scss:index.css”编译css文件，压缩请参考sass指令。
+3. 运行“sass nodomui.scss:nodomui.css”编译css文件，压缩请参考sass指令。
