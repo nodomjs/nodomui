@@ -29,6 +29,15 @@
             onClose     关闭时事件
         -->
         <ui-dialog name='dlg' class='dialog' title='测试Dialog' autoOpen onOpen='onOpen' onClose='onClose'>
+            <form>
+                <div>
+                    <label>姓名：</label><input x-field='userName'/>
+                </div>
+                
+                <div>
+                    <label>年龄：</label><input x-field='age' />
+                </div>
+            </form>
             <ui-buttongroup>
                 <ui-button theme='active' size='small' icon='close' e-click='closeDlg'>关闭</ui-button>
             </ui-buttongroup>
@@ -39,6 +48,10 @@
     nodom.newApp({
         module:{
             el:'div',
+            data:{
+                userName:'yang',
+                age:42
+            },
             methods:{
                 showDlg:function(dom,model,module,e){
                     module.getPlugin('dlg').open();
@@ -51,6 +64,7 @@
                 },
                 onClose:function(model,module){
                     console.log('close');
+                    console.log(model.data);
                 }
             }
         }
