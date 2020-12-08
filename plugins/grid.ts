@@ -65,6 +65,10 @@ class UIGrid extends nodom.Plugin{
     fixHead:boolean;
 
     /**
+     * 显示checkbox
+     */
+    checkbox:boolean;
+    /**
      * 是否隐藏头部
      */
     hideHead:boolean;
@@ -112,9 +116,9 @@ class UIGrid extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','hidehead|bool','dataurl'],
-                    ['dataName','rowAlt','sortable','gridLine','fixHead','hideHead','dataUrl'],
-                    ['rows',null,null,'',null,null,null,null]);
+                    ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','checkbox|bool','hidehead|bool','dataurl'],
+                    ['dataName','rowAlt','sortable','gridLine','fixHead','checkbox','hideHead','dataUrl'],
+                    ['rows',null,null,'',null,null,null,null,null]);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -259,6 +263,10 @@ class UIGrid extends nodom.Plugin{
             //替换孩子节点
             rowDom.children = [dataDom];
             rowDom.delProp('data');
+            //checkbox
+            if(this.checkbox){
+                this.handleCheck(thead,dataDom,rowDom);
+            }
             //带子容器
             if(subDom){
                 this.handleSub(subDom,thead,dataDom,rowDom);
@@ -455,6 +463,51 @@ class UIGrid extends nodom.Plugin{
             });
         }
     }
+
+    /**
+     * 显示checkbox狂
+     * @param thead         head dom
+     * @param dataDom       数据dom
+     * @param rowDom        行dom
+     */
+    private handleCheck(thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
+        if(thead){
+            //表头加一列
+            let th:nodom.Element = new nodom.Element('div');
+            th.addClass('nd-grid-iconcol');
+            let bh:nodom.Element = new nodom.Element('b');
+            bh.addClass('nd-icon-checkbox');
+            th.add(bh);
+            bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'$wholeCheck'}",bh));
+            thead.children[0].children.unshift(th);
+            //表头复选框事件
+            bh.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
+                let check = model.data['$wholeCheck'] || false;
+                model.set('$wholeCheck',!check);
+                let model1:nodom.Model = this.getModel();
+                for(let d of model1.data[this.dataName]){
+                    let m:nodom.Model = module.modelFactory.get(d.$modelId);
+                    m.set('$checked',!check);
+                }
+            }));
+        }
+
+        
+        
+        //行前添加checkbox
+        let td:nodom.Element = new nodom.Element('div');
+        td.addClass('nd-grid-iconcol');
+        let b = new nodom.Element('b');
+        b.addClass('nd-icon-checkbox');
+        b.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'$checked'}",b));
+        b.addEvent(new nodom.NodomEvent('click', ':delg',
+            (dom,model,module,e)=>{
+                model.set('$checked',!model.data['$checked']);
+            }
+        ));
+        td.add(b);
+        dataDom.children.unshift(td);
+    }
     
     /**
      * 排序
@@ -602,6 +655,20 @@ class UIGrid extends nodom.Plugin{
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
         let model:nodom.Model = module.modelFactory.get(this.modelId);
         return model.get(this.extraDataName);
+    }
+
+    /**
+     * 获取选中行数据集
+     */
+    public getCheckedRows():Array<any>{
+        let model:nodom.Model = this.getModel();
+        let arr = [];
+        for(let d of model.data[this.dataName]){
+            if(d['$checked']){
+                arr.push(d);
+            }
+        }
+        return arr;
     }
 }
 

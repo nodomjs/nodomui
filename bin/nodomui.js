@@ -1234,7 +1234,7 @@ class UIGrid extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'hidehead|bool', 'dataurl'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'hideHead', 'dataUrl'], ['rows', null, null, '', null, null, null, null]);
+                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'checkbox|bool', 'hidehead|bool', 'dataurl'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'checkbox', 'hideHead', 'dataUrl'], ['rows', null, null, '', null, null, null, null, null]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1340,6 +1340,9 @@ class UIGrid extends nodom.Plugin {
             }
             rowDom.children = [dataDom];
             rowDom.delProp('data');
+            if (this.checkbox) {
+                this.handleCheck(thead, dataDom, rowDom);
+            }
             if (subDom) {
                 this.handleSub(subDom, thead, dataDom, rowDom);
             }
@@ -1474,6 +1477,36 @@ class UIGrid extends nodom.Plugin {
             });
         }
     }
+    handleCheck(thead, dataDom, rowDom) {
+        if (thead) {
+            let th = new nodom.Element('div');
+            th.addClass('nd-grid-iconcol');
+            let bh = new nodom.Element('b');
+            bh.addClass('nd-icon-checkbox');
+            th.add(bh);
+            bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'$wholeCheck'}", bh));
+            thead.children[0].children.unshift(th);
+            bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+                let check = model.data['$wholeCheck'] || false;
+                model.set('$wholeCheck', !check);
+                let model1 = this.getModel();
+                for (let d of model1.data[this.dataName]) {
+                    let m = module.modelFactory.get(d.$modelId);
+                    m.set('$checked', !check);
+                }
+            }));
+        }
+        let td = new nodom.Element('div');
+        td.addClass('nd-grid-iconcol');
+        let b = new nodom.Element('b');
+        b.addClass('nd-icon-checkbox');
+        b.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'$checked'}", b));
+        b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
+            model.set('$checked', !model.data['$checked']);
+        }));
+        td.add(b);
+        dataDom.children.unshift(td);
+    }
     sort(index, asc, module) {
         let dom = module.virtualDom.query(this.rowDomKey);
         let directive = dom.getDirective('repeat');
@@ -1571,6 +1604,16 @@ class UIGrid extends nodom.Plugin {
         let module = nodom.ModuleFactory.get(this.moduleId);
         let model = module.modelFactory.get(this.modelId);
         return model.get(this.extraDataName);
+    }
+    getCheckedRows() {
+        let model = this.getModel();
+        let arr = [];
+        for (let d of model.data[this.dataName]) {
+            if (d['$checked']) {
+                arr.push(d);
+            }
+        }
+        return arr;
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
