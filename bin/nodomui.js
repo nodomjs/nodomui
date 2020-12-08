@@ -1561,13 +1561,16 @@ class UIGrid extends nodom.Plugin {
         });
     }
     getData() {
-        let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.modelFactory.get(this.modelId);
-        model = model.get(this.extraDataName);
+        let model = this.getModel();
         let data = model.getData();
         if (data) {
             return data[this.dataName];
         }
+    }
+    getModel() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.modelFactory.get(this.modelId);
+        return model.get(this.extraDataName);
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);

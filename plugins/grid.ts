@@ -587,13 +587,21 @@ class UIGrid extends nodom.Plugin{
      * 获取表格数据
      */
     public getData():any[]{
-        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
-        model = model.get(this.extraDataName);
+        let model:nodom.Model = this.getModel();
         let data = model.getData();
         if(data){
             return data[this.dataName];
         }
+    }
+
+    /**
+     * 获取model
+     * @returns     model
+     */
+    public getModel():nodom.Model{
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        let model:nodom.Model = module.modelFactory.get(this.modelId);
+        return model.get(this.extraDataName);
     }
 }
 
