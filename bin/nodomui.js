@@ -1253,6 +1253,9 @@ class UIGrid extends nodom.Plugin {
         if (this.fixHead) {
             rootDom.addClass('nd-grid-fixed');
         }
+        if (this.checkbox) {
+            this.wholeCheckName = '$ui_grid_' + nodom.Util.genId();
+        }
         let thead;
         if (!this.hideHead) {
             thead = new nodom.Element('div');
@@ -1484,11 +1487,11 @@ class UIGrid extends nodom.Plugin {
             let bh = new nodom.Element('b');
             bh.addClass('nd-icon-checkbox');
             th.add(bh);
-            bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'$wholeCheck'}", bh));
+            bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'" + this.wholeCheckName + "'}", bh));
             thead.children[0].children.unshift(th);
             bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-                let check = model.data['$wholeCheck'] || false;
-                model.set('$wholeCheck', !check);
+                let check = model.data[this.wholeCheckName] || false;
+                model.set(this.wholeCheckName, !check);
                 let model1 = this.getModel();
                 for (let d of model1.data[this.dataName]) {
                     let m = module.modelFactory.get(d.$modelId);

@@ -104,6 +104,10 @@ class UIGrid extends nodom.Plugin{
     extraModelId:string;
 
     /**
+     * 全选字段名(checkbox时有效)
+     */
+    wholeCheckName:string;
+    /**
      * 分页插件
      */
     pagination:UIPagination;
@@ -143,6 +147,10 @@ class UIGrid extends nodom.Plugin{
 
         if(this.fixHead){
             rootDom.addClass('nd-grid-fixed');
+        }
+
+        if(this.checkbox){
+            this.wholeCheckName = '$ui_grid_' + nodom.Util.genId();
         }
 
         //头部，如果隐藏则不显示
@@ -478,12 +486,12 @@ class UIGrid extends nodom.Plugin{
             let bh:nodom.Element = new nodom.Element('b');
             bh.addClass('nd-icon-checkbox');
             th.add(bh);
-            bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'$wholeCheck'}",bh));
+            bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'"+ this.wholeCheckName +"'}",bh));
             thead.children[0].children.unshift(th);
             //表头复选框事件
             bh.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
-                let check = model.data['$wholeCheck'] || false;
-                model.set('$wholeCheck',!check);
+                let check = model.data[this.wholeCheckName] || false;
+                model.set(this.wholeCheckName,!check);
                 let model1:nodom.Model = this.getModel();
                 for(let d of model1.data[this.dataName]){
                     let m:nodom.Model = module.modelFactory.get(d.$modelId);
