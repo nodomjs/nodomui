@@ -975,6 +975,7 @@ class UIDialog extends nodom.Plugin {
         this.onClose = panelDom.getProp('onclose');
         this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
+        console.log(panelDom);
         panel.addHeadBtn('close', () => {
             me.close();
         });
@@ -1491,7 +1492,6 @@ class UIGrid extends nodom.Plugin {
             thead.children[0].children.unshift(th);
             bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                 let check = model.data[this.wholeCheckName] || false;
-                console.log(model.get(this.wholeCheckName));
                 model.set(this.wholeCheckName, !check);
                 let model1 = this.getModel();
                 for (let d of model1.data[this.dataName]) {
@@ -2584,10 +2584,10 @@ class UIPanel extends nodom.Plugin {
         }
         rootDom.tagName = 'div';
         rootDom.plugin = this;
+        console.log(rootDom);
         this.element = rootDom;
     }
     generate(rootDom) {
-        let me = this;
         rootDom.addClass('nd-panel');
         this.handleBody(rootDom);
         let headerDom = new nodom.Element('div');
@@ -2621,6 +2621,9 @@ class UIPanel extends nodom.Plugin {
                 }
                 else if (item.plugin.tagName === 'UI-BUTTONGROUP') {
                     btnGrp = item;
+                }
+                else {
+                    bodyDom.add(item);
                 }
             }
             else {
@@ -3496,14 +3499,12 @@ class UIText extends nodom.Plugin {
         this.element = rootDom;
     }
     generate(rootDom) {
-        let me = this;
         rootDom.addClass('nd-text');
         let field = rootDom.getDirective('field');
         let input = new nodom.Element('input');
         input.setProp('type', 'text');
-        input.addDirective(new nodom.Directive('field', field.value, input));
         rootDom.add(input);
-        input.events = rootDom.events;
+        input.addDirective(new nodom.Directive('field', field.value, input));
         let vProp = rootDom.getProp('value');
         if (!vProp) {
             vProp = rootDom.getProp('value', true);
@@ -3525,9 +3526,9 @@ class UIText extends nodom.Plugin {
                 rootDom.add(icon);
             }
         }
+        console.log(rootDom);
     }
     beforeRender(module, dom) {
-        let me = this;
         super.beforeRender(module, dom);
     }
 }

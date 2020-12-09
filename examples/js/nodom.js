@@ -1624,7 +1624,7 @@ var nodom;
                     sa.forEach((v, i) => {
                         v = this.recoveryString(v);
                         if (!nodom.Util.isNumberString(v)) {
-                            sa[i] = '"' + v + '"';
+                            sa[i] = '"' + v.replace(/"/g, '\\"') + '"';
                         }
                     });
                     let paramStr = sa.length > 0 ? ',' + sa.join(',') : '';
@@ -2387,6 +2387,13 @@ var nodom;
                         }
                     }
                 }
+                if (this.initConfig.modules) {
+                    for (let cfg of this.initConfig.modules) {
+                        let mdl = new Module(cfg);
+                        mdl.parentId = this.id;
+                        this.addChild(mdl.id);
+                    }
+                }
                 changeState(this);
                 delete this.initConfig;
                 function changeState(mod) {
@@ -2570,7 +2577,7 @@ var nodom;
                     this.children.forEach((item) => {
                         let m = nodom.ModuleFactory.get(item);
                         if (m) {
-                            m.unactive();
+                            m.active();
                         }
                     });
                 }
@@ -3900,6 +3907,7 @@ var nodom;
         directive.value = modelName;
     }, (directive, dom, module, parent) => {
         let model = module.modelFactory.get(dom.modelId);
+        dom.dontRender = true;
         if (!model || !model.data) {
             return;
         }
@@ -3909,9 +3917,9 @@ var nodom;
         }
         let rows = model.data;
         if (!nodom.Util.isArray(rows) || rows.length === 0) {
-            dom.dontRender = true;
             return;
         }
+        dom.dontRender = false;
         if (directive.filters && directive.filters.length > 0) {
             for (let f of directive.filters) {
                 rows = f.exec(rows, module);
@@ -4641,7 +4649,7 @@ var nodom;
         beforeRender(module, uidom) {
             this.element = uidom;
             this.moduleId = module.id;
-            if (uidom.key !== this.key) {
+            if (!this.modelId || uidom.key !== this.key) {
                 this.key = uidom.key;
                 this.modelId = uidom.modelId;
                 if (uidom.hasProp('name')) {
@@ -4656,7 +4664,7 @@ var nodom;
         afterRender(module, uidom) { }
         clone(dst) {
             let plugin = Reflect.construct(this.constructor, []);
-            let excludeProps = ['key', 'element'];
+            let excludeProps = ['key', 'element', 'modelId', 'moduleId'];
             nodom.Util.getOwnProps(this).forEach((prop) => {
                 if (excludeProps.includes(prop)) {
                     return;
@@ -4690,3 +4698,4 @@ var nodom;
     })();
     nodom.PluginManager = PluginManager;
 })(nodom || (nodom = {}));
+//# sourceMappingURL=nodom.js.map

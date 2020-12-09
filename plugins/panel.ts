@@ -43,6 +43,7 @@ class UIPanel extends nodom.Plugin{
         }
         rootDom.tagName = 'div';
         rootDom.plugin = this;
+        console.log(rootDom);
         this.element = rootDom;
     }
 
@@ -51,8 +52,6 @@ class UIPanel extends nodom.Plugin{
      * @param rootDom 插件对应的element
      */
     private generate(rootDom:nodom.Element){
-        let me = this;
-
         rootDom.addClass('nd-panel');
         
         //处理body
@@ -99,17 +98,20 @@ class UIPanel extends nodom.Plugin{
         
         for(let i=0;i<panelDom.children.length;i++){
             let item = panelDom.children[i];
+            
             if(item.plugin){
                 if(item.plugin.tagName ==='UI-TOOLBAR'){
                     tbar = item;
                 }else if(item.plugin.tagName ==='UI-BUTTONGROUP'){
                     btnGrp = item;
+                }else{
+                    bodyDom.add(item);
                 }
             }else{ //普通节点，放入panelbody
                 bodyDom.add(item);
             }
         }
-
+        
         panelDom.children = [];
         if(tbar){
             panelDom.add(tbar);

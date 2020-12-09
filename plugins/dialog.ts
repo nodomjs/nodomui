@@ -28,6 +28,7 @@ class UIDialog extends nodom.Plugin{
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
+        
         if(params){
             let panel:UIPanel = new UIPanel(params);
             this.generate(rootDom,panel);
@@ -58,7 +59,7 @@ class UIDialog extends nodom.Plugin{
         this.onOpen = panelDom.getProp('onopen');
 
         panelDom.delProp(['name','autoopen']);
-        
+        console.log(panelDom);
         //增加关闭按钮
         panel.addHeadBtn('close',()=>{
             me.close();

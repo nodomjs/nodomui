@@ -17,7 +17,9 @@
 </head>
 <body>
     <div>
+        <ui-button e-click='setValue'>设置值</ui-button>
         <div>
+            <div>姓名：<span>{{userName}}</span></div>
             <div>出生日期：<span>{{birth}}</span></div>
             <div>学历：<span>{{education}}</span></div>
         </div>
@@ -132,6 +134,9 @@
                 ]
             },
             methods:{
+                setValue:function(dom,model,module,e){
+                    model.set('userName','field');
+                },
                 showDlg:function(dom,model,module,e){
                     model.set('showdlg', true);
                 },

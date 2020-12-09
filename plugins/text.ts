@@ -1,6 +1,6 @@
 ///<reference types='nodomjs'/>
 /**
- * panel 插件
+ * text 插件
  * 
  */
 class UIText extends nodom.Plugin{
@@ -19,10 +19,10 @@ class UIText extends nodom.Plugin{
      * 图标位置 left,right
      */
     iconPos:string;
-
     
     constructor(params:HTMLElement|object){
         super(params);
+        
         let rootDom:nodom.Element = new nodom.Element();
         if(params){
             if(params instanceof HTMLElement){
@@ -50,23 +50,17 @@ class UIText extends nodom.Plugin{
      * @param rootDom 插件对应的element
      */
     private generate(rootDom:nodom.Element){
-        let me = this;
-
         rootDom.addClass('nd-text');
-
         //生成id
         let field = rootDom.getDirective('field');
-        
         let input:nodom.Element = new nodom.Element('input');
         input.setProp('type','text');
-
+        
+        rootDom.add(input);
+        
         //替换directive到input
         input.addDirective(new nodom.Directive('field',field.value,input));
         
-        rootDom.add(input);
-        //事件转移到input
-        input.events = rootDom.events;
-
         let vProp = rootDom.getProp('value');
         if(!vProp){
             vProp = rootDom.getProp('value',true);
@@ -74,6 +68,7 @@ class UIText extends nodom.Plugin{
         }else{
             input.setProp('value',vProp);
         }
+        
         
         //清除rootDom的指令和事件
         rootDom.removeDirectives(['field']);
@@ -89,6 +84,7 @@ class UIText extends nodom.Plugin{
                 rootDom.add(icon);
             }
         }
+        console.log(rootDom);
     }
     /**
      * 后置渲染
@@ -96,7 +92,6 @@ class UIText extends nodom.Plugin{
      * @param dom 
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
-        let me = this;
         super.beforeRender(module,dom);
     }
 }
