@@ -4676,6 +4676,15 @@ var nodom;
             }
             return plugin;
         }
+        setTmp(name, value) {
+            this.tmpParam[name] = value;
+        }
+        getTmp(name, value) {
+            this.tmpParam[name] = value;
+        }
+        removeTmp(name) {
+            delete this.tmpParam[name];
+        }
     }
     nodom.Plugin = Plugin;
 })(nodom || (nodom = {}));
