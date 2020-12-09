@@ -1491,6 +1491,7 @@ class UIGrid extends nodom.Plugin {
             thead.children[0].children.unshift(th);
             bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                 let check = model.data[this.wholeCheckName] || false;
+                console.log(model.get(this.wholeCheckName));
                 model.set(this.wholeCheckName, !check);
                 let model1 = this.getModel();
                 for (let d of model1.data[this.dataName]) {

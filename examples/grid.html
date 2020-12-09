@@ -35,11 +35,11 @@
             hideHead: 隐藏头部
         -->
 
-        <h3>简单使用</h3>
+        <!-- <h3>简单使用</h3>
         <button e-click='getGridData'>获取表格数据</button>
         <button e-click='getCheckedData'>获取选中数据</button>
         <p>表格列元素通过cols元素定义，cols每个子元素都为表格的一列</p>
-        <ui-grid name='grd'  dataName='rows' style='height:300px' dataUrl='data/grid1.json'>
+        <ui-grid name='grd'  dataName='rows' style='height:300px' dataUrl='data/grid1.json'> -->
             <!--
                 列属性
                 width:显示宽度，所有宽度之和为表格宽度份数，width值表示 width/总份数 * 100%
@@ -48,13 +48,13 @@
                 notsort: 不显示排序
                 hide: 在表格中隐藏该列
             -->
-            <cols>
+            <!-- <cols>
                 <div width='1' title='编号' notsort field='id' left>{{id}}</div>
                 <div width='3' title='商品名' field='name' left>{{name}}</div>
                 <div width='1' title='价格' field='price' left>{{price|currency}}</div>
                 <div width='1' title='原价' field='oprice'>{{oprice|currency}}</div>
             </cols>
-        </ui-grid>
+        </ui-grid> -->
         
         <!-- <h3>增加网格线</h3>
         <p>通过gridLine设置网格线，包括row(行线),column(列线),both(全部)</p>
@@ -123,7 +123,7 @@
             <sub auto cols='2'></sub>
         </ui-grid>
 
-        <h4>自定义子表格</h4>
+        <!-- <h4>自定义子表格</h4>
         <ui-grid  dataName='rows' class='height:300px' rowalt
             dataUrl='data/grid1.json'>
             <cols>
@@ -138,9 +138,9 @@
                 <div><label style='color:red;width:150px;'>价格：</label><span>{{price}}</span></div>
                 <div><label style='color:red;width:150px;'>原价：</label><span>{{oprice}}</span></div>
             </sub>
-        </ui-grid>
+        </ui-grid> -->
 
-        <h3>增加分页</h3>
+        <!-- <h3>增加分页</h3>
         <p>通过ui-pagination引入分页插件</p>
         <ui-grid  dataName='rows' style='height:300px' rowalt sortable fixHead
             dataUrl='data/grid1.json'>
@@ -156,9 +156,9 @@
                 <div width='1' title='商品描述' hide>{{desc}}</div>
             </cols>
             <sub class='sub' labelWidth='100' cols='2' auto ></sub>
-            <!--分页-->
+            
             <ui-pagination totalName='total' requestName='pageno,pagesize' pageSize='10' sizeChange='10,20,30,50' showGo showTotal />
-        </ui-grid>
+        </ui-grid> -->
         
     </div>
 </body>

@@ -298,15 +298,15 @@ h5 {
     content: ""; }
 
 /*上箭头*/
-.nd-icon-arrow-up, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise {
+.nd-icon-arrow-up, .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise {
   font-family: nd-iconfont; }
-  .nd-icon-arrow-up:before, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise:before {
+  .nd-icon-arrow-up:before, .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-raise:before {
     content: ""; }
 
 /*下箭头*/
-.nd-icon-arrow-down, .nd-select .nd-select-inputct > b, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down {
+.nd-icon-arrow-down, .nd-select .nd-select-inputct > b, .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down {
   font-family: nd-iconfont; }
-  .nd-icon-arrow-down:before, .nd-select .nd-select-inputct > b:before, .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down:before {
+  .nd-icon-arrow-down:before, .nd-select .nd-select-inputct > b:before, .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort .nd-grid-sort-down:before {
     content: ""; }
 
 /*左箭头*/
@@ -1105,18 +1105,17 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         max-height: 100px; }
     .nd-grid .nd-grid-row .nd-grid-row-item-left {
       justify-content: flex-start; }
-  .nd-grid .nd-grid-head {
+  .nd-grid > .nd-grid-head {
     background-color: #fff;
     color: #666;
-    display: flex;
     flex-direction: row;
     text-align: center;
     font-weight: bold; }
-    .nd-grid .nd-grid-head .nd-grid-row {
+    .nd-grid > .nd-grid-head .nd-grid-row {
       width: 100%;
       height: 60px;
       /*排序容器*/ }
-      .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort {
+      .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -1126,15 +1125,15 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         color: #666;
         /*升序箭头*/
         /*降序箭头*/ }
-        .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sort > b:hover {
+        .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sort > b:hover {
           color: #2864c8;
           cursor: pointer; }
-      .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sub-btn {
+      .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sub-btn {
         width: 25px;
         display: inline-block; }
-        .nd-grid .nd-grid-head .nd-grid-row .nd-grid-sub-btn:before {
+        .nd-grid > .nd-grid-head .nd-grid-row .nd-grid-sub-btn:before {
           content: ''; }
-    .nd-grid .nd-grid-head .nd-grid-row-line {
+    .nd-grid > .nd-grid-head .nd-grid-row-line {
       border-top: 1px solid #dfdfdf; }
   .nd-grid .nd-grid-iconcol {
     width: 25px;

@@ -499,8 +499,6 @@ class UIGrid extends nodom.Plugin{
                 }
             }));
         }
-
-        
         
         //行前添加checkbox
         let td:nodom.Element = new nodom.Element('div');
