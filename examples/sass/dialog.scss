@@ -2,12 +2,14 @@
 /*dialog*/
 .nd-dialog{
     position:fixed;
+    display:flex;
+    justify-content: center;
+    align-items: center;
     top:0;
     bottom:0;
     left:0;
     right:0;
-    z-index: 1000000;
-    
+    z-index:$nd-dialog-index;
     /*蒙版*/
     .nd-dialog-cover{
         background-color:$nd-color9;
@@ -17,23 +19,22 @@
         top:0;
         width:100%;
         height:100%;
-        z-index:1;
     }
 
     .nd-dialog-body{
-        position:inherit;
-        left:0;
-        top:0;
-        width:100%;
-        height:100%;
-        display:flex;
-        justify-content: center;
-        align-items: center;
-        z-index:2;
-
-        .nd-panel{
-            @extend .nd-box-default;
-        }
+        // position:inherit;
+        // left:0;
+        // top:0;
+        // width:100%;
+        // height:100%;
+        // display:flex;
+        // justify-content: center;
+        // align-items: center;
+        @extend .nd-box-default;
+        z-index: 1;
+        // .nd-panel{
+        //     @extend .nd-box-default;
+        // }
     }
 }
 .nd-dialog-hide{

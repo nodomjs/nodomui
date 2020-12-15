@@ -277,7 +277,7 @@ class UIAccordion extends nodom.Plugin {
         if (this.needPreRender) {
             module.methodFactory.add(this.method1, (dom, model, module, e) => {
                 let pmodel = module.modelFactory.get(uidom.modelId);
-                let data = pmodel.data[me.field1];
+                let data = pmodel.query(me.field1);
                 let f = me.active1;
                 for (let d of data) {
                     if (d[f] === true) {
@@ -975,18 +975,15 @@ class UIDialog extends nodom.Plugin {
         this.onClose = panelDom.getProp('onclose');
         this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
-        console.log(panelDom);
         panel.addHeadBtn('close', () => {
             me.close();
         });
         rootDom.addDirective(new nodom.Directive('show', this.dataName, rootDom));
-        let dialogBody = new nodom.Element('div');
-        dialogBody.addClass('nd-dialog-body');
-        dialogBody.add(panelDom);
+        panelDom.addClass('nd-dialog-body');
         let coverDom = new nodom.Element('div');
         coverDom.addClass('nd-dialog-cover');
         rootDom.add(coverDom);
-        rootDom.add(dialogBody);
+        rootDom.add(panelDom);
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
@@ -1609,7 +1606,7 @@ class UIGrid extends nodom.Plugin {
         let model = module.modelFactory.get(this.modelId);
         return model.get(this.extraDataName);
     }
-    getCheckedRows() {
+    getSelectedRows() {
         let model = this.getModel();
         let arr = [];
         for (let d of model.data[this.dataName]) {
@@ -1618,6 +1615,14 @@ class UIGrid extends nodom.Plugin {
             }
         }
         return arr;
+    }
+    removeSelectedRows() {
+        let model = this.getModel();
+        for (let i = 0; i < model.data.length; i++) {
+            if (model.data[i]['$checked']) {
+                model.data.splice(i--, 1);
+            }
+        }
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
@@ -2584,7 +2589,6 @@ class UIPanel extends nodom.Plugin {
         }
         rootDom.tagName = 'div';
         rootDom.plugin = this;
-        console.log(rootDom);
         this.element = rootDom;
     }
     generate(rootDom) {
@@ -3526,7 +3530,6 @@ class UIText extends nodom.Plugin {
                 rootDom.add(icon);
             }
         }
-        console.log(rootDom);
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
@@ -3713,4 +3716,123 @@ class UITree extends nodom.Plugin {
     }
 }
 nodom.PluginManager.add('UI-TREE', UITree);
+class UILoading extends nodom.Plugin {
+    constructor(params) {
+        super(params);
+        this.tagName = 'UI-LOADING';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                UITool.handleUIParam(rootDom, this, ['startangle|number', 'movecircle|number'], ['startAngle', 'moveCircle'], [Math.PI / 2, 40]);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    generate(rootDom) {
+        rootDom.setProp('name', '$ui-loading');
+        this.dataName = '$ui_loading_' + nodom.Util.genId();
+        rootDom.addClass('nd-loading');
+        rootDom.addDirective(new nodom.Directive('class', "{'nd-loading-hide':'!" + this.dataName + "'}", rootDom));
+        let coverDom = new nodom.Element('div');
+        coverDom.addClass('nd-loading-cover');
+        rootDom.add(coverDom);
+        let body = new nodom.Element('div');
+        body.addClass('nd-loading-body');
+        let canvas = new nodom.Element('canvas');
+        canvas.setProp('width', 100);
+        canvas.setProp('height', 100);
+        body.add(canvas);
+        rootDom.add(body);
+    }
+    open() {
+        const me = this;
+        me.openCount++;
+        nodom.ModuleFactory.getMain().model.set(this.dataName, true);
+        let canvas = document.querySelector("[key='" + this.element.children[1].children[0].key + "']");
+        let width = canvas.offsetWidth;
+        let circleCount = 6;
+        me.showFlag = true;
+        setTimeout(() => {
+            loop();
+        }, 500);
+        function loop() {
+            if (!me.showFlag) {
+                return;
+            }
+            let ctx = canvas.getContext('2d');
+            let centerx = width / 2;
+            let centery = width / 2;
+            let radius1 = 6;
+            let radius = me.moveCircle;
+            let angle = me.startAngle;
+            let circleArr = [];
+            loop1();
+            setTimeout(loop, 1500);
+            function loop1() {
+                if (!me.showFlag) {
+                    return;
+                }
+                ctx.clearRect(0, 0, width, width);
+                ctx.fillStyle = 'gold';
+                if (circleArr.length < circleCount) {
+                    circleArr.push(true);
+                }
+                angle += Math.PI / 8;
+                let overNum = 0;
+                for (let i = 0; i < circleArr.length; i++) {
+                    let a = angle - i * Math.PI / 8;
+                    if (a > Math.PI * 2 + me.startAngle) {
+                        overNum++;
+                        a = Math.PI * 2 + me.startAngle;
+                    }
+                    let r = radius1 - i;
+                    ctx.beginPath();
+                    ctx.arc(centerx - radius * Math.cos(a), centery - radius * Math.sin(a), r, 0, 360);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                if (overNum < circleCount) {
+                    setTimeout(loop1, 60);
+                }
+            }
+        }
+    }
+    close() {
+        if (--this.openCount === 0) {
+            nodom.ModuleFactory.getMain().model.set(this.dataName, false);
+            this.showFlag = false;
+        }
+    }
+}
+nodom.PluginManager.add('UI-LOADING', UILoading);
+var nodom;
+(function (nodom) {
+    function showLoading() {
+        let manager = nodom.ModuleFactory.getMain().getPlugin('$ui-loading');
+        if (manager) {
+            manager.open();
+        }
+    }
+    nodom.showLoading = showLoading;
+    function closeLoading(config) {
+        let module = nodom.ModuleFactory.getMain();
+        if (!module) {
+            return null;
+        }
+        let manager = module.getPlugin('$ui-loading');
+        if (manager) {
+            manager.close();
+        }
+    }
+    nodom.closeLoading = closeLoading;
+})(nodom || (nodom = {}));
 //# sourceMappingURL=nodomui.js.map

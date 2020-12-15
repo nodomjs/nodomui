@@ -117,7 +117,6 @@ class UIAccordion extends nodom.Plugin{
                 icon.addClass('nd-accordion-icon nd-icon-right');
                 icon.directives.push(new nodom.Directive('class',"{'nd-accordion-open':'"+ activeName1 + "'}",icon));
                 item.add(icon);
-                
                 item.delProp(['activename','first']); 
             }else if(item.hasProp('second')){
                 activeName2 = item.getProp('activename') || 'active';
@@ -130,10 +129,7 @@ class UIAccordion extends nodom.Plugin{
                 if(item.hasProp('itemclick')){
                     item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick')+':delg'));
                 }
-                // let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                
                 item.addDirective(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}",item));
-                // this.method2 = methodId;
                 secondDom.addClass('nd-accordion-secondct');
                 secondDom.add(item);
                 secondDom.addDirective(new nodom.Directive('class',"{'nd-accordion-hide':'!"+ activeName1 +"'}",secondDom),true);
@@ -158,7 +154,7 @@ class UIAccordion extends nodom.Plugin{
             module.methodFactory.add(this.method1,
                 (dom,model,module,e) => {
                     let pmodel:nodom.Model = module.modelFactory.get(uidom.modelId);
-                    let data = pmodel.data[me.field1];
+                    let data = pmodel.query(me.field1);
                     //选中字段名
                     let f:string = me.active1;
                     //取消之前选中

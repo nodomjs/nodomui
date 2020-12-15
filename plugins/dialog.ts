@@ -4,7 +4,7 @@
  */
 class UIDialog extends nodom.Plugin{
     tagName:string = 'UI-DIALOG';
-
+ 
     /**
      * 数据项名
      */
@@ -24,6 +24,7 @@ class UIDialog extends nodom.Plugin{
      * open 事件名
      */
     onOpen:string;
+
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -48,8 +49,6 @@ class UIDialog extends nodom.Plugin{
         rootDom.addClass('nd-dialog');
         
         let panelDom = panel.element;
-        //删除panel plugin
-        // delete panelDom.plugin;
         //获取插件名
         rootDom.setProp('name',panelDom.getProp('name'));
         //autoopen
@@ -59,25 +58,17 @@ class UIDialog extends nodom.Plugin{
         this.onOpen = panelDom.getProp('onopen');
 
         panelDom.delProp(['name','autoopen']);
-        console.log(panelDom);
         //增加关闭按钮
         panel.addHeadBtn('close',()=>{
             me.close();
         });
-        
-        
         rootDom.addDirective(new nodom.Directive('show',this.dataName,rootDom));
-
-        //body
-        let dialogBody:nodom.Element = new nodom.Element('div');
-        dialogBody.addClass('nd-dialog-body');
-        dialogBody.add(panelDom);
-
+        panelDom.addClass('nd-dialog-body');
         //蒙版
         let coverDom:nodom.Element = new nodom.Element('div');
         coverDom.addClass('nd-dialog-cover');
         rootDom.add(coverDom);
-        rootDom.add(dialogBody);
+        rootDom.add(panelDom);
     }
 
     /**

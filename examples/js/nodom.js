@@ -4046,6 +4046,7 @@ var nodom;
             if (r instanceof nodom.Expression) {
                 r = r.val(model);
             }
+            
             let ind = clsArr.indexOf(key);
             if (!r || r === 'false') {
                 if (ind !== -1) {
@@ -4652,6 +4653,7 @@ var nodom;
             if (!this.modelId || uidom.key !== this.key) {
                 this.key = uidom.key;
                 this.modelId = uidom.modelId;
+
                 if (uidom.hasProp('name')) {
                     module.addPlugin(uidom.getProp('name'), this);
                 }

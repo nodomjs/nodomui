@@ -75,7 +75,7 @@ $nd-color9: #333;           //默认tip框背景色、蒙版背景色
   box-shadow: 0px 0px 8px 1px #999; }
 
 /*默认色背景box*/
-.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog .nd-dialog-body .nd-panel, .nd-select .nd-select-list, .nd-menu .nd-menu-subct {
+.nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog .nd-dialog-body, .nd-select .nd-select-list, .nd-menu .nd-menu-subct {
   background-color: #fff;
   color: #666;
   border-radius: 5px;
@@ -911,11 +911,14 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /*dialog*/
 .nd-dialog {
   position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000000;
+  z-index: 999;
   /*蒙版*/ }
   .nd-dialog .nd-dialog-cover {
     background-color: #333;
@@ -924,18 +927,9 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     left: 0;
     top: 0;
     width: 100%;
-    height: 100%;
-    z-index: 1; }
+    height: 100%; }
   .nd-dialog .nd-dialog-body {
-    position: inherit;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2; }
+    z-index: 1; }
 
 .nd-dialog-hide {
   width: 0px;
@@ -1574,5 +1568,40 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     margin-right: 10px; }
     .nd-buttongroup .nd-btn:last-child, .nd-buttongroup .nd-listtransfer .nd-listtransfer-btngrp > b:last-child, .nd-listtransfer .nd-buttongroup .nd-listtransfer-btngrp > b:last-child {
       margin: 0px; }
+
+/*loading*/
+.nd-loading {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  /*蒙版*/ }
+  .nd-loading .nd-loading-cover {
+    background-color: #f0f0f0;
+    opacity: 0.4;
+    position: inherit;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%; }
+  .nd-loading .nd-loading-body canvas {
+    height: 100px;
+    width: 100px; }
+
+.nd-loading-hide {
+  width: 0px;
+  height: 0px; }
+  .nd-loading-hide .nd-loading-cover {
+    width: 0;
+    height: 0; }
+  .nd-loading-hide .nd-loading-body {
+    width: 0;
+    height: 0px;
+    overflow: hidden; }
 
 /*# sourceMappingURL=nodomui.css.map */

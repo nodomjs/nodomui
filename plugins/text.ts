@@ -84,7 +84,6 @@ class UIText extends nodom.Plugin{
                 rootDom.add(icon);
             }
         }
-        console.log(rootDom);
     }
     /**
      * 后置渲染

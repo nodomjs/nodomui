@@ -43,7 +43,6 @@ class UIPanel extends nodom.Plugin{
         }
         rootDom.tagName = 'div';
         rootDom.plugin = this;
-        console.log(rootDom);
         this.element = rootDom;
     }
 

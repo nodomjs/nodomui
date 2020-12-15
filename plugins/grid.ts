@@ -666,7 +666,7 @@ class UIGrid extends nodom.Plugin{
     /**
      * 获取选中行数据集
      */
-    public getCheckedRows():Array<any>{
+    public getSelectedRows():Array<any>{
         let model:nodom.Model = this.getModel();
         let arr = [];
         for(let d of model.data[this.dataName]){
@@ -675,6 +675,18 @@ class UIGrid extends nodom.Plugin{
             }
         }
         return arr;
+    }
+
+    /**
+     * 移除选中行
+     */
+    public removeSelectedRows(){
+        let model:nodom.Model = this.getModel();
+        for(let i=0;i<model.data.length;i++){
+            if(model.data[i]['$checked']){
+                model.data.splice(i--,1);
+            }
+        }
     }
 }
 

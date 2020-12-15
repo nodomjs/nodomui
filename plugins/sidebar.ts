@@ -163,7 +163,6 @@ class UISidebar extends nodom.Plugin{
             rootDom.add(parentCt);
             parentCt = subCt;
         }
-        console.log(rootDom);
         rootDom.delProp(['listField','width','maxlevels']);
     }
     

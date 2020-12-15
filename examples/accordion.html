@@ -12,9 +12,9 @@
 </head>
 <body>
     <div>
-        <ui-accordion style='width:300px'>
-        <div first data='levels' activeName='active'><b class="{{'nd-icon-' + icon}}"></b>{{title}}</div>
-        <a second data='rows' activeName='a1' itemClick='clickItem'><b class="{{'nd-icon-' + icon}}"></b>{{name}}</a>
+        <ui-accordion style='width:300px' x-model='result'>
+        <div first data='rows' activeName='active'><b class="{{'nd-icon-' + icon}}"></b>{{title}}</div>
+        <a second data='menus' activeName='a1' itemClick='clickItem'><b class="{{'nd-icon-' + icon}}"></b>{{title}}</a>
         </ui-accordion>
     </div>
 </body>
@@ -22,7 +22,8 @@
     nodom.newApp({
         module:{
             el:'div',
-            data:{
+            data:'http://localhost:3000/menu/getmenulist',
+            /*{
                 levels:[
                     {title:'商品管理',icon:'insurance',active:true,rows:[
                         {name:'商品上架',icon:'prompt'},
@@ -48,7 +49,7 @@
                         {name:'权限管理',icon:'prompt'}
                     ]}
                 ]    
-            },
+            },*/
             methods:{
                 clickItem:(dom,model,module,e)=>{
                     console.log(model.data);
