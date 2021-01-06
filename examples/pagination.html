@@ -21,6 +21,7 @@
         <p>显示记录数</p>
         <ui-pagination totalName='total' showTotal></ui-pagination>
 
+        
         <p>带页面跳转</p>
         <ui-pagination totalName='total' showTotal showGo></ui-pagination>
         
@@ -51,7 +52,7 @@
         module:{
             el:'div',
             data:{
-                total:300
+                total:200
             },
             methods:{
                 changePage:function(module,currentPage,pageSize){

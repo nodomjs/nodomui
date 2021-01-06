@@ -32,7 +32,7 @@ class UILoading extends nodom.Plugin{
     /**
      * 显示数，每open一次，+1，每close一次，-1。close时检查是否为0，为0则关闭
      */
-    private openCount:number;
+    private openCount:number=0;
     /**
      * 开始角
      */

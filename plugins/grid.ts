@@ -302,11 +302,9 @@ class UIGrid extends nodom.Plugin{
         
         //如果有分页，则需要在外添加容器
         if(pagination){
-            let parentDom:nodom.Element = new nodom.Element('div');
-            parentDom.children = [rootDom,pagination];
             pagination.addClass('nd-grid-pager');
             this.handlePagination(pagination);
-            return parentDom;
+            rootDom.add(pagination);
         }
         return rootDom;
     }
@@ -589,7 +587,7 @@ class UIGrid extends nodom.Plugin{
         let df:UIPagination = <UIPagination>pagination.plugin;
         this.pagination = df;
 
-        df.dataUrl = this.dataUrl;
+        // df.dataUrl = this.dataUrl;
         if(df.currentPage){
             this.currentPage = df.currentPage;
         }
@@ -621,6 +619,7 @@ class UIGrid extends nodom.Plugin{
                 params[reqName[1]] = pagination.pageSize;
             }
         }
+        
         nodom.request({
             url:me.dataUrl,
             params:params,
@@ -636,8 +635,7 @@ class UIGrid extends nodom.Plugin{
                 if(pagination.pageSize){
                     this.pageSize = pagination.pageSize;
                 }
-                model.set(pagination.extraDataName + '.total',r[pagination.totalName]);
-                pagination.changeParams(module);
+                pagination.setTotal(r[pagination.totalName]);
             }
         });
     }
@@ -669,7 +667,8 @@ class UIGrid extends nodom.Plugin{
     public getSelectedRows():Array<any>{
         let model:nodom.Model = this.getModel();
         let arr = [];
-        for(let d of model.data[this.dataName]){
+        let datas = model.query(this.dataName);
+        for(let d of datas){
             if(d['$checked']){
                 arr.push(d);
             }
@@ -681,12 +680,36 @@ class UIGrid extends nodom.Plugin{
      * 移除选中行
      */
     public removeSelectedRows(){
-        let model:nodom.Model = this.getModel();
-        for(let i=0;i<model.data.length;i++){
-            if(model.data[i]['$checked']){
-                model.data.splice(i--,1);
+        let datas = this.getModel().query(this.dataName);
+        for (let i = 0; i < datas.length; i++) {
+            if (datas[i]['$checked']) {
+                datas.splice(i--, 1);
             }
         }
+    }
+
+    /**
+     * 设置数据url
+     * @param url           数据url
+     * @param notRefresh    不刷新，如果设置该参数，则此次不刷新数据
+     */
+    public setDataUrl(url:string,notRefresh?:boolean){
+        this.dataUrl = url;
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        
+        if(!notRefresh){
+            //设置为第一页
+            this.pagination.setPage(1);
+            this.doReq(module,this.pagination);
+        }
+    }
+
+    /**
+     * 刷新
+     */
+    public refresh(){
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        this.doReq(module,this.pagination);
     }
 }
 

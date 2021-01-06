@@ -5,5 +5,12 @@
     display:inline-flex;
     .nd-btn{
         padding:$nd-btn-padding-top;
+        @include nd-color(2);
+
+        &:hover{
+            @include nd-color(8);
+        }
     }
+
+    
 }

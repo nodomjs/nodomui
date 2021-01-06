@@ -150,6 +150,9 @@ class UISelect extends nodom.Plugin{
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                if(!this.multiSelect){
+                    this.hideList(module);
+                }
                 me.setValue(module,model);
             }
         ));
@@ -245,10 +248,9 @@ class UISelect extends nodom.Plugin{
                     }
                 }
             );
-
-            model = module.modelFactory.get(this.extraModelId);
         }
 
+        model = module.modelFactory.get(this.extraModelId);
         if(!pmodel){
             pmodel = module.modelFactory.get(this.modelId);
         }
@@ -260,74 +262,50 @@ class UISelect extends nodom.Plugin{
         let data = model.data;
         //下拉值初始化
         if(this.listField && data.datas.length === 0 && pmodel.data[this.listField] ){
-            let valueArr:string[];
-            
-            if(this.dataName){
-                let value = pmodel.query(this.dataName);
-                if(value && value!==''){
-                    valueArr = value.toString().split(',');
-                }
-            }
-            let txtArr:string[] = [];
             let rows = pmodel.query(this.listField);
             //复制新数据
             if(rows && Array.isArray(rows)){
-                rows = nodom.Util.clone(rows);
-            
-                //初始化选中状态
-                for(let d of rows){
-                    if(valueArr && valueArr.includes(d[this.valueField]+'')){
-                        d.selected = true;
-                        txtArr.push(d[this.displayField]);
-                    }else{
-                        d.selected = false;
-                    }
-                }
-                
                 //设置下拉数据
-                model.set('datas',rows);
-                this.setValue(module);
+                model.set('datas',nodom.Util.clone(rows));
             }
+            this.setValue(module);
         }
+
+        //设置选中和显示内容
+        this.setSelectedAndDisplay(module);
     }
     
     /**
      * 设置数据
      * @param module    模块
-     * @param value     值
+     * @param model     模型
      */
     setValue(module:nodom.Module,model?:nodom.Model){
+        if(!this.dataName){
+            return;
+        }
         //原model
         let pmodel = module.modelFactory.get(this.modelId);
         //附加数据model
         let model1:nodom.Model = module.modelFactory.get(this.extraModelId);
         let rows  = model1.data['datas'];
-        //显示数组
-        let txtArr:string[] = [];
-        //值数组
-        let valArr:string[] = [];
-
         let value:string;
-        if(this.multiSelect){
-            //反选
-            if(model){
-                model.set('selected',!model.data.selected);
-            }
-            
-            for(let d of rows){
-                if(d.selected){
-                    valArr.push(d[this.valueField]);
-                    txtArr.push(d[this.displayField]);
-                }
-            }
-            if(this.dataName){
-                value = valArr.join(',');
-                
-            }
-            model1.set('display',txtArr.join(','));
+        if(!model){
+            value = pmodel.query(this.dataName);   
         }else{
-            //如果model不存在，则直接取选中值
-            if(model){
+            if(this.multiSelect){
+                //值数组
+                let valArr:string[] = [];
+                //设置选中
+                model.set('selected',!model.data.selected);
+                //获取选中的值
+                for(let d of rows){
+                    if(d.selected){
+                        valArr.push(d[this.valueField]);
+                    }
+                }
+                value = valArr.join(',');
+            }else{
                 //取消选择
                 for(let d of rows){
                     if(d.selected){
@@ -335,37 +313,69 @@ class UISelect extends nodom.Plugin{
                         break;
                     }
                 }
-                //设置选择
-                model.set('selected',!model.data.selected);
-            }
-            //设置选中
-            for(let d of rows){
-                if(d.selected){
-                    if(this.dataName){
-                        value = d[this.valueField];
-                    }
-                    model1.set('display',d[this.displayField]);
-                    this.hideList(module,model1);
-                    break;
-                }
+                value = model.query(this.valueField);
             }
         }
-        if(value !== this.value){
+        
+        if(value !== this.value){ 
+            //设置新值
             pmodel.set(this.dataName,value);
-            if(this.onChange !== ''){
+            if(this.onChange !== ''){ //change 事件
                 let foo;
-                if(typeof this.onChange === 'string'){
-                    foo = module.methodFactory.get(this.onChange);
-                }else{
+                let tp = typeof this.onChange;
+                if(tp === 'string'){
+                    foo = module.methodFactory.get(<string>this.onChange);
+                }else if(tp === 'function'){
                     foo = this.onChange;
                 }
-                if(nodom.Util.isFunction(foo)){
+                if(foo){
                     foo.apply(null,[model,module,value,this.value]);
                 }
             }
             this.value = value;
         }
+    }
+
+    /**
+     * 设置选中和显示内容
+     * @param module    模块
+     */
+    setSelectedAndDisplay(module:nodom.Module){
+        if(!this.dataName){
+            return;
+        }
+        //原model
+        let pmodel = module.modelFactory.get(this.modelId);
+        //附加数据model
+        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let rows  = model.data['datas'];
+        if(!rows || rows.length === 0){
+            return;
+        }
+        let txtArr:string[] = [];
+        let value:string = pmodel.query(this.dataName);
         
+        if(this.multiSelect){
+            let va = value.split(',');
+            for(let d of rows){
+                if(va.includes(d[this.valueField])){
+                    d.selected = true;
+                    txtArr.push(d[this.displayField]);
+                }else{
+                    d.selected = false;
+                }
+            }
+            model.set('display',txtArr.join(','));
+        }else{
+            for(let d of rows){
+                if(value ==  d[this.valueField]){
+                    d.selected = true;
+                    model.set('display',d[this.displayField]);
+                }else{
+                    d.selected = false;
+                }
+            }
+        }
     }
 
     /**

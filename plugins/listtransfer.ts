@@ -174,39 +174,38 @@ class UIListTransfer extends nodom.Plugin{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         //uidom model
-        let pmodel:nodom.Model;
-        
+        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
         if(this.needPreRender){
-            pmodel = module.modelFactory.get(this.modelId);
             let model:nodom.Model = pmodel.set(this.extraDataName,{
                 //数据
                 datas:[]
             });
-
             this.extraModelId = model.id;
-            let value = pmodel.query(this.dataName);
             let datas = pmodel.query(this.listField);
-            
-            let rows = [];
-            if(Array.isArray(datas)){
-                let va = [];
-                if(value){
-                    va = value.split(',');
-                }
-                rows = nodom.Util.clone(datas);
-                for(let d of rows){
-                    d.selected = false;
-                    d.isValue = false;
-                    if(va && va.includes(d[this.valueField]+'')){
-                        d.isValue = true;
-                    }
-                }
-            }
-            model.set('datas',rows);
+            model.set('datas',nodom.Util.clone(datas));
         }
+        this.setValueSelected(module);
     }
 
-
+    /**
+     * 设置选中
+     * @param module 
+     */
+    private setValueSelected(module:nodom.Module){
+        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
+        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let value = pmodel.query(this.dataName);
+        let va = value.split(',');
+        let rows = model.query('datas');
+        for(let d of rows){
+            if(va && va.includes(d[this.valueField]+'')){
+                d.isValue = true;
+            }else{
+                d.isValue = false;
+            }
+        }
+        model.set('datas',rows);
+    }
     /**
      * 移动数据
      * @param module    模块

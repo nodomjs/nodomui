@@ -18,17 +18,18 @@
 <body>
     <div>
         <p>简单用法</p>
+        <button e-click='change'>修改</button>
         <ui-listtransfer style='height:200px;max-width:500px;' x-field='selectedUser'  valueField='uid' 
             displayField='userName' listField='users'>
         </ui-listtransfer>
         <p>自定义</p>
-        <ui-listtransfer style='height:200px;max-width:500px;' x-field='selectedUser'  valueField='uid' 
+        <!-- <ui-listtransfer style='height:200px;max-width:500px;' x-field='selectedUser'  valueField='uid' 
             displayField='userName' listField='users'>
             <div>
                 <span style='width:100px;display:inline-block;'>{{userName}}</span>
                 <span >{{company}}</span>
             </div>
-        </ui-listtransfer>
+        </ui-listtransfer> -->
     </div>
 </body>
 <script>
@@ -45,6 +46,11 @@
                     {uid:5,userName:'fieldyang','company':'京东'},
                     {uid:6,userName:'路人甲','company':'google'}
                 ]
+            },
+            methods:{
+                change(dom,model){
+                    model.set('selectedUser','1');
+                }
             }
         }
     })

@@ -1365,11 +1365,9 @@ class UIGrid extends nodom.Plugin {
             rootDom.addClass('nd-grid-ct-col-line');
         }
         if (pagination) {
-            let parentDom = new nodom.Element('div');
-            parentDom.children = [rootDom, pagination];
             pagination.addClass('nd-grid-pager');
             this.handlePagination(pagination);
-            return parentDom;
+            rootDom.add(pagination);
         }
         return rootDom;
     }
@@ -1552,7 +1550,6 @@ class UIGrid extends nodom.Plugin {
         let me = this;
         let df = pagination.plugin;
         this.pagination = df;
-        df.dataUrl = this.dataUrl;
         if (df.currentPage) {
             this.currentPage = df.currentPage;
         }
@@ -1589,8 +1586,7 @@ class UIGrid extends nodom.Plugin {
                 if (pagination.pageSize) {
                     this.pageSize = pagination.pageSize;
                 }
-                model.set(pagination.extraDataName + '.total', r[pagination.totalName]);
-                pagination.changeParams(module);
+                pagination.setTotal(r[pagination.totalName]);
             }
         });
     }
@@ -1609,7 +1605,8 @@ class UIGrid extends nodom.Plugin {
     getSelectedRows() {
         let model = this.getModel();
         let arr = [];
-        for (let d of model.data[this.dataName]) {
+        let datas = model.query(this.dataName);
+        for (let d of datas) {
             if (d['$checked']) {
                 arr.push(d);
             }
@@ -1617,12 +1614,24 @@ class UIGrid extends nodom.Plugin {
         return arr;
     }
     removeSelectedRows() {
-        let model = this.getModel();
-        for (let i = 0; i < model.data.length; i++) {
-            if (model.data[i]['$checked']) {
-                model.data.splice(i--, 1);
+        let datas = this.getModel().query(this.dataName);
+        for (let i = 0; i < datas.length; i++) {
+            if (datas[i]['$checked']) {
+                datas.splice(i--, 1);
             }
         }
+    }
+    setDataUrl(url, notRefresh) {
+        this.dataUrl = url;
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        if (!notRefresh) {
+            this.pagination.setPage(1);
+            this.doReq(module, this.pagination);
+        }
+    }
+    refresh() {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        this.doReq(module, this.pagination);
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
@@ -2028,32 +2037,32 @@ class UIListTransfer extends nodom.Plugin {
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
-        let pmodel;
+        let pmodel = module.modelFactory.get(this.modelId);
         if (this.needPreRender) {
-            pmodel = module.modelFactory.get(this.modelId);
             let model = pmodel.set(this.extraDataName, {
                 datas: []
             });
             this.extraModelId = model.id;
-            let value = pmodel.query(this.dataName);
             let datas = pmodel.query(this.listField);
-            let rows = [];
-            if (Array.isArray(datas)) {
-                let va = [];
-                if (value) {
-                    va = value.split(',');
-                }
-                rows = nodom.Util.clone(datas);
-                for (let d of rows) {
-                    d.selected = false;
-                    d.isValue = false;
-                    if (va && va.includes(d[this.valueField] + '')) {
-                        d.isValue = true;
-                    }
-                }
-            }
-            model.set('datas', rows);
+            model.set('datas', nodom.Util.clone(datas));
         }
+        this.setValueSelected(module);
+    }
+    setValueSelected(module) {
+        let pmodel = module.modelFactory.get(this.modelId);
+        let model = module.modelFactory.get(this.extraModelId);
+        let value = pmodel.query(this.dataName);
+        let va = value.split(',');
+        let rows = model.query('datas');
+        for (let d of rows) {
+            if (va && va.includes(d[this.valueField] + '')) {
+                d.isValue = true;
+            }
+            else {
+                d.isValue = false;
+            }
+        }
+        model.set('datas', rows);
     }
     transfer(module, direction, all) {
         let model = module.modelFactory.get(this.extraModelId);
@@ -2304,14 +2313,14 @@ class UIPagination extends nodom.Plugin {
     constructor(params) {
         super(params);
         this.tagName = 'UI-PAGINATION';
-        this.minPage = 1;
-        this.maxPage = 1;
+        this.minPage = 0;
+        this.maxPage = 0;
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2', 'dataurl'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName', 'dataUrl'], ['total', 10, 1, null, null, 10, [], 5, '', [], '']);
+                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName'], ['total', 10, 1, null, null, 10, [], 0, '', []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2326,6 +2335,9 @@ class UIPagination extends nodom.Plugin {
     }
     generate(rootDom) {
         let me = this;
+        if (me.steps === 0) {
+            me.steps = me.pageSize;
+        }
         rootDom.addClass('nd-pagination');
         rootDom.children = [];
         this.extraDataName = '$ui_pagination_' + nodom.Util.genId();
@@ -2415,14 +2427,16 @@ class UIPagination extends nodom.Plugin {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.changeParams(module, -me.steps, true);
+            let step = me.currentPage - me.steps < 1 ? -me.currentPage + 1 : -me.steps;
+            me.changeParams(module, step, true);
             me.update(module);
         }));
         right1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.changeParams(module, me.steps, true);
+            let step = me.steps + me.currentPage > me.maxPage ? me.maxPage - me.currentPage : me.steps;
+            me.changeParams(module, step, true);
             me.update(module);
         }));
         if (this.showGo) {
@@ -2512,23 +2526,16 @@ class UIPagination extends nodom.Plugin {
                 min = pageCount - this.showNum + 1;
             }
             max = min + this.showNum - 1;
-            if (min === 1) {
-                btnAllow += 1;
-            }
-            if (max === pageCount) {
-                btnAllow += 8;
-            }
         }
         else {
             min = 1;
             max = pageCount;
-            btnAllow = 9;
         }
         if (current === pageCount) {
-            btnAllow += 4;
+            btnAllow += 12;
         }
         if (current === 1) {
-            btnAllow += 2;
+            btnAllow += 3;
         }
         if (model.query('pageSize') === this.pageSize && current === this.currentPage && min === this.minPage && max === this.maxPage) {
             return;
@@ -2551,6 +2558,7 @@ class UIPagination extends nodom.Plugin {
         model.set('btnAllow', btnAllow);
     }
     handleInit(dom, module) {
+        const me = this;
         if (!this.needPreRender) {
             return;
         }
@@ -2566,6 +2574,47 @@ class UIPagination extends nodom.Plugin {
         });
         this.extraModelId = model1.id;
         this.changeParams(module, 1);
+        model1.watch('pageNo', () => {
+            let no = model1.query('pageNo');
+            try {
+                no = parseInt(no);
+            }
+            catch (e) {
+            }
+            if (isNaN(no)) {
+                no = me.currentPage;
+            }
+            this.changeParams(module, no);
+        });
+    }
+    setTotal(value) {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.modelFactory.get(this.modelId);
+        model.set(this.extraDataName + '.total', value);
+        this.changeParams(module);
+    }
+    getTotal() {
+        let model = this.getModel();
+        if (model !== null) {
+            model.query(this.extraDataName + '.total');
+        }
+        return 0;
+    }
+    getTotalName() {
+        return this.totalName;
+    }
+    setPage(value) {
+        let model = this.getModel();
+        if (model !== null) {
+            model.set(this.extraDataName + '.pageNo', value);
+        }
+    }
+    getPage() {
+        let model = this.getModel();
+        if (model !== null) {
+            return model.query(this.extraDataName + '.pageNo');
+        }
+        return 0;
     }
 }
 nodom.PluginManager.add('UI-PAGINATION', UIPagination);
@@ -2808,37 +2857,41 @@ class UIRelationMap extends nodom.Plugin {
         super.beforeRender(module, uidom);
         let model = module.modelFactory.get(uidom.modelId);
         let rowData = model.query(this.listField[1]);
+        if (!rowData) {
+            return;
+        }
         let colData = model.query(this.listField[0]);
+        if (!colData) {
+            return;
+        }
         let data = model.query(this.dataName);
         let idRow = this.valueField[1];
         let idCol = this.valueField[0];
-        if (!module.model.query(this.mapName)) {
-            let mapData = [];
-            let title;
-            for (let d of rowData) {
-                let a1 = [];
-                let id1 = d[idRow];
-                title = d[this.displayField[1]];
-                for (let d1 of colData) {
-                    let active = false;
-                    if (data && data.length > 0) {
-                        for (let da of data) {
-                            if (da[idRow] === id1 && da[idCol] === d1[idCol]) {
-                                active = true;
-                                break;
-                            }
+        let mapData = [];
+        let title;
+        for (let d of rowData) {
+            let a1 = [];
+            let id1 = d[idRow];
+            title = d[this.displayField[1]];
+            for (let d1 of colData) {
+                let active = false;
+                if (data && data.length > 0) {
+                    for (let da of data) {
+                        if (da[idRow] === id1 && da[idCol] === d1[idCol]) {
+                            active = true;
+                            break;
                         }
                     }
-                    a1.push({
-                        id1: id1,
-                        id2: d1[idCol],
-                        active: active
-                    });
                 }
-                mapData.push({ title: title, cols: a1 });
+                a1.push({
+                    id1: id1,
+                    id2: d1[idCol],
+                    active: active
+                });
             }
-            module.model.set(this.mapName, mapData);
+            mapData.push({ title: title, cols: a1 });
         }
+        module.model.set(this.mapName, mapData);
     }
     switchValue(module, dom, model) {
         let pmodel = module.modelFactory.get(this.modelId);
@@ -2936,6 +2989,9 @@ class UISelect extends nodom.Plugin {
         icon.addClass('nd-select-itemicon');
         itemDom.children = [item, icon];
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+            if (!this.multiSelect) {
+                this.hideList(module);
+            }
             me.setValue(module, model);
         }));
         let showDom = new nodom.Element('div');
@@ -3005,8 +3061,8 @@ class UISelect extends nodom.Plugin {
                     me.hideList(module, model);
                 }
             });
-            model = module.modelFactory.get(this.extraModelId);
         }
+        model = module.modelFactory.get(this.extraModelId);
         if (!pmodel) {
             pmodel = module.modelFactory.get(this.modelId);
         }
@@ -3015,89 +3071,99 @@ class UISelect extends nodom.Plugin {
         }
         let data = model.data;
         if (this.listField && data.datas.length === 0 && pmodel.data[this.listField]) {
-            let valueArr;
-            if (this.dataName) {
-                let value = pmodel.query(this.dataName);
-                if (value && value !== '') {
-                    valueArr = value.toString().split(',');
-                }
-            }
-            let txtArr = [];
             let rows = pmodel.query(this.listField);
             if (rows && Array.isArray(rows)) {
-                rows = nodom.Util.clone(rows);
-                for (let d of rows) {
-                    if (valueArr && valueArr.includes(d[this.valueField] + '')) {
-                        d.selected = true;
-                        txtArr.push(d[this.displayField]);
-                    }
-                    else {
-                        d.selected = false;
-                    }
-                }
-                model.set('datas', rows);
-                this.setValue(module);
+                model.set('datas', nodom.Util.clone(rows));
             }
+            this.setValue(module);
         }
+        this.setSelectedAndDisplay(module);
     }
     setValue(module, model) {
+        if (!this.dataName) {
+            return;
+        }
         let pmodel = module.modelFactory.get(this.modelId);
         let model1 = module.modelFactory.get(this.extraModelId);
         let rows = model1.data['datas'];
-        let txtArr = [];
-        let valArr = [];
         let value;
-        if (this.multiSelect) {
-            if (model) {
-                model.set('selected', !model.data.selected);
-            }
-            for (let d of rows) {
-                if (d.selected) {
-                    valArr.push(d[this.valueField]);
-                    txtArr.push(d[this.displayField]);
-                }
-            }
-            if (this.dataName) {
-                value = valArr.join(',');
-            }
-            model1.set('display', txtArr.join(','));
+        if (!model) {
+            value = pmodel.query(this.dataName);
         }
         else {
-            if (model) {
+            if (this.multiSelect) {
+                let valArr = [];
+                model.set('selected', !model.data.selected);
+                for (let d of rows) {
+                    if (d.selected) {
+                        valArr.push(d[this.valueField]);
+                    }
+                }
+                value = valArr.join(',');
+            }
+            else {
                 for (let d of rows) {
                     if (d.selected) {
                         d.selected = false;
                         break;
                     }
                 }
-                model.set('selected', !model.data.selected);
-            }
-            for (let d of rows) {
-                if (d.selected) {
-                    if (this.dataName) {
-                        value = d[this.valueField];
-                    }
-                    model1.set('display', d[this.displayField]);
-                    this.hideList(module, model1);
-                    break;
-                }
+                value = model.query(this.valueField);
             }
         }
         if (value !== this.value) {
             pmodel.set(this.dataName, value);
             if (this.onChange !== '') {
                 let foo;
-                if (typeof this.onChange === 'string') {
+                let tp = typeof this.onChange;
+                if (tp === 'string') {
                     foo = module.methodFactory.get(this.onChange);
                 }
-                else {
+                else if (tp === 'function') {
                     foo = this.onChange;
                 }
-                if (nodom.Util.isFunction(foo)) {
+                if (foo) {
                     foo.apply(null, [model, module, value, this.value]);
                 }
             }
             this.value = value;
+        }
+    }
+    setSelectedAndDisplay(module) {
+        if (!this.dataName) {
+            return;
+        }
+        let pmodel = module.modelFactory.get(this.modelId);
+        let model = module.modelFactory.get(this.extraModelId);
+        let rows = model.data['datas'];
+        if (!rows || rows.length === 0) {
+            return;
+        }
+        let txtArr = [];
+        let value = pmodel.query(this.dataName);
+        if (this.multiSelect) {
+            let va = value.split(',');
+            for (let d of rows) {
+                if (va.includes(d[this.valueField])) {
+                    d.selected = true;
+                    txtArr.push(d[this.displayField]);
+                }
+                else {
+                    d.selected = false;
+                }
+            }
+            model.set('display', txtArr.join(','));
+        }
+        else {
+            for (let d of rows) {
+                if (value == d[this.valueField]) {
+                    d.selected = true;
+                    model.set('display', d[this.displayField]);
+                }
+                else {
+                    d.selected = false;
+                }
+            }
         }
     }
     hideList(module, model) {
@@ -3720,6 +3786,7 @@ class UILoading extends nodom.Plugin {
     constructor(params) {
         super(params);
         this.tagName = 'UI-LOADING';
+        this.openCount = 0;
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {

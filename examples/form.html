@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="css/nodomui.css" />
     <script src='js/nodom.js'></script>
     <script src='../bin/nodomui.js'></script>
-    <script src='../dist/text.js'></script>
     <style>
        form{
            width:500px;
@@ -136,6 +135,7 @@
             methods:{
                 setValue:function(dom,model,module,e){
                     model.set('userName','field');
+                    model.set('education','1');
                 },
                 showDlg:function(dom,model,module,e){
                     model.set('showdlg', true);

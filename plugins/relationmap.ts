@@ -123,37 +123,41 @@ class UIRelationMap extends nodom.Plugin{
         //增加列表格渲染数据
         let model:nodom.Model = module.modelFactory.get(uidom.modelId);
         let rowData = model.query(this.listField[1]);
+        if(!rowData){
+            return;
+        }
         let colData = model.query(this.listField[0]);
+        if(!colData){
+            return;
+        }
         let data = model.query(this.dataName);
         let idRow = this.valueField[1];
         let idCol = this.valueField[0];
-        if(!module.model.query(this.mapName)){
-            let mapData = [];
-            let title:string;
-            for(let d of rowData){
-                let a1 = [];
-                let id1 = d[idRow];
-                title = d[this.displayField[1]];
-                for(let d1 of colData){
-                    let active:boolean = false;    
-                    if(data && data.length>0){
-                        for(let da of data){
-                            if(da[idRow] === id1 && da[idCol] === d1[idCol]){
-                                active = true;
-                                break;
-                            }
+        let mapData = [];
+        let title:string;
+        for(let d of rowData){
+            let a1 = [];
+            let id1 = d[idRow];
+            title = d[this.displayField[1]];
+            for(let d1 of colData){
+                let active:boolean = false;    
+                if(data && data.length>0){
+                    for(let da of data){
+                        if(da[idRow] === id1 && da[idCol] === d1[idCol]){
+                            active = true;
+                            break;
                         }
                     }
-                    a1.push({
-                        id1:id1,
-                        id2:d1[idCol],
-                        active:active
-                    });
                 }
-                mapData.push({title:title,cols:a1});
+                a1.push({
+                    id1:id1,
+                    id2:d1[idCol],
+                    active:active
+                });
             }
-            module.model.set(this.mapName,mapData);
+            mapData.push({title:title,cols:a1});
         }
+        module.model.set(this.mapName,mapData);
     }
 
     /**
