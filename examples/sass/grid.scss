@@ -3,49 +3,71 @@
 /*表格css*/
 .nd-grid{
     box-sizing: border-box;
-    display:flex;
-    flex-direction: column;
     overflow:auto;
-    .nd-grid-row{
-        display: flex;
-        .nd-grid-row-item{
-            flex:1;
-            display:flex;
-            justify-content:center;
-            padding:$nd-padding;
-            align-items:center;
-            img{
-                max-width:100px;
-                max-height:100px;
+    table{
+        overflow:visible;
+        border-color:$nd-color5;
+        table-layout:fixed;
+        border-collapse: collapse;
+        tr{
+            width:100%;
+            td,th{
+                padding:$nd-padding;
+                overflow:hidden;
+                box-sizing: border-box;
+                text-overflow: ellipsis;
+                vertical-align: middle;
+                div{
+                    overflow: hidden;
+                    width:100%;
+                    text-overflow: ellipsis;
+                    white-space: normal;
+                    word-break: break-all;
+                    display:inline-block;
+                }
             }
         }
+    }
+    
+    .nd-grid-body{
+        margin-top:1px;
+        tr{
+            /*左对齐*/
+            td.nd-grid-item-left{
+                justify-content:flex-start;
+            }
 
-        /*左对齐*/
-        .nd-grid-row-item-left{
-            justify-content:flex-start;
-        }
-
-        .nd-grid-sub-btn{
-            @extend .nd-icon-right;
+            .nd-grid-sub-btn{
+                display:inline-block;
+                @extend .nd-icon-right;
+            }
+            
+            /*显示sub的图标旋转*/
+            .nd-grid-showsub{
+                transform:rotate(90deg);
+            }
         }
     }
 
-    > .nd-grid-head{
+    .nd-grid-head{
+        box-sizing:border-box;
         @include nd-color(1);
-        flex-direction: row;
-        text-align:center;
-        font-weight:bold;
-        .nd-grid-row{
-            width:100%;
+        table{
+            height:100% !important;
+        }
+        tr{
             height:$nd-gridhead-height;
+            font-weight:bold;
+            
             /*排序容器*/
             .nd-grid-sort{
-                display:flex;
+                display:inline-flex;
                 flex-direction: column;
                 align-items: center;
-                margin-left:$nd-padding;
-                line-height:10px;
+                line-height:8px;
+                vertical-align: middle;
                 @include nd-color(1);
+                margin-left:3px;
                 /*升序箭头*/
                 .nd-grid-sort-raise{
                     @extend .nd-icon-arrow-up;
@@ -60,49 +82,12 @@
                     cursor: pointer;
                 }
             }
-
-            .nd-grid-sub-btn{
-                width:25px;
-                display:inline-block;
-                &:before{
-                    content:'';
-                }
-            }
         }
 
-        .nd-grid-row-line{
-            border-top:1px solid $nd-color5;
-        }
-    }
-
-    /*图标列*/
-    .nd-grid-iconcol{
-        width:25px;
-        display:flex;
-        justify-content:center;
-        align-items: center;
-    }
-
-    /*tbody*/
-    .nd-grid-body{
-        @include nd-color(1);
-        .nd-grid-row{
-            &:hover{
-                @extend .nd-item-hovercolor;
-            }
-        }
-        .nd-grid-row-line:last-child{
-            border-bottom:1px solid $nd-color5;
-        }
-    }
-
-    /*显示sub的图标旋转*/
-    .nd-grid-showsub{
-        transform:rotate(90deg);
     }
 
     /*每行颜色交错*/
-    .nd-grid-body-rowalt >div:nth-child(even){
+    .nd-grid-rowalt tr:nth-child(even){
         @include nd-color(2);
     }
 
@@ -111,9 +96,6 @@
         display:flex;
         flex-direction: column;
         padding:$nd-padding;
-        border-bottom:1px solid $nd-color5;
-        border-right:1px solid $nd-color5;
-        border-left:1px solid $nd-color5;
         .nd-grid-sub-row{
             display:flex;
             min-height:30px;
@@ -121,7 +103,12 @@
             align-items: center;
             justify-content: space-around;
             flex:1;
+            
             .nd-grid-sub-item{
+                label{
+                    margin-right:$nd-padding;
+                    font-weight:bold;
+                }
                 flex:1;
                 display:flex;
                 align-items: center;
@@ -131,53 +118,40 @@
             }
         }
     }
-    /*行网格线*/
-    .nd-grid-row-line{
-        border-bottom:1px solid $nd-color5;
-    }
+}
+/*行网格线*/
+.nd-grid-row-line{
+    border-bottom:1px solid $nd-color5;
+    border-top:1px solid $nd-color5;
+}
 
-    /*列网格线*/
-    .nd-grid-col-line{
-        > * {
-            border-right:1px solid $nd-color5;
-        }
+.nd-grid-column-line{
+    border-left:1px solid $nd-color5;
+    border-right:1px solid $nd-color5;
+}
 
-        &:first-child{
-            border-left:1px solid $nd-color5;
-        }
-    }
+.nd-grid-top-line{
+    border-top:1px solid $nd-color5;
+}
+
+.nd-grid-all-line{
+    border:1px solid $nd-color5;
 }
 
 .nd-grid-fixed{
-    position:relative;
     overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction: column;
     padding-top:$nd-gridhead-height;
     .nd-grid-head{
-        box-sizing: border-box;
-        padding-right:10px;
-        position:absolute;
         width:100%;
         top:0px;
         left:0px;
+        position:absolute;
+        overflow:hidden !important;
     }
     .nd-grid-body{
         overflow-y:auto;
     }
 }
-
-.nd-grid-pager{
-    padding-top:$nd-padding * 2;
-    text-align:right;
-}
-
-/*容器行线*/
-// .nd-grid-ct-row-line{
-//     border-top:1px solid $nd-color5;
-//     border-bottom:1px solid $nd-color5;
-// }
-
-/*容器列线*/
-// .nd-grid-ct-col-line{
-//     border-left:1px solid $nd-color5;
-//     border-right:1px solid $nd-color5;
-// }

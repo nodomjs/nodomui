@@ -58,14 +58,19 @@ class UISelect extends nodom.Plugin{
     filterMethodId:string;
 
     /**
-     * 值
+     * 值 数组(multi)或单个值
      */
-    value:string;
+    value:any;
 
     /**
      * change 事件或事件名
      */
     onChange:string|Function;
+
+    /**
+     * 是否显示 请选择...
+     */
+    showEmpty:boolean;
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -75,9 +80,9 @@ class UISelect extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool','onchange'],
-                    ['valueField','displayField','multiSelect','listField','listWidth','allowFilter','onChange'],
-                    [null,null,null,null,0,null,'']
+                    ['valuefield','displayfield','multiselect|bool','listfield','listwidth|number','allowfilter|bool','onchange','showempty|bool'],
+                    ['valueField','displayField','multiSelect','listField','listWidth','allowFilter','onChange','showEmpty'],
+                    [null,null,null,null,0,null,'',null]
                 );
             }else if(typeof params === 'object'){
                 for(let o in params){
@@ -143,7 +148,6 @@ class UISelect extends nodom.Plugin{
         let directive:nodom.Directive = new nodom.Directive('repeat','datas',itemDom);
         itemDom.addDirective(directive);
         itemDom.addDirective(new nodom.Directive('class',"{'nd-select-selected':'selected'}",itemDom));
-
         let icon:nodom.Element = new nodom.Element('b');
         icon.addClass('nd-select-itemicon');
         itemDom.children = [item,icon];
@@ -151,9 +155,9 @@ class UISelect extends nodom.Plugin{
         itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
                 if(!this.multiSelect){
-                    this.hideList(module);
+                    this.hideList();
                 }
-                me.setValue(module,model);
+                me.select(model);
             }
         ));
 
@@ -174,7 +178,7 @@ class UISelect extends nodom.Plugin{
         showDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module,e,el)=>{
                 if(model.data.show){
-                    me.hideList(module,model);
+                    me.hideList(model);
                 }else{
                     model.set('show',true);
                     let height = el.offsetHeight;
@@ -199,7 +203,6 @@ class UISelect extends nodom.Plugin{
             showDom.add(queryDom);
         }
         showDom.add(icon);
-
         listDom.children = [itemDom];
         rootDom.children = [showDom,listDom];
     }
@@ -217,7 +220,7 @@ class UISelect extends nodom.Plugin{
         //附加数据model
         let model:nodom.Model;
         if(this.needPreRender){
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             let model:nodom.Model = pmodel.set(this.extraDataName,{
                 show:false,     //下拉框显示
                 display:'',     //显示内容
@@ -225,11 +228,16 @@ class UISelect extends nodom.Plugin{
                 datas:[]        //下拉框数据
             });
 
+            //添加监听下拉数据改变
+            // pmodel.watch(this.listField,(model,field,value)=>{
+            //     this.setListData(module,value);
+            // });
+
             this.extraModelId = model.id;
         
             //增加过滤器方法
-            module.methodFactory.add(this.filterMethodId,function(){
-                let model:nodom.Model = this.modelFactory.get(me.extraModelId);
+            module.addMethod(this.filterMethodId,function(){
+                let model:nodom.Model = this.getModel(me.extraModelId);
                 let rows = model.query('datas');
                 if(rows){
                     return rows.filter( (item)=> {
@@ -241,141 +249,136 @@ class UISelect extends nodom.Plugin{
             //注册click事件到全局事件管理器
             UIEventRegister.addEvent('click',module.id,dom.key,
                 (module:nodom.Module,dom:nodom.Element,inOrout:boolean,e:Event)=>{
-                    let model:nodom.Model = module.modelFactory.get(me.extraModelId);
+                    let model:nodom.Model = module.getModel(me.extraModelId);
                     //外部点击则关闭
                     if(!inOrout && model.data.show){
-                        me.hideList(module,model);
+                        me.hideList(model);
                     }
                 }
             );
         }
 
-        model = module.modelFactory.get(this.extraModelId);
+        model = module.getModel(this.extraModelId);
         if(!pmodel){
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
         }
         
         if(!model){
-            model = module.modelFactory.get(this.extraModelId);
+            model = module.getModel(this.extraModelId);
         }
         
         let data = model.data;
         //下拉值初始化
         if(this.listField && data.datas.length === 0 && pmodel.data[this.listField] ){
             let rows = pmodel.query(this.listField);
-            //复制新数据
-            if(rows && Array.isArray(rows)){
-                //设置下拉数据
-                model.set('datas',nodom.Util.clone(rows));
+            //增加empty 选项
+            if(this.showEmpty){
+                let d = {};
+                d[this.displayField] = NUITipWords.emptySelect;
+                d['selected'] = false;
+                rows.unshift(d);
             }
-            this.setValue(module);
+            model.set('datas',rows);
         }
-
-        //设置选中和显示内容
-        this.setSelectedAndDisplay(module);
+        this.setValue(pmodel.query(this.dataName));
     }
     
     /**
      * 设置数据
      * @param module    模块
-     * @param model     模型
+     * @param value     值
      */
-    setValue(module:nodom.Module,model?:nodom.Model){
+    setValue(value:any){
         if(!this.dataName){
             return;
         }
-        //原model
-        let pmodel = module.modelFactory.get(this.modelId);
-        //附加数据model
-        let model1:nodom.Model = module.modelFactory.get(this.extraModelId);
-        let rows  = model1.data['datas'];
-        let value:string;
-        if(!model){
-            value = pmodel.query(this.dataName);   
-        }else{
-            if(this.multiSelect){
-                //值数组
-                let valArr:string[] = [];
-                //设置选中
-                model.set('selected',!model.data.selected);
-                //获取选中的值
-                for(let d of rows){
-                    if(d.selected){
-                        valArr.push(d[this.valueField]);
-                    }
-                }
-                value = valArr.join(',');
-            }else{
-                //取消选择
-                for(let d of rows){
-                    if(d.selected){
-                        d.selected = false;
-                        break;
-                    }
-                }
-                value = model.query(this.valueField);
-            }
+        if(this.multiSelect && !Array.isArray(value)){
+            value = [value];
         }
-        
-        if(value !== this.value){ 
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        //原model
+        let pmodel = module.getModel(this.modelId);
+        let value1 = pmodel.query(this.dataName);
+        if(value !== value1){ 
             //设置新值
             pmodel.set(this.dataName,value);
             if(this.onChange !== ''){ //change 事件
                 let foo;
                 let tp = typeof this.onChange;
                 if(tp === 'string'){
-                    foo = module.methodFactory.get(<string>this.onChange);
+                    foo = module.getMethod(<string>this.onChange);
                 }else if(tp === 'function'){
                     foo = this.onChange;
                 }
                 if(foo){
-                    foo.apply(null,[model,module,value,this.value]);
+                    foo.apply(null,[pmodel,module,value,this.value]);
                 }
             }
-            this.value = value;
         }
+        this.value = value;
+        this.genSelectedAndDisplay();
     }
 
+    /**
+     * 设置选中或非选中
+     * @param model 
+     */
+    private select(model:nodom.Model){
+        let v = model.data[this.valueField];
+        if(this.multiSelect){
+            if(!this.value){
+                this.value = [];
+            }
+            if(model.data.___selected){
+                let ind = this.value.indexOf(v);
+                if(ind !== -1){
+                    this.value.splice(ind,1);
+                }
+            }else{
+                this.value.push(v);
+            }
+        }else{
+            if(!model.data.___selected){
+                this.value = v;
+            }
+        }
+        this.setValue(this.value);
+    }
     /**
      * 设置选中和显示内容
      * @param module    模块
      */
-    setSelectedAndDisplay(module:nodom.Module){
+    genSelectedAndDisplay(){
         if(!this.dataName){
             return;
         }
-        //原model
-        let pmodel = module.modelFactory.get(this.modelId);
+        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
         //附加数据model
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
-        let rows  = model.data['datas'];
-        if(!rows || rows.length === 0){
-            return;
-        }
-        let txtArr:string[] = [];
-        let value:string = pmodel.query(this.dataName);
-        
+        let model:nodom.Model = module.getModel(this.extraModelId);
+        let text;
         if(this.multiSelect){
-            let va = value.split(',');
-            for(let d of rows){
-                if(va.includes(d[this.valueField])){
-                    d.selected = true;
-                    txtArr.push(d[this.displayField]);
-                }else{
-                    d.selected = false;
+            let ta = [];
+            if(!this.value){
+                return;
+            }
+            for(let d of model.data.datas){
+                d.___selected = this.value.includes(d[this.valueField]);
+                if(d.___selected){
+                    ta.push(d[this.displayField]);
                 }
             }
-            model.set('display',txtArr.join(','));
+            text = ta.join(',');
         }else{
-            for(let d of rows){
-                if(value ==  d[this.valueField]){
-                    d.selected = true;
-                    model.set('display',d[this.displayField]);
+            for(let d of model.data.datas){
+                if(this.value === d[this.valueField]){
+                    text = d[this.displayField];
+                    d.___selected = true;
                 }else{
-                    d.selected = false;
+                    d.___selected = false;
                 }
             }
         }
+        model.set('display',text);
     }
 
     /**
@@ -383,9 +386,10 @@ class UISelect extends nodom.Plugin{
      * @param module module
      * @param model  附加model   
      */
-    hideList(module:nodom.Module,model?:nodom.Model){
+    hideList(model?:nodom.Model){
         if(!model){
-            model = module.modelFactory.get(this.extraModelId);
+            let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+            model = module.getModel(this.extraModelId);
         }
         model.set('show',false);
         model.set('query','');

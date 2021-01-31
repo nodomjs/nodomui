@@ -161,7 +161,7 @@ class UITip extends nodom.Plugin{
             return;
         }
         let needCheck:boolean = false;
-        let model:nodom.Model = nodom.ModuleFactory.getMain().modelFactory.get(this.modelId);
+        let model:nodom.Model = nodom.ModuleFactory.getMain().getModel(this.modelId);
         let ct:number = new Date().getTime();
         
         for(let loc of ['top','right','bottom','left']){

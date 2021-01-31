@@ -30,6 +30,7 @@ module.exports = function (grunt) {
             './plugins/radio.ts',
             './plugins/relationmap.ts',
             './plugins/select.ts',
+            // './plugins/selectgroup.ts',
             './plugins/tab.ts',
             './plugins/tip.ts',
             './plugins/toolbar.ts',

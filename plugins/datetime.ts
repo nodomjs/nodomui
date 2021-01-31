@@ -148,7 +148,7 @@ class UIDatetime extends nodom.Plugin{
         btnOk.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
             e.preventDefault();
             model.set('show',false);
-            let pmodel:nodom.Model = module.modelFactory.get(me.modelId);
+            let pmodel:nodom.Model = module.getModel(me.modelId);
             pmodel.set(this.dataName,me.genValueStr());
         }));
         
@@ -166,7 +166,7 @@ class UIDatetime extends nodom.Plugin{
         let me = this;
         super.beforeRender(module,uidom);
         this.listKey = uidom.children[1].key;
-        let model:nodom.Model = module.modelFactory.get(uidom.modelId);
+        let model:nodom.Model = module.getModel(uidom.modelId);
         
         if(this.needPreRender){
             //设置附加数据项
@@ -277,7 +277,7 @@ class UIDatetime extends nodom.Plugin{
         daySpan.add(txt);
         
         //日期点击事件
-        daySpan.addEvent(new nodom.NodomEvent('click',':delg',(dom,model,module)=>{
+        daySpan.addEvent(new nodom.NodomEvent('click',(dom,model,module)=>{
             let data = model.data;
             if(data.disable){
                 return;
@@ -317,7 +317,7 @@ class UIDatetime extends nodom.Plugin{
         item.add(txt);
         hourDom.add(item);
         
-        item.addEvent(new nodom.NodomEvent('click',':delg',
+        item.addEvent(new nodom.NodomEvent('click',
             (dom,model,module,e,el)=>{
                 me.selectTime(module,dom,model);
             }
@@ -383,7 +383,7 @@ class UIDatetime extends nodom.Plugin{
             });
         }
         
-        let model:nodom.Model = module.modelFactory.get(this.pickerModelId);
+        let model:nodom.Model = module.getModel(this.pickerModelId);
         model.set('year',year);
         model.set('month',month);
         model.set('days',dayArr);
@@ -394,7 +394,7 @@ class UIDatetime extends nodom.Plugin{
      * @param module 
      */
     genTimes(module:nodom.Module){
-        let model:nodom.Model = module.modelFactory.get(this.pickerModelId);
+        let model:nodom.Model = module.getModel(this.pickerModelId);
         let hours=[];
         let minutes=[];
         let seconds=[];
@@ -454,7 +454,7 @@ class UIDatetime extends nodom.Plugin{
      * @param distance 
      */
     changeMonth(module:nodom.Module,distance:number){
-        let model = module.modelFactory.get(this.pickerModelId);
+        let model = module.getModel(this.pickerModelId);
         let year = model.query('year');
         let month = model.query('month');
         
@@ -488,8 +488,8 @@ class UIDatetime extends nodom.Plugin{
             if(str === ''){
                 return;
             }
-            let model:nodom.Model = module.modelFactory.get(this.modelId);
-            let model1:nodom.Model = module.modelFactory.get(this.pickerModelId);        
+            let model:nodom.Model = module.getModel(this.modelId);
+            let model1:nodom.Model = module.getModel(this.pickerModelId);        
             if(this.type === 'date' || this.type === 'datetime'){
                 let date:Date = new Date(str);    
                 if(date.toTimeString() !== 'Invalid Date'){
@@ -527,7 +527,7 @@ class UIDatetime extends nodom.Plugin{
      */
     selectDate(module:nodom.Module,model?:any){
         //把selected的项置false
-        let pmodel = module.modelFactory.get(this.pickerModelId);
+        let pmodel = module.getModel(this.pickerModelId);
         if(pmodel){
             let days = pmodel.query('days');
             for(let d of days){
@@ -554,7 +554,7 @@ class UIDatetime extends nodom.Plugin{
      */
     selectTime(module:nodom.Module,dom:nodom.Element,model?:any){
         //把selected的项置false
-        let pmodel = module.modelFactory.get(this.pickerModelId);
+        let pmodel = module.getModel(this.pickerModelId);
         let role = dom.getProp('role');
         if(pmodel){
             let datas = pmodel.query(role+'s');
@@ -566,7 +566,7 @@ class UIDatetime extends nodom.Plugin{
             }
         }
         if(!model){
-            model = module.modelFactory.get(dom.modelId);
+            model = module.getModel(dom.modelId);
         }
         if(model){
             model.set('selected',true);
@@ -606,7 +606,7 @@ class UIDatetime extends nodom.Plugin{
      */
     setTimeSelect(module:nodom.Module){
         let me = this;
-        let model:nodom.Model = module.modelFactory.get(this.pickerModelId);
+        let model:nodom.Model = module.getModel(this.pickerModelId);
         let data = [this.hour,this.minute,this.second];
         ['hours','minutes','seconds'].forEach((item,i)=>{
             let datas = model.query(item);
@@ -637,7 +637,7 @@ class UIDatetime extends nodom.Plugin{
             }
 
             data.forEach((item,i)=>{
-                let el:HTMLElement = module.container.querySelector("[key='"+ timeCt.children[i].key +"']");
+                let el:HTMLElement = module.getNode(timeCt.children[i].key);
                 el.scrollTo(0,data[i]*30);
             });
         }

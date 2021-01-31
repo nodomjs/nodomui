@@ -7,6 +7,7 @@
 		record:'条',
 		NO:'第',
 		page:'页',
+		emptySelect:'请选择...',
 		weekday:{
 			sunday:'日',
 			monday:'一',

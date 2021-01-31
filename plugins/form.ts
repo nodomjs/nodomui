@@ -46,16 +46,28 @@ class UIForm extends nodom.Plugin{
         rootDom.addClass('nd-form');    
         
         for(let c of rootDom.children){
-            if(!c.tagName){
+            if(c.tagName !== 'ROW'){
                 continue;
             }
-            c.addClass('nd-form-item');
+            //row div
+            c.tagName = 'DIV';
+            c.addClass('nd-form-row');
             if(c.children){
                 for(let c1 of c.children){
-                    //修改label width
-                    if(c1.tagName === 'LABEL'){
-                        c1.assets.set('style','width:' + this.labelWidth + 'px');
-                        break;
+                    if(c1.tagName !== 'ITEM'){
+                        continue;
+                    }
+                    //item div
+                    c1.tagName = 'DIV';
+                    c1.addClass('nd-form-item');
+                    if(c1.children){
+                        for(let c2 of c1.children){
+                            //修改label width
+                            if(c2.tagName === 'LABEL'){
+                                c2.assets.set('style','width:' + this.labelWidth + 'px');
+                                break;
+                            }
+                        }
                     }
                 }
             }

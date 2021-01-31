@@ -93,7 +93,7 @@ class UIAccordion extends nodom.Plugin{
                 item.addClass('nd-accordion-first');
                 //增加事件
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.addEvent(new nodom.NodomEvent('click', methodId+':delg'));
+                item.addEvent(new nodom.NodomEvent('click', methodId));
                 this.method1 = methodId;
                 
                 activeName1 = item.getProp('activename') || 'active';
@@ -127,7 +127,7 @@ class UIAccordion extends nodom.Plugin{
                 this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
                 if(item.hasProp('itemclick')){
-                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick')+':delg'));
+                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick')));
                 }
                 item.addDirective(new nodom.Directive('class',"{'nd-accordion-selected':'"+ activeName2 +"'}",item));
                 secondDom.addClass('nd-accordion-secondct');
@@ -151,9 +151,9 @@ class UIAccordion extends nodom.Plugin{
         //添加第一层click事件
         if(this.needPreRender){
 
-            module.methodFactory.add(this.method1,
+            module.addMethod(this.method1,
                 (dom,model,module,e) => {
-                    let pmodel:nodom.Model = module.modelFactory.get(uidom.modelId);
+                    let pmodel:nodom.Model = module.getModel(uidom.modelId);
                     let data = pmodel.query(me.field1);
                     //选中字段名
                     let f:string = me.active1;
@@ -168,9 +168,9 @@ class UIAccordion extends nodom.Plugin{
             );
 
             //添加第二层click事件
-            module.methodFactory.add(this.method2,
+            module.addMethod(this.method2,
                 (dom,model,module,e) => {
-                    let pmodel:nodom.Model = module.modelFactory.get(uidom.modelId);
+                    let pmodel:nodom.Model = module.getModel(uidom.modelId);
                     let data = pmodel.data[me.field1];
                     //选中字段名
                     let f:string = me.active2;

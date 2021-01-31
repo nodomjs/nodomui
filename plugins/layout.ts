@@ -99,7 +99,7 @@ class UILayout extends nodom.Plugin{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         if(this.needPreRender){
-            let model:nodom.Model = module.modelFactory.get(dom.modelId);
+            let model:nodom.Model = module.getModel(dom.modelId);
             model.set(this.extraDataName,{
                 openWest:true,  //west是否展开
                 openEast:true,  //east是否展开

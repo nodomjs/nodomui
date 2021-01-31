@@ -71,14 +71,45 @@ class UIPagination extends nodom.Plugin{
     extraModelId:number;
 
     /**
+     * 页面总数
+     */
+    private pageCount:number = 0;
+
+    /**
+     * 数据记录总数
+     */
+    private recordCount:number = 0;
+    /**
+     * 数据url
+     */
+    private dataUrl:string;
+
+    /**
+     * 请求页号 name
+     */
+    private pageName:string;
+
+    /**
+     * 请求 页面大小 name
+     */
+    private sizeName:string;
+    
+    /**
+     * 请求参数对戏，当dataUrl存在时有效
+     */
+    private params:object = {};
+
+
+
+    /**
      * 变化事件 方法名或函数，如果为方法名，则属于module的method factory
      */
     onChange:string|Function;
 
     /**
-     * 请求参数名 [页号,页面大小] 默认为[]
+     * 请求返回后响应事件
      */
-    requestName:string[];
+    onReq:string|Function;
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -88,9 +119,9 @@ class UIPagination extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','onchange','requestname|array|2'],
-                    ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','onChange','requestName'],
-                    ['total',10,1,null,null,10,[],0,'',[]]);
+                    ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','dataurl','pagename','sizename','onchange','onreq'],
+                    ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','dataUrl','pageName','sizeName','onChange','onReq'],
+                    ['total',10,1,null,null,10,[],0,'','page','size','','']);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -150,11 +181,7 @@ class UIPagination extends nodom.Plugin{
                 dataName:'pageSize',
                 listField:'sizeData',
                 displayField:'text',
-                valueField:'value',
-                onChange:(model,module,newValue,oldValue)=>{
-                    me.changeParams(module);
-                    me.update(module);
-                }
+                valueField:'value'
             }).element);
         }
 
@@ -192,11 +219,12 @@ class UIPagination extends nodom.Plugin{
         pageCt.add(right1);
 
         rootDom.add(pageCt);
-        //点击事件
+
+        //页面号点击事件
         page.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
-                me.changeParams(module,model.data['no']);
-                me.update(module);
+                let model1:nodom.Model = module.getModel(this.extraModelId);
+                model1.set('pageNo',model.data['no']);
             }
         ));
         left.addEvent(new nodom.NodomEvent('click',
@@ -204,8 +232,10 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.changeParams(module,-1,true);
-                me.update(module);
+                if(this.currentPage === 1){
+                    return;
+                }
+                model.set('pageNo',--this.currentPage);
             }
         ));
 
@@ -214,8 +244,10 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                me.changeParams(module,1,true);
-                me.update(module);
+                if(this.currentPage === this.pageCount){
+                    return;
+                }
+                model.set('pageNo',++this.currentPage);
             }
         ));
 
@@ -224,9 +256,11 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                let step = me.currentPage - me.steps < 1 ? -me.currentPage+1:-me.steps;
-                me.changeParams(module,step,true);
-                me.update(module);
+                let page = me.currentPage - me.steps;
+                if(page < 1){
+                    page = 1;
+                }
+                model.set('pageNo',page);
             }
         ));
 
@@ -235,10 +269,11 @@ class UIPagination extends nodom.Plugin{
                 if(dom.hasClass('nd-pagination-disable')){
                     return;
                 }
-                let step = me.steps + me.currentPage > me.maxPage ? me.maxPage - me.currentPage:me.steps;
-
-                me.changeParams(module,step,true);
-                me.update(module);
+                let page = me.currentPage + me.steps;
+                if(page > this.pageCount){
+                    page = this.pageCount;
+                }
+                model.set('pageNo',page);
             }
         ));
         //显示第x页及输入框
@@ -264,6 +299,109 @@ class UIPagination extends nodom.Plugin{
     }
 
     /**
+     * 计算最大最小页号
+     * @param module 
+     * @param steps 
+     */
+    private cacMinMax(module:nodom.Module){
+        let step = this.showNum / 2 | 0;
+        this.minPage = this.currentPage - step;
+        this.maxPage = this.currentPage + step;
+        if(this.minPage < 1){
+            this.minPage = 1;
+        }
+        if(this.minPage > this.pageCount){
+            this.minPage = this.pageCount;
+        }
+        if(this.maxPage < 1){
+            this.maxPage = 1;
+        }
+        if(this.maxPage > this.pageCount){
+            this.maxPage = this.pageCount;
+        }
+        if(this.pageCount > this.showNum){
+            //补全页码个数为 showNum
+            let d = this.maxPage + 1 - this.minPage  - this.showNum;
+            if(d < 0){  //数量不够
+                if(this.maxPage === this.pageCount){
+                    this.minPage += d;
+                }else{
+                    this.maxPage -= d;
+                }
+            }else if(d>0){ //数量多了
+                if(this.maxPage === this.pageCount){
+                    this.minPage += d;
+                }else{
+                    this.maxPage -= d;
+                }
+            }
+        }
+    }
+
+    /**
+     * 添加数据项watch
+     * @param pmodel    插件外部模型
+     * @param model     插件内部模型
+     */
+    private addWatch(pmodel:nodom.Model,model:nodom.Model){
+        //增加页面号
+        model.watch('pageNo',(module,field,value)=>{
+            if(typeof value === 'string'){
+                value = parseInt(value);
+            }
+            //设置当前页
+            this.currentPage = value;
+            this.cacMinMax(module);
+            this.changeParams(module);
+            this.doChangeEvent(module);
+            this.doReq(module);
+        });
+
+        //监听页面大小
+        model.watch('pageSize',(module,field,value)=>{
+            if(typeof value === 'string'){
+                value = parseInt(value);
+            }
+            //设置页面大小
+            this.pageSize = value;
+            this.pageCount = Math.ceil(this.recordCount/this.pageSize);
+            this.cacMinMax(module);
+            this.changeParams(module);
+            this.doChangeEvent(module);
+            this.doReq(module);
+        });
+
+        //监听total
+        model.watch('total',(module,field,value)=>{
+            let old = this.pageCount;
+            this.recordCount = value;
+            this.pageCount = Math.ceil(this.recordCount/this.pageSize);
+            this.cacMinMax(module);
+            this.changeParams(module);
+            
+            //total修改导致页面减少，且当前页超出最大页
+            if(this.currentPage >= this.pageCount){
+                model.set('pageNo',this.pageCount-1);
+            }
+
+            //旧页面数为0
+            if(this.pageCount>0 && old === 0){ 
+                model.set('pageNo',1);
+            }
+            //保持父对象同步
+            pmodel.data[this.totalName] = value;
+        });
+        
+        //监听父对象total
+        pmodel.watch(this.totalName,(module,field,value)=>{
+            if(typeof value === 'string'){
+                value = parseInt(value);
+            }
+            model.set('total',value);
+        });
+    }
+
+    /**
      * 渲染前置方法
      * @param module 
      * @param uidom 
@@ -274,128 +412,37 @@ class UIPagination extends nodom.Plugin{
     }
     
     /**
-     * 设置当前值
-     * @param module    模块
-     * @param current   当前页或位移量
-     * @param isStep    如果true current为位移量
-     */
-    private update(module:nodom.Module,current?:number,isStep?:boolean){
-        //onchange 事件执行
-        if(this.onChange !== ''){
-            let foo:Function;
-            if(typeof this.onChange === 'string'){
-                foo = module.methodFactory.get(this.onChange);
-            }else if(nodom.Util.isFunction(this.onChange)){
-                foo = this.onChange;
-            }
-            if(foo){
-                foo.apply(this,[module,this.currentPage,this.pageSize]);
-            }
-        }
-    }
-
-    /**
      * 改变pagination 参数
      * @param module    模块
-     * @param current   当前页或位移量
-     * @param isStep    如果true，则current为位移量
      */
-    public changeParams(module:nodom.Module,current?:number,isStep?:boolean){
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
-        // 如果不存在total数据，则从模块中获取
-        let data = model.query(this.extraDataName);
-        let total = data.total;
-        if(!total){
-            let data1 = model.data;
-            if(data1 && data1[this.totalName]){
-                total = data1[this.totalName];
-            }
-            if(total){
-                data.total = total;
-            }
+    private changeParams(module?:nodom.Module){
+        if(!module){
+            module = nodom.ModuleFactory.get(this.moduleId);
         }
         
-        //表示是步数
-        if(isStep){
-            current = this.currentPage + current;
-        }
-        if(!total){
-            return;
-        }
-        
-        //子model
-        model = model.get(this.extraDataName);
-        let pageSize = model.data['pageSize'];
-        //设置pagesize，切换到第一页
-        if(!current){
-            let d = model.query('pageNo');
-            if(typeof d === 'string' && d!==''){
-                //转换为数值
-                d = parseInt(d);
-            }
-            current = d||1;
-        }
-        
-        //页面数
-        let pageCount:number = Math.ceil(total/pageSize);
-        
-        //限定current在页面范围内
-        if(current > pageCount){
-            current = pageCount;
-        }else if(current < 1){
-            current = 1;
-        }
-        let min:number=1;
-        let max:number;
         let btnAllow:number = 0;
-        //页面数>显示数
-        if(pageCount>this.showNum){
-            //中心的位置
-            let center:number = (this.showNum+1)/2 | 0;
-            if(current - center + 1 > 0){
-                min = current  - center  + 1;
-            }
-            if(min < 1){
-                min = 1;
-            }else if (min + this.showNum - 1 > pageCount) {
-                min = pageCount - this.showNum + 1;
-            }
-            max = min + this.showNum - 1;
-        }else{
-            min = 1;
-            max = pageCount;
-        }
-
-        if(current === pageCount){
-            btnAllow += 12;
-        }
-        if(current === 1){
-            btnAllow += 3;
-        }
-        
-        //参数未改变，则不渲染
-        if(model.query('pageSize') === this.pageSize && current === this.currentPage && min === this.minPage && max === this.maxPage){
-            return;
-        }
         //页面号数据数组
         let pageArr = [];
-        for(let i=min;i<=max;i++){
-            let active:boolean = i===current?true:false;
+        
+        for(let i=this.minPage;i<=this.maxPage;i++){
             pageArr.push({
                 no:i,
-                active:active
+                active: i===this.currentPage?true:false
             });
         }
-        this.currentPage = current;
-        this.minPage = min;
-        this.maxPage = max;
-        this.pageSize = model.data['pageSize'];
-        model.set('pages',pageArr);
-        model.set('pageSize',this.pageSize);
-        //设置当前页
-        model.set('pageNo',current);
+
+        if(this.currentPage === 1){
+            btnAllow = 3;
+        }else if(this.currentPage === this.pageCount){
+            btnAllow = 12;
+        }else{
+            btnAllow = 0;
+        }
+        
+        let model:nodom.Model = module.getModel(this.extraModelId);
         //设置箭头状态值
         model.set('btnAllow',btnAllow);
+        model.set('pages',pageArr);
     }
     /**
      * 只执行一次的初始化
@@ -403,18 +450,17 @@ class UIPagination extends nodom.Plugin{
      * @param module
      */
     private handleInit(dom:nodom.Element,module:nodom.Module){
-        const me = this;
         if(!this.needPreRender){
             return;
         }
-        let model:nodom.Model = module.modelFactory.get(dom.modelId);
+        let model:nodom.Model = module.getModel(dom.modelId);
+        let total = model.query(this.totalName) || 0;
         let model1:nodom.Model = model.set(this.extraDataName,{
-            //总条数
-            total:0,
+            total:total,
             //页面数
             pageNum:0,
             //页号
-            pageNo:this.currentPage || 1,
+            pageNo:0,
             //页面大小
             pageSize:this.pageSize,
             /**
@@ -428,22 +474,16 @@ class UIPagination extends nodom.Plugin{
             //页面数数组
             sizeData:this.pageSizeDatas || [10,20,30,50]
         });
-
+        
+        this.pageCount = Math.ceil(total/this.pageSize);
+        this.cacMinMax(module);
+        
         //附加数据模型
         this.extraModelId = model1.id;
-        this.changeParams(module,1);
-        //增加监听
-        model1.watch('pageNo',()=>{
-            let no = model1.query('pageNo');
-            try{
-                no = parseInt(no);
-            }catch(e){
-            }
-            if(isNaN(no)){
-                no = me.currentPage;
-            }
-            this.changeParams(module,no);
-        });
+        this.addWatch(model,model1);
+        if(this.pageCount > 0 || this.dataUrl !== ''){
+            this.setPage(1);
+        }
     }
 
     /**
@@ -452,7 +492,7 @@ class UIPagination extends nodom.Plugin{
      */
     public setTotal(value:number){
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
+        let model:nodom.Model = module.getModel(this.modelId);
         model.set(this.extraDataName + '.total',value);
         this.changeParams(module);
     }
@@ -483,6 +523,7 @@ class UIPagination extends nodom.Plugin{
      */
     public setPage(value:number){
         let model:nodom.Model = this.getModel();
+        
         if(model!==null){
             model.set(this.extraDataName + '.pageNo',value);
         }
@@ -499,6 +540,103 @@ class UIPagination extends nodom.Plugin{
         }
         return 0;
     }
+
+    /**
+     * 设置参数值
+     * @param name      参数名 
+     * @param value     参数值
+     */
+    public setParam(name,value){
+        this.params[name] = value;
+    }
+
+    /**
+     * 获取参数值
+     * @param name      参数名 
+     * @returns         参数值
+     */
+    public getParam(name:string):any{
+        return this.params[name];
+    }
+    /**
+     * 请求数据
+     */
+    private doReq(module?:nodom.Module){
+        if(this.dataUrl === ''){
+            return;
+        }
+        if(!module){
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        
+        //复制参数
+        let params = nodom.Util.clone(this.params);
+        params[this.pageName] = this.currentPage;
+        params[this.sizeName] = this.pageSize;
+        
+        nodom.request({
+            url:this.dataUrl,
+            params:params,
+            type:'json'
+        }).then(r=>{
+            if(!r){
+                return;
+            }
+            if(r.total){
+                this.setTotal(r.total);
+            }else if(Array.isArray(r)){ //无total且结果为数组，则设置total为数组长度
+                this.setTotal(r.length);
+            }
+            this.doReqEvent(r,module);
+        });
+    }
+
+    /**
+     * 执行change事件
+     * @param module    模块
+     */
+    private doChangeEvent(module?:nodom.Module){
+        if(this.onChange === ''){
+            return;
+        }
+        if(!module){
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let foo:Function;
+        if(typeof this.onChange === 'string'){
+            this.onChange = module.getMethod(this.onChange);
+        }else if(nodom.Util.isFunction(this.onChange)){
+            foo = this.onChange;
+        }
+        if(foo){
+            foo.apply(this,[module,this.currentPage,this.pageSize]);
+        }
+    }
+
+    /**
+     * 执行请求后事件
+     * @param data 
+     * @param module 
+     */
+    private doReqEvent(data:any,module?:nodom.Module){
+        if(this.onReq === ''){
+            return;
+        }
+        if(!module){
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        // onReq事件
+        let foo:Function;
+        if(typeof this.onReq === 'string'){
+            this.onReq = module.getMethod(this.onReq);
+        }else if(nodom.Util.isFunction(this.onReq)){
+            foo = this.onReq;
+        }
+        if(foo){
+            foo.apply(this,[module,data]);
+        }
+    }
+
 }
 
 nodom.PluginManager.add('UI-PAGINATION',UIPagination);

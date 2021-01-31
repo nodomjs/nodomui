@@ -243,7 +243,7 @@ class UIFile extends nodom.Plugin{
      * @param id        res id
      */
     private removeFile(module:nodom.Module,id:any){
-        let pm:nodom.Model = module.modelFactory.get(this.modelId);
+        let pm:nodom.Model = module.getModel(this.modelId);
         let rows = pm.query(this.dataName);
         //从上传结果中删除
         if(Array.isArray(rows)){
@@ -259,7 +259,7 @@ class UIFile extends nodom.Plugin{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         if(this.needPreRender){
-            let model = module.modelFactory.get(dom.modelId);
+            let model = module.getModel(dom.modelId);
             //增加附加model
             if(model){
                 model.set(this.extraDataName,{

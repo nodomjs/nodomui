@@ -104,6 +104,10 @@ class UIGrid extends nodom.Plugin{
     extraModelId:string;
 
     /**
+     * 默认列宽
+     */
+    defaultColWidth:number;
+    /**
      * 全选字段名(checkbox时有效)
      */
     wholeCheckName:string;
@@ -111,6 +115,30 @@ class UIGrid extends nodom.Plugin{
      * 分页插件
      */
     pagination:UIPagination;
+
+    /**
+     * 是否显示详情
+     */
+    showDetail:boolean;
+
+    /**
+     * 显示子属性名
+     */
+    private subName:string;
+
+    /**
+     * 选中属性名
+     */
+    private checkName:string;
+
+    /**
+     *  滚动变量数据
+     */
+    private scrollName:string;
+    /**
+     * repeat 指令
+     */
+    private repeatDirective:nodom.Directive;
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -120,9 +148,9 @@ class UIGrid extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','checkbox|bool','hidehead|bool','dataurl'],
-                    ['dataName','rowAlt','sortable','gridLine','fixHead','checkbox','hideHead','dataUrl'],
-                    ['rows',null,null,'',null,null,null,null,null]);
+                    ['dataname','rowalt|bool','sortable|bool','gridline','fixhead|bool','checkbox|bool','hidehead|bool','dataurl','defaultcolwidth|number'],
+                    ['dataName','rowAlt','sortable','gridLine','fixHead','checkbox','hideHead','dataUrl','defaultColWidth'],
+                    ['rows',null,null,'',null,null,null,'',0]);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -131,7 +159,6 @@ class UIGrid extends nodom.Plugin{
             rootDom.tagName = 'div';
             rootDom = this.generate(rootDom);
         }
-        
         rootDom.plugin = this;
         this.element = rootDom;
     }
@@ -145,6 +172,12 @@ class UIGrid extends nodom.Plugin{
         //生成附加数据名
         this.extraDataName = '$ui_grid_' + nodom.Util.genId();
 
+        //生成行数据附加名
+        let genName = '$ui_grid_' + nodom.Util.genId();
+        this.subName = genName + '_showSub';
+        this.checkName = genName + '_checked';
+        this.scrollName = genName + '_scroll';
+
         if(this.fixHead){
             rootDom.addClass('nd-grid-fixed');
         }
@@ -154,18 +187,24 @@ class UIGrid extends nodom.Plugin{
         }
 
         //头部，如果隐藏则不显示
-        let thead:nodom.Element
+        let headTbl:nodom.Element;
+        let thead:nodom.Element;
         if(!this.hideHead){
             thead = new nodom.Element('div');
             thead.addClass('nd-grid-head');
+            headTbl = new nodom.Element('table');
+            thead.add(headTbl);
         }
         
         //tbody
         let tbody:nodom.Element = new nodom.Element('div');
         tbody.addClass('nd-grid-body');
         if(this.rowAlt){
-            tbody.addClass('nd-grid-body-rowalt');
+            tbody.addClass('nd-grid-rowalt');
         }
+
+        let bodyTbl:nodom.Element = new nodom.Element('table');
+        tbody.add(bodyTbl);
 
         //数据行dom
         let rowDom:nodom.Element;
@@ -178,204 +217,272 @@ class UIGrid extends nodom.Plugin{
             if(c.tagName === 'COLS'){
                 rowDom = c;
             }else if(c.tagName === 'SUB'){
+                this.showDetail = true;
                 subDom = c;
             }else if(c.plugin && c.plugin.tagName === 'UI-PAGINATION'){
                 pagination = c;
             }
         }
         
-        if(rowDom){
-            this.rowDomKey = rowDom.key;
-            //每一行包括行数据和subpanel，所以需要rowDom作为容器，dataDom作为数据行，subDom最为子panel
-            //增加repeat指令
-            let filter:nodom.Filter;
-            //设置选择页数据
-            if(pagination){
-                this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
-                filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
-            }
-            let directive:nodom.Directive = new nodom.Directive('repeat',this.extraDataName + '.' + this.dataName,rowDom);
-            if(filter){
-                directive.filters = [filter];
-            }
-            rowDom.addDirective(directive);
+        if(!rowDom){
+            return;
+        }
+        //增加repeat指令
+        // let filter:nodom.Filter;
+        // //设置选择页数据
+        // if(pagination){
+        //     this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
+        //     filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
+        // }
             
-            rowDom.tagName = 'div';
-
-            //第一个孩子
-            let dataDom:nodom.Element = new nodom.Element('div');
-            dataDom.addClass('nd-grid-row');
-            //网格线
-            if(this.gridLine === 'col' || this.gridLine === 'both'){
-                dataDom.addClass('nd-grid-col-line');
+        //处理所有td
+        for(let c of rowDom.children){
+            //不带tagname的直接删除
+            if(!c.tagName){
+                continue;
             }
 
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                dataDom.addClass('nd-grid-row-line');
-            }
-
-            //处理所有td
-            for(let i=0;i<rowDom.children.length;i++){
-                let c = rowDom.children[i];
-                //不带tagname的直接删除
-                if(!c.tagName){
-                    rowDom.children.splice(i--,1);
-                    continue;
-                }
-
-                //隐藏列不显示
-                if(c.hasProp('hide')){
-                    c.delProp('hide');
-                    continue;
-                }
-                
-                let field:string = c.getProp('field');
-                if(field){
-                    field = field.trim();
-                }
-                //暂存field
-                this.fields.push( {
-                    title:c.getProp('title'),
-                    field:field,
-                    expressions:c.children[0].expressions
-                });
-                //添加到头部
-                this.addToHead(c,i,thead,field);
-                
-                //td
-                let tdIn:nodom.Element = c.children[0];
-
-                switch(c.getProp('type')){
-                    case 'img':
-                        tdIn.tagName = 'img';
-                        tdIn.setProp('src',tdIn.expressions,true);
-                        c.children = [tdIn];
-                        delete tdIn.expressions;
-                        break;
-                }
-                c.tagName='div';
-                c.addClass('nd-grid-row-item');
-                //表格内容左对其
-                if(c.hasProp('left')){
-                    c.addClass('nd-grid-row-item-left');
-                }
-                //设置自定义flex
-                if(c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))){
-                    c.setProp('style','flex:' + c.getProp('width'));
-                }
-                
-                dataDom.add(c);
-                c.delProp(['title','type','width','field','notsort','left']);
+            let field:string = c.getProp('field');
+            if(field){
+                field = field.trim();
             }
             
-            //替换孩子节点
-            rowDom.children = [dataDom];
-            rowDom.delProp('data');
-            //checkbox
-            if(this.checkbox){
-                this.handleCheck(thead,dataDom,rowDom);
-            }
-            //带子容器
-            if(subDom){
-                this.handleSub(subDom,thead,dataDom,rowDom);
-            }
-            tbody.add(rowDom);
+            //暂存field
+            this.fields.push({
+                title:c.getProp('title'),
+                field:field,
+                type:0,  //0 数据表格, 1 子表格 ,2 checkbox
+                notsort:c.hasProp('notsort'),
+                children: c.children,
+                hide:c.hasProp('hide'),
+                width: c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))?c.getProp('width'):this.defaultColWidth
+            });
         }
         
-        if(thead){
+        if(this.checkbox){
+            this.fields.unshift({
+                type:2,
+                width:45,
+            })
+        }
+
+        if(this.showDetail){
+            this.fields.unshift({
+                type:1,
+                width:45,
+            })
+        }
+
+        this.handleBody(bodyTbl,this.fields,subDom);
+        if(headTbl){
+            this.handleHead(headTbl,this.fields);
             rootDom.children=[thead,tbody];
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                rootDom.addClass('nd-grid-ct-row-line');
-            }
         }else{
             rootDom.children=[tbody];
         }
-
-        if(this.gridLine === 'row' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-row-line');
-        }
-
-        if(this.gridLine === 'col' || this.gridLine === 'both'){
-            rootDom.addClass('nd-grid-ct-col-line');
-        }
         
-        
-        //如果有分页，则需要在外添加容器
-        if(pagination){
-            pagination.addClass('nd-grid-pager');
-            this.handlePagination(pagination);
-            rootDom.add(pagination);
-        }
+        //网格线
+        this.handleGridLine(tbody,thead);
+        this.handleScroll(tbody,thead);
         return rootDom;
     }
 
     /**
-     * 添加到头部
-     * @param col       列dom
-     * @param index     当前index
-     * @param thead     thead
-     * @param field     绑定字段
-     */ 
-    private addToHead(col:nodom.Element,index:number,thead:nodom.Element,field?:string){
-        if(!thead){
+     * 处理网格线
+     * @param tbody     body容器 
+     * @param thead     head容器
+     */
+    private handleGridLine(tbody:nodom.Element,thead:nodom.Element){
+        if(!this.gridLine){
             return;
         }
-        //如果没有孩子节点，则创建一个
-        if(thead.children.length === 0){
-            let thCt = new nodom.Element('div');
-            thCt.addClass('nd-grid-row');
-            //网格线
-            if(this.gridLine === 'col' || this.gridLine === 'both'){
-                thCt.addClass('nd-grid-col-line');
-            }
-
-            if(this.gridLine === 'row' || this.gridLine === 'both'){
-                thCt.addClass('nd-grid-row-line');
-            }
-
-            thead.add(thCt);    
-        }
-        //隐藏头部不显示
-        if(thead){
-            //th
-            let th:nodom.Element = new nodom.Element('div');
-            th.addClass('nd-grid-row-item');
-            th.setProp('style','flex:' + col.getProp('width')||0);
-            //表头内容
-            let span:nodom.Element = new nodom.Element('span');
-            span.assets.set('innerHTML',col.getProp('title'));
-            th.add(span);
-            //允许排序
-            if(this.sortable){
-                //图片不排序，设置notsort属性，无field属性不排序
-                if(col.getProp('type') !== 'img' && !col.hasProp('notsort') && field){
-                    th.add(this.addSortBtn(index));
+        
+        let type;
+        switch(this.gridLine){
+            case 'row':
+                type = 'rows';
+                tbody.addClass('nd-grid-row-line');
+                if(thead){
+                    thead.addClass('nd-grid-top-line');
                 }
-            }
-            thead.children[0].add(th);
+                break;
+            case 'col':
+                type='cols';
+                tbody.addClass('nd-grid-column-line');
+                thead.addClass('nd-grid-column-line');
+                break;
+            case 'both':
+                type='all';
+                tbody.addClass('nd-grid-all-line');
+                if(thead){
+                    thead.addClass('nd-grid-column-line nd-grid-top-line');
+                }
+                break;
         }
+        //表格网格线
+        if(type){
+            tbody.children[0].setProp('rules',type);
+            if(thead){
+                thead.children[0].setProp('rules',type);
+            }
+        }
+    }
+    /**
+     * 处理thead
+     * @param tbl       表头tbl
+     * @param fields    字段集合
+     */ 
+    private handleHead(tbl:nodom.Element,fields:any[]){
+        let colGroup:nodom.Element = new nodom.Element('colgroup');
+        tbl.add(colGroup);
+        let thead:nodom.Element = new nodom.Element('thead');
+        tbl.add(thead);
+        let tr:nodom.Element = new nodom.Element('tr');
+        thead.add(tr);
+        let width = 0;
+        for(let f of fields){
+            if(f.hide){
+                continue;
+            }
+            // 列定义
+            let col:nodom.Element = new nodom.Element('col');
+            if(f.width){
+                col.setProp('width',f.width);
+                width += parseInt(f.width);
+            }
+            
+            //添加到列group
+            colGroup.add(col);
+
+            let th:nodom.Element = new nodom.Element('th');
+            
+            let div:nodom.Element = new nodom.Element('div');
+            th.add(div);
+            tr.add(th);
+
+            switch(f.type){
+                case 0:
+                    div.assets.set('innerHTML',f.title);
+                    //允许排序
+                    if(this.sortable){
+                        //图片不排序，设置notsort属性，无field属性不排序
+                        if(f.type !== 'img' && !f.notsort && f.field){
+                            div.add(this.addSortBtn(f.field));
+                        }
+                    }
+                    break;
+                case 1:  //子表格
+                    let b:nodom.Element = new nodom.Element();
+                    b.textContent='';
+                    div.add(b);
+                    break;
+                case 2: //checkbox
+                    let bh:nodom.Element = new nodom.Element('b');
+                    bh.addClass('nd-icon-checkbox');
+                    div.add(bh);
+                    bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'"+ this.wholeCheckName +"'}",bh));
+
+                    //表头复选框事件
+                    bh.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
+                        let check = model.data[this.wholeCheckName] || false;
+                        model.set(this.wholeCheckName,!check);
+                        let model1:nodom.Model = this.getModel();
+                        for(let d of model1.data[this.dataName]){
+                            let m:nodom.Model = module.getModel(d.$modelId);
+                            m.set(this.checkName,!check);
+                        }
+                    }));
+            }
+        }
+        //设置head宽度和移动head
+        tbl.setProp('style',['min-width:' + width +'px;transform:translateX(',new nodom.Expression(this.scrollName),'px)'],true);
+    }
+
+    /**
+     * 处理table body
+     * @param tbl       body tbl
+     * @param fields    字段集合
+     * @param subDom    子表格
+     */ 
+    private handleBody(tbl:nodom.Element,fields:any[],subDom:nodom.Element){
+        let colGroup:nodom.Element = new nodom.Element('colgroup');
+        tbl.add(colGroup);
+        let tBody:nodom.Element = new nodom.Element('tbody');
+        tbl.add(tBody);
+        //外层tr容器，因为可能存在detail行，所以需要加一个不渲染的容器
+        let trCt:nodom.Element = new nodom.Element('div');
+        tBody.add(trCt);
+        new nodom.Directive('ignoreself','',trCt);
+        let directive = new nodom.Directive('repeat',this.dataName,trCt);
+        this.repeatDirective = directive;
+        
+        let tr:nodom.Element = new nodom.Element('tr');
+        trCt.add(tr);
+        let width = 0;
+        for(let f of fields){
+            if(f.hide){
+                continue;
+            }
+            // 列定义
+            let col:nodom.Element = new nodom.Element('col');
+            if(f.width){
+                col.setProp('width',f.width);
+                width += parseInt(f.width);
+            }
+            //添加到列group
+            colGroup.add(col);
+
+            let td:nodom.Element = new nodom.Element('td');
+            
+            let div:nodom.Element = new nodom.Element('div');
+            td.add(div);
+            tr.add(td);
+            switch(f.type){
+                case 0:
+                    div.children = f.children;
+                    break;
+                case 1:
+                    let b = new nodom.Element('b');
+                    b.addClass('nd-grid-sub-btn');
+                    new nodom.Directive('class',"{'nd-grid-showsub':'"+ this.subName + "'}",b);
+                    div.add(b);
+                    this.handleSub(subDom,tbl,b);
+                    break;
+                case 2:
+                    let b1 = new nodom.Element('b');
+                    b1.addClass('nd-icon-checkbox');
+                    new nodom.Directive('class',"{'nd-icon-checked':'"+ this.checkName +"'}",b1);
+                    div.add(b1);
+                    b1.addEvent(new nodom.NodomEvent('click', 
+                        (dom,model,module,e)=>{
+                            model.set(this.checkName,!model.data[this.checkName]);
+                        }
+                    ));
+            }
+        }
+        tbl.setProp('style','min-width:' + width + 'px');
     }
     /**
      * 添加排序按钮
      */
-    private addSortBtn(index:number):nodom.Element{
+    private addSortBtn(field:string):nodom.Element{
         let updown:nodom.Element = new nodom.Element('span');
         updown.addClass('nd-grid-sort');
         let up:nodom.Element = new nodom.Element('B');
         up.addClass('nd-grid-sort-raise');
         //保存index
-        up.tmpData = {index:index};
+        up.setProp('field',field);
         let down:nodom.Element = new nodom.Element('B');
         down.addClass('nd-grid-sort-down');
         //保存index
-        down.tmpData = {index:index};
+        down.setProp('field',field);
         const plugin:UIGrid = this;
         /**
          * 升序按钮事件
          */
         up.addEvent(new nodom.NodomEvent('click',
             (dom,model,module,e)=>{
-                plugin.sort(parseInt(dom.tmpData['index']),'asc',module);
+                plugin.sort(dom.getProp('field'),'asc',module);
             }
         ));
 
@@ -384,7 +491,7 @@ class UIGrid extends nodom.Plugin{
          */
         down.addEvent(new nodom.NodomEvent('click',
             (dom,model,module,e)=>{
-                plugin.sort(parseInt(dom.tmpData['index']),'desc',module);
+                plugin.sort(dom.getProp('field'),'desc',module);
             }
         ));
         updown.add(up);
@@ -395,41 +502,38 @@ class UIGrid extends nodom.Plugin{
     /**
      * 添加sub panel
      * @param subDom    ui-sub dom 
-     * @param thead     表格头部dom
-     * @param dataDom   数据行dom
-     * @param rowDom    数据行dom容器
+     * @param bodyTbl   body 表格
+     * @param b         下拉点击按钮
      */
-    private handleSub(subDom:nodom.Element,thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
-        //表头加一列
-        let th:nodom.Element = new nodom.Element('div');
-        th.addClass('nd-grid-iconcol');
-        let b:nodom.Element = new nodom.Element('b');
-        b.addClass('nd-grid-sub-btn');
-        th.add(b);
-        if(thead){
-            thead.children[0].children.unshift(th);
-        }
-        
-        //行前添加箭头
-        let td:nodom.Element = new nodom.Element('div');
-        td.addClass('nd-grid-iconcol');
-        b = new nodom.Element('b');
-        b.addClass('nd-grid-sub-btn');
-        b.addDirective(new nodom.Directive('class',"{'nd-grid-showsub':'$showSub'}",b));
-        b.addEvent(new nodom.NodomEvent('click', ':delg',
+    private handleSub(subDom:nodom.Element,bodyTbl:nodom.Element,b:nodom.Element){
+        b.addEvent(new nodom.NodomEvent('click', 
             (dom,model,module,e)=>{
-                model.set('$showSub',!model.data['$showSub']);
+                model.set(this.subName,!model.query(this.subName));
             }
         ));
-        td.add(b);
-        dataDom.children.unshift(td);
-        subDom.tagName = 'div';
-        rowDom.add(subDom);
-
+        
         //子panel处理
+        let detailDom:nodom.Element = new nodom.Element('tr');
+        bodyTbl.children[1].children[0].add(detailDom);
+        
         //增加显示指令，$showSub作为新增数据项，用于控制显示
-        subDom.addDirective(new nodom.Directive('show','$showSub',subDom));
+        new nodom.Directive('show',this.subName,detailDom);
+        
+        let td = new nodom.Element('td');
+        detailDom.add(td);
+        td.add(subDom);
+        subDom.tagName = 'div';
         subDom.addClass('nd-grid-sub');
+
+        let showCount=0;
+        for(let f of this.fields){
+            if(!f['hide']){
+                showCount++;
+            }
+        }
+        //设置colspan
+        td.setProp('colspan',showCount);
+        
         //自动
         if(subDom.hasProp('auto')){
             subDom.children = [];
@@ -444,6 +548,9 @@ class UIGrid extends nodom.Plugin{
             let cnt = 0;
             let rowCt:nodom.Element;
             this.fields.forEach((item)=>{
+                if(item['type'] !== 0){
+                    return;
+                }
                 if(cnt++ % cols === 0){
                     rowCt = new nodom.Element('div');
                     rowCt.addClass('nd-grid-sub-row');
@@ -453,85 +560,30 @@ class UIGrid extends nodom.Plugin{
                 let itemCt:nodom.Element = new nodom.Element('div');
                 itemCt.addClass('nd-grid-sub-item');
                 let label:nodom.Element = new nodom.Element('label');
-                label.assets.set('innerHTML',item['title']+':');
+                label.assets.set('innerHTML',item['title']);
                 label.assets.set('style','width:' + lw + 'px');
                 itemCt.add(label);
 
                 let span:nodom.Element = new nodom.Element('span');
                 span.addClass('nd-grid-sub-content');
                 let txt:nodom.Element = new nodom.Element();
-                txt.expressions = item['expressions'];
+                txt.expressions = [new nodom.Expression(item['field'])];
                 span.add(txt);
                 itemCt.add(span);
-
                 rowCt.add(itemCt);
                 subDom.delProp(['auto','labelwidth']);
             });
         }
     }
-
-    /**
-     * 显示checkbox狂
-     * @param thead         head dom
-     * @param dataDom       数据dom
-     * @param rowDom        行dom
-     */
-    private handleCheck(thead:nodom.Element,dataDom:nodom.Element,rowDom:nodom.Element){
-        if(thead){
-            //表头加一列
-            let th:nodom.Element = new nodom.Element('div');
-            th.addClass('nd-grid-iconcol');
-            let bh:nodom.Element = new nodom.Element('b');
-            bh.addClass('nd-icon-checkbox');
-            th.add(bh);
-            bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'"+ this.wholeCheckName +"'}",bh));
-            thead.children[0].children.unshift(th);
-            //表头复选框事件
-            bh.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
-                let check = model.data[this.wholeCheckName] || false;
-                model.set(this.wholeCheckName,!check);
-                let model1:nodom.Model = this.getModel();
-                for(let d of model1.data[this.dataName]){
-                    let m:nodom.Model = module.modelFactory.get(d.$modelId);
-                    m.set('$checked',!check);
-                }
-            }));
-        }
-        
-        //行前添加checkbox
-        let td:nodom.Element = new nodom.Element('div');
-        td.addClass('nd-grid-iconcol');
-        let b = new nodom.Element('b');
-        b.addClass('nd-icon-checkbox');
-        b.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'$checked'}",b));
-        b.addEvent(new nodom.NodomEvent('click', ':delg',
-            (dom,model,module,e)=>{
-                model.set('$checked',!model.data['$checked']);
-            }
-        ));
-        td.add(b);
-        dataDom.children.unshift(td);
-    }
     
     /**
      * 排序
-     * @param module        模块
-     * @param fieldIndex    排序字段名
+     * @param field         字段名
      * @param asc           desc 降序 asc升序
      */
-    private sort(index:number,asc:string,module:nodom.Module){
-        let dom:nodom.Element = module.virtualDom.query(this.rowDomKey);
-        let directive:nodom.Directive = dom.getDirective('repeat');
-        if(!directive){
-            return;
-        }
-        //找到字段
-        let f = this.fields[index];
-        
-        if(!f || !f['field']){
-            return;
-        }
-        let arr:string[] = ['orderby',f['field'],asc];
+    private sort(field:string,asc:string,module:nodom.Module){
+        let directive:nodom.Directive = this.repeatDirective;
+        let arr:string[] = ['orderby',field,asc];
         if(!directive.filters){
             directive.filters = [];
         }
@@ -540,9 +592,21 @@ class UIGrid extends nodom.Plugin{
         }else{
             directive.filters[1] = new nodom.Filter(arr);
         }
-        
         //重新渲染
         nodom.Renderer.add(module);
+    }
+
+    /**
+     * 处理滚动事件
+     * @param dom 
+     */
+    private handleScroll(tbody:nodom.Element,thead:nodom.Element){
+        if(!thead){
+            return;
+        }
+        tbody.addEvent(new nodom.NodomEvent('scroll',(dom,model,module,e)=>{
+            model.set(this.scrollName,-e.target.scrollLeft);
+        }));
     }
 
     /**
@@ -553,93 +617,13 @@ class UIGrid extends nodom.Plugin{
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         let me = this;
         super.beforeRender(module,uidom);
-        
         if(this.needPreRender){
             //增加附加数据项
-            let model:nodom.Model = module.modelFactory.get(uidom.modelId);
-            model.set(this.extraDataName,{});
-            //如果有分页，由分页去请求数据
-            if(!this.pagination){
-                this.doReq(module,this.pagination);
-            }
-            
-            //增加过滤器方法
-            if(this.selectPageMethodId){
-                module.methodFactory.add(this.selectPageMethodId,
-                    (arr)=>{
-                        let start = (me.currentPage-1) * me.pageSize;
-                        let end = start + me.pageSize;
-                        return arr.slice(start,end);
-                    }
-                );
-            }
+            // let model:nodom.Model = module.getModel(uidom.modelId);
+            // model.set(this.extraDataName,{});
         }
     }
-
-
-    /**
-     * 处理pagination
-     * @param pagination    pagination对应dom
-     */
-    private handlePagination(pagination:nodom.Element){
-        let me = this;
-        
-        let df:UIPagination = <UIPagination>pagination.plugin;
-        this.pagination = df;
-
-        // df.dataUrl = this.dataUrl;
-        if(df.currentPage){
-            this.currentPage = df.currentPage;
-        }
-        
-        if(df.pageSize){
-            this.pageSize = df.pageSize;
-        }
-        //如果已经有change事件了，则不再设置
-        if(!df.onChange){
-            //增加onchange事件
-            df.onChange = (module:nodom.Module)=>{
-                me.doReq(module,df);
-            }
-        }
-    }
-
-    /**
-     * 请求数据
-     * @param module        模块    
-     * @param pagination    分页插件
-     */
-    private doReq(module:nodom.Module,pagination?:UIPagination){
-        const me = this;
-        let params = {};
-        if(pagination){
-            let reqName = pagination.requestName;
-            if(reqName.length === 2){
-                params[reqName[0]] = pagination.currentPage;
-                params[reqName[1]] = pagination.pageSize;
-            }
-        }
-        
-        nodom.request({
-            url:me.dataUrl,
-            params:params,
-            type:'json'
-        }).then(r=>{
-            if(!r){
-                return;
-            }
-            let model:nodom.Model = module.modelFactory.get(me.modelId);
-            model.set(this.extraDataName,r);
-            // 设置pagination total值
-            if(pagination){
-                if(pagination.pageSize){
-                    this.pageSize = pagination.pageSize;
-                }
-                pagination.setTotal(r[pagination.totalName]);
-            }
-        });
-    }
-
+    
     /**
      * 获取表格数据
      */
@@ -652,12 +636,32 @@ class UIGrid extends nodom.Plugin{
     }
 
     /**
+     * 设置数据
+     * @param data 
+     */
+    public setData(data){
+        const module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
+        let model:nodom.Model = module.getModel(this.modelId);
+        model.set(this.extraDataName,data);
+        // 设置pagination total值
+        if(this.pagination){
+            if(this.pagination.pageSize){
+                this.pageSize = this.pagination.pageSize;
+            }
+            let total = data[this.pagination.totalName];
+            if(!total &&  data[this.dataName]){
+                total = data[this.dataName].length;
+            }
+            this.pagination.setTotal(total);
+        }
+    }
+    /**
      * 获取model
      * @returns     model
      */
     public getModel():nodom.Model{
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        let model:nodom.Model = module.modelFactory.get(this.modelId);
+        let model:nodom.Model = module.getModel(this.modelId);
         return model.get(this.extraDataName);
     }
 
@@ -688,29 +692,6 @@ class UIGrid extends nodom.Plugin{
         }
     }
 
-    /**
-     * 设置数据url
-     * @param url           数据url
-     * @param notRefresh    不刷新，如果设置该参数，则此次不刷新数据
-     */
-    public setDataUrl(url:string,notRefresh?:boolean){
-        this.dataUrl = url;
-        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        
-        if(!notRefresh){
-            //设置为第一页
-            this.pagination.setPage(1);
-            this.doReq(module,this.pagination);
-        }
-    }
-
-    /**
-     * 刷新
-     */
-    public refresh(){
-        let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        this.doReq(module,this.pagination);
-    }
 }
 
 nodom.PluginManager.add('UI-GRID',UIGrid);

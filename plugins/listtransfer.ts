@@ -174,7 +174,7 @@ class UIListTransfer extends nodom.Plugin{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         //uidom model
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
+        let pmodel:nodom.Model = module.getModel(this.modelId);
         if(this.needPreRender){
             let model:nodom.Model = pmodel.set(this.extraDataName,{
                 //数据
@@ -192,8 +192,8 @@ class UIListTransfer extends nodom.Plugin{
      * @param module 
      */
     private setValueSelected(module:nodom.Module){
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let pmodel:nodom.Model = module.getModel(this.modelId);
+        let model:nodom.Model = module.getModel(this.extraModelId);
         let value = pmodel.query(this.dataName);
         let va = value.split(',');
         let rows = model.query('datas');
@@ -213,7 +213,7 @@ class UIListTransfer extends nodom.Plugin{
      * @param all       true 全部移动  false 移动选中的项
      */
     private transfer(module:nodom.Module,direction:number,all:boolean){
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let model:nodom.Model = module.getModel(this.extraModelId);
         let datas = model.data.datas;
         let isValue:boolean = direction===1?true:false;
         for(let d of datas){
@@ -232,8 +232,8 @@ class UIListTransfer extends nodom.Plugin{
      * @param module    模块
      */
     private updateValue(module:nodom.Module){
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let pmodel:nodom.Model = module.getModel(this.modelId);
+        let model:nodom.Model = module.getModel(this.extraModelId);
         let a = [];
         for(let d of model.data.datas){
             if(d.isValue){

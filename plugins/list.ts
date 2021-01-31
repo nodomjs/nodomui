@@ -166,7 +166,7 @@ class UIList extends nodom.Plugin{
         //附加数据model
         let model:nodom.Model;
         if(this.needPreRender){
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             pmodel.set(this.extraDataName,{
                 datas:[]        //下拉框数据
             }).id;
@@ -174,7 +174,7 @@ class UIList extends nodom.Plugin{
 
         
         if(!pmodel){
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
         }
         
         if(!model){
@@ -222,7 +222,7 @@ class UIList extends nodom.Plugin{
      */
     setValue(module:nodom.Module,model?:nodom.Model){
         //原model
-        let pmodel = module.modelFactory.get(this.modelId);
+        let pmodel = module.getModel(this.modelId);
         //附加数据model
         let model1:nodom.Model = pmodel.get(this.extraDataName);
         let rows  = model1.data['datas'];

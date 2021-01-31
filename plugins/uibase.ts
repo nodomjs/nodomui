@@ -29,7 +29,7 @@ class UITool{
      * @param changeSize    是否修改框size
      */
     static adjustPosAndSize(module:nodom.Module,key:string,x:number,y:number,distance?:number,bodyHeight?:number,changeSize?:boolean){
-        let el = <HTMLElement>module.container.querySelector("[key='"+ key +"']");
+        let el = <HTMLElement>module.getNode(key);
         
         //el可能还未出现，延迟处理
         if(!el){
@@ -181,7 +181,7 @@ class UIEventRegister{
                 let evts:IEventObj[] = this.listeners.get(eventName);
                 for(let evt of evts){
                     let module:nodom.Module = nodom.ModuleFactory.get(evt.module);
-                    let dom:nodom.Element = module.renderTree.query(evt.dom);
+                    let dom:nodom.Element = module.getElement(evt.dom);
                     if(!dom){
                         continue;
                     }

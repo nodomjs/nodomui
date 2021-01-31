@@ -24,7 +24,7 @@ var nodom;
             }
             nodom.Application.setPath(config.path);
             if (config.modules) {
-                yield nodom.ModuleFactory.init(config.modules);
+                yield nodom.ModuleFactory.addModules(config.modules);
             }
             nodom.Scheduler.addTask(nodom.MessageQueue.handleQueue, nodom.MessageQueue);
             nodom.Scheduler.addTask(nodom.Renderer.render, nodom.Renderer);
@@ -32,7 +32,7 @@ var nodom;
             let module;
             if (config.module.class) {
                 module = yield nodom.ModuleFactory.getInstance(config.module.class, config.module.name, config.module.data);
-                module.selector = config.module.el;
+                module.setSelector(config.module.el);
             }
             else {
                 module = new nodom.Module(config.module);
@@ -61,6 +61,10 @@ var nodom;
         return nodom.DirectiveManager.addType(name, priority, init, handler);
     }
     nodom.createDirective = createDirective;
+    function addModules(modules) {
+        nodom.ModuleFactory.addModules(modules);
+    }
+    nodom.addModules = addModules;
     function request(config) {
         return new Promise((resolve, reject) => {
             if (typeof config === 'string') {
@@ -76,7 +80,7 @@ var nodom;
             const async = config.async === false ? false : true;
             const req = new XMLHttpRequest();
             req.withCredentials = config.withCredentials;
-            const method = config.method || 'GET';
+            const method = (config.method || 'GET').toUpperCase();
             req.timeout = async ? config.timeout : 0;
             req.onload = () => {
                 if (req.status === 200) {
@@ -126,7 +130,6 @@ var nodom;
                         for (let o in config.params) {
                             fd.append(o, config.params[o]);
                         }
-                        req.open(method, url, async, config.user, config.pwd);
                         data = fd;
                     }
                     break;
@@ -163,7 +166,7 @@ var nodom;
                 let map = new WeakMap();
                 return clone(srcObj, expKey, extra);
                 function clone(src, expKey, extra) {
-                    if (typeof src !== 'object' || Util.isFunction(src)) {
+                    if (!src || typeof src !== 'object' || Util.isFunction(src)) {
                         return src;
                     }
                     let dst;
@@ -361,7 +364,7 @@ var nodom;
                 return pview.querySelector(selector);
             }
             static isEl(el) {
-                return el instanceof HTMLElement;
+                return el instanceof HTMLElement || el instanceof SVGElement;
             }
             static isNode(node) {
                 return node !== undefined && node !== null && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.DOCUMENT_FRAGMENT_NODE);
@@ -379,8 +382,12 @@ var nodom;
                 }
                 return el;
             }
-            static newSvgEl(tagName) {
-                return document.createElementNS("http://www.w3.org/2000/svg", tagName);
+            static newSvgEl(tagName, config) {
+                let el = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+                if (this.isObject(config)) {
+                    this.attr(el, config);
+                }
+                return el;
             }
             static replaceNode(srcNode, nodes) {
                 if (!this.isNode(srcNode)) {
@@ -602,12 +609,12 @@ var nodom;
     class Compiler {
         static compile(elementStr) {
             const div = nodom.Util.newEl('div');
-            div.innerHTML = elementStr;
+            try {
+                div.innerHTML = elementStr;
+            }
+            catch (e) { }
             let oe = new nodom.Element('div');
             this.handleChildren(oe, div);
-            if (oe.children.length === 1) {
-                return oe.children[0];
-            }
             return oe;
         }
         static compileDom(ele) {
@@ -683,6 +690,9 @@ var nodom;
             el.childNodes.forEach((nd) => {
                 let o = this.compileDom(nd);
                 if (o) {
+                    if (o.tagName && oe.isSvgNode) {
+                        o.isSvgNode = true;
+                    }
                     oe.children.push(o);
                 }
             });
@@ -744,6 +754,7 @@ var nodom;
             }
             if (type !== undefined && dom) {
                 nodom.DirectiveManager.init(this, dom);
+                dom.addDirective(this);
             }
         }
         exec(module, dom, parent) {
@@ -833,21 +844,24 @@ var nodom;
             this.expressions = [];
             this.children = [];
             this.dontRender = false;
+            this.dontRenderSelf = false;
             this.tagName = tag;
+            if (tag && tag.toLowerCase() === 'svg') {
+                this.isSvgNode = true;
+            }
             this.key = nodom.Util.genId() + '';
         }
         render(module, parent) {
-            let me = this;
             if (this.dontRender) {
                 this.doDontRender();
                 return;
             }
             if (parent) {
-                this.parent = parent;
-                this.parentKey = parent.key;
                 if (!this.modelId) {
                     this.modelId = parent.modelId;
                 }
+                this.parent = parent;
+                this.parentKey = parent.key;
             }
             if (this.plugin) {
                 this.plugin.beforeRender(module, this);
@@ -886,14 +900,14 @@ var nodom;
             this.dontRender = false;
             if (type === 'fresh' || type === 'add' || type === 'text') {
                 if (parent) {
-                    el = module.container.querySelector("[key='" + parent.key + "']");
+                    el = module.getNode(parent.key);
                 }
                 else {
-                    el = module.container;
+                    el = module.getContainer();
                 }
             }
             else if (this.tagName !== undefined) {
-                el = module.container.querySelector("[key='" + this.key + "']");
+                el = module.getNode(this.key);
                 this.handleAssets(el);
             }
             if (!el) {
@@ -964,7 +978,13 @@ var nodom;
                     }
             }
             function newEl(vdom, parent, parentEl) {
-                let el = document.createElement(vdom.tagName);
+                let el;
+                if (vdom.isSvgNode) {
+                    el = nodom.Util.newSvgEl(vdom.tagName);
+                }
+                else {
+                    el = nodom.Util.newEl(vdom.tagName);
+                }
                 nodom.Util.getOwnProps(vdom.props).forEach((k) => {
                     el.setAttribute(k, vdom.props[k]);
                 });
@@ -1006,12 +1026,17 @@ var nodom;
         }
         clone(changeKey) {
             let dst = new Element();
-            let notCopyProps = ['parent', 'directives', 'props', 'exprProps', 'events', 'children'];
+            let notCopyProps = ['parent', 'directives', 'children'];
             nodom.Util.getOwnProps(this).forEach((p) => {
                 if (notCopyProps.includes(p)) {
                     return;
                 }
-                dst[p] = this[p];
+                if (typeof this[p] === 'object') {
+                    dst[p] = nodom.Util.clone(this[p]);
+                }
+                else {
+                    dst[p] = this[p];
+                }
             });
             if (changeKey) {
                 dst.key = nodom.Util.genId() + '';
@@ -1029,43 +1054,6 @@ var nodom;
                     d = d.clone(dst);
                 }
                 dst.directives.push(d);
-            }
-            nodom.Util.getOwnProps(this.props).forEach((k) => {
-                dst.props[k] = this.props[k];
-            });
-            nodom.Util.getOwnProps(this.exprProps).forEach((k) => {
-                if (changeKey) {
-                    let item = this.exprProps[k];
-                    if (Array.isArray(item)) {
-                        let arr = [];
-                        for (let o of item) {
-                            arr.push(o instanceof nodom.Expression ? o.clone() : o);
-                        }
-                        dst.exprProps[k] = arr;
-                    }
-                    else if (item instanceof nodom.Expression) {
-                        dst.exprProps[k] = item.clone();
-                    }
-                    else {
-                        dst.exprProps[k] = item;
-                    }
-                }
-                else {
-                    dst.exprProps[k] = this.exprProps[k];
-                }
-            });
-            for (let key of this.events.keys()) {
-                let evt = this.events.get(key);
-                if (nodom.Util.isArray(evt)) {
-                    let a = [];
-                    for (let e of evt) {
-                        a.push(e.clone());
-                    }
-                    dst.events.set(key, a);
-                }
-                else {
-                    dst.events.set(key, evt.clone());
-                }
             }
             for (let c of this.children) {
                 dst.add(c.clone(changeKey));
@@ -1087,7 +1075,7 @@ var nodom;
             if (this.dontRender) {
                 return;
             }
-            let model = module.modelFactory.get(this.modelId);
+            let model = module.getModel(this.modelId);
             let value = '';
             exprArr.forEach((v) => {
                 if (v instanceof nodom.Expression) {
@@ -1118,7 +1106,7 @@ var nodom;
                     }
                 }
                 else if (this.exprProps[k] instanceof nodom.Expression) {
-                    this.props[k] = this.exprProps[k].val(module.modelFactory.get(this.modelId));
+                    this.props[k] = this.exprProps[k].val(module.getModel(this.modelId));
                 }
             }
         }
@@ -1126,8 +1114,8 @@ var nodom;
             if (!this.tagName && !el) {
                 return;
             }
-            for (let key of this.assets.keys()) {
-                el[key] = this.assets.get(key);
+            for (let key of this.assets) {
+                el[key[0]] = key[1];
             }
         }
         handleTextContent(module) {
@@ -1146,20 +1134,11 @@ var nodom;
             for (let evt of this.events.values()) {
                 if (nodom.Util.isArray(evt)) {
                     for (let evo of evt) {
-                        bind(evo, module, this, el, parent, parentEl);
+                        evo.bind(module, this, el, parent, parentEl);
                     }
                 }
                 else {
-                    let ev = evt;
-                    bind(ev, module, this, el, parent, parentEl);
-                }
-            }
-            function bind(e, module, dom, el, parent, parentEl) {
-                if (e.delg && parent) {
-                    e.delegateTo(module, dom, el, parent, parentEl);
-                }
-                else {
-                    e.bind(module, dom, el);
+                    evt.bind(module, this, el, parent, parentEl);
                 }
             }
         }
@@ -1198,7 +1177,7 @@ var nodom;
             }
         }
         hasDirective(directiveType) {
-            return this.directives.find(item => item.type.name === directiveType) !== undefined;
+            return this.directives.findIndex(item => item.type.name === directiveType) !== -1;
         }
         getDirective(directiveType) {
             return this.directives.find(item => item.type.name === directiveType);
@@ -1212,15 +1191,15 @@ var nodom;
             if (parent) {
                 parent.removeChild(this);
             }
-            if (delHtml && module && module.container) {
-                let el = module.container.querySelector("[key='" + this.key + "']");
+            if (delHtml && module) {
+                let el = module.getNode(this.key);
                 if (el !== null) {
                     nodom.Util.remove(el);
                 }
             }
         }
         removeFromHtml(module) {
-            let el = module.container.querySelector("[key='" + this.key + "']");
+            let el = module.getNode(this.key);
             if (el !== null) {
                 nodom.Util.remove(el);
             }
@@ -1239,7 +1218,7 @@ var nodom;
                 return this.parent;
             }
             if (this.parentKey) {
-                return module.renderTree.query(this.parentKey);
+                return module.getElement(this.parentKey);
             }
         }
         replace(dst) {
@@ -1671,12 +1650,13 @@ var nodom;
                     valueArr.push(getFieldValue(module, fieldObj, field));
                 });
                 valueArr.unshift(module);
+                let v;
                 try {
-                    return this.execFunc.apply(null, valueArr);
+                    v = this.execFunc.apply(null, valueArr);
                 }
                 catch (e) {
-                    console.log(e);
                 }
+                return v === undefined || v === null ? '' : v;
                 function getFieldValue(module, dataObj, field) {
                     if (dataObj.hasOwnProperty(field)) {
                         return dataObj[field];
@@ -1956,17 +1936,34 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Message {
-        constructor(fromModule, toModule, content) {
+        constructor(fromModule, toModule, content, parentId) {
             this.fromModule = fromModule;
             this.toModule = toModule;
             this.content = content;
+            this.parentId = parentId;
         }
     }
     nodom.Message = Message;
     let MessageQueue = (() => {
         class MessageQueue {
-            static add(from, to, data) {
-                this.messages.push(new Message(from, to, data));
+            static add(from, to, data, parentId) {
+                if (parentId) {
+                    this.noOwnerMessages.push(new Message(from, to, data, parentId));
+                }
+                else {
+                    this.messages.push(new Message(from, to, data));
+                }
+            }
+            static move(moduleName, moduleId, parentId) {
+                let index = this.noOwnerMessages.findIndex(item => item.parentId === parentId && moduleName === item.toModule);
+                if (index === -1) {
+                    return;
+                }
+                let msg = this.noOwnerMessages[index];
+                this.noOwnerMessages.splice(index, 1);
+                msg.toModule = moduleId;
+                delete msg.parentId;
+                this.messages.push(msg);
             }
             static handleQueue() {
                 for (let i = 0; i < this.messages.length; i++) {
@@ -1980,6 +1977,7 @@ var nodom;
             }
         }
         MessageQueue.messages = [];
+        MessageQueue.noOwnerMessages = [];
         return MessageQueue;
     })();
     nodom.MessageQueue = MessageQueue;
@@ -2006,9 +2004,7 @@ var nodom;
             this.id = nodom.Util.genId();
             if (module) {
                 this.moduleId = module.id;
-                if (module.modelFactory) {
-                    module.modelFactory.add(this.id, this);
-                }
+                module.setModel(this.id, this);
             }
             if (!data || !nodom.Util.isObject(data) && !nodom.Util.isArray(data)) {
                 data = {};
@@ -2128,7 +2124,7 @@ var nodom;
                                 nodom.Util.apply(f, this, [module, field, value]);
                             }
                             else if (nodom.Util.isString(f)) {
-                                let foo = module.methodFactory.get(f);
+                                let foo = module.getMethod(f);
                                 if (nodom.Util.isFunction(foo)) {
                                     nodom.Util.apply(foo, this, [module, field, value]);
                                 }
@@ -2285,6 +2281,7 @@ var nodom;
         constructor(config) {
             this.firstRender = true;
             this.children = [];
+            this.createOps = [];
             this.firstRenderOps = [];
             this.beforeFirstRenderOps = [];
             this.renderOps = [];
@@ -2306,6 +2303,10 @@ var nodom;
             nodom.ModuleFactory.add(this);
             this.methodFactory = new nodom.MethodFactory(this);
             this.modelFactory = new nodom.ModelFactory(this);
+            for (let foo of this.createOps) {
+                foo.call(this);
+            }
+            this.doModuleEvent('onCreate');
             if (!config) {
                 return;
             }
@@ -2316,7 +2317,7 @@ var nodom;
                     this.methodFactory.add(item, config.methods[item]);
                 });
             }
-            if (this.hasContainer()) {
+            if (this.getContainer()) {
                 this.template = this.container.innerHTML.trim();
                 this.container.innerHTML = '';
             }
@@ -2411,7 +2412,7 @@ var nodom;
             });
         }
         render() {
-            if (this.state !== 3 || !this.virtualDom || !this.hasContainer()) {
+            if (this.state !== 3 || !this.virtualDom || !this.getContainer()) {
                 return false;
             }
             let root = this.virtualDom.clone();
@@ -2438,6 +2439,7 @@ var nodom;
                     let oldTree = this.renderTree;
                     this.renderTree = root;
                     root.render(this, null);
+                    this.clearDontRender(root);
                     this.doModuleEvent('onBeforeRenderToHtml');
                     root.compare(oldTree, this.renderDoms);
                     for (let i = this.renderDoms.length - 1; i >= 0; i--) {
@@ -2465,6 +2467,7 @@ var nodom;
                 root.modelId = this.model.id;
             }
             root.render(this, null);
+            this.clearDontRender(root);
             this.doModuleEvent('onBeforeFirstRenderToHTML');
             nodom.Util.empty(this.container);
             root.renderToHtml(this, { type: 'fresh' });
@@ -2489,14 +2492,14 @@ var nodom;
             m.virtualDom = this.virtualDom.clone(true);
             return m;
         }
-        hasContainer() {
+        getContainer() {
             if (this.selector) {
                 this.container = document.querySelector(this.selector);
             }
             else {
                 this.container = document.querySelector("[key='" + this.containerKey + "']");
             }
-            return this.container !== null;
+            return this.container;
         }
         setContainerKey(key) {
             this.containerKey = key;
@@ -2515,40 +2518,56 @@ var nodom;
                     m.parentId = this.id;
                 }
                 this.moduleMap.set(m.name, moduleId);
+                nodom.MessageQueue.move(m.name, moduleId, this.id);
             }
         }
-        send(toName, data) {
+        send(toName, data, type) {
             if (typeof toName === 'number') {
                 nodom.MessageQueue.add(this.id, toName, data);
                 return;
             }
             let toId;
-            let m = this;
-            for (let i = 0; i < 3 && m; i++) {
-                toId = m.moduleMap.get(toName);
-                if (!toId && m.parentId) {
-                    m = nodom.ModuleFactory.get(m.parentId);
-                }
-                else {
+            let parentId;
+            let m;
+            switch (type) {
+                case 1:
+                    m = this.getChild(toName);
+                    if (m) {
+                        toId = m.id;
+                    }
+                    parentId = this.id;
                     break;
-                }
+                case 2:
+                    toId = this.parentId || 0;
+                default:
+                    parentId = this.parentId || 0;
+                    m = nodom.ModuleFactory.get(parentId);
+                    if (m) {
+                        m = m.getChild(toName);
+                        if (m) {
+                            toId = m.id;
+                        }
+                    }
             }
             if (toId) {
                 nodom.MessageQueue.add(this.id, toId, data);
+            }
+            else {
+                nodom.MessageQueue.add(this.id, toName, data, parentId);
             }
         }
         broadcast(data) {
             if (this.parentId) {
                 let pmod = nodom.ModuleFactory.get(this.parentId);
                 if (pmod) {
-                    this.send(pmod.name, data);
+                    this.send(this.parentId, data);
                     if (pmod.children) {
                         pmod.children.forEach((item) => {
                             if (item === this.id) {
                                 return;
                             }
                             let m = nodom.ModuleFactory.get(item);
-                            this.send(m.name, data);
+                            this.send(m.id, data);
                         });
                     }
                 }
@@ -2556,7 +2575,7 @@ var nodom;
             if (this.children !== undefined) {
                 this.children.forEach((item) => {
                     let m = nodom.ModuleFactory.get(item);
-                    this.send(m.name, data);
+                    this.send(m.id, data);
                 });
             }
         }
@@ -2638,6 +2657,14 @@ var nodom;
                 this.beforeFirstRenderOps.push(foo);
             }
         }
+        addCreateOperation(foo) {
+            if (!nodom.Util.isFunction(foo)) {
+                return;
+            }
+            if (!this.createOps.includes(foo)) {
+                this.createOps.push(foo);
+            }
+        }
         addRenderOperation(foo) {
             if (!nodom.Util.isFunction(foo)) {
                 return;
@@ -2659,6 +2686,53 @@ var nodom;
                 nodom.Util.apply(renderOps.shift(), this, []);
             }
         }
+        clearDontRender(dom) {
+            for (let i = 0; i < dom.children.length; i++) {
+                let item = dom.children[i];
+                if (item.dontRender) {
+                    dom.children.splice(i, 1);
+                    return;
+                }
+                if (item.dontRenderSelf) {
+                    let arr = [];
+                    for (let d of item.children) {
+                        d.parent = dom.parent;
+                        d.parentKey = dom.parentKey;
+                        arr.push(d);
+                    }
+                    dom.children.splice.apply(dom.children, [i, 1].concat(arr));
+                    continue;
+                }
+                this.clearDontRender(item);
+            }
+        }
+        getChild(name, descendant) {
+            if (this.moduleMap.has(name)) {
+                let mid = this.moduleMap.get(name);
+                return nodom.ModuleFactory.get(mid);
+            }
+            else if (descendant) {
+                for (let id of this.children) {
+                    let m = nodom.ModuleFactory.get(id);
+                    if (m) {
+                        let m1 = m.getChild(name, descendant);
+                        if (m1) {
+                            return m1;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        getMethod(name) {
+            return this.methodFactory.get(name);
+        }
+        addMethod(name, foo) {
+            this.methodFactory.add(name, foo);
+        }
+        removeMethod(name) {
+            this.methodFactory.remove(name);
+        }
         addPlugin(name, plugin) {
             if (name) {
                 this.plugins.set(name, plugin);
@@ -2666,6 +2740,50 @@ var nodom;
         }
         getPlugin(name) {
             return this.plugins.get(name);
+        }
+        getModel(modelId) {
+            return modelId ? this.modelFactory.get(modelId) : this.model;
+        }
+        setModel(modelId, model) {
+            this.modelFactory.add(modelId, model);
+        }
+        setDataUrl(url) {
+            this.dataUrl = url;
+            this.loadNewData = true;
+        }
+        getNode(key, notNull) {
+            let keyName;
+            let value;
+            if (typeof key === 'string') {
+                keyName = 'key';
+                value = key;
+            }
+            else {
+                keyName = Object.getOwnPropertyNames(key)[0];
+                value = key[keyName];
+            }
+            let qs = "[" + keyName + "='" + value + "']";
+            let el = this.container ? this.container.querySelector(qs) : null;
+            if (!el && notNull) {
+                return this.container;
+            }
+            return el;
+        }
+        getElement(key, fromVirtualDom) {
+            let tree = fromVirtualDom ? this.virtualDom : this.renderTree;
+            return tree.query(key);
+        }
+        isContainerKey(key) {
+            return this.containerKey === key;
+        }
+        setFirstRender(flag) {
+            this.firstRender = flag;
+        }
+        setMain() {
+            this.isMain = true;
+        }
+        setSelector(selector) {
+            this.selector = selector;
         }
     }
     nodom.Module = Module;
@@ -2718,8 +2836,7 @@ var nodom;
                             let mdl = cfg.instance.clone(moduleName);
                             if (data) {
                                 if (typeof data === 'string') {
-                                    mdl.dataUrl = data;
-                                    mdl.loadNewData = true;
+                                    mdl.setDataUrl(data);
                                 }
                                 else {
                                     mdl.model = new nodom.Model(data, mdl);
@@ -2735,12 +2852,12 @@ var nodom;
             }
             static setMain(m) {
                 this.mainModule = m;
-                m.isMain = true;
+                m.setMain();
             }
             static getMain() {
                 return this.mainModule;
             }
-            static init(modules) {
+            static addModules(modules) {
                 return __awaiter(this, void 0, void 0, function* () {
                     for (let cfg of modules) {
                         if (!cfg.path) {
@@ -2789,8 +2906,6 @@ var nodom;
                     }
                 });
             }
-            static awake() {
-            }
         }
         ModuleFactory.modules = new Map();
         ModuleFactory.classes = new Map();
@@ -2836,7 +2951,8 @@ var nodom;
             if (eventStr) {
                 let tp = typeof eventStr;
                 if (tp === 'string') {
-                    eventStr.split(':').forEach((item, i) => {
+                    let eStr = eventStr.trim();
+                    eStr.split(':').forEach((item, i) => {
                         item = item.trim();
                         if (i === 0) {
                             this.handler = item;
@@ -2902,11 +3018,11 @@ var nodom;
         }
         fire(e, el) {
             const module = nodom.ModuleFactory.get(this.moduleId);
-            if (!module.hasContainer()) {
+            if (!module.getContainer()) {
                 return;
             }
-            let dom = module.renderTree.query(this.domKey);
-            const model = module.modelFactory.get(dom.modelId);
+            let dom = module.getElement(this.domKey);
+            const model = module.getModel(dom.modelId);
             if (this.capture) {
                 handleSelf(this, e, model, module, dom, el);
                 handleDelg(this, e, dom);
@@ -2921,7 +3037,7 @@ var nodom;
                 this.events.get(this.name).length === 0 &&
                 this.handler === undefined) {
                 if (!el) {
-                    el = module.container.querySelector("[key='" + this.domKey + "']");
+                    el = module.getNode(this.domKey);
                 }
                 if (ExternalEvent.touches[this.name]) {
                     ExternalEvent.unregist(this, el);
@@ -2964,7 +3080,7 @@ var nodom;
             }
             function handleSelf(eObj, e, model, module, dom, el) {
                 if (typeof eObj.handler === 'string') {
-                    eObj.handler = module.methodFactory.get(eObj.handler);
+                    eObj.handler = module.getMethod(eObj.handler);
                 }
                 if (!eObj.handler) {
                     return;
@@ -2978,9 +3094,17 @@ var nodom;
                 }
             }
         }
-        bind(module, dom, el) {
+        bind(module, dom, el, parent, parentEl) {
             this.moduleId = module.id;
             this.domKey = dom.key;
+            if (this.delg && parent) {
+                this.delegateTo(module, dom, el, parent, parentEl);
+            }
+            else {
+                this.bindTo(el);
+            }
+        }
+        bindTo(el) {
             if (ExternalEvent.touches[this.name]) {
                 ExternalEvent.regist(this, el);
             }
@@ -2999,7 +3123,7 @@ var nodom;
             }
             if (!parent.events.has(this.name)) {
                 let ev = new NodomEvent(this.name);
-                ev.bind(module, parent, parentEl);
+                ev.bindTo(parentEl);
                 parent.events.set(this.name, ev);
             }
             let evt = parent.events.get(this.name);
@@ -3043,6 +3167,18 @@ var nodom;
             });
             return evt;
         }
+        getDomKey() {
+            return this.domKey;
+        }
+        setExtraParam(key, value) {
+            if (!this.extraParamMap) {
+                this.extraParamMap = new Map();
+            }
+            this.extraParamMap.set(key, value);
+        }
+        getExtraParam(key) {
+            return this.extraParamMap.get(key);
+        }
     }
     nodom.NodomEvent = NodomEvent;
     let ExternalEvent = (() => {
@@ -3054,7 +3190,7 @@ var nodom;
                 }
                 if (!el) {
                     const module = nodom.ModuleFactory.get(evtObj.moduleId);
-                    el = module.container.querySelector("[key='" + evtObj.domKey + "']");
+                    el = module.getNode(evtObj.getDomKey());
                 }
                 evtObj.touchListeners = new Map();
                 if (touchEvts && el !== null) {
@@ -3070,7 +3206,7 @@ var nodom;
                 const evt = ExternalEvent.touches[evtObj.name];
                 if (!el) {
                     const module = nodom.ModuleFactory.get(evtObj.moduleId);
-                    el = module.container.querySelector("[key='" + evtObj.domKey + "']");
+                    el = module.getNode(evtObj.getDomKey());
                 }
                 if (evt) {
                     if (el !== null) {
@@ -3089,12 +3225,10 @@ var nodom;
         tap: {
             touchstart: function (e, evtObj) {
                 let tch = e.touches[0];
-                evtObj.extParams = {
-                    pos: { sx: tch.pageX, sy: tch.pageY, t: Date.now() }
-                };
+                evtObj.setExtraParam('pos', { sx: tch.pageX, sy: tch.pageY, t: Date.now() });
             },
             touchmove: function (e, evtObj) {
-                let pos = evtObj.extParams.pos;
+                let pos = evtObj.getExtraParam('pos');
                 let tch = e.touches[0];
                 let dx = tch.pageX - pos.sx;
                 let dy = tch.pageY - pos.sy;
@@ -3103,7 +3237,7 @@ var nodom;
                 }
             },
             touchend: function (e, evtObj) {
-                let pos = evtObj.extParams.pos;
+                let pos = evtObj.getExtraParam('pos');
                 let dt = Date.now() - pos.t;
                 if (pos.move === true || dt > 200) {
                     return;
@@ -3115,18 +3249,16 @@ var nodom;
             touchstart: function (e, evtObj) {
                 let tch = e.touches[0];
                 let t = Date.now();
-                evtObj.extParams = {
-                    swipe: {
-                        oldTime: [t, t],
-                        speedLoc: [{ x: tch.pageX, y: tch.pageY }, { x: tch.pageX, y: tch.pageY }],
-                        oldLoc: { x: tch.pageX, y: tch.pageY }
-                    }
-                };
+                evtObj.setExtraParam('swipe', {
+                    oldTime: [t, t],
+                    speedLoc: [{ x: tch.pageX, y: tch.pageY }, { x: tch.pageX, y: tch.pageY }],
+                    oldLoc: { x: tch.pageX, y: tch.pageY }
+                });
             },
             touchmove: function (e, evtObj) {
                 let nt = Date.now();
                 let tch = e.touches[0];
-                let mv = evtObj.extParams['swipe'];
+                let mv = evtObj.getExtraParam('swipe');
                 if (nt - mv.oldTime > 50) {
                     mv.speedLoc[0] = { x: mv.speedLoc[1].x, y: mv.speedLoc[1].y };
                     mv.speedLoc[1] = { x: tch.pageX, y: tch.pageY };
@@ -3136,7 +3268,7 @@ var nodom;
                 mv.oldLoc = { x: tch.pageX, y: tch.pageY };
             },
             touchend: function (e, evtObj) {
-                let mv = evtObj.extParams['swipe'];
+                let mv = evtObj.getExtraParam('swipe');
                 let nt = Date.now();
                 let ind = (nt - mv.oldTime[1] < 30) ? 0 : 1;
                 let dx = mv.oldLoc.x - mv.speedLoc[ind].x;
@@ -3283,7 +3415,7 @@ var nodom;
                             showPath = route.useParentPath && proute ? proute.fullPath : route.fullPath;
                             let module = nodom.ModuleFactory.get(route.module);
                             route.setLinkActive();
-                            module.firstRender = true;
+                            module.setFirstRender(true);
                             yield module.active();
                             setRouteParamToModel(route, module);
                         }
@@ -3308,11 +3440,11 @@ var nodom;
                             else {
                                 module = nodom.ModuleFactory.get(route.module);
                             }
-                            module.firstRender = true;
+                            module.setFirstRender(true);
                             let routerKey = Router.routerKeyMap.get(parentModule.id);
                             for (let i = 0; i < parentModule.children.length; i++) {
                                 let m = nodom.ModuleFactory.get(parentModule.children[i]);
-                                if (m && m.containerKey === routerKey) {
+                                if (m && m.isContainerKey(routerKey)) {
                                     parentModule.children.splice(i, 1);
                                     break;
                                 }
@@ -3845,7 +3977,7 @@ var nodom;
                 .then((m) => {
                 if (m) {
                     m.setContainerKey(dom.key);
-                    let dom1 = module.virtualDom.query(dom.key);
+                    let dom1 = module.getElement(dom.key, true);
                     if (dom1) {
                         let dir = dom1.getDirective('module');
                         dir.extra.moduleId = m.id;
@@ -3877,7 +4009,7 @@ var nodom;
             startIndex = 1;
         }
         else if (dom.modelId) {
-            model = module.modelFactory.get(dom.modelId);
+            model = module.getModel(dom.modelId);
         }
         if (!model || !model.data) {
             return;
@@ -3906,7 +4038,7 @@ var nodom;
         }
         directive.value = modelName;
     }, (directive, dom, module, parent) => {
-        let model = module.modelFactory.get(dom.modelId);
+        let model = module.getModel(dom.modelId);
         dom.dontRender = true;
         if (!model || !model.data) {
             return;
@@ -3962,7 +4094,7 @@ var nodom;
             directive.value = expr;
         }
     }, (directive, dom, module, parent) => {
-        let model = module.modelFactory.get(dom.modelId);
+        let model = module.getModel(dom.modelId);
         let v = directive.value.val(model);
         let indif = -1, indelse = -1;
         for (let i = 0; i < parent.children.length; i++) {
@@ -4007,7 +4139,7 @@ var nodom;
             directive.value = expr;
         }
     }, (directive, dom, module, parent) => {
-        let model = module.modelFactory.get(dom.modelId);
+        let model = module.getModel(dom.modelId);
         let v = directive.value.val(model);
         if (v && v !== 'false') {
             dom.dontRender = false;
@@ -4037,7 +4169,7 @@ var nodom;
         let obj = directive.value;
         let clsArr = [];
         let cls = dom.getProp('class');
-        let model = module.modelFactory.get(dom.modelId);
+        let model = module.getModel(dom.modelId);
         if (nodom.Util.isString(cls) && !nodom.Util.isEmpty(cls)) {
             clsArr = cls.trim().split(/\s+/);
         }
@@ -4046,7 +4178,6 @@ var nodom;
             if (r instanceof nodom.Expression) {
                 r = r.val(model);
             }
-            
             let ind = clsArr.indexOf(key);
             if (!r || r === 'false') {
                 if (ind !== -1) {
@@ -4096,7 +4227,7 @@ var nodom;
     }, (directive, dom, module, parent) => {
         const type = dom.getProp('type');
         const tgname = dom.tagName.toLowerCase();
-        const model = module.modelFactory.get(dom.modelId);
+        const model = module.getModel(dom.modelId);
         if (!model.data) {
             return;
         }
@@ -4133,7 +4264,7 @@ var nodom;
             }
         }
         else {
-            dom.assets.set('value', dataValue);
+            dom.assets.set('value', dataValue === undefined || dataValue === null ? '' : dataValue);
         }
     });
     nodom.DirectiveManager.addType('validity', 10, (directive, dom) => {
@@ -4170,7 +4301,7 @@ var nodom;
         }
     }, (directive, dom, module, parent) => {
         setTimeout(() => {
-            const el = module.container.querySelector("[name='" + directive.value + "']");
+            const el = module.getNode({ name: directive.value });
             if (!directive.extra.initEvent) {
                 directive.extra.initEvent = true;
                 el.addEventListener('focus', function () {
@@ -4185,7 +4316,7 @@ var nodom;
             dom.dontRender = true;
             return;
         }
-        const el = module.container.querySelector("[name='" + directive.value + "']");
+        const el = module.getNode({ name: directive.value });
         if (!el) {
             return;
         }
@@ -4197,7 +4328,7 @@ var nodom;
         });
         let resultArr = [];
         if (directive.params.method) {
-            const foo = module.methodFactory.get(directive.params.method);
+            const foo = module.getMethod(directive.params.method);
             if (nodom.Util.isFunction(foo)) {
                 let r = foo.call(module.model, el.value);
                 if (!r) {
@@ -4312,6 +4443,10 @@ var nodom;
         dom.setProp('role', 'module');
     }, (directive, dom, module, parent) => {
         nodom.Router.routerKeyMap.set(module.id, dom.key);
+    });
+    nodom.DirectiveManager.addType('ignoreself', 10, (directive, dom) => {
+        dom.dontRenderSelf = true;
+    }, (directive, dom, module, parent) => {
     });
 })(nodom || (nodom = {}));
 var nodom;
@@ -4653,7 +4788,6 @@ var nodom;
             if (!this.modelId || uidom.key !== this.key) {
                 this.key = uidom.key;
                 this.modelId = uidom.modelId;
-
                 if (uidom.hasProp('name')) {
                     module.addPlugin(uidom.getProp('name'), this);
                 }
@@ -4678,14 +4812,13 @@ var nodom;
             }
             return plugin;
         }
-        setTmp(name, value) {
-            this.tmpParam[name] = value;
-        }
-        getTmp(name, value) {
-            this.tmpParam[name] = value;
-        }
-        removeTmp(name) {
-            delete this.tmpParam[name];
+        getModel() {
+            let module = nodom.ModuleFactory.get(this.moduleId);
+            if (!module) {
+                return null;
+            }
+            let model = module.getModel(this.modelId);
+            return model ? model : null;
         }
     }
     nodom.Plugin = Plugin;

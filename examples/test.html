@@ -1,140 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/nodomui.css" />
+    <script src='js/nodom.js'></script>
+    <script src='../bin/nodomui.js'></script>
     <style>
-        span{
-            display:block;
-            position:absolute;
-            background-color:gold;
-        }
+
     </style>
 </head>
+
 <body>
-    <canvas width='300' height='300'></canvas>
-    <div style='height:300px;height:300px;'></div>
+    <div>
+        <div name="checkgrid" style="height:300px" class="nd-grid nd-grid-both-line" key="18">
+            <div class="nd-grid-body nd-grid-rowalt" key="45">
+                <table cellspacing="0" class="nd-grid-line" rules="all" key="46">
+                    <colgroup key="47">
+                        <col width="30" key="96">
+                        <col width="100" key="52">
+                        <col width="100" key="55">
+                        <col width="100" key="58">
+                        <col key="61">
+                    </colgroup>
+                    <tr key="51_0">
+                        <td colspan='1' class="nd-grid-iconcol" key="97_0"><b class="nd-grid-sub-btn" key="98_0"></b></td>
+                        <td colspan='1' key="53_0">1</td>
+                        <td colspan='1' key="56_0">¥46</td>
+                        <td colspan='1' key="59_0">¥399</td>
+                        <td colspan='1' key="62_0">女款韩版休闲圆领宽松运动风条纹撞色短袖连衣裙</td>
+                    </tr>
+                    <tr  key="102_0" >
+                        <td colspan="5" key="105_0">
+                            <div class="nd-grid-sub" cols="2" key="39_0">
+                                <div class="nd-grid-sub-row" key="106_0">
+                                    <div class="nd-grid-sub-item" key="107_0"><label key="108_0"
+                                            style="width: 100px;">编号:</label><span class="nd-grid-sub-content"
+                                            key="109_0">1</span></div>
+                                    <div class="nd-grid-sub-item" key="111_0"><label key="112_0"
+                                            style="width: 100px;">价格:</label><span class="nd-grid-sub-content"
+                                            key="113_0"></span>12234</div>
+                                </div>
+                                <div class="nd-grid-sub-row" key="115_0">
+                                    <div class="nd-grid-sub-item" key="116_0"><label key="117_0"
+                                            style="width: 100px;">原价:</label><span class="nd-grid-sub-content"
+                                            key="118_0"></span></div>
+                                    <div class="nd-grid-sub-item" key="120_0"><label key="121_0"
+                                            style="width: 100px;">商品名:</label><span class="nd-grid-sub-content"
+                                            key="122_0">afaldfjaldfjalkdfladf</span></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script>
-    
-    /*function loop(){
-        let ctx = document.querySelector('canvas').getContext('2d');
-        ctx.clearRect(0,0,300,300);
-        ctx.fillStyle = 'gold';
-        let centerx = 150;
-        let centery = 150;
-        let radius1 = 8;
-        let radius = 40;
-        let angle = startAngle;
-        for(let i=0;i<8;i++){
-            ctx.beginPath();
-            ctx.arc(centerx + radius * Math.cos(angle),centery + radius*Math.sin(angle),radius1,0,360);
-            angle += Math.PI/4;
-            radius1 -= 0.5;
-            ctx.closePath();    
-            ctx.fill();    
-        }
-        startAngle += Math.PI/32;
-        setTimeout(loop,30);
-    }*/
 
-    function loop(){
-        let ctx = document.querySelector('canvas').getContext('2d');
-        ctx.clearRect(0,0,300,300);
-        ctx.fillStyle = 'gold';
-        let centerx = 150;
-        let centery = 150;
-        let radius1 = 6;
-        let radius = 40;
-        let angle = startAngle;
-        let index = 0;
-        let circleArr = [];
-        loop1();
-        setTimeout(loop,1500);
-        
-        function loop1(){
-            ctx.clearRect(0,0,300,300);
-            if(circleArr.length<circleCount){
-                circleArr.push(true);
-            }
-            angle+=Math.PI/8;
 
-            let overNum = 0;
-            
-            for(let i=0;i<circleArr.length;i++){
-                let a = angle - i * Math.PI/8;
-                if(a > Math.PI*2 + startAngle){
-                    overNum++;
-                    a = Math.PI*2 + startAngle;
-                }
-                
-                let r = radius1 - i;
-                ctx.beginPath();
-                ctx.arc(centerx - radius * Math.cos(a),centery - radius*Math.sin(a),r,0,360);
-                ctx.closePath();    
-                ctx.fill();
-            }
-            if(overNum < circleCount){
-                setTimeout(loop1,60);
-            }
-            
-        }
-    }
 
-    // let ct = document.querySelector('div');
-    // let width = 12;
-    // let centerX = 100;
-    // let centerY = 100;
-    // let locRadius = 50;
-    // let startAngle = Math.PI/2;
-    // let circleCount = 6;
-    // let spans = [];
-    // for(let i=0;i<circleCount;i++){
-    //     let span = document.createElement('span');
-    //     span.style.width = width + 'px';
-    //     span.style.height = width + 'px';
-    //     span.style.borderRadius = width/2 + 'px';
-        
-    //     span.style.left = (centerX - locRadius * Math.cos(startAngle) - width/2) + 'px';
-    //     span.style.top = (centerY - locRadius * Math.sin(startAngle) - width/2) + 'px';
-    //     spans.push(span);
-    //     ct.appendChild(span);
-    //     width-=2;
-    // }
-
-    // function loop(){
-    //     let angle = startAngle;
-    //     let index = 1;
-    //     loop1();
-
-    //     setTimeout(loop,2500);
-        
-    //     function loop1(){
-    //         angle+=Math.PI/8;
-    //         let overNum = 0;
-    //         if(index < circleCount){
-    //             index++;
-    //         }
-    //         for(let i=0;i<index;i++){
-    //             let a = angle - i * Math.PI/8;
-    //             if(a > Math.PI*2 + startAngle){
-    //                 overNum++;
-    //                 a = Math.PI*2 + startAngle;
-    //             }
-    //             spans[i].style.left = (centerX - locRadius * Math.cos(a) - spans[i].offsetWidth/2) + 'px';
-    //             spans[i].style.top = (centerY - locRadius * Math.sin(a)- spans[i].offsetWidth/2) + 'px';
-    //         }
-    //         if(overNum < circleCount){
-    //             setTimeout(loop1,60);
-    //         }
-            
-    //     }
-    // }
-
-    // loop();
-
-    
 </script>
+
 </html>

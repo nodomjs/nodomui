@@ -121,7 +121,7 @@ class UIRelationMap extends nodom.Plugin{
     beforeRender(module:nodom.Module,uidom:nodom.Element){
         super.beforeRender(module,uidom);
         //增加列表格渲染数据
-        let model:nodom.Model = module.modelFactory.get(uidom.modelId);
+        let model:nodom.Model = module.getModel(uidom.modelId);
         let rowData = model.query(this.listField[1]);
         if(!rowData){
             return;
@@ -167,7 +167,7 @@ class UIRelationMap extends nodom.Plugin{
      * @param model 
      */
     switchValue(module:nodom.Module,dom:nodom.Element,model:nodom.Model){
-        let pmodel:nodom.Model = module.modelFactory.get(this.modelId);
+        let pmodel:nodom.Model = module.getModel(this.modelId);
         let data = pmodel.query(this.dataName);
         let id1 = model.data['id1'];
         let id2 = model.data['id2'];

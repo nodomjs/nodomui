@@ -92,14 +92,14 @@ class UIDialog extends nodom.Plugin{
     public open(){
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
         if(module){
-            let model:nodom.Model = module.modelFactory.get(this.modelId);
+            let model:nodom.Model = module.getModel(this.modelId);
             if(model){
                 model.set(this.dataName,true);
             }
 
             //onopen事件
             if(this.onOpen){
-                let foo = module.methodFactory.get(this.onOpen);
+                let foo = module.getMethod(this.onOpen);
                 if(foo){
                     nodom.Util.apply(foo,model,[model,module]);
                 }
@@ -115,14 +115,14 @@ class UIDialog extends nodom.Plugin{
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
         
         if(module){
-            let model:nodom.Model = module.modelFactory.get(this.modelId);
+            let model:nodom.Model = module.getModel(this.modelId);
             if(model){
                 model.set(this.dataName,false);
             }
             
             //onClose事件
             if(this.onClose){
-                let foo = module.methodFactory.get(this.onClose);
+                let foo = module.getMethod(this.onClose);
                 if(foo){
                     nodom.Util.apply(foo,model,[model,module]);
                 }

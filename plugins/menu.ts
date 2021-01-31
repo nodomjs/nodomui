@@ -140,7 +140,7 @@ class UIMenu extends nodom.Plugin{
                 parentCt.addEvent(new nodom.NodomEvent('mouseleave',
                     (dom,model,module,e)=>{
                         let parent = dom.getParent(module);
-                        let pmodel = module.modelFactory.get(parent.modelId);
+                        let pmodel = module.getModel(parent.modelId);
                         pmodel.set(me.activeName,false);
                         //第一级需要还原direction
                         if(dom.hasClass('nd-menu-first')){
@@ -158,7 +158,7 @@ class UIMenu extends nodom.Plugin{
         
         //初始化各级
         for(let i=0;i<this.maxLevel;i++){
-            parentCt.tmpData = {level:i+1};
+            parentCt.setProp('level',i+1);
             let itemCt:nodom.Element = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat',this.listField,itemCt));
             itemCt.addClass('nd-menu-nodect');
@@ -166,7 +166,7 @@ class UIMenu extends nodom.Plugin{
             itemCt.add(item);
             
             //缓存item级
-            itemCt.tmpData = {level:(i+1)};
+            itemCt.setProp('level',i+1);
             //子菜单箭头图标
             if(this.popupMenu || i>0){
                 let icon1 = new nodom.Element('b');
@@ -189,7 +189,7 @@ class UIMenu extends nodom.Plugin{
             subCt.addEvent(new nodom.NodomEvent('mouseleave',
                 (dom,model,module,e)=>{
                     let parent = dom.getParent(module);
-                    let pmodel = module.modelFactory.get(parent.modelId);
+                    let pmodel = module.getModel(parent.modelId);
                     pmodel.set(me.activeName,false);
                 }
             ));
@@ -219,7 +219,7 @@ class UIMenu extends nodom.Plugin{
                     }
                     let x = e.clientX;
                     let w = me.menuWidth;
-                    let model:nodom.Model = module.modelFactory.get(uidom.modelId);
+                    let model:nodom.Model = module.getModel(uidom.modelId);
                     let rows = model.query(me.listField);
                     if(rows && rows.length>0){
                         let h:number = rows.length * me.menuHeight;
@@ -307,7 +307,7 @@ class UIMenu extends nodom.Plugin{
      
     private cacPos(dom:nodom.Element,x:number,y:number,w:number,h:number,el?:HTMLElement):number[]{
         //非pop第一级菜单
-        let firstNopop:boolean = dom && !this.popupMenu && dom.tmpData['level'] === 1;
+        let firstNopop:boolean = dom && !this.popupMenu && dom.getProp('level') === 1;
         //超出宽度
         let widthOut:boolean = x + w > window.innerWidth;
         let heightOut:boolean = y + h > window.innerHeight;

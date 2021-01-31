@@ -87,7 +87,7 @@ class UIRadio extends nodom.Plugin{
             item.assets.set('style','margin:0 ' + this.itemMargin + 'px;');
             item.addEvent(new nodom.NodomEvent('click',
                 (dom,model,module)=>{
-                    let model1:nodom.Model = module.modelFactory.get(this.modelId);
+                    let model1:nodom.Model = module.getModel(this.modelId);
                     let datas:Array<object> = model1.query(this.listField);
                     // 所有选项的select置false
                     if(datas){
@@ -127,7 +127,7 @@ class UIRadio extends nodom.Plugin{
      */
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         if(this.checkName){
             let datas:Array<object> = model.query(this.listField);
             if(datas){

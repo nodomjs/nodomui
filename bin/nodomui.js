@@ -4,6 +4,7 @@ const NUITipWords = {
     record: '条',
     NO: '第',
     page: '页',
+    emptySelect: '请选择...',
     weekday: {
         sunday: '日',
         monday: '一',
@@ -33,7 +34,7 @@ class UITool {
         }
     }
     static adjustPosAndSize(module, key, x, y, distance, bodyHeight, changeSize) {
-        let el = module.container.querySelector("[key='" + key + "']");
+        let el = module.getNode(key);
         if (!el) {
             setTimeout(() => {
                 UITool.adjustPosAndSize(module, key, x, y, distance, document.body.scrollHeight, changeSize);
@@ -149,7 +150,7 @@ class UIEventRegister {
                 let evts = this.listeners.get(eventName);
                 for (let evt of evts) {
                     let module = nodom.ModuleFactory.get(evt.module);
-                    let dom = module.renderTree.query(evt.dom);
+                    let dom = module.getElement(evt.dom);
                     if (!dom) {
                         continue;
                     }
@@ -234,7 +235,7 @@ class UIAccordion extends nodom.Plugin {
                 firstDom.addDirective(new nodom.Directive('repeat', item.getProp('data'), firstDom), true);
                 item.addClass('nd-accordion-first');
                 let methodId = '$nodomGenMethod' + nodom.Util.genId();
-                item.addEvent(new nodom.NodomEvent('click', methodId + ':delg'));
+                item.addEvent(new nodom.NodomEvent('click', methodId));
                 this.method1 = methodId;
                 activeName1 = item.getProp('activename') || 'active';
                 this.active1 = activeName1;
@@ -259,7 +260,7 @@ class UIAccordion extends nodom.Plugin {
                 this.field2 = item.getProp('data');
                 item.addClass('nd-accordion-second');
                 if (item.hasProp('itemclick')) {
-                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick') + ':delg'));
+                    item.addEvent(new nodom.NodomEvent('click', item.getProp('itemclick')));
                 }
                 item.addDirective(new nodom.Directive('class', "{'nd-accordion-selected':'" + activeName2 + "'}", item));
                 secondDom.addClass('nd-accordion-secondct');
@@ -275,8 +276,8 @@ class UIAccordion extends nodom.Plugin {
         const me = this;
         super.beforeRender(module, uidom);
         if (this.needPreRender) {
-            module.methodFactory.add(this.method1, (dom, model, module, e) => {
-                let pmodel = module.modelFactory.get(uidom.modelId);
+            module.addMethod(this.method1, (dom, model, module, e) => {
+                let pmodel = module.getModel(uidom.modelId);
                 let data = pmodel.query(me.field1);
                 let f = me.active1;
                 for (let d of data) {
@@ -286,8 +287,8 @@ class UIAccordion extends nodom.Plugin {
                 }
                 model.set(f, true);
             });
-            module.methodFactory.add(this.method2, (dom, model, module, e) => {
-                let pmodel = module.modelFactory.get(uidom.modelId);
+            module.addMethod(this.method2, (dom, model, module, e) => {
+                let pmodel = module.getModel(uidom.modelId);
                 let data = pmodel.data[me.field1];
                 let f = me.active2;
                 for (let d of data) {
@@ -537,7 +538,7 @@ class UIDatetime extends nodom.Plugin {
         btnOk.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
             e.preventDefault();
             model.set('show', false);
-            let pmodel = module.modelFactory.get(me.modelId);
+            let pmodel = module.getModel(me.modelId);
             pmodel.set(this.dataName, me.genValueStr());
         }));
         pickerDom.add(btnCt);
@@ -547,7 +548,7 @@ class UIDatetime extends nodom.Plugin {
         let me = this;
         super.beforeRender(module, uidom);
         this.listKey = uidom.children[1].key;
-        let model = module.modelFactory.get(uidom.modelId);
+        let model = module.getModel(uidom.modelId);
         if (this.needPreRender) {
             model.set(this.extraDataName, {
                 show: false,
@@ -633,7 +634,7 @@ class UIDatetime extends nodom.Plugin {
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression('date')];
         daySpan.add(txt);
-        daySpan.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module) => {
+        daySpan.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             let data = model.data;
             if (data.disable) {
                 return;
@@ -665,7 +666,7 @@ class UIDatetime extends nodom.Plugin {
         item.setProp('role', 'hour');
         item.add(txt);
         hourDom.add(item);
-        item.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e, el) => {
+        item.addEvent(new nodom.NodomEvent('click', (dom, model, module, e, el) => {
             me.selectTime(module, dom, model);
         }));
         let minuteDom = hourDom.clone(true);
@@ -714,13 +715,13 @@ class UIDatetime extends nodom.Plugin {
                 date: i - wd
             });
         }
-        let model = module.modelFactory.get(this.pickerModelId);
+        let model = module.getModel(this.pickerModelId);
         model.set('year', year);
         model.set('month', month);
         model.set('days', dayArr);
     }
     genTimes(module) {
-        let model = module.modelFactory.get(this.pickerModelId);
+        let model = module.getModel(this.pickerModelId);
         let hours = [];
         let minutes = [];
         let seconds = [];
@@ -771,7 +772,7 @@ class UIDatetime extends nodom.Plugin {
         }
     }
     changeMonth(module, distance) {
-        let model = module.modelFactory.get(this.pickerModelId);
+        let model = module.getModel(this.pickerModelId);
         let year = model.query('year');
         let month = model.query('month');
         month += distance;
@@ -799,8 +800,8 @@ class UIDatetime extends nodom.Plugin {
             if (str === '') {
                 return;
             }
-            let model = module.modelFactory.get(this.modelId);
-            let model1 = module.modelFactory.get(this.pickerModelId);
+            let model = module.getModel(this.modelId);
+            let model1 = module.getModel(this.pickerModelId);
             if (this.type === 'date' || this.type === 'datetime') {
                 let date = new Date(str);
                 if (date.toTimeString() !== 'Invalid Date') {
@@ -833,7 +834,7 @@ class UIDatetime extends nodom.Plugin {
         }
     }
     selectDate(module, model) {
-        let pmodel = module.modelFactory.get(this.pickerModelId);
+        let pmodel = module.getModel(this.pickerModelId);
         if (pmodel) {
             let days = pmodel.query('days');
             for (let d of days) {
@@ -851,7 +852,7 @@ class UIDatetime extends nodom.Plugin {
         }
     }
     selectTime(module, dom, model) {
-        let pmodel = module.modelFactory.get(this.pickerModelId);
+        let pmodel = module.getModel(this.pickerModelId);
         let role = dom.getProp('role');
         if (pmodel) {
             let datas = pmodel.query(role + 's');
@@ -863,7 +864,7 @@ class UIDatetime extends nodom.Plugin {
             }
         }
         if (!model) {
-            model = module.modelFactory.get(dom.modelId);
+            model = module.getModel(dom.modelId);
         }
         if (model) {
             model.set('selected', true);
@@ -888,7 +889,7 @@ class UIDatetime extends nodom.Plugin {
     }
     setTimeSelect(module) {
         let me = this;
-        let model = module.modelFactory.get(this.pickerModelId);
+        let model = module.getModel(this.pickerModelId);
         let data = [this.hour, this.minute, this.second];
         ['hours', 'minutes', 'seconds'].forEach((item, i) => {
             let datas = model.query(item);
@@ -915,7 +916,7 @@ class UIDatetime extends nodom.Plugin {
                 timeCt = uidom.children[1].children[0].children[0].children[1];
             }
             data.forEach((item, i) => {
-                let el = module.container.querySelector("[key='" + timeCt.children[i].key + "']");
+                let el = module.getNode(timeCt.children[i].key);
                 el.scrollTo(0, data[i] * 30);
             });
         }
@@ -996,12 +997,12 @@ class UIDialog extends nodom.Plugin {
     open() {
         let module = nodom.ModuleFactory.get(this.moduleId);
         if (module) {
-            let model = module.modelFactory.get(this.modelId);
+            let model = module.getModel(this.modelId);
             if (model) {
                 model.set(this.dataName, true);
             }
             if (this.onOpen) {
-                let foo = module.methodFactory.get(this.onOpen);
+                let foo = module.getMethod(this.onOpen);
                 if (foo) {
                     nodom.Util.apply(foo, model, [model, module]);
                 }
@@ -1011,12 +1012,12 @@ class UIDialog extends nodom.Plugin {
     close() {
         let module = nodom.ModuleFactory.get(this.moduleId);
         if (module) {
-            let model = module.modelFactory.get(this.modelId);
+            let model = module.getModel(this.modelId);
             if (model) {
                 model.set(this.dataName, false);
             }
             if (this.onClose) {
-                let foo = module.methodFactory.get(this.onClose);
+                let foo = module.getMethod(this.onClose);
                 if (foo) {
                     nodom.Util.apply(foo, model, [model, module]);
                 }
@@ -1156,7 +1157,7 @@ class UIFile extends nodom.Plugin {
         return ctDom;
     }
     removeFile(module, id) {
-        let pm = module.modelFactory.get(this.modelId);
+        let pm = module.getModel(this.modelId);
         let rows = pm.query(this.dataName);
         if (Array.isArray(rows)) {
             for (let i = 0; i < rows.length; i++) {
@@ -1170,7 +1171,7 @@ class UIFile extends nodom.Plugin {
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
-            let model = module.modelFactory.get(dom.modelId);
+            let model = module.getModel(dom.modelId);
             if (model) {
                 model.set(this.extraDataName, {
                     state: 0,
@@ -1206,15 +1207,25 @@ class UIForm extends nodom.Plugin {
     generate(rootDom) {
         rootDom.addClass('nd-form');
         for (let c of rootDom.children) {
-            if (!c.tagName) {
+            if (c.tagName !== 'ROW') {
                 continue;
             }
-            c.addClass('nd-form-item');
+            c.tagName = 'DIV';
+            c.addClass('nd-form-row');
             if (c.children) {
                 for (let c1 of c.children) {
-                    if (c1.tagName === 'LABEL') {
-                        c1.assets.set('style', 'width:' + this.labelWidth + 'px');
-                        break;
+                    if (c1.tagName !== 'ITEM') {
+                        continue;
+                    }
+                    c1.tagName = 'DIV';
+                    c1.addClass('nd-form-item');
+                    if (c1.children) {
+                        for (let c2 of c1.children) {
+                            if (c2.tagName === 'LABEL') {
+                                c2.assets.set('style', 'width:' + this.labelWidth + 'px');
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -1232,7 +1243,7 @@ class UIGrid extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'checkbox|bool', 'hidehead|bool', 'dataurl'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'checkbox', 'hideHead', 'dataUrl'], ['rows', null, null, '', null, null, null, null, null]);
+                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'checkbox|bool', 'hidehead|bool', 'dataurl', 'defaultcolwidth|number'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'checkbox', 'hideHead', 'dataUrl', 'defaultColWidth'], ['rows', null, null, '', null, null, null, '', 0]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1248,22 +1259,31 @@ class UIGrid extends nodom.Plugin {
     generate(rootDom) {
         rootDom.addClass('nd-grid');
         this.extraDataName = '$ui_grid_' + nodom.Util.genId();
+        let genName = '$ui_grid_' + nodom.Util.genId();
+        this.subName = genName + '_showSub';
+        this.checkName = genName + '_checked';
+        this.scrollName = genName + '_scroll';
         if (this.fixHead) {
             rootDom.addClass('nd-grid-fixed');
         }
         if (this.checkbox) {
             this.wholeCheckName = '$ui_grid_' + nodom.Util.genId();
         }
+        let headTbl;
         let thead;
         if (!this.hideHead) {
             thead = new nodom.Element('div');
             thead.addClass('nd-grid-head');
+            headTbl = new nodom.Element('table');
+            thead.add(headTbl);
         }
         let tbody = new nodom.Element('div');
         tbody.addClass('nd-grid-body');
         if (this.rowAlt) {
-            tbody.addClass('nd-grid-body-rowalt');
+            tbody.addClass('nd-grid-rowalt');
         }
+        let bodyTbl = new nodom.Element('table');
+        tbody.add(bodyTbl);
         let rowDom;
         let subDom;
         let pagination;
@@ -1272,178 +1292,234 @@ class UIGrid extends nodom.Plugin {
                 rowDom = c;
             }
             else if (c.tagName === 'SUB') {
+                this.showDetail = true;
                 subDom = c;
             }
             else if (c.plugin && c.plugin.tagName === 'UI-PAGINATION') {
                 pagination = c;
             }
         }
-        if (rowDom) {
-            this.rowDomKey = rowDom.key;
-            let filter;
-            if (pagination) {
-                this.selectPageMethodId = '$$nodom_method_gen_' + nodom.Util.genId();
-                filter = new nodom.Filter('select:func:' + this.selectPageMethodId);
-            }
-            let directive = new nodom.Directive('repeat', this.extraDataName + '.' + this.dataName, rowDom);
-            if (filter) {
-                directive.filters = [filter];
-            }
-            rowDom.addDirective(directive);
-            rowDom.tagName = 'div';
-            let dataDom = new nodom.Element('div');
-            dataDom.addClass('nd-grid-row');
-            if (this.gridLine === 'col' || this.gridLine === 'both') {
-                dataDom.addClass('nd-grid-col-line');
-            }
-            if (this.gridLine === 'row' || this.gridLine === 'both') {
-                dataDom.addClass('nd-grid-row-line');
-            }
-            for (let i = 0; i < rowDom.children.length; i++) {
-                let c = rowDom.children[i];
-                if (!c.tagName) {
-                    rowDom.children.splice(i--, 1);
-                    continue;
-                }
-                if (c.hasProp('hide')) {
-                    c.delProp('hide');
-                    continue;
-                }
-                let field = c.getProp('field');
-                if (field) {
-                    field = field.trim();
-                }
-                this.fields.push({
-                    title: c.getProp('title'),
-                    field: field,
-                    expressions: c.children[0].expressions
-                });
-                this.addToHead(c, i, thead, field);
-                let tdIn = c.children[0];
-                switch (c.getProp('type')) {
-                    case 'img':
-                        tdIn.tagName = 'img';
-                        tdIn.setProp('src', tdIn.expressions, true);
-                        c.children = [tdIn];
-                        delete tdIn.expressions;
-                        break;
-                }
-                c.tagName = 'div';
-                c.addClass('nd-grid-row-item');
-                if (c.hasProp('left')) {
-                    c.addClass('nd-grid-row-item-left');
-                }
-                if (c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width'))) {
-                    c.setProp('style', 'flex:' + c.getProp('width'));
-                }
-                dataDom.add(c);
-                c.delProp(['title', 'type', 'width', 'field', 'notsort', 'left']);
-            }
-            rowDom.children = [dataDom];
-            rowDom.delProp('data');
-            if (this.checkbox) {
-                this.handleCheck(thead, dataDom, rowDom);
-            }
-            if (subDom) {
-                this.handleSub(subDom, thead, dataDom, rowDom);
-            }
-            tbody.add(rowDom);
+        if (!rowDom) {
+            return;
         }
-        if (thead) {
-            rootDom.children = [thead, tbody];
-            if (this.gridLine === 'row' || this.gridLine === 'both') {
-                rootDom.addClass('nd-grid-ct-row-line');
+        for (let c of rowDom.children) {
+            if (!c.tagName) {
+                continue;
             }
+            let field = c.getProp('field');
+            if (field) {
+                field = field.trim();
+            }
+            this.fields.push({
+                title: c.getProp('title'),
+                field: field,
+                type: 0,
+                notsort: c.hasProp('notsort'),
+                children: c.children,
+                hide: c.hasProp('hide'),
+                width: c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width')) ? c.getProp('width') : this.defaultColWidth
+            });
+        }
+        if (this.checkbox) {
+            this.fields.unshift({
+                type: 2,
+                width: 45,
+            });
+        }
+        if (this.showDetail) {
+            this.fields.unshift({
+                type: 1,
+                width: 45,
+            });
+        }
+        this.handleBody(bodyTbl, this.fields, subDom);
+        if (headTbl) {
+            this.handleHead(headTbl, this.fields);
+            rootDom.children = [thead, tbody];
         }
         else {
             rootDom.children = [tbody];
         }
-        if (this.gridLine === 'row' || this.gridLine === 'both') {
-            rootDom.addClass('nd-grid-ct-row-line');
-        }
-        if (this.gridLine === 'col' || this.gridLine === 'both') {
-            rootDom.addClass('nd-grid-ct-col-line');
-        }
-        if (pagination) {
-            pagination.addClass('nd-grid-pager');
-            this.handlePagination(pagination);
-            rootDom.add(pagination);
-        }
+        this.handleGridLine(tbody, thead);
+        this.handleScroll(tbody, thead);
         return rootDom;
     }
-    addToHead(col, index, thead, field) {
-        if (!thead) {
+    handleGridLine(tbody, thead) {
+        if (!this.gridLine) {
             return;
         }
-        if (thead.children.length === 0) {
-            let thCt = new nodom.Element('div');
-            thCt.addClass('nd-grid-row');
-            if (this.gridLine === 'col' || this.gridLine === 'both') {
-                thCt.addClass('nd-grid-col-line');
-            }
-            if (this.gridLine === 'row' || this.gridLine === 'both') {
-                thCt.addClass('nd-grid-row-line');
-            }
-            thead.add(thCt);
-        }
-        if (thead) {
-            let th = new nodom.Element('div');
-            th.addClass('nd-grid-row-item');
-            th.setProp('style', 'flex:' + col.getProp('width') || 0);
-            let span = new nodom.Element('span');
-            span.assets.set('innerHTML', col.getProp('title'));
-            th.add(span);
-            if (this.sortable) {
-                if (col.getProp('type') !== 'img' && !col.hasProp('notsort') && field) {
-                    th.add(this.addSortBtn(index));
+        let type;
+        switch (this.gridLine) {
+            case 'row':
+                type = 'rows';
+                tbody.addClass('nd-grid-row-line');
+                if (thead) {
+                    thead.addClass('nd-grid-top-line');
                 }
+                break;
+            case 'col':
+                type = 'cols';
+                tbody.addClass('nd-grid-column-line');
+                thead.addClass('nd-grid-column-line');
+                break;
+            case 'both':
+                type = 'all';
+                tbody.addClass('nd-grid-all-line');
+                if (thead) {
+                    thead.addClass('nd-grid-column-line nd-grid-top-line');
+                }
+                break;
+        }
+        if (type) {
+            tbody.children[0].setProp('rules', type);
+            if (thead) {
+                thead.children[0].setProp('rules', type);
             }
-            thead.children[0].add(th);
         }
     }
-    addSortBtn(index) {
+    handleHead(tbl, fields) {
+        let colGroup = new nodom.Element('colgroup');
+        tbl.add(colGroup);
+        let thead = new nodom.Element('thead');
+        tbl.add(thead);
+        let tr = new nodom.Element('tr');
+        thead.add(tr);
+        let width = 0;
+        for (let f of fields) {
+            if (f.hide) {
+                continue;
+            }
+            let col = new nodom.Element('col');
+            if (f.width) {
+                col.setProp('width', f.width);
+                width += parseInt(f.width);
+            }
+            colGroup.add(col);
+            let th = new nodom.Element('th');
+            let div = new nodom.Element('div');
+            th.add(div);
+            tr.add(th);
+            switch (f.type) {
+                case 0:
+                    div.assets.set('innerHTML', f.title);
+                    if (this.sortable) {
+                        if (f.type !== 'img' && !f.notsort && f.field) {
+                            div.add(this.addSortBtn(f.field));
+                        }
+                    }
+                    break;
+                case 1:
+                    let b = new nodom.Element();
+                    b.textContent = '';
+                    div.add(b);
+                    break;
+                case 2:
+                    let bh = new nodom.Element('b');
+                    bh.addClass('nd-icon-checkbox');
+                    div.add(bh);
+                    bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'" + this.wholeCheckName + "'}", bh));
+                    bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+                        let check = model.data[this.wholeCheckName] || false;
+                        model.set(this.wholeCheckName, !check);
+                        let model1 = this.getModel();
+                        for (let d of model1.data[this.dataName]) {
+                            let m = module.getModel(d.$modelId);
+                            m.set(this.checkName, !check);
+                        }
+                    }));
+            }
+        }
+        tbl.setProp('style', ['min-width:' + width + 'px;transform:translateX(', new nodom.Expression(this.scrollName), 'px)'], true);
+    }
+    handleBody(tbl, fields, subDom) {
+        let colGroup = new nodom.Element('colgroup');
+        tbl.add(colGroup);
+        let tBody = new nodom.Element('tbody');
+        tbl.add(tBody);
+        let trCt = new nodom.Element('div');
+        tBody.add(trCt);
+        new nodom.Directive('ignoreself', '', trCt);
+        let directive = new nodom.Directive('repeat', this.dataName, trCt);
+        this.repeatDirective = directive;
+        let tr = new nodom.Element('tr');
+        trCt.add(tr);
+        let width = 0;
+        for (let f of fields) {
+            if (f.hide) {
+                continue;
+            }
+            let col = new nodom.Element('col');
+            if (f.width) {
+                col.setProp('width', f.width);
+                width += parseInt(f.width);
+            }
+            colGroup.add(col);
+            let td = new nodom.Element('td');
+            let div = new nodom.Element('div');
+            td.add(div);
+            tr.add(td);
+            switch (f.type) {
+                case 0:
+                    div.children = f.children;
+                    break;
+                case 1:
+                    let b = new nodom.Element('b');
+                    b.addClass('nd-grid-sub-btn');
+                    new nodom.Directive('class', "{'nd-grid-showsub':'" + this.subName + "'}", b);
+                    div.add(b);
+                    this.handleSub(subDom, tbl, b);
+                    break;
+                case 2:
+                    let b1 = new nodom.Element('b');
+                    b1.addClass('nd-icon-checkbox');
+                    new nodom.Directive('class', "{'nd-icon-checked':'" + this.checkName + "'}", b1);
+                    div.add(b1);
+                    b1.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+                        model.set(this.checkName, !model.data[this.checkName]);
+                    }));
+            }
+        }
+        tbl.setProp('style', 'min-width:' + width + 'px');
+    }
+    addSortBtn(field) {
         let updown = new nodom.Element('span');
         updown.addClass('nd-grid-sort');
         let up = new nodom.Element('B');
         up.addClass('nd-grid-sort-raise');
-        up.tmpData = { index: index };
+        up.setProp('field', field);
         let down = new nodom.Element('B');
         down.addClass('nd-grid-sort-down');
-        down.tmpData = { index: index };
+        down.setProp('field', field);
         const plugin = this;
         up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            plugin.sort(parseInt(dom.tmpData['index']), 'asc', module);
+            plugin.sort(dom.getProp('field'), 'asc', module);
         }));
         down.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            plugin.sort(parseInt(dom.tmpData['index']), 'desc', module);
+            plugin.sort(dom.getProp('field'), 'desc', module);
         }));
         updown.add(up);
         updown.add(down);
         return updown;
     }
-    handleSub(subDom, thead, dataDom, rowDom) {
-        let th = new nodom.Element('div');
-        th.addClass('nd-grid-iconcol');
-        let b = new nodom.Element('b');
-        b.addClass('nd-grid-sub-btn');
-        th.add(b);
-        if (thead) {
-            thead.children[0].children.unshift(th);
-        }
-        let td = new nodom.Element('div');
-        td.addClass('nd-grid-iconcol');
-        b = new nodom.Element('b');
-        b.addClass('nd-grid-sub-btn');
-        b.addDirective(new nodom.Directive('class', "{'nd-grid-showsub':'$showSub'}", b));
-        b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
-            model.set('$showSub', !model.data['$showSub']);
+    handleSub(subDom, bodyTbl, b) {
+        b.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
+            model.set(this.subName, !model.query(this.subName));
         }));
-        td.add(b);
-        dataDom.children.unshift(td);
+        let detailDom = new nodom.Element('tr');
+        bodyTbl.children[1].children[0].add(detailDom);
+        new nodom.Directive('show', this.subName, detailDom);
+        let td = new nodom.Element('td');
+        detailDom.add(td);
+        td.add(subDom);
         subDom.tagName = 'div';
-        rowDom.add(subDom);
-        subDom.addDirective(new nodom.Directive('show', '$showSub', subDom));
         subDom.addClass('nd-grid-sub');
+        let showCount = 0;
+        for (let f of this.fields) {
+            if (!f['hide']) {
+                showCount++;
+            }
+        }
+        td.setProp('colspan', showCount);
         if (subDom.hasProp('auto')) {
             subDom.children = [];
             let lw = subDom.getProp('labelwidth') || 100;
@@ -1454,6 +1530,9 @@ class UIGrid extends nodom.Plugin {
             let cnt = 0;
             let rowCt;
             this.fields.forEach((item) => {
+                if (item['type'] !== 0) {
+                    return;
+                }
                 if (cnt++ % cols === 0) {
                     rowCt = new nodom.Element('div');
                     rowCt.addClass('nd-grid-sub-row');
@@ -1462,13 +1541,13 @@ class UIGrid extends nodom.Plugin {
                 let itemCt = new nodom.Element('div');
                 itemCt.addClass('nd-grid-sub-item');
                 let label = new nodom.Element('label');
-                label.assets.set('innerHTML', item['title'] + ':');
+                label.assets.set('innerHTML', item['title']);
                 label.assets.set('style', 'width:' + lw + 'px');
                 itemCt.add(label);
                 let span = new nodom.Element('span');
                 span.addClass('nd-grid-sub-content');
                 let txt = new nodom.Element();
-                txt.expressions = item['expressions'];
+                txt.expressions = [new nodom.Expression(item['field'])];
                 span.add(txt);
                 itemCt.add(span);
                 rowCt.add(itemCt);
@@ -1476,47 +1555,9 @@ class UIGrid extends nodom.Plugin {
             });
         }
     }
-    handleCheck(thead, dataDom, rowDom) {
-        if (thead) {
-            let th = new nodom.Element('div');
-            th.addClass('nd-grid-iconcol');
-            let bh = new nodom.Element('b');
-            bh.addClass('nd-icon-checkbox');
-            th.add(bh);
-            bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'" + this.wholeCheckName + "'}", bh));
-            thead.children[0].children.unshift(th);
-            bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-                let check = model.data[this.wholeCheckName] || false;
-                model.set(this.wholeCheckName, !check);
-                let model1 = this.getModel();
-                for (let d of model1.data[this.dataName]) {
-                    let m = module.modelFactory.get(d.$modelId);
-                    m.set('$checked', !check);
-                }
-            }));
-        }
-        let td = new nodom.Element('div');
-        td.addClass('nd-grid-iconcol');
-        let b = new nodom.Element('b');
-        b.addClass('nd-icon-checkbox');
-        b.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'$checked'}", b));
-        b.addEvent(new nodom.NodomEvent('click', ':delg', (dom, model, module, e) => {
-            model.set('$checked', !model.data['$checked']);
-        }));
-        td.add(b);
-        dataDom.children.unshift(td);
-    }
-    sort(index, asc, module) {
-        let dom = module.virtualDom.query(this.rowDomKey);
-        let directive = dom.getDirective('repeat');
-        if (!directive) {
-            return;
-        }
-        let f = this.fields[index];
-        if (!f || !f['field']) {
-            return;
-        }
-        let arr = ['orderby', f['field'], asc];
+    sort(field, asc, module) {
+        let directive = this.repeatDirective;
+        let arr = ['orderby', field, asc];
         if (!directive.filters) {
             directive.filters = [];
         }
@@ -1528,67 +1569,19 @@ class UIGrid extends nodom.Plugin {
         }
         nodom.Renderer.add(module);
     }
+    handleScroll(tbody, thead) {
+        if (!thead) {
+            return;
+        }
+        tbody.addEvent(new nodom.NodomEvent('scroll', (dom, model, module, e) => {
+            model.set(this.scrollName, -e.target.scrollLeft);
+        }));
+    }
     beforeRender(module, uidom) {
         let me = this;
         super.beforeRender(module, uidom);
         if (this.needPreRender) {
-            let model = module.modelFactory.get(uidom.modelId);
-            model.set(this.extraDataName, {});
-            if (!this.pagination) {
-                this.doReq(module, this.pagination);
-            }
-            if (this.selectPageMethodId) {
-                module.methodFactory.add(this.selectPageMethodId, (arr) => {
-                    let start = (me.currentPage - 1) * me.pageSize;
-                    let end = start + me.pageSize;
-                    return arr.slice(start, end);
-                });
-            }
         }
-    }
-    handlePagination(pagination) {
-        let me = this;
-        let df = pagination.plugin;
-        this.pagination = df;
-        if (df.currentPage) {
-            this.currentPage = df.currentPage;
-        }
-        if (df.pageSize) {
-            this.pageSize = df.pageSize;
-        }
-        if (!df.onChange) {
-            df.onChange = (module) => {
-                me.doReq(module, df);
-            };
-        }
-    }
-    doReq(module, pagination) {
-        const me = this;
-        let params = {};
-        if (pagination) {
-            let reqName = pagination.requestName;
-            if (reqName.length === 2) {
-                params[reqName[0]] = pagination.currentPage;
-                params[reqName[1]] = pagination.pageSize;
-            }
-        }
-        nodom.request({
-            url: me.dataUrl,
-            params: params,
-            type: 'json'
-        }).then(r => {
-            if (!r) {
-                return;
-            }
-            let model = module.modelFactory.get(me.modelId);
-            model.set(this.extraDataName, r);
-            if (pagination) {
-                if (pagination.pageSize) {
-                    this.pageSize = pagination.pageSize;
-                }
-                pagination.setTotal(r[pagination.totalName]);
-            }
-        });
     }
     getData() {
         let model = this.getModel();
@@ -1597,9 +1590,24 @@ class UIGrid extends nodom.Plugin {
             return data[this.dataName];
         }
     }
+    setData(data) {
+        const module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.getModel(this.modelId);
+        model.set(this.extraDataName, data);
+        if (this.pagination) {
+            if (this.pagination.pageSize) {
+                this.pageSize = this.pagination.pageSize;
+            }
+            let total = data[this.pagination.totalName];
+            if (!total && data[this.dataName]) {
+                total = data[this.dataName].length;
+            }
+            this.pagination.setTotal(total);
+        }
+    }
     getModel() {
         let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         return model.get(this.extraDataName);
     }
     getSelectedRows() {
@@ -1620,18 +1628,6 @@ class UIGrid extends nodom.Plugin {
                 datas.splice(i--, 1);
             }
         }
-    }
-    setDataUrl(url, notRefresh) {
-        this.dataUrl = url;
-        let module = nodom.ModuleFactory.get(this.moduleId);
-        if (!notRefresh) {
-            this.pagination.setPage(1);
-            this.doReq(module, this.pagination);
-        }
-    }
-    refresh() {
-        let module = nodom.ModuleFactory.get(this.moduleId);
-        this.doReq(module, this.pagination);
     }
 }
 nodom.PluginManager.add('UI-GRID', UIGrid);
@@ -1704,7 +1700,7 @@ class UILayout extends nodom.Plugin {
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
-            let model = module.modelFactory.get(dom.modelId);
+            let model = module.getModel(dom.modelId);
             model.set(this.extraDataName, {
                 openWest: true,
                 openEast: true,
@@ -1868,13 +1864,13 @@ class UIList extends nodom.Plugin {
         let pmodel;
         let model;
         if (this.needPreRender) {
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             pmodel.set(this.extraDataName, {
                 datas: []
             }).id;
         }
         if (!pmodel) {
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
         }
         if (!model) {
             model = pmodel.get(this.extraDataName);
@@ -1907,7 +1903,7 @@ class UIList extends nodom.Plugin {
         }
     }
     setValue(module, model) {
-        let pmodel = module.modelFactory.get(this.modelId);
+        let pmodel = module.getModel(this.modelId);
         let model1 = pmodel.get(this.extraDataName);
         let rows = model1.data['datas'];
         let valArr = [];
@@ -2037,7 +2033,7 @@ class UIListTransfer extends nodom.Plugin {
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
-        let pmodel = module.modelFactory.get(this.modelId);
+        let pmodel = module.getModel(this.modelId);
         if (this.needPreRender) {
             let model = pmodel.set(this.extraDataName, {
                 datas: []
@@ -2049,8 +2045,8 @@ class UIListTransfer extends nodom.Plugin {
         this.setValueSelected(module);
     }
     setValueSelected(module) {
-        let pmodel = module.modelFactory.get(this.modelId);
-        let model = module.modelFactory.get(this.extraModelId);
+        let pmodel = module.getModel(this.modelId);
+        let model = module.getModel(this.extraModelId);
         let value = pmodel.query(this.dataName);
         let va = value.split(',');
         let rows = model.query('datas');
@@ -2065,7 +2061,7 @@ class UIListTransfer extends nodom.Plugin {
         model.set('datas', rows);
     }
     transfer(module, direction, all) {
-        let model = module.modelFactory.get(this.extraModelId);
+        let model = module.getModel(this.extraModelId);
         let datas = model.data.datas;
         let isValue = direction === 1 ? true : false;
         for (let d of datas) {
@@ -2080,8 +2076,8 @@ class UIListTransfer extends nodom.Plugin {
         this.updateValue(module);
     }
     updateValue(module) {
-        let pmodel = module.modelFactory.get(this.modelId);
-        let model = module.modelFactory.get(this.extraModelId);
+        let pmodel = module.getModel(this.modelId);
+        let model = module.getModel(this.extraModelId);
         let a = [];
         for (let d of model.data.datas) {
             if (d.isValue) {
@@ -2157,7 +2153,7 @@ class UIMenu extends nodom.Plugin {
                 parentCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
                 parentCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
                     let parent = dom.getParent(module);
-                    let pmodel = module.modelFactory.get(parent.modelId);
+                    let pmodel = module.getModel(parent.modelId);
                     pmodel.set(me.activeName, false);
                     if (dom.hasClass('nd-menu-first')) {
                         this.direction = 0;
@@ -2171,13 +2167,13 @@ class UIMenu extends nodom.Plugin {
         }
         rootDom.add(parentCt);
         for (let i = 0; i < this.maxLevel; i++) {
-            parentCt.tmpData = { level: i + 1 };
+            parentCt.setProp('level', i + 1);
             let itemCt = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
             itemCt.addClass('nd-menu-nodect');
             let item = menuNode.clone(true);
             itemCt.add(item);
-            itemCt.tmpData = { level: (i + 1) };
+            itemCt.setProp('level', i + 1);
             if (this.popupMenu || i > 0) {
                 let icon1 = new nodom.Element('b');
                 icon1.addDirective(new nodom.Directive('class', "{'nd-menu-subicon':'" + this.listField + "&&" + this.listField + ".length>0'}", icon1));
@@ -2191,7 +2187,7 @@ class UIMenu extends nodom.Plugin {
             subCt.addClass('nd-menu-subct');
             subCt.addEvent(new nodom.NodomEvent('mouseleave', (dom, model, module, e) => {
                 let parent = dom.getParent(module);
-                let pmodel = module.modelFactory.get(parent.modelId);
+                let pmodel = module.getModel(parent.modelId);
                 pmodel.set(me.activeName, false);
             }));
             subCt.setProp('style', new nodom.Expression(this.menuStyleName), true);
@@ -2211,7 +2207,7 @@ class UIMenu extends nodom.Plugin {
                 }
                 let x = e.clientX;
                 let w = me.menuWidth;
-                let model = module.modelFactory.get(uidom.modelId);
+                let model = module.getModel(uidom.modelId);
                 let rows = model.query(me.listField);
                 if (rows && rows.length > 0) {
                     let h = rows.length * me.menuHeight;
@@ -2268,7 +2264,7 @@ class UIMenu extends nodom.Plugin {
         return [openEvent, closeEvent];
     }
     cacPos(dom, x, y, w, h, el) {
-        let firstNopop = dom && !this.popupMenu && dom.tmpData['level'] === 1;
+        let firstNopop = dom && !this.popupMenu && dom.getProp('level') === 1;
         let widthOut = x + w > window.innerWidth;
         let heightOut = y + h > window.innerHeight;
         let top = dom ? 0 : y;
@@ -2315,12 +2311,15 @@ class UIPagination extends nodom.Plugin {
         this.tagName = 'UI-PAGINATION';
         this.minPage = 0;
         this.maxPage = 0;
+        this.pageCount = 0;
+        this.recordCount = 0;
+        this.params = {};
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'onchange', 'requestname|array|2'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'onChange', 'requestName'], ['total', 10, 1, null, null, 10, [], 0, '', []]);
+                UITool.handleUIParam(rootDom, this, ['totalname', 'pagesize|number', 'currentpage|number', 'showtotal|bool', 'showgo|bool', 'shownum|number', 'sizechange|array|number', 'steps|number', 'dataurl', 'pagename', 'sizename', 'onchange', 'onreq'], ['totalName', 'pageSize', 'currentPage', 'showTotal', 'showGo', 'showNum', 'pageSizeData', 'steps', 'dataUrl', 'pageName', 'sizeName', 'onChange', 'onReq'], ['total', 10, 1, null, null, 10, [], 0, '', 'page', 'size', '', '']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2371,11 +2370,7 @@ class UIPagination extends nodom.Plugin {
                 dataName: 'pageSize',
                 listField: 'sizeData',
                 displayField: 'text',
-                valueField: 'value',
-                onChange: (model, module, newValue, oldValue) => {
-                    me.changeParams(module);
-                    me.update(module);
-                }
+                valueField: 'value'
             }).element);
         }
         let pageCt = new nodom.Element('div');
@@ -2406,38 +2401,46 @@ class UIPagination extends nodom.Plugin {
         pageCt.add(right1);
         rootDom.add(pageCt);
         page.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-            me.changeParams(module, model.data['no']);
-            me.update(module);
+            let model1 = module.getModel(this.extraModelId);
+            model1.set('pageNo', model.data['no']);
         }));
         left.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.changeParams(module, -1, true);
-            me.update(module);
+            if (this.currentPage === 1) {
+                return;
+            }
+            model.set('pageNo', --this.currentPage);
         }));
         right.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            me.changeParams(module, 1, true);
-            me.update(module);
+            if (this.currentPage === this.pageCount) {
+                return;
+            }
+            model.set('pageNo', ++this.currentPage);
         }));
         left1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            let step = me.currentPage - me.steps < 1 ? -me.currentPage + 1 : -me.steps;
-            me.changeParams(module, step, true);
-            me.update(module);
+            let page = me.currentPage - me.steps;
+            if (page < 1) {
+                page = 1;
+            }
+            model.set('pageNo', page);
         }));
         right1.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (dom.hasClass('nd-pagination-disable')) {
                 return;
             }
-            let step = me.steps + me.currentPage > me.maxPage ? me.maxPage - me.currentPage : me.steps;
-            me.changeParams(module, step, true);
-            me.update(module);
+            let page = me.currentPage + me.steps;
+            if (page > this.pageCount) {
+                page = this.pageCount;
+            }
+            model.set('pageNo', page);
         }));
         if (this.showGo) {
             let goDom = new nodom.Element('div');
@@ -2458,138 +2461,140 @@ class UIPagination extends nodom.Plugin {
         rootDom.plugin = this;
         return rootDom;
     }
+    cacMinMax(module) {
+        let step = this.showNum / 2 | 0;
+        this.minPage = this.currentPage - step;
+        this.maxPage = this.currentPage + step;
+        if (this.minPage < 1) {
+            this.minPage = 1;
+        }
+        if (this.minPage > this.pageCount) {
+            this.minPage = this.pageCount;
+        }
+        if (this.maxPage < 1) {
+            this.maxPage = 1;
+        }
+        if (this.maxPage > this.pageCount) {
+            this.maxPage = this.pageCount;
+        }
+        if (this.pageCount > this.showNum) {
+            let d = this.maxPage + 1 - this.minPage - this.showNum;
+            if (d < 0) {
+                if (this.maxPage === this.pageCount) {
+                    this.minPage += d;
+                }
+                else {
+                    this.maxPage -= d;
+                }
+            }
+            else if (d > 0) {
+                if (this.maxPage === this.pageCount) {
+                    this.minPage += d;
+                }
+                else {
+                    this.maxPage -= d;
+                }
+            }
+        }
+    }
+    addWatch(pmodel, model) {
+        model.watch('pageNo', (module, field, value) => {
+            if (typeof value === 'string') {
+                value = parseInt(value);
+            }
+            this.currentPage = value;
+            this.cacMinMax(module);
+            this.changeParams(module);
+            this.doChangeEvent(module);
+            this.doReq(module);
+        });
+        model.watch('pageSize', (module, field, value) => {
+            if (typeof value === 'string') {
+                value = parseInt(value);
+            }
+            this.pageSize = value;
+            this.pageCount = Math.ceil(this.recordCount / this.pageSize);
+            this.cacMinMax(module);
+            this.changeParams(module);
+            this.doChangeEvent(module);
+            this.doReq(module);
+        });
+        model.watch('total', (module, field, value) => {
+            let old = this.pageCount;
+            this.recordCount = value;
+            this.pageCount = Math.ceil(this.recordCount / this.pageSize);
+            this.cacMinMax(module);
+            this.changeParams(module);
+            if (this.currentPage >= this.pageCount) {
+                model.set('pageNo', this.pageCount - 1);
+            }
+            if (this.pageCount > 0 && old === 0) {
+                model.set('pageNo', 1);
+            }
+            pmodel.data[this.totalName] = value;
+        });
+        pmodel.watch(this.totalName, (module, field, value) => {
+            if (typeof value === 'string') {
+                value = parseInt(value);
+            }
+            model.set('total', value);
+        });
+    }
     beforeRender(module, uidom) {
         super.beforeRender(module, uidom);
         this.handleInit(uidom, module);
     }
-    update(module, current, isStep) {
-        if (this.onChange !== '') {
-            let foo;
-            if (typeof this.onChange === 'string') {
-                foo = module.methodFactory.get(this.onChange);
-            }
-            else if (nodom.Util.isFunction(this.onChange)) {
-                foo = this.onChange;
-            }
-            if (foo) {
-                foo.apply(this, [module, this.currentPage, this.pageSize]);
-            }
+    changeParams(module) {
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
         }
-    }
-    changeParams(module, current, isStep) {
-        let model = module.modelFactory.get(this.modelId);
-        let data = model.query(this.extraDataName);
-        let total = data.total;
-        if (!total) {
-            let data1 = model.data;
-            if (data1 && data1[this.totalName]) {
-                total = data1[this.totalName];
-            }
-            if (total) {
-                data.total = total;
-            }
-        }
-        if (isStep) {
-            current = this.currentPage + current;
-        }
-        if (!total) {
-            return;
-        }
-        model = model.get(this.extraDataName);
-        let pageSize = model.data['pageSize'];
-        if (!current) {
-            let d = model.query('pageNo');
-            if (typeof d === 'string' && d !== '') {
-                d = parseInt(d);
-            }
-            current = d || 1;
-        }
-        let pageCount = Math.ceil(total / pageSize);
-        if (current > pageCount) {
-            current = pageCount;
-        }
-        else if (current < 1) {
-            current = 1;
-        }
-        let min = 1;
-        let max;
         let btnAllow = 0;
-        if (pageCount > this.showNum) {
-            let center = (this.showNum + 1) / 2 | 0;
-            if (current - center + 1 > 0) {
-                min = current - center + 1;
-            }
-            if (min < 1) {
-                min = 1;
-            }
-            else if (min + this.showNum - 1 > pageCount) {
-                min = pageCount - this.showNum + 1;
-            }
-            max = min + this.showNum - 1;
-        }
-        else {
-            min = 1;
-            max = pageCount;
-        }
-        if (current === pageCount) {
-            btnAllow += 12;
-        }
-        if (current === 1) {
-            btnAllow += 3;
-        }
-        if (model.query('pageSize') === this.pageSize && current === this.currentPage && min === this.minPage && max === this.maxPage) {
-            return;
-        }
         let pageArr = [];
-        for (let i = min; i <= max; i++) {
-            let active = i === current ? true : false;
+        for (let i = this.minPage; i <= this.maxPage; i++) {
             pageArr.push({
                 no: i,
-                active: active
+                active: i === this.currentPage ? true : false
             });
         }
-        this.currentPage = current;
-        this.minPage = min;
-        this.maxPage = max;
-        this.pageSize = model.data['pageSize'];
-        model.set('pages', pageArr);
-        model.set('pageSize', this.pageSize);
-        model.set('pageNo', current);
+        if (this.currentPage === 1) {
+            btnAllow = 3;
+        }
+        else if (this.currentPage === this.pageCount) {
+            btnAllow = 12;
+        }
+        else {
+            btnAllow = 0;
+        }
+        let model = module.getModel(this.extraModelId);
         model.set('btnAllow', btnAllow);
+        model.set('pages', pageArr);
     }
     handleInit(dom, module) {
-        const me = this;
         if (!this.needPreRender) {
             return;
         }
-        let model = module.modelFactory.get(dom.modelId);
+        let model = module.getModel(dom.modelId);
+        let total = model.query(this.totalName) || 0;
         let model1 = model.set(this.extraDataName, {
-            total: 0,
+            total: total,
             pageNum: 0,
-            pageNo: this.currentPage || 1,
+            pageNo: 0,
             pageSize: this.pageSize,
             btnAllow: 0,
             pages: [],
             sizeData: this.pageSizeDatas || [10, 20, 30, 50]
         });
+        this.pageCount = Math.ceil(total / this.pageSize);
+        this.cacMinMax(module);
         this.extraModelId = model1.id;
-        this.changeParams(module, 1);
-        model1.watch('pageNo', () => {
-            let no = model1.query('pageNo');
-            try {
-                no = parseInt(no);
-            }
-            catch (e) {
-            }
-            if (isNaN(no)) {
-                no = me.currentPage;
-            }
-            this.changeParams(module, no);
-        });
+        this.addWatch(model, model1);
+        if (this.pageCount > 0 || this.dataUrl !== '') {
+            this.setPage(1);
+        }
     }
     setTotal(value) {
         let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         model.set(this.extraDataName + '.total', value);
         this.changeParams(module);
     }
@@ -2615,6 +2620,75 @@ class UIPagination extends nodom.Plugin {
             return model.query(this.extraDataName + '.pageNo');
         }
         return 0;
+    }
+    setParam(name, value) {
+        this.params[name] = value;
+    }
+    getParam(name) {
+        return this.params[name];
+    }
+    doReq(module) {
+        if (this.dataUrl === '') {
+            return;
+        }
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let params = nodom.Util.clone(this.params);
+        params[this.pageName] = this.currentPage;
+        params[this.sizeName] = this.pageSize;
+        nodom.request({
+            url: this.dataUrl,
+            params: params,
+            type: 'json'
+        }).then(r => {
+            if (!r) {
+                return;
+            }
+            if (r.total) {
+                this.setTotal(r.total);
+            }
+            else if (Array.isArray(r)) {
+                this.setTotal(r.length);
+            }
+            this.doReqEvent(r, module);
+        });
+    }
+    doChangeEvent(module) {
+        if (this.onChange === '') {
+            return;
+        }
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let foo;
+        if (typeof this.onChange === 'string') {
+            this.onChange = module.getMethod(this.onChange);
+        }
+        else if (nodom.Util.isFunction(this.onChange)) {
+            foo = this.onChange;
+        }
+        if (foo) {
+            foo.apply(this, [module, this.currentPage, this.pageSize]);
+        }
+    }
+    doReqEvent(data, module) {
+        if (this.onReq === '') {
+            return;
+        }
+        if (!module) {
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        let foo;
+        if (typeof this.onReq === 'string') {
+            this.onReq = module.getMethod(this.onReq);
+        }
+        else if (nodom.Util.isFunction(this.onReq)) {
+            foo = this.onReq;
+        }
+        if (foo) {
+            foo.apply(this, [module, data]);
+        }
     }
 }
 nodom.PluginManager.add('UI-PAGINATION', UIPagination);
@@ -2747,7 +2821,7 @@ class UIRadio extends nodom.Plugin {
             item.addDirective(directive);
             item.assets.set('style', 'margin:0 ' + this.itemMargin + 'px;');
             item.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
-                let model1 = module.modelFactory.get(this.modelId);
+                let model1 = module.getModel(this.modelId);
                 let datas = model1.query(this.listField);
                 if (datas) {
                     for (let d of datas) {
@@ -2775,7 +2849,7 @@ class UIRadio extends nodom.Plugin {
     }
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         if (this.checkName) {
             let datas = model.query(this.listField);
             if (datas) {
@@ -2855,7 +2929,7 @@ class UIRelationMap extends nodom.Plugin {
     }
     beforeRender(module, uidom) {
         super.beforeRender(module, uidom);
-        let model = module.modelFactory.get(uidom.modelId);
+        let model = module.getModel(uidom.modelId);
         let rowData = model.query(this.listField[1]);
         if (!rowData) {
             return;
@@ -2894,7 +2968,7 @@ class UIRelationMap extends nodom.Plugin {
         module.model.set(this.mapName, mapData);
     }
     switchValue(module, dom, model) {
-        let pmodel = module.modelFactory.get(this.modelId);
+        let pmodel = module.getModel(this.modelId);
         let data = pmodel.query(this.dataName);
         let id1 = model.data['id1'];
         let id2 = model.data['id2'];
@@ -2934,7 +3008,7 @@ class UISelect extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiselect|bool', 'listfield', 'listwidth|number', 'allowfilter|bool', 'onchange'], ['valueField', 'displayField', 'multiSelect', 'listField', 'listWidth', 'allowFilter', 'onChange'], [null, null, null, null, 0, null, '']);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiselect|bool', 'listfield', 'listwidth|number', 'allowfilter|bool', 'onchange', 'showempty|bool'], ['valueField', 'displayField', 'multiSelect', 'listField', 'listWidth', 'allowFilter', 'onChange', 'showEmpty'], [null, null, null, null, 0, null, '', null]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2990,9 +3064,9 @@ class UISelect extends nodom.Plugin {
         itemDom.children = [item, icon];
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
             if (!this.multiSelect) {
-                this.hideList(module);
+                this.hideList();
             }
-            me.setValue(module, model);
+            me.select(model);
         }));
         let showDom = new nodom.Element('div');
         showDom.addClass('nd-select-inputct');
@@ -3006,7 +3080,7 @@ class UISelect extends nodom.Plugin {
         icon = new nodom.Element('b');
         showDom.addEvent(new nodom.NodomEvent('click', (dom, model, module, e, el) => {
             if (model.data.show) {
-                me.hideList(module, model);
+                me.hideList(model);
             }
             else {
                 model.set('show', true);
@@ -3037,7 +3111,7 @@ class UISelect extends nodom.Plugin {
         let pmodel;
         let model;
         if (this.needPreRender) {
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             let model = pmodel.set(this.extraDataName, {
                 show: false,
                 display: '',
@@ -3045,8 +3119,8 @@ class UISelect extends nodom.Plugin {
                 datas: []
             });
             this.extraModelId = model.id;
-            module.methodFactory.add(this.filterMethodId, function () {
-                let model = this.modelFactory.get(me.extraModelId);
+            module.addMethod(this.filterMethodId, function () {
+                let model = this.getModel(me.extraModelId);
                 let rows = model.query('datas');
                 if (rows) {
                     return rows.filter((item) => {
@@ -3056,119 +3130,121 @@ class UISelect extends nodom.Plugin {
                 return [];
             });
             UIEventRegister.addEvent('click', module.id, dom.key, (module, dom, inOrout, e) => {
-                let model = module.modelFactory.get(me.extraModelId);
+                let model = module.getModel(me.extraModelId);
                 if (!inOrout && model.data.show) {
-                    me.hideList(module, model);
+                    me.hideList(model);
                 }
             });
         }
-        model = module.modelFactory.get(this.extraModelId);
+        model = module.getModel(this.extraModelId);
         if (!pmodel) {
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
         }
         if (!model) {
-            model = module.modelFactory.get(this.extraModelId);
+            model = module.getModel(this.extraModelId);
         }
         let data = model.data;
         if (this.listField && data.datas.length === 0 && pmodel.data[this.listField]) {
             let rows = pmodel.query(this.listField);
-            if (rows && Array.isArray(rows)) {
-                model.set('datas', nodom.Util.clone(rows));
+            if (this.showEmpty) {
+                let d = {};
+                d[this.displayField] = NUITipWords.emptySelect;
+                d['selected'] = false;
+                rows.unshift(d);
             }
-            this.setValue(module);
+            model.set('datas', rows);
         }
-        this.setSelectedAndDisplay(module);
+        this.setValue(pmodel.query(this.dataName));
     }
-    setValue(module, model) {
+    setValue(value) {
         if (!this.dataName) {
             return;
         }
-        let pmodel = module.modelFactory.get(this.modelId);
-        let model1 = module.modelFactory.get(this.extraModelId);
-        let rows = model1.data['datas'];
-        let value;
-        if (!model) {
-            value = pmodel.query(this.dataName);
+        if (this.multiSelect && !Array.isArray(value)) {
+            value = [value];
         }
-        else {
-            if (this.multiSelect) {
-                let valArr = [];
-                model.set('selected', !model.data.selected);
-                for (let d of rows) {
-                    if (d.selected) {
-                        valArr.push(d[this.valueField]);
-                    }
-                }
-                value = valArr.join(',');
-            }
-            else {
-                for (let d of rows) {
-                    if (d.selected) {
-                        d.selected = false;
-                        break;
-                    }
-                }
-                value = model.query(this.valueField);
-            }
-        }
-        if (value !== this.value) {
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let pmodel = module.getModel(this.modelId);
+        let value1 = pmodel.query(this.dataName);
+        if (value !== value1) {
             pmodel.set(this.dataName, value);
             if (this.onChange !== '') {
                 let foo;
                 let tp = typeof this.onChange;
                 if (tp === 'string') {
-                    foo = module.methodFactory.get(this.onChange);
+                    foo = module.getMethod(this.onChange);
                 }
                 else if (tp === 'function') {
                     foo = this.onChange;
                 }
                 if (foo) {
-                    foo.apply(null, [model, module, value, this.value]);
+                    foo.apply(null, [pmodel, module, value, this.value]);
                 }
             }
-            this.value = value;
         }
+        this.value = value;
+        this.genSelectedAndDisplay();
     }
-    setSelectedAndDisplay(module) {
+    select(model) {
+        let v = model.data[this.valueField];
+        if (this.multiSelect) {
+            if (!this.value) {
+                this.value = [];
+            }
+            if (model.data.___selected) {
+                let ind = this.value.indexOf(v);
+                if (ind !== -1) {
+                    this.value.splice(ind, 1);
+                }
+            }
+            else {
+                this.value.push(v);
+            }
+        }
+        else {
+            if (!model.data.___selected) {
+                this.value = v;
+            }
+        }
+        this.setValue(this.value);
+    }
+    genSelectedAndDisplay() {
         if (!this.dataName) {
             return;
         }
-        let pmodel = module.modelFactory.get(this.modelId);
-        let model = module.modelFactory.get(this.extraModelId);
-        let rows = model.data['datas'];
-        if (!rows || rows.length === 0) {
-            return;
-        }
-        let txtArr = [];
-        let value = pmodel.query(this.dataName);
+        let module = nodom.ModuleFactory.get(this.moduleId);
+        let model = module.getModel(this.extraModelId);
+        let text;
         if (this.multiSelect) {
-            let va = value.split(',');
-            for (let d of rows) {
-                if (va.includes(d[this.valueField])) {
-                    d.selected = true;
-                    txtArr.push(d[this.displayField]);
-                }
-                else {
-                    d.selected = false;
+            let ta = [];
+            if (!this.value) {
+                return;
+            }
+            for (let d of model.data.datas) {
+                d.___selected = this.value.includes(d[this.valueField]);
+                if (d.___selected) {
+                    ta.push(d[this.displayField]);
                 }
             }
-            model.set('display', txtArr.join(','));
+            text = ta.join(',');
         }
         else {
-            for (let d of rows) {
-                if (value == d[this.valueField]) {
-                    d.selected = true;
-                    model.set('display', d[this.displayField]);
+            for (let d of model.data.datas) {
+                if (this.value === d[this.valueField]) {
+                    text = d[this.displayField];
+                    d.___selected = true;
                 }
                 else {
-                    d.selected = false;
+                    d.___selected = false;
                 }
             }
         }
+        model.set('display', text);
     }
-    hideList(module, model) {
+    hideList(model) {
         if (!model) {
-            model = module.modelFactory.get(this.extraModelId);
+            let module = nodom.ModuleFactory.get(this.moduleId);
+            model = module.getModel(this.extraModelId);
         }
         model.set('show', false);
         model.set('query', '');
@@ -3271,7 +3347,7 @@ class UITab extends nodom.Plugin {
         super.beforeRender(module, dom);
         let pmodel;
         if (this.needPreRender) {
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             let data = {
                 datas: this.tabs
             };
@@ -3287,7 +3363,7 @@ class UITab extends nodom.Plugin {
         if (!module) {
             return;
         }
-        let model = module.modelFactory.get(this.extraModelId);
+        let model = module.getModel(this.extraModelId);
         let index = nodom.Util.isNumber(cfg.index) ? cfg.index : model.data.datas.length;
         let tabName = cfg.name || ('Tab' + nodom.Util.genId());
         model.data.datas.splice(index, 0, {
@@ -3322,7 +3398,7 @@ class UITab extends nodom.Plugin {
         if (!module) {
             module = nodom.ModuleFactory.get(this.moduleId);
         }
-        let pmodel = module.modelFactory.get(this.extraModelId);
+        let pmodel = module.getModel(this.extraModelId);
         let datas = pmodel.data.datas;
         let activeIndex;
         if (datas.length === 1) {
@@ -3353,7 +3429,7 @@ class UITab extends nodom.Plugin {
         if (!module) {
             module = nodom.ModuleFactory.get(this.moduleId);
         }
-        let pmodel = module.modelFactory.get(this.extraModelId);
+        let pmodel = module.getModel(this.extraModelId);
         let datas = pmodel.data.datas;
         let activeData;
         for (let o of datas) {
@@ -3456,7 +3532,7 @@ class UITip extends nodom.Plugin {
             return;
         }
         let needCheck = false;
-        let model = nodom.ModuleFactory.getMain().modelFactory.get(this.modelId);
+        let model = nodom.ModuleFactory.getMain().getModel(this.modelId);
         let ct = new Date().getTime();
         for (let loc of ['top', 'right', 'bottom', 'left']) {
             let data = model.data[loc];
@@ -3630,10 +3706,10 @@ class UITree extends nodom.Plugin {
         this.checkedChdNumName = '$ui_tree_' + nodom.Util.genId();
         let methodId = '$nodomGenMethod' + nodom.Util.genId();
         this.arrowClickId = methodId;
-        let closeOpenEvent = new nodom.NodomEvent('click', methodId + ':delg');
+        let closeOpenEvent = new nodom.NodomEvent('click', methodId);
         let itemClickEvent;
         if (this.itemClick !== '') {
-            itemClickEvent = new nodom.NodomEvent('click', this.itemClick + ':delg');
+            itemClickEvent = new nodom.NodomEvent('click', this.itemClick);
         }
         let parentCt = rootDom;
         let item;
@@ -3696,8 +3772,8 @@ class UITree extends nodom.Plugin {
         const me = this;
         super.beforeRender(module, uidom);
         if (this.needPreRender) {
-            module.methodFactory.add(me.arrowClickId, (dom, model, module, e) => {
-                let pmodel = module.modelFactory.get(dom.modelId);
+            module.addMethod(me.arrowClickId, (dom, model, module, e) => {
+                let pmodel = module.getModel(dom.modelId);
                 let rows = pmodel.data[me.listField];
                 if (!rows || rows.length === 0) {
                     return;
@@ -3724,7 +3800,7 @@ class UITree extends nodom.Plugin {
             model.set(this.checkedChdNumName, 0);
         }
         for (let d of rows) {
-            let m = module.modelFactory.get(d.$modelId);
+            let m = module.getModel(d.$modelId);
             m.set(this.checkName, checked);
             this.handleSubCheck(m, module, checked);
         }
@@ -3766,7 +3842,7 @@ class UITree extends nodom.Plugin {
         }
         let va = [];
         let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         getChecked(model.data[this.listField]);
         return va;
         function getChecked(rows) {

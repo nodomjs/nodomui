@@ -95,12 +95,12 @@ class UITree extends nodom.Plugin{
         //展开收拢事件
         let methodId = '$nodomGenMethod' + nodom.Util.genId();
         this.arrowClickId = methodId;
-        let closeOpenEvent:nodom.NodomEvent = new nodom.NodomEvent('click', methodId + ':delg');
+        let closeOpenEvent:nodom.NodomEvent = new nodom.NodomEvent('click', methodId);
         
         //item click 事件
         let itemClickEvent:nodom.NodomEvent;
         if(this.itemClick !== ''){
-            itemClickEvent = new nodom.NodomEvent('click', this.itemClick + ':delg');
+            itemClickEvent = new nodom.NodomEvent('click', this.itemClick);
         }
         let parentCt:nodom.Element = rootDom;
         let item:nodom.Element;
@@ -189,10 +189,10 @@ class UITree extends nodom.Plugin{
         super.beforeRender(module,uidom);
         if(this.needPreRender){
             //展开收拢事件
-            module.methodFactory.add(me.arrowClickId,
+            module.addMethod(me.arrowClickId,
                 (dom,model, module, e) => {
                     
-                    let pmodel:nodom.Model = module.modelFactory.get(dom.modelId);
+                    let pmodel:nodom.Model = module.getModel(dom.modelId);
                     let rows = pmodel.data[me.listField];
                     //叶子节点不处理
                     if(!rows || rows.length === 0){
@@ -238,7 +238,7 @@ class UITree extends nodom.Plugin{
        
         //子孙节点
         for(let d of rows){
-            let m:nodom.Model = module.modelFactory.get(d.$modelId);
+            let m:nodom.Model = module.getModel(d.$modelId);
             m.set(this.checkName,checked);
             this.handleSubCheck(m,module,checked);
         }
@@ -296,7 +296,7 @@ class UITree extends nodom.Plugin{
 
         let va = [];
         let module:nodom.Module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.modelFactory.get(this.modelId);
+        let model = module.getModel(this.modelId);
         getChecked(model.data[this.listField]);
         return va;
 

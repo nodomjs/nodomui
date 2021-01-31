@@ -182,7 +182,7 @@ class UITab extends nodom.Plugin{
         let pmodel:nodom.Model;
         //附加数据model
         if(this.needPreRender){
-            pmodel = module.modelFactory.get(this.modelId);
+            pmodel = module.getModel(this.modelId);
             let data = {
                 datas:this.tabs
             }
@@ -213,7 +213,7 @@ class UITab extends nodom.Plugin{
             return;
         }
 
-        let model:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let model:nodom.Model = module.getModel(this.extraModelId);
         
         //设置索引
         let index:number = nodom.Util.isNumber(cfg.index)?cfg.index:model.data.datas.length;
@@ -259,7 +259,7 @@ class UITab extends nodom.Plugin{
         if(!module){
             module = nodom.ModuleFactory.get(this.moduleId);
         }
-        let pmodel:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let pmodel:nodom.Model = module.getModel(this.extraModelId);
         let datas  = pmodel.data.datas;
         let activeIndex:number;
         //最后一个不删除
@@ -303,7 +303,7 @@ class UITab extends nodom.Plugin{
         if(!module){
             module = nodom.ModuleFactory.get(this.moduleId);
         }
-        let pmodel:nodom.Model = module.modelFactory.get(this.extraModelId);
+        let pmodel:nodom.Model = module.getModel(this.extraModelId);
         let datas  = pmodel.data.datas;
         
         let activeData;
