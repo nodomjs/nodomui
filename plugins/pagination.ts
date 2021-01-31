@@ -7,68 +7,63 @@ class UIPagination extends nodom.Plugin{
     tagName:string = 'UI-PAGINATION';
     
     /**
-     * 附加数据项名
-     */
-    extraDataName:string;
-
-    /**
      * 总条数字段名
      */
-    totalName:string;
+    private totalName:string;
 
     /**
      * 页面大小
      */
-    pageSize:number;
+    private pageSize:number;
 
     /**
      * 是否显示total
      */
-    showTotal:boolean;
+    private showTotal:boolean;
     /**
      * 是否显示第几页
      */
-    showGo:boolean;
+    private showGo:boolean;
 
     /**
      * 当前页
      */
-    currentPage:number;
+    private currentPage:number;
 
     /**
      * 显示页数
      */
-    showNum:number;
+    private showNum:number;
 
     /**
      * 页面size列表
      */
-    pageSizeData:number[];
+    private pageSizeData:number[];
 
     /**
      * 处理后的page size data
      */
-    pageSizeDatas:object[];
+    private pageSizeDatas:object[];
 
     /**
      * 双箭头的步幅，默认5
      */
-    steps:number;
+    private steps:number;
 
     /**
      * 显示的最小页号
      */
-    minPage:number=0;
+    private minPage:number=0;
 
     /**
      * 显示的最大页号
      */
-    maxPage:number=0;
+    private maxPage:number=0;
 
     /**
      * 附加数据模型id
      */
-    extraModelId:number;
+    private extraModelId:number;
 
     /**
      * 页面总数
@@ -99,17 +94,20 @@ class UIPagination extends nodom.Plugin{
      */
     private params:object = {};
 
-
-
     /**
      * 变化事件 方法名或函数，如果为方法名，则属于module的method factory
      */
-    onChange:string|Function;
+    private onChange:string|Function;
+
+    /**
+     * 请求前执行函数
+     */
+    private onBeforeReq:string|Function;
 
     /**
      * 请求返回后响应事件
      */
-    onReq:string|Function;
+    private onReq:string|Function;
 
     constructor(params:HTMLElement|object){
         super(params);
@@ -119,9 +117,9 @@ class UIPagination extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','dataurl','pagename','sizename','onchange','onreq'],
-                    ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','dataUrl','pageName','sizeName','onChange','onReq'],
-                    ['total',10,1,null,null,10,[],0,'','page','size','','']);
+                    ['totalname','pagesize|number','currentpage|number','showtotal|bool','showgo|bool','shownum|number','sizechange|array|number','steps|number','dataurl','pagename','sizename','onchange','onreq','onbeforereq'],
+                    ['totalName','pageSize','currentPage','showTotal','showGo','showNum','pageSizeData','steps','dataUrl','pageName','sizeName','onChange','onReq','onBeforeReq'],
+                    ['total',10,1,null,null,10,[],0,'','page','size','','','']);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -191,12 +189,12 @@ class UIPagination extends nodom.Plugin{
         //左双箭头
         let left1:nodom.Element = new nodom.Element('b');
         left1.addClass('nd-pagination-leftarrow1');
-        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[1,3,5,7,9,11,13,15].includes(btnAllow)'}",left1));
+        left1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'btnAllow===1'}",left1));
         pageCt.add(left1);
         //左箭头
         let left:nodom.Element = new nodom.Element('b');
         left.addClass('nd-pagination-leftarrow');
-        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[2,3,6,7,10,11,15].includes(btnAllow)'}",left));
+        left.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'btnAllow===1'}",left));
         pageCt.add(left);
         //页面数字
         let page:nodom.Element = new nodom.Element('span');
@@ -210,12 +208,12 @@ class UIPagination extends nodom.Plugin{
         //右箭头
         let right:nodom.Element = new nodom.Element('b');
         right.addClass('nd-pagination-rightarrow');
-        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[4,5,6,7,12,13,15].includes(btnAllow)'}",right));
+        right.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'btnAllow===2'}",right));
         pageCt.add(right);
         //右双箭头
         let right1:nodom.Element = new nodom.Element('b');
         right1.addClass('nd-pagination-rightarrow1');
-        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'[8,9,10,11,12,13,15].includes(btnAllow)'}",right1));
+        right1.addDirective(new nodom.Directive('class',"{'nd-pagination-disable':'btnAllow===2'}",right1));
         pageCt.add(right1);
 
         rootDom.add(pageCt);
@@ -378,7 +376,7 @@ class UIPagination extends nodom.Plugin{
             this.pageCount = Math.ceil(this.recordCount/this.pageSize);
             this.cacMinMax(module);
             this.changeParams(module);
-            
+
             //total修改导致页面减少，且当前页超出最大页
             if(this.currentPage >= this.pageCount){
                 model.set('pageNo',this.pageCount-1);
@@ -431,12 +429,11 @@ class UIPagination extends nodom.Plugin{
             });
         }
 
+        //左箭头失效
         if(this.currentPage === 1){
-            btnAllow = 3;
-        }else if(this.currentPage === this.pageCount){
-            btnAllow = 12;
-        }else{
-            btnAllow = 0;
+            btnAllow = 1;
+        }else if(this.currentPage === this.pageCount){ //右箭头失效
+            btnAllow = 2;
         }
         
         let model:nodom.Model = module.getModel(this.extraModelId);
@@ -464,9 +461,8 @@ class UIPagination extends nodom.Plugin{
             //页面大小
             pageSize:this.pageSize,
             /**
-             * 按钮允许使用name(自动创建)
-             * 包括左双箭头、左箭头、右箭头、右双箭头
-             * 对应数据 1左双箭头禁用 2左箭头禁用 4右箭头禁用 8右双箭头禁用,组合值则禁用多个:如6禁用左箭头和右箭头
+             * 1 左箭头 双左箭头失效
+             * 2 右箭头 双右箭头失效
              */
             btnAllow:0,
             //显示页号数组，如 [11,12,13,14,15]
@@ -543,11 +539,17 @@ class UIPagination extends nodom.Plugin{
 
     /**
      * 设置参数值
-     * @param name      参数名 
+     * @param name      参数名 或对象，如果为对象，则分别设置值
      * @param value     参数值
      */
     public setParam(name,value){
-        this.params[name] = value;
+        if(typeof name === 'object'){
+            for(let p in name){
+                this.params[p] = name[p];
+            }
+        }else{
+            this.params[name] = value;
+        }
     }
 
     /**
@@ -558,10 +560,24 @@ class UIPagination extends nodom.Plugin{
     public getParam(name:string):any{
         return this.params[name];
     }
+
+    /**
+     * 移除属性
+     * @param name  参数名或参数名数组 
+     */
+    public removeParam(name:string|string[]){
+        if(Array.isArray(name)){
+            for(let n of name){
+                delete this.params[n];
+            }
+        }else{
+            delete this.params[name];
+        }
+    }
     /**
      * 请求数据
      */
-    private doReq(module?:nodom.Module){
+    public doReq(module?:nodom.Module){
         if(this.dataUrl === ''){
             return;
         }
@@ -569,6 +585,8 @@ class UIPagination extends nodom.Plugin{
             module = nodom.ModuleFactory.get(this.moduleId);
         }
         
+        this.doBeforeReqEvent(module);
+
         //复制参数
         let params = nodom.Util.clone(this.params);
         params[this.pageName] = this.currentPage;
@@ -605,6 +623,7 @@ class UIPagination extends nodom.Plugin{
         let foo:Function;
         if(typeof this.onChange === 'string'){
             this.onChange = module.getMethod(this.onChange);
+            foo = this.onChange;
         }else if(nodom.Util.isFunction(this.onChange)){
             foo = this.onChange;
         }
@@ -629,11 +648,36 @@ class UIPagination extends nodom.Plugin{
         let foo:Function;
         if(typeof this.onReq === 'string'){
             this.onReq = module.getMethod(this.onReq);
+            foo = this.onReq;
         }else if(nodom.Util.isFunction(this.onReq)){
             foo = this.onReq;
         }
         if(foo){
             foo.apply(this,[module,data]);
+        }
+    }
+
+    /**
+     * 执行请求后事件
+     * @param module 
+     */
+    private doBeforeReqEvent(module?:nodom.Module){
+        if(this.onBeforeReq === ''){
+            return;
+        }
+        if(!module){
+            module = nodom.ModuleFactory.get(this.moduleId);
+        }
+        // onReq事件
+        let foo:Function;
+        if(typeof this.onBeforeReq === 'string'){
+            this.onBeforeReq = module.getMethod(this.onBeforeReq);
+            foo = this.onBeforeReq;
+        }else if(nodom.Util.isFunction(this.onReq)){
+            foo = this.onBeforeReq;
+        }
+        if(foo){
+            foo.apply(this,[module,this]);
         }
     }
 

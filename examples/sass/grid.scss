@@ -4,7 +4,11 @@
 .nd-grid{
     box-sizing: border-box;
     overflow:auto;
+    display:flex;
+    flex-direction: column;
+
     table{
+        width:100%;
         overflow:visible;
         border-color:$nd-color5;
         table-layout:fixed;
@@ -30,6 +34,7 @@
     }
     
     .nd-grid-body{
+        box-sizing:border-box;
         margin-top:1px;
         tr{
             /*左对齐*/
@@ -50,11 +55,9 @@
     }
 
     .nd-grid-head{
+        width:100%;
         box-sizing:border-box;
         @include nd-color(1);
-        table{
-            height:100% !important;
-        }
         tr{
             height:$nd-gridhead-height;
             font-weight:bold;
@@ -83,7 +86,6 @@
                 }
             }
         }
-
     }
 
     /*每行颜色交错*/
@@ -140,17 +142,6 @@
 
 .nd-grid-fixed{
     overflow:hidden;
-    position:relative;
-    display:flex;
-    flex-direction: column;
-    padding-top:$nd-gridhead-height;
-    .nd-grid-head{
-        width:100%;
-        top:0px;
-        left:0px;
-        position:absolute;
-        overflow:hidden !important;
-    }
     .nd-grid-body{
         overflow-y:auto;
     }

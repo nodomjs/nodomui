@@ -1085,8 +1085,11 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 .nd-grid {
   box-sizing: border-box;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
   /*每行颜色交错*/ }
   .nd-grid table {
+    width: 100%;
     overflow: visible;
     border-color: #dfdfdf;
     table-layout: fixed;
@@ -1107,6 +1110,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
           word-break: break-all;
           display: inline-block; }
   .nd-grid .nd-grid-body {
+    box-sizing: border-box;
     margin-top: 1px; }
     .nd-grid .nd-grid-body tr {
       /*左对齐*/
@@ -1118,11 +1122,10 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       .nd-grid .nd-grid-body tr .nd-grid-showsub {
         transform: rotate(90deg); }
   .nd-grid .nd-grid-head {
+    width: 100%;
     box-sizing: border-box;
     background-color: #fff;
     color: #000; }
-    .nd-grid .nd-grid-head table {
-      height: 100% !important; }
     .nd-grid .nd-grid-head tr {
       height: 60px;
       font-weight: bold;
@@ -1183,17 +1186,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   border: 1px solid #dfdfdf; }
 
 .nd-grid-fixed {
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding-top: 60px; }
-  .nd-grid-fixed .nd-grid-head {
-    width: 100%;
-    top: 0px;
-    left: 0px;
-    position: absolute;
-    overflow: hidden !important; }
+  overflow: hidden; }
   .nd-grid-fixed .nd-grid-body {
     overflow-y: auto; }
 
