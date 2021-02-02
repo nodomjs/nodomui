@@ -3,6 +3,7 @@
 
 .nd-panel{
     border-radius:$nd-radius;
+    border:1px solid $nd-color6;
     @extend .nd-border;
     @include nd-color(1);
     box-sizing: border-box;
@@ -17,36 +18,36 @@
     }
     /* 头部 */
     .nd-panel-header{
-        @include nd-color(6);
-        height: 40px;
-        line-height:40px;
-        padding:0 $nd-padding;
+        height: $nd-head-height;
+        line-height:$nd-head-height;
+        padding:0 $nd-padding*2;
         border-radius:$nd-radius $nd-radius 0 0;
         display:inline-flex;
         justify-content: space-between;
         /* 标题 */
         .nd-panel-title{
             font-size:$nd-fontnormal;
+            font-weight:$nd-fontweight-bold;
         }
 
         /*头部工具栏*/
         .nd-panel-header-bar{
             font-size:$nd-fontlarge;
             margin-right:-$nd-padding;
+            float:right;
             > *{
                 margin-right:$nd-padding/2;
             }
             
             .nd-panel-min{
-                @include nd-clickicon('minus');
+                @include nd-clickicon('minus1');
             }
             .nd-panel-max{
-                @include nd-clickicon('add');
+                @include nd-clickicon('add1');
             }
             .nd-panel-close{
-                @include nd-clickicon('close');
+                @include nd-clickicon('cross');
             }
-            
         }
     }
 

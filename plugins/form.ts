@@ -65,7 +65,10 @@ class UIForm extends nodom.Plugin{
                             //修改label width
                             if(c2.tagName === 'LABEL'){
                                 c2.assets.set('style','width:' + this.labelWidth + 'px');
-                                break;
+                            }
+                            if(c2.tagName === 'UNIT'){
+                                c2.tagName = 'span';
+                                c2.addClass('nd-form-item-unit');
                             }
                         }
                     }

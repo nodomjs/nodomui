@@ -1,6 +1,6 @@
 ///<reference types='nodomjs'/>
 /**
- * panel 插件
+ * dialog 插件
  */
 class UIDialog extends nodom.Plugin{
     tagName:string = 'UI-DIALOG';
@@ -59,7 +59,7 @@ class UIDialog extends nodom.Plugin{
 
         panelDom.delProp(['name','autoopen']);
         //增加关闭按钮
-        panel.addHeadBtn('close',()=>{
+        panel.addHeadBtn('cross',()=>{
             me.close();
         });
         rootDom.addDirective(new nodom.Directive('show',this.dataName,rootDom));

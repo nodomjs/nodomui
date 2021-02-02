@@ -16,6 +16,7 @@
 </head>
 <body>
     <div>
+        
         <ui-button e-click='setValue'>设置值</ui-button>
         <div>
             <div>姓名：<span>{{userName}}</span></div>
@@ -27,6 +28,7 @@
                 <item>
                     <label>姓名:</label>
                     <ui-text x-field='userName' value='{{userName}}' icon='search'></ui-text>
+                    
                 </item>
                 <item>
                     <label>性别:</label>
@@ -36,13 +38,20 @@
                     </ui-radio>
                 </item>
             </row>
+            <row>
                 <item>
-                    <label>性别:</label>
-                    <ui-radio  x-field='sexy'>
-                        <span value='M'>男</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <span value='F'>女</span>
-                    </ui-radio>
+                    <label>速度:</label>
+                    <ui-text x-field='userName' value='{{userName}}' icon='search'></ui-text>
+                    <unit>m/s</unit>
                 </item>
+                <item>
+                    <label>体重:</label>
+                    <ui-text x-field='userName' value='{{userName}}' icon='search'></ui-text>
+                    <unit>kg</unit>
+                </item>
+                
+            </row>
+                
             <row>
                 <item>
                     <label>出生日期:</label>
@@ -120,10 +129,11 @@
                 </item>
             </row>
         </ui-form>
+        <ui-floatbox />
     </div>
 </body>
 <script>
-    nodom.newApp({
+    $.a({
         module:{
             el:'div',
             data:{

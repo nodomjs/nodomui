@@ -36,7 +36,8 @@ module.exports = function (grunt) {
             './plugins/toolbar.ts',
             './plugins/text.ts',
             './plugins/tree.ts',
-            './plugins/loading.ts'
+            './plugins/loading.ts',
+            './plugins/floatbox.ts'
         ],
         out:'bin/nodomui.js',
         options:{

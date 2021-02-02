@@ -47,6 +47,7 @@ class UITool {
             if (changeSize) {
                 el.style.maxHeight = (window.innerHeight - 50) + 'px';
             }
+            distance = distance || 0;
             if (y + el.offsetHeight > height && y > el.offsetHeight + distance) {
                 el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)';
             }
@@ -976,7 +977,7 @@ class UIDialog extends nodom.Plugin {
         this.onClose = panelDom.getProp('onclose');
         this.onOpen = panelDom.getProp('onopen');
         panelDom.delProp(['name', 'autoopen']);
-        panel.addHeadBtn('close', () => {
+        panel.addHeadBtn('cross', () => {
             me.close();
         });
         rootDom.addDirective(new nodom.Directive('show', this.dataName, rootDom));
@@ -1223,7 +1224,10 @@ class UIForm extends nodom.Plugin {
                         for (let c2 of c1.children) {
                             if (c2.tagName === 'LABEL') {
                                 c2.assets.set('style', 'width:' + this.labelWidth + 'px');
-                                break;
+                            }
+                            if (c2.tagName === 'UNIT') {
+                                c2.tagName = 'span';
+                                c2.addClass('nd-form-item-unit');
                             }
                         }
                     }
@@ -1421,7 +1425,7 @@ class UIGrid extends nodom.Plugin {
                     let bh = new nodom.Element('b');
                     bh.addClass('nd-icon-checkbox');
                     div.add(bh);
-                    bh.addDirective(new nodom.Directive('class', "{'nd-icon-checked':'" + this.wholeCheckName + "'}", bh));
+                    bh.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.wholeCheckName + "'}", bh));
                     bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                         let check = model.data[this.wholeCheckName] || false;
                         model.set(this.wholeCheckName, !check);
@@ -1485,7 +1489,7 @@ class UIGrid extends nodom.Plugin {
                 case 2:
                     let b1 = new nodom.Element('b');
                     b1.addClass('nd-icon-checkbox');
-                    new nodom.Directive('class', "{'nd-icon-checked':'" + this.checkName + "'}", b1);
+                    new nodom.Directive('class', "{'nd-checked':'" + this.checkName + "'}", b1);
                     div.add(b1);
                     b1.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                         model.set(this.checkName, !model.data[this.checkName]);
@@ -2165,7 +2169,6 @@ class UIMenu extends nodom.Plugin {
         }
         rootDom.add(parentCt);
         for (let i = 0; i < this.maxLevel; i++) {
-            parentCt.setProp('level', i + 1);
             let itemCt = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat', this.listField, itemCt));
             itemCt.addClass('nd-menu-nodect');
@@ -2224,7 +2227,7 @@ class UIMenu extends nodom.Plugin {
                 if (!rows || rows.length === 0) {
                     return;
                 }
-                let firstNopop = dom.tmpData.level === 1 && !me.popupMenu;
+                let firstNopop = dom.getProp('level') === 1 && !me.popupMenu;
                 let h = rows.length * this.menuHeight;
                 let w = this.menuWidth;
                 let x, y;
@@ -2247,12 +2250,13 @@ class UIMenu extends nodom.Plugin {
                 if (rows && rows.length > 0) {
                     model.set(me.activeName, false);
                     if (this.direction === 1) {
+                        let level = dom.getProp('level');
                         if (me.popupMenu) {
-                            if (dom.tmpData['level'] === 2) {
+                            if (level === 2) {
                                 this.direction = 0;
                             }
                         }
-                        else if (dom.tmpData['level'] === 1) {
+                        else if (level === 1) {
                             this.direction = 0;
                         }
                     }
@@ -2263,6 +2267,7 @@ class UIMenu extends nodom.Plugin {
     }
     cacPos(dom, x, y, w, h, el) {
         let firstNopop = dom && !this.popupMenu && dom.getProp('level') === 1;
+        console.log(firstNopop);
         let widthOut = x + w > window.innerWidth;
         let heightOut = y + h > window.innerHeight;
         let top = dom ? 0 : y;
@@ -2735,7 +2740,7 @@ class UIPanel extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['Panel', []]);
+                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], [' ', []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -4012,4 +4017,115 @@ var nodom;
     }
     nodom.closeLoading = closeLoading;
 })(nodom || (nodom = {}));
+class UIFloatBox extends nodom.Plugin {
+    constructor(params) {
+        super(params);
+        this.tagName = 'UI-FLOATBOX';
+        let rootDom = new nodom.Element();
+        if (params) {
+            if (params instanceof HTMLElement) {
+                nodom.Compiler.handleAttributes(rootDom, params);
+                nodom.Compiler.handleChildren(rootDom, params);
+            }
+            else if (typeof params === 'object') {
+                for (let o in params) {
+                    this[o] = params[o];
+                }
+            }
+            rootDom.setProp('name', '$ui_floatbox');
+            this.generate(rootDom);
+        }
+        rootDom.tagName = 'div';
+        rootDom.plugin = this;
+        this.element = rootDom;
+    }
+    generate(rootDom) {
+        this.dataName = '$ui_floatbox' + nodom.Util.genId();
+        rootDom.addClass('nd-floatbox');
+        new nodom.Directive('show', this.dataName + '.show', rootDom);
+        rootDom.setProp('style', ['left:', new nodom.Expression(this.dataName + '.left'),
+            'px;top:', new nodom.Expression(this.dataName + '.top'), 'px;'], true);
+        let innerCt = new nodom.Element('div');
+        rootDom.add(innerCt);
+    }
+    beforeRender(module, dom) {
+        super.beforeRender(module, dom);
+        if (this.needPreRender) {
+            let model = module.model;
+            model.set(this.dataName, {
+                left: 0,
+                top: 0,
+                show: false
+            });
+        }
+    }
+    show(evt, loc) {
+        let module = nodom.ModuleFactory.getMain();
+        if (!module) {
+            return;
+        }
+        if (module) {
+            let model = module.model;
+            model.set(this.dataName, {
+                show: true,
+                left: 0,
+                top: 0
+            });
+            if (model) {
+                model.set(this.dataName, {
+                    show: true,
+                    left: 0,
+                    top: 0
+                });
+                this.updateLoc(module, evt, loc);
+            }
+        }
+    }
+    updateLoc(module, evt, loc) {
+        let ex = evt.pageX;
+        let ey = evt.pageY;
+        let eox = evt.offsetX;
+        let eoy = evt.offsetY;
+        let ow = evt.target.offsetWidth;
+        let oh = evt.target.offsetHeight;
+        let x = ex - eox - 3;
+        let y = ey - eoy + oh - 15;
+        let el = module.getNode(this.element.key);
+        if (!el) {
+            setTimeout(() => {
+                this.updateLoc(module, evt, loc);
+            }, 0);
+            return;
+        }
+        let width = el.offsetWidth;
+        let height = el.offsetHeight;
+        if (x + width > window.innerWidth) {
+            x = window.innerWidth - width;
+        }
+        if (y + height > window.innerHeight) {
+            if (y - height - oh > 0) {
+                y -= height + oh;
+            }
+        }
+        module.model.set(this.dataName + '.left', x);
+        module.model.set(this.dataName + '.top', y);
+    }
+}
+var nodom;
+(function (nodom) {
+    function floatbox(dom, evt, loc) {
+        let module = nodom.ModuleFactory.getMain();
+        if (!module) {
+            return null;
+        }
+        let floatBox = module.getPlugin('$ui_floatbox');
+        let vDom = module.getElement(floatBox.element.key, true);
+        vDom.children[0].children = [dom];
+        if (floatBox) {
+            floatBox.show(evt, loc);
+        }
+    }
+    nodom.floatbox = floatbox;
+})(nodom || (nodom = {}));
+nodom.PluginManager.add('UI-FLOATBOX', UIFloatBox);
 //# sourceMappingURL=nodomui.js.map

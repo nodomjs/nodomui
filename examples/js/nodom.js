@@ -153,7 +153,12 @@ var nodom;
         });
     }
     nodom.request = request;
+    function a(params) {
+        return newApp(params);
+    }
+    nodom.a = a;
 })(nodom || (nodom = {}));
+var $ = nodom;
 var nodom;
 (function (nodom) {
     let Util = (() => {
@@ -4781,7 +4786,8 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Plugin {
-        constructor(params) { }
+        constructor(params) {
+        }
         beforeRender(module, uidom) {
             this.element = uidom;
             this.moduleId = module.id;

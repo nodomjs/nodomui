@@ -21,12 +21,12 @@
         }
 
         &:hover{
-            @extend .nd-item-hovercolor;
+            @extend .nd-hover-active;
         }
     }
 
     .nd-list-item-active{
-        color:$nd-activecolor;
+        @extend .nd-active-color;
         .nd-list-icon{
             @extend .nd-icon-select;
         }

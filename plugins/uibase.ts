@@ -44,6 +44,8 @@ class UITool{
             if(changeSize){
                 el.style.maxHeight = (window.innerHeight-50) + 'px';
             }
+
+            distance = distance || 0;
             
             if(y + el.offsetHeight > height && y > el.offsetHeight+distance){
                 el.style.transform = 'translate(0,' + -(el.offsetHeight + distance) + 'px)'; 

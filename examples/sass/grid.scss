@@ -10,7 +10,7 @@
     table{
         width:100%;
         overflow:visible;
-        border-color:$nd-color5;
+        border-color:$nd-color-grey5;
         table-layout:fixed;
         border-collapse: collapse;
         tr{
@@ -51,6 +51,10 @@
             .nd-grid-showsub{
                 transform:rotate(90deg);
             }
+
+            &:hover{
+                @extend .nd-hover-active;
+            }
         }
     }
 
@@ -59,7 +63,7 @@
         box-sizing:border-box;
         @include nd-color(1);
         tr{
-            height:$nd-gridhead-height;
+            height:$nd-head-height;
             font-weight:bold;
             
             /*排序容器*/
@@ -81,7 +85,7 @@
                 }
 
                 >b:hover{
-                    color:$nd-activecolor;
+                    color:$nd-color-active1;
                     cursor: pointer;
                 }
             }
@@ -90,7 +94,7 @@
 
     /*每行颜色交错*/
     .nd-grid-rowalt tr:nth-child(even){
-        @include nd-color(2);
+        background-color:$nd-color-grey7;
     }
 
     .nd-grid-sub{
@@ -123,21 +127,21 @@
 }
 /*行网格线*/
 .nd-grid-row-line{
-    border-bottom:1px solid $nd-color5;
-    border-top:1px solid $nd-color5;
+    border-top:$nd-border;
+    border-bottom:$nd-border;
 }
 
 .nd-grid-column-line{
-    border-left:1px solid $nd-color5;
-    border-right:1px solid $nd-color5;
+    border-left:$nd-border;
+    border-right:$nd-border;
 }
 
 .nd-grid-top-line{
-    border-top:1px solid $nd-color5;
+    border-top:$nd-border;
 }
 
 .nd-grid-all-line{
-    border:1px solid $nd-color5;
+    border:$nd-border;
 }
 
 .nd-grid-fixed{

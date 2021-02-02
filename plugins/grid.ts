@@ -327,7 +327,7 @@ class UIGrid extends nodom.Plugin{
                     let bh:nodom.Element = new nodom.Element('b');
                     bh.addClass('nd-icon-checkbox');
                     div.add(bh);
-                    bh.addDirective(new nodom.Directive('class',"{'nd-icon-checked':'"+ this.wholeCheckName +"'}",bh));
+                    bh.addDirective(new nodom.Directive('class',"{'nd-checked':'"+ this.wholeCheckName +"'}",bh));
 
                     //表头复选框事件
                     bh.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
@@ -406,7 +406,7 @@ class UIGrid extends nodom.Plugin{
                 case 2:
                     let b1 = new nodom.Element('b');
                     b1.addClass('nd-icon-checkbox');
-                    new nodom.Directive('class',"{'nd-icon-checked':'"+ this.checkName +"'}",b1);
+                    new nodom.Directive('class',"{'nd-checked':'"+ this.checkName +"'}",b1);
                     div.add(b1);
                     b1.addEvent(new nodom.NodomEvent('click', 
                         (dom,model,module,e)=>{

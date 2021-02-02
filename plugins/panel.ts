@@ -33,7 +33,7 @@ class UIPanel extends nodom.Plugin{
                 UITool.handleUIParam(rootDom,this,
                     ['title','buttons|array'],
                     ['title','buttons'],
-                    ['Panel',[]]);
+                    [' ',[]]);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];

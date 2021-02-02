@@ -155,10 +155,9 @@ class UIMenu extends nodom.Plugin{
             parentCt.addClass('nd-menu-first-nopop');
         }
         rootDom.add(parentCt);
-        
         //初始化各级
         for(let i=0;i<this.maxLevel;i++){
-            parentCt.setProp('level',i+1);
+            // parentCt.setProp('level',i+1);
             let itemCt:nodom.Element = new nodom.Element('div');
             itemCt.directives.push(new nodom.Directive('repeat',this.listField,itemCt));
             itemCt.addClass('nd-menu-nodect');
@@ -252,7 +251,7 @@ class UIMenu extends nodom.Plugin{
                     if(!rows || rows.length===0){
                         return;
                     }
-                    let firstNopop:boolean = dom.tmpData.level === 1 && !me.popupMenu;
+                    let firstNopop:boolean = dom.getProp('level') === 1 && !me.popupMenu;
                     let h = rows.length * this.menuHeight;
                     let w = this.menuWidth;
                     let x:number,
@@ -281,11 +280,12 @@ class UIMenu extends nodom.Plugin{
                         model.set(me.activeName,false);
                         //重置direction，popmenu第一级，非popmenu第二级菜单关闭时需要重置direction
                         if(this.direction===1){
+                            let level = dom.getProp('level');
                             if(me.popupMenu){
-                                if(dom.tmpData['level']===2){
+                                if(level===2){
                                     this.direction = 0;
                                 }
-                            }else if(dom.tmpData['level']===1){
+                            }else if(level===1){
                                 this.direction = 0;
                             }
                         }
@@ -308,6 +308,7 @@ class UIMenu extends nodom.Plugin{
     private cacPos(dom:nodom.Element,x:number,y:number,w:number,h:number,el?:HTMLElement):number[]{
         //非pop第一级菜单
         let firstNopop:boolean = dom && !this.popupMenu && dom.getProp('level') === 1;
+        
         //超出宽度
         let widthOut:boolean = x + w > window.innerWidth;
         let heightOut:boolean = y + h > window.innerHeight;

@@ -3,11 +3,11 @@
 .nd-accordion{
     @extend .nd-commonbox;
     .nd-accordion-item{
-        border-bottom:1px solid $nd-color5;
+        border-bottom:$nd-border;
         .nd-accordion-first{
-            @include nd-color(3);
             padding:$nd-padding*2;
             font-size:$nd-fontnormal;
+            font-weight:bold;
             width:100%;
             box-sizing: border-box;
             display:inline-flex;
@@ -38,7 +38,7 @@
             }
     
             .nd-accordion-second:hover{
-                @extend .nd-item-hovercolor;
+                @extend .nd-hover-active;
             }
         }
         .nd-accordion-hide{

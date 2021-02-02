@@ -680,7 +680,6 @@ class UIPagination extends nodom.Plugin{
             foo.apply(this,[module,this]);
         }
     }
-
 }
 
 nodom.PluginManager.add('UI-PAGINATION',UIPagination);
