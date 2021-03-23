@@ -62,6 +62,7 @@ class UIForm extends nodom.Plugin{
                     c1.addClass('nd-form-item');
                     if(c1.children){
                         for(let c2 of c1.children){
+                            console.log(c2,c2.tagName);
                             //修改label width
                             if(c2.tagName === 'LABEL'){
                                 c2.assets.set('style','width:' + this.labelWidth + 'px');

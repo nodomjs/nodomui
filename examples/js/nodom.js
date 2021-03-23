@@ -666,11 +666,11 @@ var nodom;
             return Reflect.construct(de, [el]).element;
         }
         static handleAttributes(oe, el) {
+            let directives = [];
             for (let i = 0; i < el.attributes.length; i++) {
                 let attr = el.attributes[i];
-                let v = attr.value.trim();
                 if (attr.name.startsWith('x-')) {
-                    oe.addDirective(new nodom.Directive(attr.name.substr(2), v, oe), true);
+                    directives.push(attr);
                 }
                 else if (attr.name.startsWith('e-')) {
                     let en = attr.name.substr(2);
@@ -678,6 +678,7 @@ var nodom;
                 }
                 else {
                     let isExpr = false;
+                    let v = attr.value.trim();
                     if (v !== '') {
                         let ra = this.compileExpression(v);
                         if (nodom.Util.isArray(ra)) {
@@ -689,6 +690,14 @@ var nodom;
                         oe.setProp(attr.name, v);
                     }
                 }
+            }
+            for (let attr of directives) {
+                new nodom.Directive(attr.name.substr(2), attr.value.trim(), oe, null, true);
+            }
+            if (directives.length > 1) {
+                oe.directives.sort((a, b) => {
+                    return a.type.prio - b.type.prio;
+                });
             }
         }
         static handleChildren(oe, el) {
@@ -731,7 +740,7 @@ var nodom;
 var nodom;
 (function (nodom) {
     class Directive {
-        constructor(type, value, dom, filters) {
+        constructor(type, value, dom, filters, notSort) {
             this.id = nodom.Util.genId();
             this.type = nodom.DirectiveManager.getType(type);
             if (nodom.Util.isString(value)) {
@@ -759,11 +768,13 @@ var nodom;
             }
             if (type !== undefined && dom) {
                 nodom.DirectiveManager.init(this, dom);
-                dom.addDirective(this);
+                dom.addDirective(this, !notSort);
             }
         }
         exec(module, dom, parent) {
-            return nodom.DirectiveManager.exec(this, dom, module, parent);
+            return __awaiter(this, void 0, void 0, function* () {
+                return nodom.DirectiveManager.exec(this, dom, module, parent);
+            });
         }
         clone(dst) {
             let dir = new Directive(this.type.name, this.value);
@@ -2034,6 +2045,15 @@ var nodom;
             }
         }
         set(key, value) {
+            if (value === undefined) {
+                if (typeof key === 'object') {
+                    this.addSetterGetter(key);
+                    for (let o in key) {
+                        this.data[o] = key[o];
+                    }
+                }
+                return;
+            }
             let fn;
             let index = key.lastIndexOf('.');
             let model;
@@ -2287,10 +2307,6 @@ var nodom;
             this.firstRender = true;
             this.children = [];
             this.createOps = [];
-            this.firstRenderOps = [];
-            this.beforeFirstRenderOps = [];
-            this.renderOps = [];
-            this.beforeRenderOps = [];
             this.state = 0;
             this.loadNewData = false;
             this.modelFactory = new nodom.ModelFactory();
@@ -2437,7 +2453,6 @@ var nodom;
                 }
             }
             else {
-                this.doRenderOp(this.beforeRenderOps);
                 this.doModuleEvent('onBeforeRender');
                 if (this.model) {
                     root.modelId = this.model.id;
@@ -2459,13 +2474,11 @@ var nodom;
                     });
                 }
                 this.doModuleEvent('onRender');
-                this.doRenderOp(this.renderOps);
             }
             this.renderDoms = [];
             return true;
         }
         doFirstRender(root) {
-            this.doRenderOp(this.beforeFirstRenderOps);
             this.doModuleEvent('onBeforeFirstRender');
             this.renderTree = root;
             if (this.model) {
@@ -2478,7 +2491,6 @@ var nodom;
             root.renderToHtml(this, { type: 'fresh' });
             delete this.firstRender;
             this.doModuleEvent('onFirstRender');
-            this.doRenderOp(this.firstRenderOps);
         }
         clone(moduleName) {
             let me = this;
@@ -2598,12 +2610,12 @@ var nodom;
                 this.state = 3;
                 nodom.Renderer.add(this);
                 if (nodom.Util.isArray(this.children)) {
-                    this.children.forEach((item) => {
+                    this.children.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         let m = nodom.ModuleFactory.get(item);
                         if (m) {
-                            m.active();
+                            yield m.active();
                         }
-                    });
+                    }));
                 }
             });
         }
@@ -2646,49 +2658,12 @@ var nodom;
             }
             nodom.Util.apply(foo, this, param);
         }
-        addFirstRenderOperation(foo) {
-            if (!nodom.Util.isFunction(foo)) {
-                return;
-            }
-            if (this.firstRenderOps.indexOf(foo) === -1) {
-                this.firstRenderOps.push(foo);
-            }
-        }
-        addBeforeFirstRenderOperation(foo) {
-            if (!nodom.Util.isFunction(foo)) {
-                return;
-            }
-            if (!this.beforeFirstRenderOps.includes(foo)) {
-                this.beforeFirstRenderOps.push(foo);
-            }
-        }
         addCreateOperation(foo) {
             if (!nodom.Util.isFunction(foo)) {
                 return;
             }
             if (!this.createOps.includes(foo)) {
                 this.createOps.push(foo);
-            }
-        }
-        addRenderOperation(foo) {
-            if (!nodom.Util.isFunction(foo)) {
-                return;
-            }
-            if (!this.renderOps.includes(foo)) {
-                this.renderOps.push(foo);
-            }
-        }
-        addBeforeRenderOperation(foo) {
-            if (!nodom.Util.isFunction(foo)) {
-                return;
-            }
-            if (!this.beforeRenderOps.includes(foo)) {
-                this.beforeRenderOps.push(foo);
-            }
-        }
-        doRenderOp(renderOps) {
-            for (; renderOps.length > 0;) {
-                nodom.Util.apply(renderOps.shift(), this, []);
             }
         }
         clearDontRender(dom) {
@@ -3333,15 +3308,13 @@ var nodom;
                 }
             }
             static render() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    for (let i = 0; i < this.waitList.length; i++) {
-                        let m = nodom.ModuleFactory.get(this.waitList[i]);
-                        if (!m || m.render()) {
-                            this.waitList.shift();
-                            i--;
-                        }
+                for (let i = 0; i < this.waitList.length; i++) {
+                    let m = nodom.ModuleFactory.get(this.waitList[i]);
+                    if (!m || m.render()) {
+                        this.waitList.shift();
+                        i--;
                     }
-                });
+                }
             }
         }
         Renderer.waitList = [];
@@ -3455,23 +3428,9 @@ var nodom;
                                 }
                             }
                             parentModule.addChild(module.id);
-                            if (index++ === 0) {
-                                module.setContainerKey(routerKey);
-                                yield module.active();
-                                route.setLinkActive();
-                            }
-                            else {
-                                parentModule.addFirstRenderOperation(function () {
-                                    return __awaiter(this, void 0, void 0, function* () {
-                                        let routerKey = Router.routerKeyMap.get(this.id);
-                                        if (routerKey) {
-                                            module.setContainerKey(routerKey);
-                                            yield module.active();
-                                        }
-                                        route.setLinkActive();
-                                    });
-                                });
-                            }
+                            module.setContainerKey(routerKey);
+                            yield module.active();
+                            route.setLinkActive();
                             setRouteParamToModel(route);
                             if (nodom.Util.isFunction(this.onDefaultEnter)) {
                                 this.onDefaultEnter(module.model);
@@ -3620,34 +3579,22 @@ var nodom;
                     return;
                 }
                 domArr.forEach((item) => {
-                    let dom = module.renderTree.query(item);
+                    let dom = module.getElement(item);
                     if (!dom) {
                         return;
                     }
                     let domPath = dom.getProp('path');
-                    if (dom.hasProp('active', true)) {
+                    if (dom.hasProp('activename')) {
                         let model = module.modelFactory.get(dom.modelId);
                         if (!model) {
                             return;
                         }
-                        let expr = dom.getProp('active', true)[0];
-                        if (!expr) {
-                            return;
-                        }
-                        let field = expr.fields[0];
+                        let field = dom.getProp('activename');
                         if (path === domPath || path.indexOf(domPath + '/') === 0) {
-                            model.data[field] = true;
+                            model.set(field, true);
                         }
                         else {
-                            model.data[field] = false;
-                        }
-                    }
-                    else if (dom.hasProp('active')) {
-                        if (path === domPath || path.indexOf(domPath + '/') === 0) {
-                            dom.setProp('active', true);
-                        }
-                        else {
-                            dom.set('active', false);
+                            model.set(field, false);
                         }
                     }
                 });
@@ -3772,7 +3719,6 @@ var nodom;
             let paramIndex = 0;
             let retArr = [];
             let fullPath = '';
-            let showPath = '';
             let preNode = this.root;
             for (let i = 0; i < pathArr.length; i++) {
                 let v = pathArr[i].trim();
@@ -3791,6 +3737,7 @@ var nodom;
                         node.data = {};
                         preNode = node;
                         find = true;
+                        paramIndex = 0;
                         break;
                     }
                 }
@@ -3969,7 +3916,7 @@ var nodom;
             dom.setProp('modulename', valueArr[1]);
         }
         directive.extra = {};
-    }, (directive, dom, module, parent) => {
+    }, (directive, dom, module, parent) => __awaiter(this, void 0, void 0, function* () {
         const ext = directive.extra;
         let needNew = ext.moduleId === undefined;
         let subMdl;
@@ -3978,24 +3925,22 @@ var nodom;
             needNew = subMdl.getContainerKey() !== dom.key;
         }
         if (needNew) {
-            nodom.ModuleFactory.getInstance(directive.value, dom.getProp('modulename'), dom.getProp('data'))
-                .then((m) => {
-                if (m) {
-                    m.setContainerKey(dom.key);
-                    let dom1 = module.getElement(dom.key, true);
-                    if (dom1) {
-                        let dir = dom1.getDirective('module');
-                        dir.extra.moduleId = m.id;
-                    }
-                    module.addChild(m.id);
-                    m.active();
+            let m = yield nodom.ModuleFactory.getInstance(directive.value, dom.getProp('modulename'), dom.getProp('data'));
+            if (m) {
+                m.setContainerKey(dom.key);
+                let dom1 = module.getElement(dom.key, true);
+                if (dom1) {
+                    let dir = dom1.getDirective('module');
+                    dir.extra.moduleId = m.id;
                 }
-            });
+                module.addChild(m.id);
+                yield m.active();
+            }
         }
         else if (subMdl && subMdl.state !== 3) {
-            subMdl.active();
+            yield subMdl.active();
         }
-    });
+    }));
     nodom.DirectiveManager.addType('model', 1, (directive, dom) => {
         let value = directive.value;
         if (nodom.Util.isString(value)) {
@@ -4407,7 +4352,7 @@ var nodom;
         if (dom.tagName === 'A') {
             dom.setProp('href', 'javascript:void(0)');
         }
-        if (typeof value === 'string' && value.substr(0, 2) === '{{' && value.substr(value.length - 2, 2) === '}}') {
+        if (typeof value === 'string' && /^\{\{.+\}\}$/.test(value)) {
             value = new nodom.Expression(value.substring(2, value.length - 2));
         }
         if (value instanceof nodom.Expression) {
@@ -4417,6 +4362,13 @@ var nodom;
         else {
             dom.setProp('path', value);
         }
+        if (dom.hasProp('activename')) {
+            let an = dom.getProp('activename');
+            dom.setProp('active', new nodom.Expression(an), true);
+            if (dom.hasProp('activeclass')) {
+                new nodom.Directive('class', "{" + dom.getProp('activeclass') + ":'" + an + "'}", dom);
+            }
+        }
         dom.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
             let path = dom.getProp('path');
             if (nodom.Util.isEmpty(path)) {
@@ -4425,22 +4377,20 @@ var nodom;
             nodom.Router.go(path);
         }));
     }, (directive, dom, module, parent) => {
-        if (dom.hasProp('active')) {
-            let domArr = nodom.Router.activeDomMap.get(module.id);
-            if (!domArr) {
-                nodom.Router.activeDomMap.set(module.id, [dom.key]);
-            }
-            else {
-                if (!domArr.includes(dom.key)) {
-                    domArr.push(dom.key);
-                }
+        let path = dom.getProp('path');
+        let domArr = nodom.Router.activeDomMap.get(module.id);
+        if (!domArr) {
+            nodom.Router.activeDomMap.set(module.id, [dom.key]);
+        }
+        else {
+            if (!domArr.includes(dom.key)) {
+                domArr.push(dom.key);
             }
         }
-        let path = dom.getProp('path');
         if (!path || path === nodom.Router.currentPath) {
             return;
         }
-        if (dom.hasProp('active') && dom.getProp('active') !== 'false' && (!nodom.Router.currentPath || path.indexOf(nodom.Router.currentPath) === 0)) {
+        if (dom.hasProp('active') && dom.getProp('active') && (!nodom.Router.currentPath || path.indexOf(nodom.Router.currentPath) === 0)) {
             setTimeout(() => { nodom.Router.go(path); }, 0);
         }
     });

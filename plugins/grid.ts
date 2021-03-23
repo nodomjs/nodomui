@@ -193,6 +193,7 @@ class UIGrid extends nodom.Plugin{
             fields.push({
                 title:c.getProp('title'),
                 field:field,
+                align:c.hasProp('center')?'center':'left', //表格（非表头）居中
                 type:0,  //0 数据表格, 1 子表格 ,2 checkbox
                 notsort:c.hasProp('notsort'),
                 children: c.children,
@@ -204,15 +205,15 @@ class UIGrid extends nodom.Plugin{
         if(this.checkbox){
             fields.unshift({
                 type:2,
-                width:45,
-            })
+                width:45
+            });
         }
 
         if(this.showDetail){
             fields.unshift({
                 type:1,
-                width:45,
-            })
+                width:45
+            });
         }
 
         this.handleBody(tbody,fields,subDom);
@@ -381,6 +382,7 @@ class UIGrid extends nodom.Plugin{
             if(f.width){
                 col.setProp('width',f.width);
                 width += parseInt(f.width);
+
             }else{
                 fixWidth = false;
             }
@@ -394,6 +396,9 @@ class UIGrid extends nodom.Plugin{
             tr.add(td);
             switch(f.type){
                 case 0:
+                    if(f.align === 'center'){
+                        div.addClass('nd-grid-td-center');
+                    }
                     div.children = f.children;
                     break;
                 case 1:
@@ -401,6 +406,7 @@ class UIGrid extends nodom.Plugin{
                     b.addClass('nd-grid-sub-btn');
                     new nodom.Directive('class',"{'nd-grid-showsub':'"+ this.subName + "'}",b);
                     div.add(b);
+                    div.addClass('nd-grid-td-center');
                     this.handleSub(subDom,tbl,b,fields);
                     break;
                 case 2:
@@ -408,6 +414,7 @@ class UIGrid extends nodom.Plugin{
                     b1.addClass('nd-icon-checkbox');
                     new nodom.Directive('class',"{'nd-checked':'"+ this.checkName +"'}",b1);
                     div.add(b1);
+                    div.addClass('nd-grid-td-center');
                     b1.addEvent(new nodom.NodomEvent('click', 
                         (dom,model,module,e)=>{
                             model.set(this.checkName,!model.data[this.checkName]);

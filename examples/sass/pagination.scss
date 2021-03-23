@@ -53,8 +53,7 @@
     .nd-pagination-go{
         input{
             width:50px;
-            border:1px solid $nd-color4;
-            margin:0 $nd-padding;
+            @extend .nd-input;
         }
     }
 }

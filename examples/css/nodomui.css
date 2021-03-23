@@ -19,7 +19,7 @@
 /*字体粗体*/
 /*zindex*/
 /*border样式*/
-.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
+.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-pagination .nd-pagination-go input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-pagination .nd-pagination-go input:focus, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
   background-color: white;
   color: #0e71c6; }
 
@@ -132,13 +132,12 @@ a:visited {
   cursor: pointer; }
 
 /*输入框*/
-input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input {
+input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input, .nd-pagination .nd-pagination-go input {
   padding: 10px;
-  background-color: #fff;
-  color: #000;
   border-radius: 5px;
-  border: 1px solid #ccc; }
-  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus {
+  border: 1px solid #ccc;
+  margin: 0 5px; }
+  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-pagination .nd-pagination-go input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-pagination .nd-pagination-go input:focus {
     border-color: #0e71c6; }
 
 /*带图标输入框*/
@@ -169,23 +168,24 @@ button, input {
 /**滚动条**/
 @media screen and (max-width: 640px) {
   ::-webkit-scrollbar {
-    width: 2px; } }
+    width: 2px;
+    height: 2px; } }
 @media screen and (min-width: 640px) {
   ::-webkit-scrollbar {
-    width: 6px; } }
+    width: 10px;
+    height: 10px; } }
 
+/*滚动条轨道*/
 ::-webkit-scrollbar-track {
-  background-color: #fff;
-  color: #000; }
+  border: 1px solid #eee;
+  border-radius: 5px; }
 
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #666;
-  color: #000; }
+  background-color: #eee; }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #666;
-    color: #000; }
+    background-color: #888; }
 
 /*标题*/
 h1 {
@@ -902,7 +902,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       text-align: center; }
     .nd-datetime .nd-datetime-timetbl .nd-datetime-timect {
       font-size: 14px;
-      height: 150px;
+      height: 180px;
       display: flex; }
       .nd-datetime .nd-datetime-timetbl .nd-datetime-timect > div {
         overflow: auto;
@@ -1043,6 +1043,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       background-position: 0 0;
       background-size: 100% 100%;
       background-repeat: no-repeat;
+      background-color: #f0f0f0;
       display: flex;
       align-items: center;
       justify-content: center; }
@@ -1091,7 +1092,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  /*每行颜色交错*/ }
+  /*每行颜色交错*/
+  /*居中*/ }
   .nd-grid table {
     width: 100%;
     overflow: visible;
@@ -1172,6 +1174,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
           font-weight: bold; }
         .nd-grid .nd-grid-sub .nd-grid-sub-row .nd-grid-sub-item .nd-grid-sub-content {
           flex: 1; }
+  .nd-grid .nd-grid-td-center {
+    text-align: center; }
 
 /*行网格线*/
 .nd-grid-row-line {
@@ -1370,9 +1374,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-pagination .nd-pagination-total {
     padding: 0 10px; }
   .nd-pagination .nd-pagination-go input {
-    width: 50px;
-    border: 1px solid #fff;
-    margin: 0 10px; }
+    width: 50px; }
 
 /* panel */
 .nd-panel {

@@ -17,7 +17,10 @@ class UIPanel extends nodom.Plugin{
      * 头部图标按钮dom
      */
     headerBtnDom:nodom.Element;
-
+    /**
+     * 不显示头
+     */
+    noHeader:boolean;
     /**
      * 关闭按钮操作
      */
@@ -33,7 +36,8 @@ class UIPanel extends nodom.Plugin{
                 UITool.handleUIParam(rootDom,this,
                     ['title','buttons|array'],
                     ['title','buttons'],
-                    [' ',[]]);
+                    ['',[]]
+                );
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -55,28 +59,33 @@ class UIPanel extends nodom.Plugin{
         
         //处理body
         this.handleBody(rootDom);
-        //处理头部
-        //header
-        let headerDom:nodom.Element = new nodom.Element('div');
-        headerDom.addClass('nd-panel-header');
-        if(this.title){
-            //title
-            let titleCt:nodom.Element = new nodom.Element('span');
-            titleCt.addClass('nd-panel-title');
-            titleCt.assets.set('innerHTML',this.title);
-            headerDom.add(titleCt);
-        }
-        
-        let headbarDom:nodom.Element = new nodom.Element('div');
-        headbarDom.addClass('nd-panel-header-bar');
-        this.headerBtnDom = headbarDom;
-        headerDom.add(headbarDom);
-        rootDom.children.unshift(headerDom);
+        //处理头部，如果title和button都不存在，则不处理
+        if(this.title && this.title!=='' || this.buttons.length!==0){
+            if(this.title === ''){
+                this.title = 'panel';
+            }
+            //header
+            let headerDom:nodom.Element = new nodom.Element('div');
+            headerDom.addClass('nd-panel-header');
+            if(this.title){
+                //title
+                let titleCt:nodom.Element = new nodom.Element('span');
+                titleCt.addClass('nd-panel-title');
+                titleCt.assets.set('innerHTML',this.title);
+                headerDom.add(titleCt);
+            }
+            
+            let headbarDom:nodom.Element = new nodom.Element('div');
+            headbarDom.addClass('nd-panel-header-bar');
+            this.headerBtnDom = headbarDom;
+            headerDom.add(headbarDom);
+            rootDom.children.unshift(headerDom);
 
-        //头部按钮
-        for(let btn of this.buttons){
-            let a = btn.split('|');
-            this.addHeadBtn(a[0],a[1]);
+            //头部按钮
+            for(let btn of this.buttons){
+                let a = btn.split('|');
+                this.addHeadBtn(a[0],a[1]);
+            }
         }
     }
 

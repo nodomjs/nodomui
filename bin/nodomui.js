@@ -455,12 +455,13 @@ class UIDatetime extends nodom.Plugin {
     constructor(params) {
         super(params);
         this.tagName = 'UI-DATETIME';
+        this.msecond = 0;
         let rootDom = new nodom.Element();
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['type'], ['type'], ['date']);
+                UITool.handleUIParam(rootDom, this, ['type', 'showms|bool'], ['type', 'showMs'], ['date', null]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -527,8 +528,12 @@ class UIDatetime extends nodom.Plugin {
             btn.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                 e.preventDefault();
                 let nda = new Date();
-                me.setValue(module, nda.getFullYear() + '-' + (nda.getMonth() + 1) + '-' + nda.getDate() + ' '
-                    + nda.getHours() + ':' + nda.getMinutes() + ':' + nda.getSeconds());
+                let value = nda.getFullYear() + '-' + (nda.getMonth() + 1) + '-' + nda.getDate() + ' '
+                    + nda.getHours() + ':' + nda.getMinutes() + ':' + nda.getSeconds();
+                if (this.showMs) {
+                    value += '.' + nda.getMilliseconds();
+                }
+                me.setValue(module, value);
             }));
             btnCt.add(btn);
         }
@@ -677,6 +682,12 @@ class UIDatetime extends nodom.Plugin {
         secondDom.children[0].getDirective('repeat').value = 'seconds';
         secondDom.children[0].setProp('role', 'second');
         itemCt.children = [hourDom, minuteDom, secondDom];
+        if (this.showMs) {
+            let msDom = hourDom.clone(true);
+            msDom.children[0].getDirective('repeat').value = 'mseconds';
+            msDom.children[0].setProp('role', 'msecond');
+            itemCt.add(msDom);
+        }
         return pickerDom;
     }
     genDates(module, year, month) {
@@ -746,6 +757,26 @@ class UIDatetime extends nodom.Plugin {
         model.set('hours', hours);
         model.set('minutes', minutes);
         model.set('seconds', seconds);
+        if (this.showMs) {
+            let mseconds = [];
+            for (let i = 0; i < 999; i++) {
+                let v = i + '';
+                if (i < 10) {
+                    v = '00' + i;
+                }
+                else if (i < 100) {
+                    v = '0' + i;
+                }
+                else {
+                    v = i + '';
+                }
+                mseconds.push({
+                    v: v,
+                    selected: i === 0 ? true : false
+                });
+            }
+            model.set('mseconds', mseconds);
+        }
     }
     cacMonthDays(year, month, disMonth) {
         if (disMonth) {
@@ -802,7 +833,6 @@ class UIDatetime extends nodom.Plugin {
                 return;
             }
             let model = module.getModel(this.modelId);
-            let model1 = module.getModel(this.pickerModelId);
             if (this.type === 'date' || this.type === 'datetime') {
                 let date = new Date(str);
                 if (date.toTimeString() !== 'Invalid Date') {
@@ -811,11 +841,7 @@ class UIDatetime extends nodom.Plugin {
                     this.date = date.getDate();
                     this.genDates(module, this.year, this.month);
                     if (this.type === 'datetime') {
-                        this.hour = date.getHours();
-                        this.minute = date.getMinutes();
-                        this.second = date.getSeconds();
-                        model1.set('time', this.genValueStr('time'));
-                        this.setTimeSelect(module);
+                        this.setTime(module, date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
                     }
                 }
                 else {
@@ -823,16 +849,31 @@ class UIDatetime extends nodom.Plugin {
                 }
             }
             else if (this.type === 'time') {
-                if (/^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(str)) {
+                if (/^\d{1,2}:\d{1,2}(:\d{1,2})?(\.\d{1,3})?$/.test(str)) {
                     let sa = str.split(':');
-                    this.hour = parseInt(sa[0]);
-                    this.minute = parseInt(sa[1]);
-                    this.second = sa.length > 2 ? parseInt(sa[2]) : 0;
-                    model1.set('time', this.genValueStr('time'));
-                    this.setTimeSelect(module);
+                    let h = parseInt(sa[0]);
+                    let m = parseInt(sa[1]);
+                    let s = 0, ms = 0;
+                    if (sa.length > 2) {
+                        let a = sa[2].split('.');
+                        s = parseInt(a[0]);
+                        if (a.length > 1) {
+                            ms = parseInt(a[1]);
+                        }
+                    }
+                    this.setTime(module, h, m, s, ms);
                 }
             }
         }
+    }
+    setTime(module, hour, minute, second, msecond) {
+        let model1 = module.getModel(this.pickerModelId);
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+        this.msecond = msecond;
+        model1.set('time', this.genValueStr('time'));
+        this.setTimeSelect(module);
     }
     selectDate(module, model) {
         let pmodel = module.getModel(this.pickerModelId);
@@ -891,9 +932,12 @@ class UIDatetime extends nodom.Plugin {
     setTimeSelect(module) {
         let me = this;
         let model = module.getModel(this.pickerModelId);
-        let data = [this.hour, this.minute, this.second];
-        ['hours', 'minutes', 'seconds'].forEach((item, i) => {
+        let data = [this.hour, this.minute, this.second, this.msecond];
+        ['hours', 'minutes', 'seconds', 'mseconds'].forEach((item, i) => {
             let datas = model.query(item);
+            if (!datas) {
+                return;
+            }
             for (let d of datas) {
                 if (d.selected) {
                     d.selected = false;
@@ -941,16 +985,33 @@ class UIDatetime extends nodom.Plugin {
         if (!this.second) {
             this.second = 0;
         }
+        let retValue;
         switch (type || this.type) {
             case 'datetime':
-                return [this.year, this.month < 10 ? '0' + this.month : this.month, this.date < 10 ? '0' + this.date : this.date].join('-') +
+                retValue = [this.year, this.month < 10 ? '0' + this.month : this.month, this.date < 10 ? '0' + this.date : this.date].join('-') +
                     ' ' +
                     [this.hour < 10 ? '0' + this.hour : this.hour, this.minute < 10 ? '0' + this.minute : this.minute, this.second < 10 ? '0' + this.second : this.second].join(':');
+                break;
             case 'time':
-                return [this.hour < 10 ? '0' + this.hour : this.hour, this.minute < 10 ? '0' + this.minute : this.minute, this.second < 10 ? '0' + this.second : this.second].join(':');
+                retValue = [this.hour < 10 ? '0' + this.hour : this.hour, this.minute < 10 ? '0' + this.minute : this.minute, this.second < 10 ? '0' + this.second : this.second].join(':');
+                break;
             default:
-                return [this.year, this.month < 10 ? '0' + this.month : this.month, this.date < 10 ? '0' + this.date : this.date].join('-');
+                retValue = [this.year, this.month < 10 ? '0' + this.month : this.month, this.date < 10 ? '0' + this.date : this.date].join('-');
         }
+        if (this.showMs && this.type !== 'date') {
+            let v;
+            if (this.msecond < 10) {
+                v = '00' + this.msecond;
+            }
+            else if (this.msecond < 100) {
+                v = '0' + this.msecond;
+            }
+            else {
+                v = this.msecond;
+            }
+            retValue += '.' + v;
+        }
+        return retValue;
     }
 }
 nodom.PluginManager.add('UI-DATETIME', UIDatetime);
@@ -1222,6 +1283,7 @@ class UIForm extends nodom.Plugin {
                     c1.addClass('nd-form-item');
                     if (c1.children) {
                         for (let c2 of c1.children) {
+                            console.log(c2, c2.tagName);
                             if (c2.tagName === 'LABEL') {
                                 c2.assets.set('style', 'width:' + this.labelWidth + 'px');
                             }
@@ -1312,6 +1374,7 @@ class UIGrid extends nodom.Plugin {
             fields.push({
                 title: c.getProp('title'),
                 field: field,
+                align: c.hasProp('center') ? 'center' : 'left',
                 type: 0,
                 notsort: c.hasProp('notsort'),
                 children: c.children,
@@ -1322,13 +1385,13 @@ class UIGrid extends nodom.Plugin {
         if (this.checkbox) {
             fields.unshift({
                 type: 2,
-                width: 45,
+                width: 45
             });
         }
         if (this.showDetail) {
             fields.unshift({
                 type: 1,
-                width: 45,
+                width: 45
             });
         }
         this.handleBody(tbody, fields, subDom);
@@ -1477,6 +1540,9 @@ class UIGrid extends nodom.Plugin {
             tr.add(td);
             switch (f.type) {
                 case 0:
+                    if (f.align === 'center') {
+                        div.addClass('nd-grid-td-center');
+                    }
                     div.children = f.children;
                     break;
                 case 1:
@@ -1484,6 +1550,7 @@ class UIGrid extends nodom.Plugin {
                     b.addClass('nd-grid-sub-btn');
                     new nodom.Directive('class', "{'nd-grid-showsub':'" + this.subName + "'}", b);
                     div.add(b);
+                    div.addClass('nd-grid-td-center');
                     this.handleSub(subDom, tbl, b, fields);
                     break;
                 case 2:
@@ -1491,6 +1558,7 @@ class UIGrid extends nodom.Plugin {
                     b1.addClass('nd-icon-checkbox');
                     new nodom.Directive('class', "{'nd-checked':'" + this.checkName + "'}", b1);
                     div.add(b1);
+                    div.addClass('nd-grid-td-center');
                     b1.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
                         model.set(this.checkName, !model.data[this.checkName]);
                     }));
@@ -2267,7 +2335,6 @@ class UIMenu extends nodom.Plugin {
     }
     cacPos(dom, x, y, w, h, el) {
         let firstNopop = dom && !this.popupMenu && dom.getProp('level') === 1;
-        console.log(firstNopop);
         let widthOut = x + w > window.innerWidth;
         let heightOut = y + h > window.innerHeight;
         let top = dom ? 0 : y;
@@ -2740,7 +2807,7 @@ class UIPanel extends nodom.Plugin {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
                 nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], [' ', []]);
+                UITool.handleUIParam(rootDom, this, ['title', 'buttons|array'], ['title', 'buttons'], ['', []]);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -2756,22 +2823,27 @@ class UIPanel extends nodom.Plugin {
     generate(rootDom) {
         rootDom.addClass('nd-panel');
         this.handleBody(rootDom);
-        let headerDom = new nodom.Element('div');
-        headerDom.addClass('nd-panel-header');
-        if (this.title) {
-            let titleCt = new nodom.Element('span');
-            titleCt.addClass('nd-panel-title');
-            titleCt.assets.set('innerHTML', this.title);
-            headerDom.add(titleCt);
-        }
-        let headbarDom = new nodom.Element('div');
-        headbarDom.addClass('nd-panel-header-bar');
-        this.headerBtnDom = headbarDom;
-        headerDom.add(headbarDom);
-        rootDom.children.unshift(headerDom);
-        for (let btn of this.buttons) {
-            let a = btn.split('|');
-            this.addHeadBtn(a[0], a[1]);
+        if (this.title && this.title !== '' || this.buttons.length !== 0) {
+            if (this.title === '') {
+                this.title = 'panel';
+            }
+            let headerDom = new nodom.Element('div');
+            headerDom.addClass('nd-panel-header');
+            if (this.title) {
+                let titleCt = new nodom.Element('span');
+                titleCt.addClass('nd-panel-title');
+                titleCt.assets.set('innerHTML', this.title);
+                headerDom.add(titleCt);
+            }
+            let headbarDom = new nodom.Element('div');
+            headbarDom.addClass('nd-panel-header-bar');
+            this.headerBtnDom = headbarDom;
+            headerDom.add(headbarDom);
+            rootDom.children.unshift(headerDom);
+            for (let btn of this.buttons) {
+                let a = btn.split('|');
+                this.addHeadBtn(a[0], a[1]);
+            }
         }
     }
     handleBody(panelDom) {

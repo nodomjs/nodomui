@@ -12,6 +12,10 @@ class UIDatetime extends nodom.Plugin{
     hour:number;
     minute:number;
     second:number;
+    /**
+     * 毫秒
+     */
+    msecond:number = 0;
 
     dataName:string;
     /**
@@ -37,6 +41,10 @@ class UIDatetime extends nodom.Plugin{
      */
     listKey:string;
     
+    /**
+     * 是否显示ms
+     */
+    showMs:boolean;
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
@@ -45,9 +53,9 @@ class UIDatetime extends nodom.Plugin{
                 nodom.Compiler.handleAttributes(rootDom,params);
                 nodom.Compiler.handleChildren(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['type'],
-                    ['type'],
-                    ['date']);
+                    ['type','showms|bool'],
+                    ['type','showMs'],
+                    ['date',null]);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -133,8 +141,12 @@ class UIDatetime extends nodom.Plugin{
             btn.addEvent(new nodom.NodomEvent('click',(dom,model,module,e)=>{
                 e.preventDefault();
                 let nda:Date = new Date();
-                me.setValue(module,nda.getFullYear() + '-' + (nda.getMonth()+1) + '-' + nda.getDate() + ' ' 
-                    + nda.getHours() + ':' + nda.getMinutes() + ':' + nda.getSeconds());
+                let value = nda.getFullYear() + '-' + (nda.getMonth()+1) + '-' + nda.getDate() + ' ' 
+                + nda.getHours() + ':' + nda.getMinutes() + ':' + nda.getSeconds();
+                if(this.showMs){
+                    value += '.' + nda.getMilliseconds();
+                }
+                me.setValue(module,value);
             }));
             btnCt.add(btn);
         }
@@ -167,7 +179,6 @@ class UIDatetime extends nodom.Plugin{
         super.beforeRender(module,uidom);
         this.listKey = uidom.children[1].key;
         let model:nodom.Model = module.getModel(uidom.modelId);
-        
         if(this.needPreRender){
             //设置附加数据项
             model.set(this.extraDataName,{
@@ -184,7 +195,6 @@ class UIDatetime extends nodom.Plugin{
 
             this.pickerModelId = model.get(this.extraDataName).id;
 
-            
             if(this.type === 'date'){
                 this.genDates(module);
             }else if(this.type === 'time'){
@@ -193,7 +203,6 @@ class UIDatetime extends nodom.Plugin{
                 this.genDates(module);
                 this.genTimes(module);
             }
-            
             //增加外部点击隐藏
             UIEventRegister.addEvent('click',module.id,uidom.children[1].key,(module,dom,inOrOut,e)=>{
                 if(!inOrOut){
@@ -325,11 +334,19 @@ class UIDatetime extends nodom.Plugin{
 
         let minuteDom:nodom.Element = hourDom.clone(true);
         let secondDom:nodom.Element = hourDom.clone(true);
+        
         minuteDom.children[0].getDirective('repeat').value = 'minutes';
         minuteDom.children[0].setProp('role','minute');
         secondDom.children[0].getDirective('repeat').value = 'seconds';
         secondDom.children[0].setProp('role','second');
         itemCt.children = [hourDom,minuteDom,secondDom];
+        //显示ms
+        if(this.showMs){
+            let msDom:nodom.Element = hourDom.clone(true);
+            msDom.children[0].getDirective('repeat').value = 'mseconds';
+            msDom.children[0].setProp('role','msecond');
+            itemCt.add(msDom);
+        }
         return pickerDom;
     }
     /**
@@ -418,6 +435,25 @@ class UIDatetime extends nodom.Plugin{
         model.set('hours',hours);
         model.set('minutes',minutes);
         model.set('seconds',seconds);
+        //ms值
+        if(this.showMs){
+            let mseconds = [];
+            for(let i=0;i<999;i++){
+                let v = i+'';
+                if(i<10){
+                    v = '00' + i;
+                }else if(i<100){
+                    v = '0' + i;
+                }else{
+                    v = i+'';
+                }
+                mseconds.push({
+                    v:v,
+                    selected:i===0?true:false
+                });
+            }
+            model.set('mseconds',mseconds);
+        }
     }
     /**
      * 计算一个月的天数
@@ -489,9 +525,8 @@ class UIDatetime extends nodom.Plugin{
                 return;
             }
             let model:nodom.Model = module.getModel(this.modelId);
-            let model1:nodom.Model = module.getModel(this.pickerModelId);        
             if(this.type === 'date' || this.type === 'datetime'){
-                let date:Date = new Date(str);    
+                let date:Date = new Date(str);
                 if(date.toTimeString() !== 'Invalid Date'){
                     this.year = date.getFullYear();
                     this.month = date.getMonth() + 1;
@@ -499,26 +534,46 @@ class UIDatetime extends nodom.Plugin{
                     this.genDates(module,this.year,this.month);
                     //datetime 需要设置时间
                     if(this.type === 'datetime'){
-                        this.hour = date.getHours();
-                        this.minute = date.getMinutes();
-                        this.second = date.getSeconds();
-                        model1.set('time',this.genValueStr('time'));
-                        this.setTimeSelect(module);
+                        this.setTime(module,date.getHours(),date.getMinutes(),date.getSeconds(),date.getMilliseconds());
                     }
                 }else{ //日期格式不对，则直接设置插件当前日期时间值
                     model.set(this.dataName,this.genValueStr());
                 }
             }else if(this.type === 'time'){
-                if(/^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(str)){
+                if(/^\d{1,2}:\d{1,2}(:\d{1,2})?(\.\d{1,3})?$/.test(str)){
                     let sa:string[] = str.split(':');
-                    this.hour = parseInt(sa[0]);
-                    this.minute = parseInt(sa[1]);
-                    this.second = sa.length>2?parseInt(sa[2]):0;
-                    model1.set('time',this.genValueStr('time'));
-                    this.setTimeSelect(module);
+                    let h = parseInt(sa[0]);
+                    let m = parseInt(sa[1]);
+                    let s=0,ms=0;
+                    if(sa.length > 2){
+                        let a = sa[2].split('.');
+                        s = parseInt(a[0]);
+                        if(a.length>1){
+                            ms = parseInt(a[1]);
+                        }
+                    }
+                    this.setTime(module,h,m,s,ms);
                 }
             }
         }
+    }
+
+    /**
+     * 设置时间
+     * @param module 
+     * @param hour 
+     * @param minute 
+     * @param second 
+     * @param msecond 
+     */
+    setTime(module:nodom.Module,hour:number,minute:number,second:number,msecond?:number){
+        let model1:nodom.Model = module.getModel(this.pickerModelId);
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+        this.msecond = msecond;
+        model1.set('time',this.genValueStr('time'));
+        this.setTimeSelect(module);
     }
     /**
      * 选中日期
@@ -579,7 +634,7 @@ class UIDatetime extends nodom.Plugin{
 
     /**
      * 初始化并显示picker
-     * @param dom       input或inputct       
+     * @param dom       input或inputct
      * @param model     数据模型
      * @param module    模块
      * @param el        当前el
@@ -607,9 +662,12 @@ class UIDatetime extends nodom.Plugin{
     setTimeSelect(module:nodom.Module){
         let me = this;
         let model:nodom.Model = module.getModel(this.pickerModelId);
-        let data = [this.hour,this.minute,this.second];
-        ['hours','minutes','seconds'].forEach((item,i)=>{
+        let data = [this.hour,this.minute,this.second,this.msecond];
+        ['hours','minutes','seconds','mseconds'].forEach((item,i)=>{
             let datas = model.query(item);
+            if(!datas){
+                return;
+            }
             //清除之前选中
             for(let d of datas){
                 if(d.selected){
@@ -666,16 +724,31 @@ class UIDatetime extends nodom.Plugin{
             this.second = 0;
         }
         
+        let retValue;
         switch(type||this.type){
             case 'datetime':
-                return [this.year,this.month<10?'0'+this.month:this.month,this.date<10?'0'+this.date:this.date].join('-') +
+                retValue = [this.year,this.month<10?'0'+this.month:this.month,this.date<10?'0'+this.date:this.date].join('-') +
                         ' ' + 
                         [this.hour<10?'0'+this.hour:this.hour,this.minute<10?'0'+this.minute:this.minute,this.second<10?'0'+this.second:this.second].join(':');
+                break;
             case 'time':
-                return [this.hour<10?'0'+this.hour:this.hour,this.minute<10?'0'+this.minute:this.minute,this.second<10?'0'+this.second:this.second].join(':');
+                retValue = [this.hour<10?'0'+this.hour:this.hour,this.minute<10?'0'+this.minute:this.minute,this.second<10?'0'+this.second:this.second].join(':');
+                break;
             default:
-                return [this.year,this.month<10?'0'+this.month:this.month,this.date<10?'0'+this.date:this.date].join('-');
+                retValue = [this.year,this.month<10?'0'+this.month:this.month,this.date<10?'0'+this.date:this.date].join('-');
         }
+        if(this.showMs && this.type !== 'date'){
+            let v;
+            if(this.msecond < 10){
+                v = '00' + this.msecond;
+            }else if(this.msecond<100){
+                v = '0' + this.msecond;
+            }else{
+                v = this.msecond;
+            }
+            retValue += '.' + v;
+        }
+        return retValue;
     }
 }
 

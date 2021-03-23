@@ -279,9 +279,9 @@ a:visited{
 /*输入框*/
 input,.nd-input{
     padding:$nd-padding;
-    @include nd-color(1);
     border-radius:$nd-radius;
     border:$nd-border1;
+    margin:0 5px;
     &:hover, &:focus{
         @extend .nd-item-hovercolor;
         border-color:$nd-color-active1;
@@ -326,25 +326,31 @@ button,input{
 ::-webkit-scrollbar{
     @media screen and (max-width: 640px){
         width:2px;
+        height:2px;
     }
 
     @media screen and (min-width: 640px){
-        width:6px;        
+        width:10px;
+        height:10px;        
     }
 }
 
+/*滚动条轨道*/
 ::-webkit-scrollbar-track
 {
-    @include nd-color(1);
-    // border-left:1px solid $nd-color5;
+    // @include nd-color(1);
+    border:$nd-border;
+    border-radius:5px;
+    // background-color:$nd-color-grey7;
 }
 
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb{
     border-radius: $nd-padding;
-    @include nd-color(7);
+    // @include nd-color(7);
+    background-color:$nd-color-grey5;
     &:hover{
-        @include nd-color(7);
+        background-color:$nd-color-grey2;
     }
 }
 

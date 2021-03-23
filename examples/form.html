@@ -28,7 +28,7 @@
                 <item>
                     <label>姓名:</label>
                     <ui-text x-field='userName' value='{{userName}}' icon='search'></ui-text>
-                    
+                    <unit></unit>
                 </item>
                 <item>
                     <label>性别:</label>
@@ -55,20 +55,22 @@
             <row>
                 <item>
                     <label>出生日期:</label>
-                    <ui-datetime class='nd-form-input' x-field='birth' type='date'/>
-                </item>
-
-                <item>
-                    <label>计划时间:</label>
-                    <ui-datetime class='nd-form-input' x-field='plantime' type='datetime'/>
+                    <ui-datetime class='nd-form-input' x-field='birth' type='date'></ui-datetime>
+                    <unit></unit>
                 </item>
 
                 <item>
                     <label>开始时间:</label>
-                    <ui-datetime class='nd-form-input' x-field='starttime' type='time'/>
+                    <ui-datetime class='nd-form-input' x-field='starttime' type='time' showMs/>
                 </item>
             </row>
-            
+            <row>
+                <item>
+                    <label>计划时间:</label>
+                    <!-- showms 是否显示毫秒 -->
+                    <ui-datetime class='nd-form-input' x-field='plantime' type='datetime' showms/>
+                </item>
+            </row>
             <row>
                 <item>
                     <label>学历:</label>
