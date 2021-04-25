@@ -1291,21 +1291,15 @@ var nodom;
             }
             this.props['class'] = clazz;
         }
-        hasProp(propName, isExpr) {
-            if (isExpr) {
-                return this.exprProps.hasOwnProperty(propName);
-            }
-            else {
-                return this.props.hasOwnProperty(propName);
-            }
+        hasProp(propName) {
+            return this.props.hasOwnProperty(propName) || this.exprProps.hasOwnProperty(propName);
         }
-        getProp(propName, isExpr) {
-            if (isExpr) {
-                return this.exprProps[propName];
+        getProp(propName) {
+            let prop = this.props[propName];
+            if (prop === undefined) {
+                prop = this.exprProps[propName];
             }
-            else {
-                return this.props[propName];
-            }
+            return prop;
         }
         setProp(propName, v, isExpr) {
             if (isExpr) {
@@ -1315,26 +1309,18 @@ var nodom;
                 this.props[propName] = v;
             }
         }
-        delProp(props, isExpr) {
+        delProp(props) {
             if (nodom.Util.isArray(props)) {
-                if (isExpr) {
-                    for (let p of props) {
-                        delete this.exprProps[p];
-                    }
+                for (let p of props) {
+                    delete this.exprProps[p];
                 }
-                else {
-                    for (let p of props) {
-                        delete this.props[p];
-                    }
+                for (let p of props) {
+                    delete this.props[p];
                 }
             }
             else {
-                if (isExpr) {
-                    delete this.exprProps[props];
-                }
-                else {
-                    delete this.props[props];
-                }
+                delete this.exprProps[props];
+                delete this.props[props];
             }
         }
         query(key) {
@@ -1824,6 +1810,9 @@ var nodom;
                 return __awaiter(this, void 0, void 0, function* () {
                     let me = this;
                     this.preHandle(reqs);
+                    if (reqs.length === 0) {
+                        return [];
+                    }
                     let taskId = nodom.Util.genId();
                     let resArr = [];
                     for (let item of reqs) {
@@ -1832,9 +1821,6 @@ var nodom;
                     this.loadingTasks.set(taskId, resArr);
                     return new Promise((res, rej) => __awaiter(this, void 0, void 0, function* () {
                         for (let item of reqs) {
-                            if (!item.needLoad) {
-                                continue;
-                            }
                             let url = item.url;
                             if (this.resources.has(url)) {
                                 let r = me.awake(taskId);
@@ -1929,14 +1915,13 @@ var nodom;
                         };
                     }
                     reqs[i].type = reqs[i].type || this.getType(reqs[i].url);
-                    reqs[i].needLoad = true;
                     if (reqs[i].type === 'css') {
                         let css = nodom.Util.newEl('link');
                         css.type = 'text/css';
                         css.rel = 'stylesheet';
                         css.href = reqs[i].url;
                         head.appendChild(css);
-                        reqs[i].needLoad = false;
+                        reqs.splice(i--, 1);
                     }
                 }
                 return reqs;
@@ -2051,8 +2036,8 @@ var nodom;
                     for (let o in key) {
                         this.data[o] = key[o];
                     }
+                    return;
                 }
-                return;
             }
             let fn;
             let index = key.lastIndexOf('.');
@@ -4144,6 +4129,11 @@ var nodom;
         dom.setProp('name', directive.value);
         let type = dom.getProp('type') || 'text';
         let eventName = dom.tagName === 'input' && ['text', 'checkbox', 'radio'].includes(type) ? 'input' : 'change';
+        if (!dom.hasProp('value') && ['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
+            || dom.tagName === 'TEXTAREA') {
+            let field = directive.value;
+            dom.setProp('value', new nodom.Expression(field), true);
+        }
         dom.addEvent(new nodom.NodomEvent(eventName, function (dom, model, module, e, el) {
             if (!el) {
                 return;
@@ -4151,10 +4141,6 @@ var nodom;
             let type = dom.getProp('type');
             let field = dom.getDirective('field').value;
             let v = el.value;
-            if (['text', 'number', 'date', 'datetime', 'datetime-local', 'month', 'week', 'time', 'email', 'password', 'search', 'tel', 'url', 'color', 'radio'].includes(type)
-                || dom.tagName === 'TEXTAREA') {
-                dom.setProp('value', new nodom.Expression(field), true);
-            }
             if (type === 'checkbox') {
                 if (dom.getProp('yes-value') == v) {
                     v = dom.getProp('no-value');
@@ -4214,7 +4200,9 @@ var nodom;
             }
         }
         else {
-            dom.assets.set('value', dataValue === undefined || dataValue === null ? '' : dataValue);
+            if (!dom.hasProp('value')) {
+                dom.assets.set('value', dataValue === undefined || dataValue === null ? '' : dataValue);
+            }
         }
     });
     nodom.DirectiveManager.addType('validity', 10, (directive, dom) => {
@@ -4798,4 +4786,3 @@ var nodom;
     })();
     nodom.PluginManager = PluginManager;
 })(nodom || (nodom = {}));
-//# sourceMappingURL=nodom.js.map

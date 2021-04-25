@@ -10,7 +10,7 @@
     table{
         width:100%;
         overflow:visible;
-        border-color:$nd-color-grey5;
+        border-color:$nd-color6;
         table-layout:fixed;
         border-collapse: collapse;
         tr{
@@ -53,7 +53,8 @@
             }
 
             &:hover{
-                @extend .nd-hover-active;
+                // @extend .nd-hover-active;
+                @extend .nd-item-hovercolor;
             }
         }
     }
@@ -94,7 +95,7 @@
 
     /*每行颜色交错*/
     .nd-grid-rowalt tr:nth-child(even){
-        background-color:$nd-color-grey7;
+        background-color:$nd-color10;
     }
 
     .nd-grid-sub{

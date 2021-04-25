@@ -59,7 +59,7 @@
         
          <h3>增加网格线</h3>
         <p>通过gridLine设置网格线，包括row(行线),column(列线),both(全部)</p>
-        <ui-grid  dataName='rows' style='height:300px' gridLine='both' checkbox>
+        <ui-grid  dataName='rows' style='height:300px' gridLine='both' checkbox rowalt>
             <cols>
                 <div width='50' title='编号' notsort field='id' left>{{id}}</div>
                 <div width='100' title='价格' field='price' center>{{price|currency}}</div>
@@ -144,7 +144,7 @@
       <h3>增加分页</h3>
         <p>通过ui-pagination引入分页插件</p>
         
-        <!-- <ui-grid name='grd' dataName='rows' style='height:300px;' gridline='both' rowalt sortable checkbox
+        <ui-grid name='grd' dataName='rows' style='height:300px;' gridline='both' rowalt sortable checkbox
         >
             <cols>
                 <div width='50' title='编号' notsort field='id'>{{id}}</div>
@@ -162,10 +162,10 @@
                 <div width='200' title='商品描述5' field='desc' >{{desc}}</div>
                 <div width='200' title='商品描述6' field='desc' >{{desc}}</div>
                 <div width='200' title='商品描述7' field='desc' >{{desc}}</div> 
-                <div title='商品描述' field='desc' >{{desc}}</div>
+                <!-- <div title='商品描述' field='desc' >{{desc}}</div> -->
             </cols>
             <sub class='sub' labelWidth='100' cols='2' auto ></sub>
-        </ui-grid> -->
+        </ui-grid>
     </div>
 </body>
 <script>

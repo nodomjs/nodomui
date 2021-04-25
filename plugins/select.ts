@@ -154,10 +154,20 @@ class UISelect extends nodom.Plugin{
         //点击事件
         itemDom.addEvent(new nodom.NodomEvent('click',
             (dom,model,module)=>{
+                let name = this.name || this.dataName;
+                let plugin = this.moduleId?this:module.getPlugin(name);
                 if(!this.multiSelect){
-                    this.hideList();
+                    if(plugin){
+                        this.hideList.apply(plugin);
+                    }else{
+                        this.hideList();
+                    }
                 }
-                me.select(model);
+                if(plugin){
+                    this.select.apply(plugin,[model]);
+                }else{
+                    this.select(model);
+                }
             }
         ));
 

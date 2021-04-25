@@ -23,36 +23,35 @@
 /*字体粗体*/
 /*zindex*/
 /*border样式*/
-.nd-item-hovercolor, .nd-grid .nd-grid-body tr:hover, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
-  background-color: #495078;
-  color: #f0f0f0;
-  text-shadow: 2px 2px 2px #495078; }
+.nd-item-hovercolor, input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-pagination .nd-pagination-go input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-pagination .nd-pagination-go input:focus, .nd-list-horizontal .nd-list-item:hover, .nd-menu .nd-menu-subct .nd-menu-nodect .nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect a.nd-menu-node:hover, .nd-menu .nd-menu-subct .nd-menu-nodect:hover, .nd-tree .nd-tree-nodect .nd-tree-node:hover {
+  background-color: white;
+  color: #0e71c6; }
 
 /*item active*/
-.nd-item-selectcolor, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-selected, .nd-datetime .nd-datetime-timetbl .nd-datetime-timect > div .nd-datetime-itemselect, .nd-list .nd-list-item-active, .nd-list-horizontal .nd-list-item-active {
-  background-color: #2b3260;
+.nd-item-selectcolor, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected, .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-selected, .nd-datetime .nd-datetime-timetbl .nd-datetime-timect > div .nd-datetime-itemselect, .nd-list-horizontal .nd-list-item-active {
+  background-color: #739de3;
   color: #fff; }
 
 /*框*/
 /*边框*/
-.nd-border, .nd-listtransfer .nd-list, .nd-panel {
+.nd-border, .nd-datetime .nd-datetime-picker, .nd-listtransfer .nd-list, .nd-panel {
   border-color: #eee;
   border-style: solid; }
 
 /*主背景+字体颜色*/
 .nd-main-color, .nd-tab, .nd-tab .nd-tab-head .nd-tab-item, .nd-floatbox {
-  background-color: #0d1442;
+  background-color: #222;
   color: #fff; }
 
 /*激活背景+字体颜色*/
-.nd-active-color, .nd-select .nd-select-list .nd-select-selected {
+.nd-active-color, .nd-select .nd-select-list .nd-select-selected, .nd-list .nd-list-item-active {
   background-color: white;
-  color: #f0f0f0; }
+  color: #0e71c6; }
 
 /*hover 颜色*/
-.nd-hover-active:hover, input:hover, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-pagination .nd-pagination-go input:hover, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-list .nd-list-item:hover {
-  background-color: #2b3260;
-  color: #f0f0f0; }
+.nd-hover-active:hover, .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-second:hover, .nd-select .nd-select-list .nd-select-item:hover, .nd-grid .nd-grid-body tr:hover, .nd-list .nd-list-item:hover {
+  background-color: white;
+  color: #0e71c6; }
 
 /*头部*/
 .nd-header {
@@ -69,24 +68,24 @@
 
 /*通用框*/
 .nd-commonbox, .nd-accordion, .nd-list, .nd-tree {
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff;
-  border: 1px solid #2b3260;
+  border: 1px solid #292a3e;
   padding: 10px; }
 
 /*默认色背景box*/
 .nd-box-default, .nd-datetime .nd-datetime-picker, .nd-dialog .nd-dialog-body, .nd-select .nd-select-list, .nd-menu .nd-menu-subct, .nd-floatbox .nd-floatbox-body {
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #495078; }
+  box-shadow: 0px 0px 8px 1px #999; }
 
 /*active颜色框*/
 .nd-box-active {
   padding: 5px;
   background-color: #eaf0fa;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #495078;
+  box-shadow: 0px 0px 8px 1px #999;
   color: #2050a0; }
 
 /*success 颜色框*/
@@ -94,7 +93,7 @@
   padding: 5px;
   background-color: #eaf9ed;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #495078;
+  box-shadow: 0px 0px 8px 1px #999;
   color: #219a3c; }
 
 /*warn颜色框*/
@@ -102,7 +101,7 @@
   padding: 5px;
   background-color: #fffbe6;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #495078;
+  box-shadow: 0px 0px 8px 1px #999;
   color: #ccac00; }
 
 /*error颜色框*/
@@ -110,7 +109,7 @@
   padding: 5px;
   background-color: #ffe6e6;
   border-radius: 5px;
-  box-shadow: 0px 0px 8px 1px #495078;
+  box-shadow: 0px 0px 8px 1px #999;
   color: #cc0000; }
 
 /*link*/
@@ -138,18 +137,12 @@ a:visited {
 
 /*输入框*/
 input, .nd-input, .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct, .nd-datetime .nd-datetime-timetbl > input, .nd-pagination .nd-pagination-go input {
-  background-color: #0d1442;
-  color: #fff;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid #2b3464;
+  border: 1px solid #ccc;
   margin: 0 5px; }
-
-/*label*/
-label {
-  font-size: 12px;
-  color: #fff;
-  text-shadow: 1px 1px 1px #495078; }
+  input:hover, input:focus, .nd-input:hover, .nd-input-icon:hover, .nd-datetime .nd-datetime-field:hover, .nd-text:hover, .nd-select .nd-select-inputct:hover, .nd-datetime .nd-datetime-timetbl > input:hover, .nd-pagination .nd-pagination-go input:hover, .nd-input:focus, .nd-input-icon:focus, .nd-datetime .nd-datetime-field:focus, .nd-text:focus, .nd-select .nd-select-inputct:focus, .nd-datetime .nd-datetime-timetbl > input:focus, .nd-pagination .nd-pagination-go input:focus {
+    border-color: #0e71c6; }
 
 /*带图标输入框*/
 .nd-input-icon, .nd-datetime .nd-datetime-field, .nd-text, .nd-select .nd-select-inputct {
@@ -168,7 +161,7 @@ label {
 /*global*/
 body {
   margin: 0;
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff;
   font-size: 14px; }
 
@@ -187,15 +180,15 @@ button, input {
 
 /*滚动条轨道*/
 ::-webkit-scrollbar-track {
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff;
-  border: 1px solid #2b3260;
+  border: 1px solid #eee;
   border-radius: 5px; }
 
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #2b3464;
+  background-color: #292a3e;
   color: #fff; }
   ::-webkit-scrollbar-thumb:hover {
     background-color: #888; }
@@ -222,7 +215,7 @@ h5 {
   font-weight: bold !important; }
 
 .nd-checked {
-  color: #f0f0f0; }
+  color: #0e71c6; }
 
 body {
   color: #fff; }
@@ -747,7 +740,7 @@ body {
 /**按钮**/
 button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   display: inline-block;
-  background-color: #353e6e;
+  background-color: #333448;
   color: #fff;
   border-radius: 5px;
   border: 0px;
@@ -755,7 +748,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   button > b, .nd-btn > b, .nd-listtransfer .nd-listtransfer-btngrp > b > b {
     margin-right: 5px; }
   button:hover, .nd-btn:hover, .nd-listtransfer .nd-listtransfer-btngrp > b:hover {
-    background-color: #3d487f;
+    background-color: #3e3f57;
     color: #ccc; }
 
 /*无背景色*/
@@ -815,7 +808,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /********** accordion ***********/
 .nd-accordion .nd-accordion-item {
-  border-bottom: 1px solid #2b3260; }
+  border-bottom: 1px solid #eee; }
   .nd-accordion .nd-accordion-item .nd-accordion-first {
     padding: 20px;
     font-size: 14px;
@@ -835,7 +828,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     font-size: 14px;
     display: block; }
   .nd-accordion .nd-accordion-item .nd-accordion-secondct .nd-accordion-selected {
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
   .nd-accordion .nd-accordion-item .nd-accordion-hide {
     display: none; }
@@ -854,7 +847,6 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     z-index: 997;
     margin-top: 3px;
     padding: 10px;
-    border: 1px solid #2b3260;
     /*按钮*/ }
     .nd-datetime .nd-datetime-picker .nd-datetime-btnct {
       padding: 10px 0;
@@ -897,7 +889,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       text-align: center;
       line-height: 25px; }
     .nd-datetime .nd-datetime-datetbl .nd-datetime-dates {
-      border: 1px solid #2b3260;
+      border-top: 1px solid #010216;
+      border-bottom: 1px solid #010216;
       font-size: 12px; }
       .nd-datetime .nd-datetime-datetbl .nd-datetime-dates .nd-datetime-today {
         color: #2864c8; }
@@ -938,7 +931,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   z-index: 999;
   /*蒙版*/ }
   .nd-dialog .nd-dialog-cover {
-    background-color: #495078;
+    background-color: #0d1442;
     opacity: 0.4;
     position: inherit;
     left: 0;
@@ -1011,7 +1004,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       position: absolute;
       width: 90%;
       opacity: 0.3;
-      background-color: #0d1442; }
+      background-color: #010216; }
     .nd-select .nd-select-inputct .nd-select-search-active {
       opacity: 1; }
   .nd-select .nd-select-list {
@@ -1055,7 +1048,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       background-position: 0 0;
       background-size: 100% 100%;
       background-repeat: no-repeat;
-      background-color: #2b3260;
+      background-color: #f0f0f0;
       display: flex;
       align-items: center;
       justify-content: center; }
@@ -1074,7 +1067,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     height: 100px;
     overflow: hidden;
     box-sizing: border-box;
-    background-color: #2b3260;
+    background-color: #f0f0f0;
     padding: 0;
     position: relative;
     display: inline-block; }
@@ -1109,7 +1102,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-grid table {
     width: 100%;
     overflow: visible;
-    border-color: #2b3260;
+    border-color: #292a3e;
     table-layout: fixed;
     border-collapse: collapse; }
     .nd-grid table tr {
@@ -1142,7 +1135,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-grid .nd-grid-head {
     width: 100%;
     box-sizing: border-box;
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
     .nd-grid .nd-grid-head tr {
       height: 50px;
@@ -1154,18 +1147,18 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
         align-items: center;
         line-height: 8px;
         vertical-align: middle;
-        background-color: #0d1442;
+        background-color: #010216;
         color: #fff;
         margin-left: 3px;
         /*升序箭头*/
         /*降序箭头*/ }
         .nd-grid .nd-grid-head tr .nd-grid-sort > b:hover {
-          color: #f0f0f0;
+          color: #0e71c6;
           cursor: pointer; }
   .nd-grid .nd-grid-rowalt tr:nth-child(even) {
-    background-color: #212853; }
+    background-color: #f6f6f6; }
   .nd-grid .nd-grid-sub {
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -1191,18 +1184,18 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 
 /*行网格线*/
 .nd-grid-row-line {
-  border-top: 1px solid #2b3260;
-  border-bottom: 1px solid #2b3260; }
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee; }
 
 .nd-grid-column-line {
-  border-left: 1px solid #2b3260;
-  border-right: 1px solid #2b3260; }
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee; }
 
 .nd-grid-top-line {
-  border-top: 1px solid #2b3260; }
+  border-top: 1px solid #eee; }
 
 .nd-grid-all-line {
-  border: 1px solid #2b3260; }
+  border: 1px solid #eee; }
 
 .nd-grid-fixed {
   overflow: hidden; }
@@ -1222,7 +1215,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     overflow: auto;
     box-sizing: border-box;
     position: relative;
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
   .nd-layout .nd-layout-middle {
     display: flex;
@@ -1233,7 +1226,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       flex: 1;
       overflow: auto; }
     .nd-layout .nd-layout-middle .nd-layout-header {
-      background-color: #2b3260;
+      background-color: #292a3e;
       color: #fff;
       height: 40px;
       line-height: 40px;
@@ -1252,8 +1245,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   overflow: auto; }
   .nd-list .nd-list-item {
     display: flex;
-    line-height: 30px;
-    padding: 10px; }
+    line-height: 30px; }
     .nd-list .nd-list-item .nd-list-icon {
       flex: 0;
       padding: 0;
@@ -1279,7 +1271,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   flex-direction: row;
   justify-content: space-around; }
   .nd-listtransfer .nd-list {
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff;
     border-radius: 10px;
     overflow: auto;
@@ -1301,7 +1293,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   z-index: 998;
   font-size: 14px;
   position: relative;
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff;
   /*第一级菜单*/
   /*第一级非popup菜单*/ }
@@ -1310,7 +1302,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     display: block;
     position: absolute;
     top: 0px;
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
     .nd-menu .nd-menu-subct .nd-menu-nodect {
       position: relative;
@@ -1348,7 +1340,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   top: 0;
   bottom: 0;
   min-width: 30px;
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff; }
   .nd-menu-left > .nd-menu-subct {
     position: relative;
@@ -1359,10 +1351,10 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /*pagenation*/
 .nd-pagination {
   padding: 20px 10px;
-  background-color: #0d1442;
+  background-color: #010216;
   color: #fff; }
   .nd-pagination input, .nd-pagination select {
-    border: 1px solid #0d1442;
+    border: 1px solid #010216;
     border-radius: 10px;
     padding: 10px; }
   .nd-pagination > * {
@@ -1377,13 +1369,13 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-pagination .nd-pagination-pagect .nd-pagination-page {
     padding: 0 10px; }
   .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-pagination .nd-pagination-pagect .nd-pagination-leftarrow1:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-pagination .nd-pagination-pagect .nd-pagination-rightarrow1:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-pagination .nd-pagination-total {
     padding: 0 10px; }
   .nd-pagination .nd-pagination-go input {
@@ -1392,8 +1384,8 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /* panel */
 .nd-panel {
   border-radius: 5px;
-  border: 1px solid #2b3260;
-  background-color: #0d1442;
+  border: 1px solid #292a3e;
+  background-color: #010216;
   color: #fff;
   box-sizing: border-box;
   width: 100%;
@@ -1423,28 +1415,28 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
       .nd-panel .nd-panel-header .nd-panel-header-bar > * {
         margin-right: 5px; }
       .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-min:hover {
-        color: #f0f0f0; }
+        color: #0e71c6; }
       .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-max:hover {
-        color: #f0f0f0; }
+        color: #0e71c6; }
       .nd-panel .nd-panel-header .nd-panel-header-bar .nd-panel-close:hover {
-        color: #f0f0f0; }
+        color: #0e71c6; }
   .nd-panel .nd-panel-body {
     padding: 10px;
     font-size: 14px;
     flex: 1;
     overflow: auto;
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
 
 /*relation map*/
 .nd-relationmap {
   border-spacing: 1px;
-  background-color: #2b3260;
+  background-color: #292a3e;
   color: #fff; }
   .nd-relationmap .nd-relationmap-head td {
     padding: 10px 20px; }
   .nd-relationmap td {
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff;
     text-align: center; }
   .nd-relationmap .nd-relationmap-row td:first-child {
@@ -1453,49 +1445,50 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     color: #2864c8; }
 
 /*relation map*/
-/*横向*/
-.nd-tab-horizontal {
-  display: flex;
-  flex-direction: row; }
-  .nd-tab-horizontal .nd-tab-head {
-    background-color: #0d1442;
-    color: #fff;
-    flex-direction: column; }
-  .nd-tab-horizontal .nd-tab-body {
-    flex: 1; }
-
 .nd-tab {
   flex-direction: column;
-  border: 1px solid #2b3260;
+  border: 1px solid #eee;
   /*头部 tab区域*/
   /*内容区域*/ }
   .nd-tab .nd-tab-head {
-    background-color: #0d1442;
+    background-color: #f6f6f6;
     box-sizing: border-box;
-    border-bottom: 1px solid #2b3260; }
+    border-bottom: 1px solid #eee; }
     .nd-tab .nd-tab-head .nd-tab-item {
       box-sizing: border-box;
       display: inline-block;
       padding: 0 20px;
-      border-bottom: 1px solid #2b3260;
+      border-bottom: 1px solid #eee;
       transform: translateY(-1px); }
       .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close {
         margin-left: 10px;
         font-size: 12px;
         border-radius: 10px; }
         .nd-tab .nd-tab-head .nd-tab-item .nd-tab-close:hover {
-          color: #f0f0f0; }
+          color: #0e71c6; }
     .nd-tab .nd-tab-head .nd-tab-item-active {
+      background-color: white;
+      color: #0e71c6;
       font-weight: bold;
-      border-top: 1px solid #2b3260;
-      border-left: 1px solid #2b3260;
-      border-right: 1px solid #2b3260;
+      border-top: 1px solid #eee;
+      border-left: 1px solid #eee;
+      border-right: 1px solid #eee;
       border-bottom: 0;
       margin-bottom: 1px;
-      transform: translateY(1px);
-      background-color: #2b3260; }
+      transform: translateY(1px); }
   .nd-tab .nd-tab-body {
     overflow: auto; }
+
+/*横向*/
+.nd-tab-horizontal {
+  display: flex;
+  flex-direction: row; }
+  .nd-tab-horizontal .nd-tab-head {
+    background-color: #010216;
+    color: #fff;
+    flex-direction: column; }
+  .nd-tab-horizontal .nd-tab-body {
+    flex: 1; }
 
 .nd-tip {
   position: fixed;
@@ -1521,7 +1514,7 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     .nd-tip .nd-tip-item .nd-tip-close {
       margin-right: -10px; }
       .nd-tip .nd-tip-item .nd-tip-close:hover {
-        color: #f0f0f0; }
+        color: #0e71c6; }
 
 .nd-tip-top {
   top: 30px; }
@@ -1553,9 +1546,9 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
   .nd-tree .nd-tree-nodect .nd-tree-node-open {
     transform: rotate(90deg); }
   .nd-tree .nd-tree-nodect .nd-tree-uncheck:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-tree .nd-tree-nodect .nd-tree-checked:hover {
-    color: #f0f0f0; }
+    color: #0e71c6; }
   .nd-tree .nd-tree-subct {
     display: none;
     padding-left: 1em; }
@@ -1567,21 +1560,20 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
 /* toolbar */
 .nd-toolbar {
   display: inline-flex;
-  border-bottom: 1px solid #2b3260;
-  border-top: 1px solid #2b3260;
-  padding: 3px; }
+  border-bottom: 1px solid #eee;
+  border-top: 1px solid #eee; }
   .nd-toolbar .nd-btn, .nd-toolbar .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-listtransfer .nd-toolbar .nd-listtransfer-btngrp > b {
     padding: 8px;
-    background-color: #0d1442;
+    background-color: #010216;
     color: #fff; }
     .nd-toolbar .nd-btn:hover, .nd-toolbar .nd-listtransfer .nd-listtransfer-btngrp > b:hover, .nd-listtransfer .nd-toolbar .nd-listtransfer-btngrp > b:hover {
-      background-color: #353e6e;
+      background-color: #333448;
       color: #fff; }
 
 /* button group*/
 .nd-buttongroup {
   padding: 10px;
-  border-top: 1px solid #2b3260;
+  border-top: 1px solid #eee;
   display: inline-flex;
   justify-content: flex-end; }
   .nd-buttongroup .nd-btn, .nd-buttongroup .nd-listtransfer .nd-listtransfer-btngrp > b, .nd-listtransfer .nd-buttongroup .nd-listtransfer-btngrp > b {
@@ -1637,9 +1629,9 @@ button, .nd-btn, .nd-listtransfer .nd-listtransfer-btngrp > b {
     display: inline-flex;
     border-color: #eee;
     border-radius: 5px;
-    box-shadow: 0px 0px 8px 1px #495078; }
+    box-shadow: 0px 0px 8px 1px #999; }
   .nd-floatbox .nd-floatbox-cover {
-    background-color: #495078;
+    background-color: #0d1442;
     opacity: 0.4;
     position: inherit;
     left: 0;

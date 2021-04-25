@@ -1099,7 +1099,7 @@ class UIFile extends nodom.Plugin {
         if (params) {
             if (params instanceof HTMLElement) {
                 nodom.Compiler.handleAttributes(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'multiple|bool', 'filetype', 'maxcount|number', 'uploadurl', 'deleteurl', 'uploadname'], ['valueField', 'displayField', 'multiple', 'fileType', 'maxCount', 'uploadUrl', 'deleteUrl', 'uploadName'], [null, null, null, '', 1, null, '', 'file']);
+                UITool.handleUIParam(rootDom, this, ['valuefield', 'displayfield', 'urlfield', 'multiple|bool', 'filetype', 'maxcount|number', 'uploadurl', 'deleteurl', 'uploadname'], ['valueField', 'displayField', 'urlField', 'multiple', 'fileType', 'maxCount', 'uploadUrl', 'deleteUrl', 'uploadName'], [null, null, '', null, '', 1, null, '', 'file']);
             }
             else if (typeof params === 'object') {
                 for (let o in params) {
@@ -1132,7 +1132,7 @@ class UIFile extends nodom.Plugin {
         const me = this;
         let uploadDom = new nodom.Element('div');
         uploadDom.addClass('nd-file-uploadct');
-        uploadDom.addDirective(new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom));
+        new nodom.Directive('show', this.dataName + '.length<' + this.maxCount, uploadDom);
         let fDom = new nodom.Element('input');
         fDom.setProp('type', 'file');
         fDom.addClass('nd-file-input');
@@ -1163,11 +1163,11 @@ class UIFile extends nodom.Plugin {
         uploadingDom.addClass('nd-file-uploading');
         let span1 = new nodom.Element('span');
         span1.addClass('nd-file-add');
-        span1.addDirective(new nodom.Directive('show', this.extraDataName + '.state==0', span1));
+        new nodom.Directive('show', this.extraDataName + '.state==0', span1);
         uploadingDom.add(span1);
         let span2 = new nodom.Element('span');
         span2.addClass('nd-file-progress');
-        span2.addDirective(new nodom.Directive('show', this.extraDataName + '.state==1', span2));
+        new nodom.Directive('show', this.extraDataName + '.state==1', span2);
         let txt = new nodom.Element();
         txt.expressions = [new nodom.Expression((this.extraDataName + '.uploading') || NUITipWords.uploading)];
         span2.add(txt);
@@ -1180,12 +1180,18 @@ class UIFile extends nodom.Plugin {
         const me = this;
         let ctDom = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
-        ctDom.addDirective(new nodom.Directive('repeat', this.dataName, ctDom));
+        new nodom.Directive('repeat', this.dataName, ctDom);
         let showDom = new nodom.Element('a');
         showDom.addClass('nd-file-content');
         showDom.setProp('target', 'blank');
-        let expr = new nodom.Expression(this.displayField);
-        showDom.setProp('href', expr, true);
+        let expr;
+        if (this.urlField !== '') {
+            expr = new nodom.Expression(this.urlField);
+            showDom.setProp('href', expr, true);
+        }
+        else {
+            expr = new nodom.Expression(this.displayField);
+        }
         if (this.fileType === 'image') {
             let img = new nodom.Element('img');
             img.setProp('src', expr, true);
@@ -1193,7 +1199,7 @@ class UIFile extends nodom.Plugin {
         }
         else {
             let txt = new nodom.Element();
-            txt.expressions = [expr];
+            txt.expressions = [new nodom.Expression(this.displayField)];
             showDom.add(txt);
         }
         ctDom.add(showDom);
@@ -1233,13 +1239,22 @@ class UIFile extends nodom.Plugin {
     beforeRender(module, dom) {
         super.beforeRender(module, dom);
         if (this.needPreRender) {
-            let model = module.getModel(dom.modelId);
+            let model = module.getModel(this.modelId);
             if (model) {
                 model.set(this.extraDataName, {
                     state: 0,
                     uploading: false
                 });
             }
+        }
+    }
+    reset(module) {
+        let model = module.getModel(this.modelId);
+        if (model) {
+            model.set(this.extraDataName, {
+                state: 0,
+                uploading: false
+            });
         }
     }
 }
@@ -1283,7 +1298,6 @@ class UIForm extends nodom.Plugin {
                     c1.addClass('nd-form-item');
                     if (c1.children) {
                         for (let c2 of c1.children) {
-                            console.log(c2, c2.tagName);
                             if (c2.tagName === 'LABEL') {
                                 c2.assets.set('style', 'width:' + this.labelWidth + 'px');
                             }
@@ -1299,408 +1313,6 @@ class UIForm extends nodom.Plugin {
     }
 }
 nodom.PluginManager.add('UI-FORM', UIForm);
-class UIGrid extends nodom.Plugin {
-    constructor(params) {
-        super(params);
-        this.tagName = 'UI-GRID';
-        let rootDom = new nodom.Element();
-        if (params) {
-            if (params instanceof HTMLElement) {
-                nodom.Compiler.handleAttributes(rootDom, params);
-                nodom.Compiler.handleChildren(rootDom, params);
-                UITool.handleUIParam(rootDom, this, ['dataname', 'rowalt|bool', 'sortable|bool', 'gridline', 'fixhead|bool', 'checkbox|bool', 'hidehead|bool', 'defaultcolwidth|number'], ['dataName', 'rowAlt', 'sortable', 'gridLine', 'fixHead', 'checkbox', 'hideHead', 'defaultColWidth'], ['rows', null, null, '', null, null, null, 0]);
-            }
-            else if (typeof params === 'object') {
-                for (let o in params) {
-                    this[o] = params[o];
-                }
-            }
-            rootDom.tagName = 'div';
-            rootDom = this.generate(rootDom);
-        }
-        rootDom.plugin = this;
-        this.element = rootDom;
-    }
-    generate(rootDom) {
-        rootDom.addClass('nd-grid');
-        let genName = '$ui_grid_' + nodom.Util.genId();
-        this.subName = genName + '_showSub';
-        this.checkName = genName + '_checked';
-        this.scrollName = genName + '_scroll';
-        if (this.checkbox) {
-            this.wholeCheckName = genName + '_wholeCheck';
-        }
-        if (this.fixHead) {
-            rootDom.addClass('nd-grid-fixed');
-        }
-        let headTbl;
-        let thead;
-        if (!this.hideHead) {
-            thead = new nodom.Element('div');
-            thead.addClass('nd-grid-head');
-            headTbl = new nodom.Element('table');
-            thead.add(headTbl);
-        }
-        let tbody = new nodom.Element('div');
-        tbody.addClass('nd-grid-body');
-        if (this.rowAlt) {
-            tbody.addClass('nd-grid-rowalt');
-        }
-        let bodyTbl = new nodom.Element('table');
-        tbody.add(bodyTbl);
-        let rowDom;
-        let subDom;
-        for (let c of rootDom.children) {
-            if (c.tagName === 'COLS') {
-                rowDom = c;
-            }
-            else if (c.tagName === 'SUB') {
-                this.showDetail = true;
-                subDom = c;
-            }
-        }
-        if (!rowDom) {
-            return;
-        }
-        let fields = [];
-        for (let c of rowDom.children) {
-            if (!c.tagName) {
-                continue;
-            }
-            let field = c.getProp('field');
-            if (field) {
-                field = field.trim();
-            }
-            fields.push({
-                title: c.getProp('title'),
-                field: field,
-                align: c.hasProp('center') ? 'center' : 'left',
-                type: 0,
-                notsort: c.hasProp('notsort'),
-                children: c.children,
-                hide: c.hasProp('hide'),
-                width: c.hasProp('width') && nodom.Util.isNumberString(c.getProp('width')) ? c.getProp('width') : this.defaultColWidth
-            });
-        }
-        if (this.checkbox) {
-            fields.unshift({
-                type: 2,
-                width: 45
-            });
-        }
-        if (this.showDetail) {
-            fields.unshift({
-                type: 1,
-                width: 45
-            });
-        }
-        this.handleBody(tbody, fields, subDom);
-        if (headTbl) {
-            this.handleHead(thead, fields);
-            rootDom.children = [thead, tbody];
-        }
-        else {
-            rootDom.children = [tbody];
-        }
-        this.handleGridLine(tbody, thead);
-        this.handleScroll(tbody, thead);
-        return rootDom;
-    }
-    handleGridLine(tbody, thead) {
-        if (!this.gridLine) {
-            return;
-        }
-        tbody = tbody.children[0];
-        if (thead) {
-            thead = thead.children[0];
-        }
-        let type;
-        switch (this.gridLine) {
-            case 'row':
-                type = 'rows';
-                tbody.addClass('nd-grid-row-line');
-                if (thead) {
-                    thead.addClass('nd-grid-top-line');
-                }
-                break;
-            case 'col':
-                type = 'cols';
-                tbody.addClass('nd-grid-column-line');
-                thead.addClass('nd-grid-column-line');
-                break;
-            case 'both':
-                type = 'all';
-                tbody.addClass('nd-grid-all-line');
-                if (thead) {
-                    thead.addClass('nd-grid-column-line nd-grid-top-line');
-                }
-                break;
-        }
-        if (type) {
-            tbody.setProp('rules', type);
-            if (thead) {
-                thead.setProp('rules', type);
-            }
-        }
-    }
-    handleHead(headCt, fields) {
-        let colGroup = new nodom.Element('colgroup');
-        let tbl = headCt.children[0];
-        tbl.add(colGroup);
-        let thead = new nodom.Element('thead');
-        tbl.add(thead);
-        let tr = new nodom.Element('tr');
-        thead.add(tr);
-        let width = 0;
-        let fixWidth = true;
-        for (let f of fields) {
-            if (f.hide) {
-                continue;
-            }
-            let col = new nodom.Element('col');
-            if (f.width) {
-                col.setProp('width', f.width);
-                width += parseInt(f.width);
-            }
-            else {
-                fixWidth = false;
-            }
-            colGroup.add(col);
-            let th = new nodom.Element('th');
-            let div = new nodom.Element('div');
-            th.add(div);
-            tr.add(th);
-            switch (f.type) {
-                case 0:
-                    div.assets.set('innerHTML', f.title);
-                    if (this.sortable) {
-                        if (f.type !== 'img' && !f.notsort && f.field) {
-                            div.add(this.addSortBtn(f.field));
-                        }
-                    }
-                    break;
-                case 1:
-                    let b = new nodom.Element();
-                    b.textContent = '';
-                    div.add(b);
-                    break;
-                case 2:
-                    let bh = new nodom.Element('b');
-                    bh.addClass('nd-icon-checkbox');
-                    div.add(bh);
-                    bh.addDirective(new nodom.Directive('class', "{'nd-checked':'" + this.wholeCheckName + "'}", bh));
-                    bh.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-                        let check = model.data[this.wholeCheckName] || false;
-                        model.set(this.wholeCheckName, !check);
-                        let model1 = this.getModel();
-                        for (let d of model1.data[this.dataName]) {
-                            let m = module.getModel(d.$modelId);
-                            m.set(this.checkName, !check);
-                        }
-                    }));
-            }
-        }
-        let widthName = 'min-width';
-        if (fixWidth) {
-            widthName = 'width';
-            headCt.setProp('style', 'max-width:' + (width + 15) + 'px');
-        }
-        tbl.setProp('style', [widthName + ':' + width + 'px;transform:translateX(', new nodom.Expression(this.scrollName), 'px)'], true);
-    }
-    handleBody(bodyCt, fields, subDom) {
-        let colGroup = new nodom.Element('colgroup');
-        let tbl = bodyCt.children[0];
-        tbl.add(colGroup);
-        let tBody = new nodom.Element('tbody');
-        tbl.add(tBody);
-        let trCt = new nodom.Element('div');
-        tBody.add(trCt);
-        new nodom.Directive('ignoreself', '', trCt);
-        this.repeatDirective = new nodom.Directive('repeat', this.dataName, trCt);
-        let tr = new nodom.Element('tr');
-        trCt.add(tr);
-        let width = 0;
-        let fixWidth = true;
-        for (let f of fields) {
-            if (f.hide) {
-                continue;
-            }
-            let col = new nodom.Element('col');
-            if (f.width) {
-                col.setProp('width', f.width);
-                width += parseInt(f.width);
-            }
-            else {
-                fixWidth = false;
-            }
-            colGroup.add(col);
-            let td = new nodom.Element('td');
-            let div = new nodom.Element('div');
-            td.add(div);
-            tr.add(td);
-            switch (f.type) {
-                case 0:
-                    if (f.align === 'center') {
-                        div.addClass('nd-grid-td-center');
-                    }
-                    div.children = f.children;
-                    break;
-                case 1:
-                    let b = new nodom.Element('b');
-                    b.addClass('nd-grid-sub-btn');
-                    new nodom.Directive('class', "{'nd-grid-showsub':'" + this.subName + "'}", b);
-                    div.add(b);
-                    div.addClass('nd-grid-td-center');
-                    this.handleSub(subDom, tbl, b, fields);
-                    break;
-                case 2:
-                    let b1 = new nodom.Element('b');
-                    b1.addClass('nd-icon-checkbox');
-                    new nodom.Directive('class', "{'nd-checked':'" + this.checkName + "'}", b1);
-                    div.add(b1);
-                    div.addClass('nd-grid-td-center');
-                    b1.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-                        model.set(this.checkName, !model.data[this.checkName]);
-                    }));
-            }
-        }
-        let widthName = 'min-width';
-        if (fixWidth) {
-            widthName = 'width';
-            bodyCt.setProp('style', 'max-width:' + (width + 15) + 'px');
-        }
-        tbl.setProp('style', widthName + ':' + width + 'px');
-    }
-    addSortBtn(field) {
-        let updown = new nodom.Element('span');
-        updown.addClass('nd-grid-sort');
-        let up = new nodom.Element('B');
-        up.addClass('nd-grid-sort-raise');
-        up.setProp('field', field);
-        let down = new nodom.Element('B');
-        down.addClass('nd-grid-sort-down');
-        down.setProp('field', field);
-        const plugin = this;
-        up.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            plugin.sort(dom.getProp('field'), 'asc', module);
-        }));
-        down.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            plugin.sort(dom.getProp('field'), 'desc', module);
-        }));
-        updown.add(up);
-        updown.add(down);
-        return updown;
-    }
-    handleSub(subDom, bodyTbl, b, fields) {
-        b.addEvent(new nodom.NodomEvent('click', (dom, model, module, e) => {
-            model.set(this.subName, !model.query(this.subName));
-        }));
-        let detailDom = new nodom.Element('tr');
-        bodyTbl.children[1].children[0].add(detailDom);
-        new nodom.Directive('show', this.subName, detailDom);
-        let td = new nodom.Element('td');
-        detailDom.add(td);
-        td.add(subDom);
-        subDom.tagName = 'div';
-        subDom.addClass('nd-grid-sub');
-        let showCount = 0;
-        for (let f of fields) {
-            if (!f['hide']) {
-                showCount++;
-            }
-        }
-        td.setProp('colspan', showCount);
-        if (subDom.hasProp('auto')) {
-            subDom.children = [];
-            let lw = subDom.getProp('labelwidth') || 100;
-            let cols = subDom.hasProp('cols') ? parseInt(subDom.getProp('cols')) : 1;
-            if (cols > 4) {
-                cols = 4;
-            }
-            let cnt = 0;
-            let rowCt;
-            fields.forEach((item) => {
-                if (item['type'] !== 0) {
-                    return;
-                }
-                if (cnt++ % cols === 0) {
-                    rowCt = new nodom.Element('div');
-                    rowCt.addClass('nd-grid-sub-row');
-                    subDom.add(rowCt);
-                }
-                let itemCt = new nodom.Element('div');
-                itemCt.addClass('nd-grid-sub-item');
-                let label = new nodom.Element('label');
-                label.assets.set('innerHTML', item['title']);
-                label.assets.set('style', 'width:' + lw + 'px');
-                itemCt.add(label);
-                let span = new nodom.Element('span');
-                span.addClass('nd-grid-sub-content');
-                let txt = new nodom.Element();
-                txt.expressions = [new nodom.Expression(item['field'])];
-                span.add(txt);
-                itemCt.add(span);
-                rowCt.add(itemCt);
-                subDom.delProp(['auto', 'labelwidth']);
-            });
-        }
-    }
-    sort(field, asc, module) {
-        let directive = this.repeatDirective;
-        let arr = ['orderby', field, asc];
-        if (!directive.filters) {
-            directive.filters = [];
-        }
-        if (directive.filters.length <= 1) {
-            directive.filters.push(new nodom.Filter(arr));
-        }
-        else {
-            directive.filters[1] = new nodom.Filter(arr);
-        }
-        nodom.Renderer.add(module);
-    }
-    handleScroll(tbody, thead) {
-        if (!thead) {
-            return;
-        }
-        tbody.addEvent(new nodom.NodomEvent('scroll', (dom, model, module, e) => {
-            model.set(this.scrollName, -e.target.scrollLeft);
-        }));
-    }
-    beforeRender(module, uidom) {
-        super.beforeRender(module, uidom);
-    }
-    getData() {
-        let model = this.getModel();
-        let data = model.getData();
-        if (data) {
-            return data[this.dataName];
-        }
-    }
-    getSelectedRows() {
-        let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.getModel(this.modelId);
-        let arr = [];
-        let datas = model.query(this.dataName);
-        for (let d of datas) {
-            if (d[this.checkName]) {
-                arr.push(d);
-            }
-        }
-        return arr;
-    }
-    removeSelectedRows() {
-        let module = nodom.ModuleFactory.get(this.moduleId);
-        let model = module.getModel(this.modelId);
-        let datas = model.query(this.dataName);
-        for (let i = 0; i < datas.length; i++) {
-            if (datas[i][this.checkName]) {
-                datas.splice(i--, 1);
-            }
-        }
-    }
-}
-nodom.PluginManager.add('UI-GRID', UIGrid);
 class UILayout extends nodom.Plugin {
     constructor(params) {
         super(params);

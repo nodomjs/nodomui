@@ -10,26 +10,66 @@
     <script src='js/nodom.js'></script>
     <script src='../bin/nodomui.js'></script>
     <style>
-        .div1{
-            border:1px solid #000;
-            height:40px;
-            overflow:hidden;
+        .whole{
+            position:absolute;
+            top:0px;
+            bottom:0px;
+            right:0px;
+            left:0px;
+            display:flex;
+            flex-direction:column;
         }
 
-        .div2{
-            /* z-index:1; */
-            width:200px;
-            height:41px;
-            /* padding:20px; */
-            background-color:#fff;
-            /* float:left; */
+        /* .whole > *{
+            width:100%;
+        } */
+
+        .north{
+            height:100px;
+            background:#9cf;
+        }
+
+        .center{
+            flex:1;
+            display:flex;
+            flex-direction: row;
+        }
+
+        .south{
+            height:60px;
+            background:#f0f0f0;
+        }
+
+        .west{
+            width:300px;
+            background:#a0a0a0;
+        }
+        .east{
+            flex:1;
+            display:flex;
+        }
+        .inner{
+            background:#69c;
+            flex:1;
         }
     </style>
 </head>
 
 <body>
-    <div class='div1'>
-        <div class='div2'>hello world</div>
+    <div class='whole'>
+        <div class='north'>hello</div>
+        <div class='center'>
+            <div class='west'></div>
+            <div class='east'>
+                <div style='flex:1;display:flex;width:400px'>
+                    <div class='inner'>this is inner</div>
+                </div>
+            </div>
+
+        </div>
+        <div class='south'>
+            bottom
+        </div>
     </div>
 
 </body>

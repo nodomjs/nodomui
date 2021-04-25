@@ -1,5 +1,7 @@
 ///<reference types='nodomjs'/>
 
+import { notStrictEqual } from "assert";
+
 /**
  * panel 插件
  * ui-grid参数
@@ -363,6 +365,12 @@ class UIGrid extends nodom.Plugin{
         tbl.add(colGroup);
         let tBody:nodom.Element = new nodom.Element('tbody');
         tbl.add(tBody);
+        let noRcdTr = new nodom.Element('tr');
+        new nodom.Directive('show','!' + this.dataName + '||' + this.dataName + '.length' + '==0',noRcdTr);
+        let noRcdTd = new nodom.Element('td');
+        noRcdTd.assets.set('innerHTML','无数据');
+        noRcdTr.add(noRcdTd);
+        // tBody.add(noRcdTr);
         //外层tr容器，因为可能存在detail行，所以需要加一个不渲染的容器
         let trCt:nodom.Element = new nodom.Element('div');
         tBody.add(trCt);

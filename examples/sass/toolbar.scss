@@ -6,6 +6,7 @@
     // background-color:$nd-color-grey7;
     border-bottom:$nd-border;
     border-top:$nd-border;
+    padding:3px;
     .nd-btn{
         padding:$nd-btn-padding-top;
         @include nd-color(2);

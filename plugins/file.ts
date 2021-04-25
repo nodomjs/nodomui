@@ -11,11 +11,6 @@ class UIFile extends nodom.Plugin{
     dataName:string;
 
     /**
-     * 附加数据名
-     */
-    extraDataName:string;
-
-    /**
      * 支持多个文件
      */
     multiple:boolean;
@@ -24,6 +19,11 @@ class UIFile extends nodom.Plugin{
      * 保存给dataName的值，一般是两个如'id,url',给dataName的值格式是{id:**,url:**}或[{id:**,url:**},...](multiple 方式)
      */
     valueField:string;
+
+    /**
+     * url字段名
+     */
+    urlField:string;
 
     /**
      * 用于显示的字段(必须属于returnFields)
@@ -70,6 +70,11 @@ class UIFile extends nodom.Plugin{
      */
     fileName:string;
 
+    /**
+     * 附加显示名，如果displayName不存在，则显示extraDisplayName
+     */
+    extraDisplayName:string;
+
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
@@ -77,9 +82,9 @@ class UIFile extends nodom.Plugin{
             if(params instanceof HTMLElement){
                 nodom.Compiler.handleAttributes(rootDom,params);
                 UITool.handleUIParam(rootDom,this,
-                    ['valuefield','displayfield','multiple|bool','filetype','maxcount|number','uploadurl','deleteurl','uploadname'],
-                    ['valueField','displayField','multiple','fileType','maxCount','uploadUrl','deleteUrl','uploadName'],
-                    [null,null,null,'',1,null,'','file']);
+                    ['valuefield','displayfield','urlfield','multiple|bool','filetype','maxcount|number','uploadurl','deleteurl','uploadname'],
+                    ['valueField','displayField','urlField','multiple','fileType','maxCount','uploadUrl','deleteUrl','uploadName'],
+                    [null,null,'',null,'',1,null,'','file']);
             }else if(typeof params === 'object'){
                 for(let o in params){
                     this[o] = params[o];
@@ -126,7 +131,7 @@ class UIFile extends nodom.Plugin{
         let uploadDom:nodom.Element = new nodom.Element('div');
         uploadDom.addClass('nd-file-uploadct');
         //当文件数量==maxcount时不再显示
-        uploadDom.addDirective(new nodom.Directive('show',this.dataName + '.length<' + this.maxCount,uploadDom));
+        new nodom.Directive('show',this.dataName + '.length<' + this.maxCount,uploadDom);
         
         //文件
         let fDom:nodom.Element = new nodom.Element('input');
@@ -171,12 +176,12 @@ class UIFile extends nodom.Plugin{
         //上传(+号)
         let span1:nodom.Element = new nodom.Element('span');
         span1.addClass('nd-file-add');
-        span1.addDirective(new nodom.Directive('show',this.extraDataName + '.state==0',span1));
+        new nodom.Directive('show',this.extraDataName + '.state==0',span1);
         uploadingDom.add(span1);
         //上传中
         let span2:nodom.Element = new nodom.Element('span');
         span2.addClass('nd-file-progress');
-        span2.addDirective(new nodom.Directive('show',this.extraDataName + '.state==1',span2));
+        new nodom.Directive('show',this.extraDataName + '.state==1',span2);
         let txt:nodom.Element = new nodom.Element();
         txt.expressions = [new nodom.Expression((this.extraDataName + '.uploading')||NUITipWords.uploading)];
         span2.add(txt);
@@ -195,21 +200,27 @@ class UIFile extends nodom.Plugin{
         //文件显示container
         let ctDom:nodom.Element = new nodom.Element('div');
         ctDom.addClass('nd-file-showct');
-        ctDom.addDirective(new nodom.Directive('repeat',this.dataName,ctDom));
+        new nodom.Directive('repeat',this.dataName,ctDom);
         
         //显示框
         let showDom:nodom.Element = new nodom.Element('a');
         showDom.addClass('nd-file-content');
         showDom.setProp('target','blank');
-        let expr:nodom.Expression = new nodom.Expression(this.displayField);
-        showDom.setProp('href',expr,true);
+        let expr:nodom.Expression;
+        if(this.urlField !== ''){
+            expr = new nodom.Expression(this.urlField);
+            showDom.setProp('href',expr,true);
+        }else{ //图片类型可以直接使用displayfield
+            expr = new nodom.Expression(this.displayField);
+        }
+        
         if(this.fileType === 'image'){ //图片
             let img:nodom.Element = new nodom.Element('img');
             img.setProp('src',expr,true);
             showDom.add(img);
         }else{
             let txt:nodom.Element = new nodom.Element();
-            txt.expressions = [expr];
+            txt.expressions = [new nodom.Expression(this.displayField)];
             showDom.add(txt);
         }
         ctDom.add(showDom);
@@ -259,7 +270,7 @@ class UIFile extends nodom.Plugin{
     beforeRender(module:nodom.Module,dom:nodom.Element){
         super.beforeRender(module,dom);
         if(this.needPreRender){
-            let model = module.getModel(dom.modelId);
+            let model = module.getModel(this.modelId);
             //增加附加model
             if(model){
                 model.set(this.extraDataName,{
@@ -267,6 +278,21 @@ class UIFile extends nodom.Plugin{
                     uploading:false
                 });
             }
+        }
+    }
+
+    /**
+     * 重置初始状态
+     * @param module    模块
+     */
+    public reset(module){
+        let model = module.getModel(this.modelId);
+        //增加附加model
+        if(model){
+            model.set(this.extraDataName,{
+                state:0,
+                uploading:false
+            });
         }
     }
 }

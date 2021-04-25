@@ -16,9 +16,9 @@
             label{
                 margin-right:$nd-padding;
             }
-            input,textarea,.nd-select,.nd-datetime,.nd-text{
-                flex:1;
-            }
+            // input,textarea,.nd-select,.nd-datetime,.nd-text,.nd-file{
+            //     flex:1;
+            // }
 
             .nd-form-item-unit{
                 width:50px;
@@ -27,8 +27,6 @@
                 margin-left:$nd-padding;
             }
         }
-
-        
     }
 }
 
@@ -66,7 +64,7 @@
 .nd-select{
     display:inline-block;
     position:relative;
-    
+    display:inline-flex;
     /*输入框，下箭头容器*/
     .nd-select-inputct{
         overflow:hidden;
@@ -109,7 +107,7 @@
             .nd-select-itemicon{
                 flex:0;
                 padding:0;
-                display:inline-block;                
+                display:inline-block;
             }
 
             .nd-select-itemcontent{
@@ -126,7 +124,6 @@
         }
 
         .nd-select-selected{
-            // color:$nd-activecolor;
             @extend .nd-active-color;
             .nd-select-itemicon{
                 @extend .nd-icon-select;
@@ -151,7 +148,7 @@
             background-position: 0 0;
             background-size: 100% 100%;
             background-repeat: no-repeat;
-            background-color:$nd-color-grey6;
+            background-color:$nd-color6;
             display:flex;
             align-items: center;
             justify-content: center;
@@ -178,7 +175,7 @@
         height:100px;
         overflow:hidden;
         box-sizing: border-box;
-        background-color:$nd-color-grey6;
+        background-color:$nd-color6;
         padding:0;
         position:relative;
         display:inline-block;

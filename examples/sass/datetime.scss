@@ -21,8 +21,9 @@
         z-index:$nd-combo-index;
         margin-top:$nd-dropdown-margin;
         padding:$nd-padding;
-        @extend .nd-border;
+        // @extend .nd-border;
         @extend .nd-box-default;
+        border:$nd-border;
         /*按钮*/
         .nd-datetime-btnct{
             padding:$nd-padding 0;
@@ -96,8 +97,9 @@
 
         /*日期容器*/
         .nd-datetime-dates{
-            border-top:1px solid $nd-color4;
-            border-bottom:1px solid $nd-color4;
+            // border-top:1px solid $nd-color4;
+            // border-bottom:1px solid $nd-color4;
+            border:$nd-border;
             font-size:$nd-fontsmall;
 
             > span{

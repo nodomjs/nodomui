@@ -13,12 +13,19 @@
     <div>
         <p>单文件</p>
         <!-- deleteUrl='http://localhost:3000/delres' -->
-        <ui-file x-field='files' valueField='id' displayField="fileName" uploadName='file' 
+        <!--
+            valueField      值字段
+            displayField    显示字段
+            urlField        从服务器返回的上传文件路径名
+            uploadName      提交名
+            uploadUrl       提交url
+        -->
+        <ui-file x-field='files' valueField='id' displayField="fileName" urlField='url' uploadName='file' extraDisplayName='fff' 
             uploadUrl='http://localhost:3000/upload'></ui-file>
 
-        <p>多文件</p>
+        <!-- <p>多文件</p>
         <ui-file x-field='photos' multiple valueField='id' displayField="url"  uploadName='file'
-        uploadUrl='http://localhost:3000/upload' fileType='image' maxCount='5'></ui-file>
+        uploadUrl='http://localhost:3000/upload' fileType='image' maxCount='5'></ui-file> -->
     </div>
 
 </body>
@@ -27,7 +34,7 @@
         module:{
             el:'div',
             data:{
-                files:[{id:1,fileName:'aaaa'},{id:2,fileName:'bbbbb'}],
+                files:[{id:2,fff:'bbbbb'}],
                 photos:[]
             }
         }

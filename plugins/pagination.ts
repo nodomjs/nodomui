@@ -109,6 +109,11 @@ class UIPagination extends nodom.Plugin{
      */
     private onReq:string|Function;
 
+    /**
+     * 准备请求
+     */
+    private readyReq:boolean;
+
     constructor(params:HTMLElement|object){
         super(params);
         let rootDom:nodom.Element = new nodom.Element();
@@ -378,8 +383,8 @@ class UIPagination extends nodom.Plugin{
             this.changeParams(module);
 
             //total修改导致页面减少，且当前页超出最大页
-            if(this.currentPage >= this.pageCount){
-                model.set('pageNo',this.pageCount-1);
+            if(this.currentPage > this.pageCount){
+                model.set('pageNo',this.pageCount);
             }
 
             //旧页面数为0
@@ -519,7 +524,6 @@ class UIPagination extends nodom.Plugin{
      */
     public setPage(value:number){
         let model:nodom.Model = this.getModel();
-        
         if(model!==null){
             model.set(this.extraDataName + '.pageNo',value);
         }
@@ -535,6 +539,22 @@ class UIPagination extends nodom.Plugin{
             return model.query(this.extraDataName + '.pageNo');
         }
         return 0;
+    }
+
+    /**
+     * 设置页号
+     * @param value 页面大小
+     */
+    public setPageSize(value:number){
+        this.pageSize = value;
+    }
+
+    /**
+     * 获取页面大小
+     * @returns     页面大小
+     */
+     public getPageSize():number{
+        return this.pageSize || 0;
     }
 
     /**
@@ -578,9 +598,11 @@ class UIPagination extends nodom.Plugin{
      * 请求数据
      */
     public doReq(module?:nodom.Module){
-        if(this.dataUrl === ''){
+        if(this.readyReq || this.dataUrl === ''){
             return;
         }
+        //设置待请求标志，避免重复请求
+        this.readyReq = true;
         if(!module){
             module = nodom.ModuleFactory.get(this.moduleId);
         }
@@ -591,22 +613,25 @@ class UIPagination extends nodom.Plugin{
         let params = nodom.Util.clone(this.params);
         params[this.pageName] = this.currentPage;
         params[this.sizeName] = this.pageSize;
-        
-        nodom.request({
-            url:this.dataUrl,
-            params:params,
-            type:'json'
-        }).then(r=>{
-            if(!r){
-                return;
-            }
-            if(r.total){
-                this.setTotal(r.total);
-            }else if(Array.isArray(r)){ //无total且结果为数组，则设置total为数组长度
-                this.setTotal(r.length);
-            }
-            this.doReqEvent(r,module);
-        });
+        setTimeout(()=>{
+            //延迟处理
+            nodom.request({
+                url:this.dataUrl,
+                params:params,
+                type:'json'
+            }).then(r=>{
+                this.readyReq = false;
+                if(!r){
+                    return;
+                }
+                if(r.total){
+                    this.setTotal(r.total);
+                }else if(Array.isArray(r)){ //无total且结果为数组，则设置total为数组长度
+                    this.setTotal(r.length);
+                }
+                this.doReqEvent(r,module);
+            });
+        },0);
     }
 
     /**
@@ -631,7 +656,7 @@ class UIPagination extends nodom.Plugin{
             foo.apply(this,[module,this.currentPage,this.pageSize]);
         }
     }
-
+    
     /**
      * 执行请求后事件
      * @param data 
