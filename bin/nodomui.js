@@ -2207,8 +2207,8 @@ class UIPagination extends nodom.Plugin {
             this.pageCount = Math.ceil(this.recordCount / this.pageSize);
             this.cacMinMax(module);
             this.changeParams(module);
-            if (this.currentPage >= this.pageCount) {
-                model.set('pageNo', this.pageCount - 1);
+            if (this.currentPage > this.pageCount) {
+                model.set('pageNo', this.pageCount);
             }
             if (this.pageCount > 0 && old === 0) {
                 model.set('pageNo', 1);
@@ -2300,6 +2300,12 @@ class UIPagination extends nodom.Plugin {
         }
         return 0;
     }
+    setPageSize(value) {
+        this.pageSize = value;
+    }
+    getPageSize() {
+        return this.pageSize || 0;
+    }
     setParam(name, value) {
         if (typeof name === 'object') {
             for (let p in name) {
@@ -2324,9 +2330,10 @@ class UIPagination extends nodom.Plugin {
         }
     }
     doReq(module) {
-        if (this.dataUrl === '') {
+        if (this.readyReq || this.dataUrl === '') {
             return;
         }
+        this.readyReq = true;
         if (!module) {
             module = nodom.ModuleFactory.get(this.moduleId);
         }
@@ -2334,22 +2341,25 @@ class UIPagination extends nodom.Plugin {
         let params = nodom.Util.clone(this.params);
         params[this.pageName] = this.currentPage;
         params[this.sizeName] = this.pageSize;
-        nodom.request({
-            url: this.dataUrl,
-            params: params,
-            type: 'json'
-        }).then(r => {
-            if (!r) {
-                return;
-            }
-            if (r.total) {
-                this.setTotal(r.total);
-            }
-            else if (Array.isArray(r)) {
-                this.setTotal(r.length);
-            }
-            this.doReqEvent(r, module);
-        });
+        setTimeout(() => {
+            nodom.request({
+                url: this.dataUrl,
+                params: params,
+                type: 'json'
+            }).then(r => {
+                this.readyReq = false;
+                if (!r) {
+                    return;
+                }
+                if (r.total) {
+                    this.setTotal(r.total);
+                }
+                else if (Array.isArray(r)) {
+                    this.setTotal(r.length);
+                }
+                this.doReqEvent(r, module);
+            });
+        }, 0);
     }
     doChangeEvent(module) {
         if (this.onChange === '') {
@@ -2493,7 +2503,9 @@ class UIPanel extends nodom.Plugin {
         let btn = new nodom.Element('b');
         btn.addClass('nd-icon-' + icon);
         btn.addClass('nd-canclick');
-        this.headerBtnDom.add(btn);
+        if (this.headerBtnDom) {
+            this.headerBtnDom.add(btn);
+        }
         if (handler) {
             btn.addEvent(new nodom.NodomEvent('click', handler));
         }
@@ -2786,10 +2798,22 @@ class UISelect extends nodom.Plugin {
         icon.addClass('nd-select-itemicon');
         itemDom.children = [item, icon];
         itemDom.addEvent(new nodom.NodomEvent('click', (dom, model, module) => {
+            let name = this.name || this.dataName;
+            let plugin = this.moduleId ? this : module.getPlugin(name);
             if (!this.multiSelect) {
-                this.hideList();
+                if (plugin) {
+                    this.hideList.apply(plugin);
+                }
+                else {
+                    this.hideList();
+                }
             }
-            me.select(model);
+            if (plugin) {
+                this.select.apply(plugin, [model]);
+            }
+            else {
+                this.select(model);
+            }
         }));
         let showDom = new nodom.Element('div');
         showDom.addClass('nd-select-inputct');

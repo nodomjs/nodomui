@@ -139,7 +139,9 @@ class UIPanel extends nodom.Plugin{
         let btn:nodom.Element = new nodom.Element('b');
         btn.addClass('nd-icon-' + icon);
         btn.addClass('nd-canclick');
-        this.headerBtnDom.add(btn);
+        if(this.headerBtnDom){
+            this.headerBtnDom.add(btn);
+        }
         if(handler){
             btn.addEvent(new nodom.NodomEvent('click',handler));
         }

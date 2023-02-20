@@ -7,15 +7,14 @@
     <title>nodomui example - panel usage</title>
     <link rel="stylesheet" type="text/css" href="css/nodomui.css" />
     <script src='js/nodom.js'></script>
-    <script src='../bin/nodomui.js'></script>
+    <script src='../dist/nodomui.js'></script>
     
 </head>
 <body>
     <div>
         <p>简单用法</p>
         <ui-tree style='width:300px;max-height:200px;' name='tree1' listField='rows'
-            icons='folderopen,folderclose' displayField='title'
-            maxLevel='4'>
+            icons='folderopen,folderclose' displayField='title'>
         </ui-tree>
 
         <p>增加复选框</p>
@@ -29,14 +28,14 @@
             maxLevel        最大级数，默认3
             icons           两个，以“,”分割，第一个为非叶子节点图标，第二个为叶子节点图标
         -->
-        <ui-tree style='width:300px;max-height:200px;'  name='tree1' listField='rows'
+        <!-- <ui-tree style='width:300px;max-height:200px;'  name='tree1' listField='rows'
             icons='folderopen,folderclose' valueField='id' displayField='title' itemClick='clickItem' 
             checkName='checked' maxLevel='4'>
-        </ui-tree>
+        </ui-tree> -->
     </div>
 </body>
 <script>
-    nodom.newApp({
+    nodom.app({
         module:{
             el:'div',
             data:{
